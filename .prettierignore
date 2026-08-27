@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+coverage/
+playwright-report/
+test-results/
+package-lock.json
+
+# Harness/spec/docs predate the tooling scaffold (T101) and are out of scope
+# for format:check — AGENTS.md and spec.md are explicitly off-limits edits
+# (AGENTS.md), and reformatting the rest is a drive-by unrelated to this task.
+.claude/
+.github/
+specs/
+AGENTS.md
+CLAUDE.md
+README.md
+scripts/
