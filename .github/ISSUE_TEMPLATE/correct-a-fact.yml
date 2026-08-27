@@ -1,0 +1,29 @@
+name: "Correct a fact / Corregir un dato"
+description: "A spec, part number, or claim on the site is wrong. / Una especificación, número de parte o afirmación del sitio está mal."
+labels: ["content: correction", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **EN:** Corrections with a source get fixed fastest.
+        **ES:** Las correcciones con fuente se arreglan más rápido.
+  - type: input
+    id: page
+    attributes:
+      label: "Page URL / URL de la página"
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: "What's wrong / Qué está mal"
+      description: "Quote the incorrect value or claim / Cite el valor o afirmación incorrecta"
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: "Correct value + source / Valor correcto + fuente"
+      description: "The right value and where it comes from (FSM section, TSB, measurement) / El valor correcto y de dónde viene"
+    validations:
+      required: true

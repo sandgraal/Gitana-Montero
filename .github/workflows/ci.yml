@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  harness:
+    name: Harness validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Validate agent routing policy
+        run: node scripts/validate-routing.mjs
+      - name: Hooks parse
+        run: |
+          bash -n .claude/hooks/guard-dangerous-git.sh
+          bash -n .claude/hooks/pre-commit-verify.sh
+
+  # ── The jobs below activate when Phase 1 (T101–T106) lands a package.json.
+  # Until then they no-op green so the harness can merge its own scaffolding.
+  verify:
+    name: Verify (check · lint · test · locales · citations · glossary · build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || '' }}
+      - name: Verify
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run verify
+          else
+            echo "package.json not present yet (pre-T101); skipping."
+          fi
+
+  links-a11y:
+    name: Links + a11y
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || '' }}
+      - name: Link check + a11y
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run check:links
+            npm run test:a11y --if-present
+          else
+            echo "package.json not present yet (pre-T101); skipping."
+          fi

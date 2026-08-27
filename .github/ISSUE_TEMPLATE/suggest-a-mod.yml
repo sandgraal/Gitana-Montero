@@ -1,0 +1,22 @@
+name: "Suggest a modification / Sugerir una modificación"
+description: "An aftermarket mod the site should document. / Una modificación que el sitio debería documentar."
+labels: ["content: mod", "triage"]
+body:
+  - type: input
+    id: vehicle
+    attributes:
+      label: "Applies to / Aplica a"
+      placeholder: "Gen 3, all markets / Gen 3, todos los mercados"
+    validations:
+      required: true
+  - type: textarea
+    id: mod
+    attributes:
+      label: "The mod / La modificación"
+      description: "What it is, what it requires, what it breaks, honest tradeoffs / Qué es, qué requiere, qué afecta, ventajas y desventajas honestas"
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: "Sources or build threads / Fuentes o hilos de proyectos"

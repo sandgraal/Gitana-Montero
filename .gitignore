@@ -1,0 +1,21 @@
+# deps / build
+node_modules/
+dist/
+.astro/
+.vercel/
+coverage/
+playwright-report/
+test-results/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# local tooling
+.claude/settings.local.json
+.claude/worktrees/
+*.local
+
+# OS
+.DS_Store

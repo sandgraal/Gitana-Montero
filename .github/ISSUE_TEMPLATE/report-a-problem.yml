@@ -1,0 +1,34 @@
+name: "Report a problem / Reportar un problema"
+description: "A Montero/Pajero/Shogun problem the site should cover, or one it covers wrong. / Un problema que el sitio debería cubrir, o que cubre mal."
+labels: ["content: problem", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **EN:** Answer in English or Spanish — both are first-class here.
+        **ES:** Responda en español o inglés — ambos son bienvenidos.
+  - type: input
+    id: vehicle
+    attributes:
+      label: "Vehicle / Vehículo"
+      description: "Year, generation, market, engine / Año, generación, mercado, motor"
+      placeholder: "2002 Montero (US), Gen 3, 6G74 SOHC"
+    validations:
+      required: true
+  - type: textarea
+    id: symptoms
+    attributes:
+      label: "Symptoms / Síntomas"
+      description: "What you see, hear, feel — in plain words / Lo que ve, oye o siente — en palabras sencillas"
+    validations:
+      required: true
+  - type: textarea
+    id: diagnosis
+    attributes:
+      label: "What you found / Lo que encontró"
+      description: "Diagnosis, cause, fix — if known. Parts and costs welcome. / Diagnóstico, causa, reparación — si se conoce. Repuestos y costos bienvenidos."
+  - type: textarea
+    id: sources
+    attributes:
+      label: "Sources / Fuentes"
+      description: "Forum threads, videos, FSM sections, or first-hand experience / Hilos de foro, videos, secciones del manual, o experiencia propia"
