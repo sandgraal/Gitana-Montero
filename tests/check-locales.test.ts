@@ -1,6 +1,7 @@
 /**
- * Graders — `check:locales` (SCF-02) and the `data.id` === file-derived Astro
- * entry id check (T104 review: "the two ids can silently diverge").
+ * Graders — `check:locales` (SCF-02), the `data.id` === file-derived Astro
+ * entry id check (T104 review: "the two ids can silently diverge"), and the
+ * `data.slug` guard (T105 review, F3).
  *
  * refs specs/001-foundation (SCF-02, I18N-06)
  */
@@ -9,6 +10,7 @@ import {
   auditEntries,
   findIdMismatch,
   findLocaleIssues,
+  findSlugFieldIssue,
 } from "../scripts/check-locales.mjs";
 
 interface Entry {
@@ -100,8 +102,23 @@ describe("findIdMismatch", () => {
   });
 });
 
+describe("findSlugFieldIssue", () => {
+  it("returns null when data has no slug key", () => {
+    expect(findSlugFieldIssue(entry())).toBeNull();
+  });
+
+  it("flags any entry data carrying a slug key (T105 review, F3)", () => {
+    const issue = findSlugFieldIssue(
+      entry({ data: { id: "x", slug: "custom-slug", prose: {} } })
+    );
+    expect(issue).not.toBeNull();
+    expect(issue?.message).toMatch(/carries a `slug` key/);
+    expect(issue?.file).toBe(entry().file);
+  });
+});
+
 describe("auditEntries", () => {
-  it("reports both locale and id issues across a mixed entry set", () => {
+  it("reports locale, id, and slug-field issues across a mixed entry set", () => {
     const good = entry();
     const badLocale = entry({
       relativePath: "b.md",
@@ -116,14 +133,26 @@ describe("auditEntries", () => {
       file: "src/content/problems/wrong.md",
       data: { id: "right", prose: { en: {}, es: {} } },
     });
-    const { localeIssues, idIssues } = auditEntries([good, badLocale, badId]);
+    const hasSlug = entry({
+      relativePath: "has-slug.md",
+      file: "src/content/problems/has-slug.md",
+      data: { id: "has-slug", slug: "override", prose: { en: {}, es: {} } },
+    });
+    const { localeIssues, idIssues, slugFieldIssues } = auditEntries([
+      good,
+      badLocale,
+      badId,
+      hasSlug,
+    ]);
     expect(localeIssues.length).toBeGreaterThan(0);
     expect(idIssues).toHaveLength(1);
     expect(idIssues[0]?.file).toBe("src/content/problems/wrong.md");
+    expect(slugFieldIssues).toHaveLength(1);
+    expect(slugFieldIssues[0]?.file).toBe("src/content/problems/has-slug.md");
   });
 
   it("is clean for a well-formed, multi-collection entry set", () => {
-    const { localeIssues, idIssues } = auditEntries([
+    const { localeIssues, idIssues, slugFieldIssues } = auditEntries([
       entry(),
       entry({
         collection: "parts",
@@ -140,5 +169,6 @@ describe("auditEntries", () => {
     ]);
     expect(localeIssues).toEqual([]);
     expect(idIssues).toEqual([]);
+    expect(slugFieldIssues).toEqual([]);
   });
 });

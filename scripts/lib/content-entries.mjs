@@ -108,6 +108,21 @@ export async function listCollectionNames(contentRoot = CONTENT_ROOT) {
  * `relativePath` is the entry file's POSIX path relative to the collection's
  * base directory (`src/content/<collection>/`), extension included — exactly
  * what `walkEntryFiles` returns.
+ *
+ * **Omitted branch (T105 review, F3):** Astro's real `generateIdDefault`
+ * checks `data.slug` *before* deriving anything from the path — `if
+ * (data.slug) return String(data.slug)` — and only falls through to the
+ * path-derived slug this function computes when no `slug` key is present.
+ * This function never reads `data` and always takes the path branch.
+ * Unreachable today: every collection's schema is `defineEntrySchema`'s
+ * `.strict()` shape (`src/schemas/entry.ts`), which has no `slug` field, so
+ * a `slug` key in frontmatter is an `unrecognized_keys` schema failure, not
+ * a silently-honored id override. But `check:locales`'s
+ * `findSlugFieldIssues` (`scripts/check-locales.mjs`) still flags any entry
+ * `data` carrying a `slug` key on sight — belt-and-suspenders against this
+ * exact divergence (an entry whose real Astro id is silently *not* what
+ * `deriveAstroEntryId` says) if a future collection ever relaxes the schema
+ * to allow one.
  */
 export function deriveAstroEntryId(relativePath) {
   const withoutExt = relativePath.replace(/\.[^./]+$/, "");

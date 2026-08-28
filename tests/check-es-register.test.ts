@@ -6,7 +6,15 @@
  * broken as one that misses real tú/vos slips. See
  * `scripts/check-es-register.mjs`'s module docstring for the grammar this
  * table is built to prove (future tense vs. vos imperative both ending in an
- * accented vowel, `está` vs. `estás`, common non-verb -ás/-és/-ís words).
+ * accented vowel, `está` vs. `estás`, common non-verb -ás/-ís words, and the
+ * -és nationality/noun space `japonés`/`portugués`/`después`/`interés`…).
+ *
+ * The seven negative sentences under "T105 review — verified false
+ * positives" below are exactly the corpus a prior revision of this lint
+ * failed on (feminine-plural adjective/noun collisions with the tú-verb
+ * lexicon, and `japonés` colliding with a since-removed `-és` suffix rule) —
+ * kept here so the corpus is not quietly re-selected around whatever the
+ * implementation currently does.
  *
  * refs specs/001-foundation (I18N-07)
  */
@@ -54,6 +62,14 @@ const NEGATIVE_SENTENCES: readonly string[] = [
   "Así funciona el sistema de frenos en este modelo.",
   "Consulte a un mecánico calificado para trabajos críticos de seguridad.",
   "El torque especificado es de 88 newton-metro para este perno.",
+  // T105 review — verified false positives on an earlier revision.
+  "Revise que las tuercas sueltas no se pierdan durante la prueba.",
+  "Limpie las superficies limpias con un paño seco antes de pintar.",
+  "Las temperaturas bajas afectan el arranque del motor en las mañanas.",
+  "Verifique que las cámaras llenas de aire no tengan fugas.",
+  "Corte tiras de tela para limpiar el aceite derramado.",
+  "El mercado japonés ofrece piezas de repuesto originales para este motor.",
+  "Un modelo japonés no es lo mismo que uno ensamblado en otro país.",
 ];
 
 describe("classifyWord — CR-Spanish table", () => {
@@ -87,9 +103,20 @@ describe("classifyWord — targeted word list", () => {
     "decís",
     "sos",
     "cambiás",
+    // vos present indicative, -er verbs — lexicon, not suffix (module
+    // docstring point 3, F1(b) of the T105 review).
+    "podés",
+    "querés",
+    "hacés",
+    "comés",
+    "volvés",
+    "entendés",
+    "vendés",
+    "corrés",
+    "debés",
   ];
   const negatives = [
-    // Non-verb words ending in the suffix rule's stressed vowel + s.
+    // Non-verb words ending in the suffix rule's stressed vowel + s (á/í only).
     "además",
     "detrás",
     "atrás",
@@ -98,12 +125,35 @@ describe("classifyWord — targeted word list", () => {
     "quizás",
     "país",
     "países",
+    // The -és nationality/noun space — no longer suffix-matched at all
+    // (T105 review F1(b)): too large to denylist, and jdm/Japan (spec §2)
+    // means "japonés" will appear in real prose.
+    "japonés",
+    "portugués",
+    "holandés",
+    "danés",
+    "irlandés",
+    "escocés",
+    "estrés",
+    "burgués",
+    "marqués",
+    "montés",
+    "envés",
     "después",
     "través",
     "revés",
     "inglés",
     "francés",
     "interés",
+    // Feminine-plural adjective/noun collisions with the tú-verb lexicon —
+    // deleted from INFORMAL_VERB_LEXICON (T105 review F1(a); verified false
+    // positives, see NEGATIVE_SENTENCES above).
+    "sueltas",
+    "limpias",
+    "bajas",
+    "llenas",
+    "tiras",
+    "giras",
     // Bare-accented-vowel usted/1st-person forms — never scanned since the
     // suffix rule requires a trailing -s (module docstring point 3).
     "está",

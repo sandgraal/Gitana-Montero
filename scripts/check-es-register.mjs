@@ -18,31 +18,49 @@
  *    occurrence is unambiguous.
  * 2. **A curated lexicon of tú/vos-conjugated verb forms** (`revisas`,
  *    `tienes`, `revisá`, `tenés`, …). Never matched as a suffix — see point 3
- *    for why — only these specific, listed forms are flagged.
+ *    for why — only these specific, listed forms are flagged. This lexicon
+ *    holds *verbs only*: an earlier revision included `sueltas`, `limpias`,
+ *    `bajas`, `llenas`, `tiras`, `giras` as tú present-indicative forms, and
+ *    T105 review caught all six as live false positives — every one of them
+ *    is at least as common as a feminine plural adjective/noun in exactly
+ *    this site's domain (`tuercas sueltas`, `superficies limpias`,
+ *    `temperaturas bajas`, `cámaras llenas`, `tiras de tela`) as it is a
+ *    conjugated verb. They are not in the lexicon below; the recall this
+ *    costs is close to zero ("¿tú sueltas el perno?" is a far rarer sentence
+ *    than "las tuercas están sueltas").
  * 3. **Vos present-indicative verbs, by their stressed final vowel *plus a
- *    required trailing `-s`*** (`hablás`, `tenés`, `vivís`, `estás`…). This
- *    is deliberately narrower than "any word ending in an accented vowel":
+ *    required trailing `-s`* — for á and í only.** (`hablás`, `vivís`,
+ *    `estás`, `país`…). This is deliberately narrower than "any word ending
+ *    in an accented vowel":
  *      - Spanish has no legitimate 1st-person or `usted`/3rd-person
- *        conjugation ending in a stressed á/é/í **followed by `-s`** — that
+ *        conjugation ending in a stressed á/í **followed by `-s`** — that
  *        shape belongs to `tú`/`vos` alone (`usted`'s plural, `ustedes`,
- *        conjugates `-an`/`-en`, not an accented vowel).
- *      - The bare accented vowel *without* the trailing `-s` is exactly
- *        where informal and correct-`usted` Spanish collide: `usted` future
- *        tense (`revisará`, `tendrá`) and present subjunctive (`esté`, `dé`)
- *        both end bare-accented, and so does 1st-person preterite narration
- *        common in this site's first-hand build-log prose (`yo revisé`, `yo
- *        viví`, `yo recibí`). A suffix rule over bare endings was tried and
- *        rejected during T105 review for exactly this reason — it flagged
- *        `está`, `esté`, `dé`, and ordinary first-person narration. The
- *        *imperative* vos forms that shape would have caught (`revisá`,
- *        `comé`) are instead hand-picked into the point-2 lexicon, limited to
- *        `-á`/`-é` endings that do not collide with 1st-person preterite
- *        (`-ir` verbs' preterite and imperative both end bare `-í`, so `-í`
- *        vos imperatives are deliberately left out of the lexicon too).
- *      - A short **denylist** still guards the trailing-`-s` rule against the
- *        handful of ordinary Costa Rican Spanish words that happen to end
- *        that way (`país`, `después`, `además`…) — the words this module's
- *        docstring/task line specifically warns about.
+ *        conjugates `-an`/`-en`, not an accented vowel). A short **denylist**
+ *        still guards this against the handful of ordinary Costa Rican
+ *        Spanish nouns/adverbs that happen to end that way (`país`,
+ *        `además`, `detrás`…).
+ *      - **`-és` is not covered by the suffix rule at all** — T105 review:
+ *        Spanish's `-és` space is a nationality/noun suffix too large to
+ *        denylist (`japonés`, `portugués`, `holandés`, `danés`, `irlandés`,
+ *        `escocés`, `estrés`, `burgués`, `marqués`…), and `jdm` (Japan) is a
+ *        first-class market per spec §2, so `japonés` *will* appear in real
+ *        prose. The vos `-ér`-verb present-indicative forms that suffix rule
+ *        would have caught are instead hand-picked into the point-2 lexicon
+ *        (`tenés`, `podés`, `querés`, …) — a closed, small set, unlike the
+ *        open-ended noun space.
+ *      - The bare accented vowel *without* the trailing `-s` is where
+ *        informal and correct-`usted` Spanish collide hardest: `usted`
+ *        future tense (`revisará`, `tendrá`) and present subjunctive
+ *        (`esté`, `dé`) both end bare-accented, and so does 1st-person
+ *        preterite narration common in this site's first-hand build-log
+ *        prose (`yo revisé`, `yo viví`, `yo recibí`). A suffix rule over bare
+ *        endings was tried and rejected during T105 review for exactly this
+ *        reason. The *imperative* vos forms that shape would have caught
+ *        (`revisá`, `comé`) are instead hand-picked into the point-2
+ *        lexicon, limited to `-á`/`-é` endings that do not collide with
+ *        1st-person preterite (`-ir` verbs' preterite and imperative both
+ *        end bare `-í`, so `-í` vos imperatives are deliberately left out of
+ *        the lexicon too).
  *
  * Scans `prose.es` in every content entry, plus (cheaply, since it is
  * already clean) the `es` block of `src/i18n/ui.ts` — I18N-08's own lint
@@ -96,24 +114,18 @@ export const INFORMAL_VERB_LEXICON = new Set([
   "desinstalas",
   "conectas",
   "desconectas",
-  "limpias",
   "drenas",
-  "llenas",
   "rellenas",
   "purgas",
-  "giras",
   "enciendes",
   "apagas",
   "usas",
   "presionas",
-  "sueltas",
   "sostienes",
   "sujetas",
   "empujas",
   "jalas",
-  "tiras",
   "levantas",
-  "bajas",
   "necesitas",
   "debes",
   "arrancas",
@@ -137,6 +149,25 @@ export const INFORMAL_VERB_LEXICON = new Set([
   "mides",
   // vos irregular, no written accent
   "sos",
+  // vos present indicative, -er verbs (-és) — a closed lexicon, not a suffix
+  // rule: see module docstring point 3 on why -és is not suffix-matched
+  // (japonés, después, través, cortés, interés… the noun/nationality space
+  // is too large to denylist, and jdm/Japan is a first-class market here).
+  "tenés",
+  "podés",
+  "querés",
+  "sabés",
+  "hacés",
+  "comés",
+  "volvés",
+  "entendés",
+  "movés",
+  "metés",
+  "perdés",
+  "vendés",
+  "corrés",
+  "respondés",
+  "debés",
   // vos imperative, -ar verbs (bare -á; safe — -ar 1st-person preterite ends
   // -é, not -á, so there is no first-hand-narration collision)
   "hablá",
@@ -182,9 +213,13 @@ export const INFORMAL_VERB_LEXICON = new Set([
 ]);
 
 /**
- * Common non-verb Costa Rican Spanish words that end in a stressed á/é/í
+ * Common non-verb Costa Rican Spanish words that end in a stressed á/í
  * followed by `-s` and would otherwise collide with the vos-ending suffix
- * rule. See module docstring point 3.
+ * rule. See module docstring point 3. Deliberately no `-és` entries: the
+ * suffix rule no longer scans `-és` at all (the noun/nationality space —
+ * `japonés`, `portugués`, `holandés`… — is too large to denylist), so a word
+ * like `cortés` or `interés` is never reached by this rule in the first
+ * place and does not need to be listed here.
  */
 export const ACCENTED_SUFFIX_DENYLIST = new Set([
   "además",
@@ -195,14 +230,6 @@ export const ACCENTED_SUFFIX_DENYLIST = new Set([
   "quizás",
   "país",
   "países",
-  "después",
-  "través",
-  "revés",
-  "cortés",
-  "descortés",
-  "inglés",
-  "francés",
-  "interés",
 ]);
 
 /**
@@ -216,11 +243,13 @@ export function classifyWord(lower) {
   // The suffix rule requires a trailing -s (module docstring point 3): a
   // bare accented ending is exactly where usted-register Spanish (future
   // tense, subjunctive) and first-hand preterite narration collide with vos.
+  // Only á/í are suffix-matched — see point 3 for why -és is excluded
+  // entirely and covered by the lexicon above instead.
   if (!lower.endsWith("s")) return null;
   const core = lower.slice(0, -1);
   const lastChar = core.slice(-1);
   if (
-    (lastChar === "á" || lastChar === "é" || lastChar === "í") &&
+    (lastChar === "á" || lastChar === "í") &&
     !ACCENTED_SUFFIX_DENYLIST.has(lower)
   ) {
     return "vos-verb";

@@ -17,6 +17,16 @@
  *   generates from the file's path. A content file saved under the wrong
  *   name would pass every schema check and still break every cross-reference
  *   that keys off the real Astro entry id.
+ * - A `data.slug` guard (T105 review, F3): Astro's real glob-loader id
+ *   generation checks `data.slug` *before* deriving anything from the file
+ *   path (`generateIdDefault` in `astro/dist/content/loaders/glob.js`) — if
+ *   present, it wins outright. `deriveAstroEntryId`
+ *   (`scripts/lib/content-entries.mjs`) only reimplements the path branch,
+ *   so an entry carrying a `slug` key would make this whole script compute
+ *   the *wrong* expected id without any error. Unreachable today — every
+ *   schema is `.strict()` with no `slug` field, so `data.slug` fails the Zod
+ *   gate first — but this script fails loudly on sight of one anyway, rather
+ *   than trusting that invariant silently forever.
  *
  * Usage: node scripts/check-locales.mjs
  *
@@ -121,19 +131,50 @@ export function findIdMismatch(entry) {
   return null;
 }
 
-/** Run both audits across every entry. Returns `{ localeIssues, idIssues }`. */
+/**
+ * Flags an entry whose `data` carries a `slug` key (T105 review, F3):
+ * `deriveAstroEntryId` never reads `data.slug`, so an entry that has one
+ * would make `findIdMismatch`'s "expected" id wrong without any signal —
+ * exactly the divergence risk the module docstring describes. Returns `null`
+ * when the entry is sound.
+ */
+export function findSlugFieldIssue(entry) {
+  const { collection, file, data } = entry;
+  if (
+    typeof data !== "object" ||
+    data === null ||
+    !Object.hasOwn(data, "slug")
+  ) {
+    return null;
+  }
+  return {
+    collection,
+    file,
+    message:
+      `${file}: entry data carries a \`slug\` key. Astro's glob loader would ` +
+      `use \`data.slug\` as this entry's real id instead of deriving one from ` +
+      `the file path — this script's id-consistency check does not account ` +
+      `for that branch (scripts/lib/content-entries.mjs), so it cannot be ` +
+      `trusted for this entry. Remove \`slug\` from the entry data.`,
+  };
+}
+
+/** Run every audit across every entry. Returns `{ localeIssues, idIssues, slugFieldIssues }`. */
 export function auditEntries(entries) {
   const localeIssues = entries.flatMap(findLocaleIssues);
   const idIssues = entries
     .map(findIdMismatch)
     .filter((issue) => issue !== null);
-  return { localeIssues, idIssues };
+  const slugFieldIssues = entries
+    .map(findSlugFieldIssue)
+    .filter((issue) => issue !== null);
+  return { localeIssues, idIssues, slugFieldIssues };
 }
 
 async function main() {
   const entries = await loadContentEntries(CONTENT_ROOT);
-  const { localeIssues, idIssues } = auditEntries(entries);
-  const problems = [...localeIssues, ...idIssues];
+  const { localeIssues, idIssues, slugFieldIssues } = auditEntries(entries);
+  const problems = [...localeIssues, ...idIssues, ...slugFieldIssues];
 
   if (problems.length > 0) {
     console.error(`check:locales — ${problems.length} problem(s):`);
