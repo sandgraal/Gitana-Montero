@@ -15,9 +15,9 @@
  * Both audits call `builtServedPaths()` on `dist/` and feed the result to
  * `auditTargets()`, so the per-collection representatives appear in the target
  * set the moment a collection has a page — no edit to either script, and
- * never a URL that was not actually built. Every content collection is empty
- * today (T104 registered the schemas; the phase-2+ content tasks fill them),
- * so today that set is exactly the two locale homes plus the 404.
+ * never a URL that was not actually built. Today that set is the two locale
+ * homes, the 404, and the glossary index in each locale (T205); the remaining
+ * collections have no page yet.
  *
  * - **`/<locale>/` (both locales, a11y + Lighthouse).** The home page SCF-06
  *   names, once per locale: `/es/` is not a translation of an audited page,
@@ -32,8 +32,10 @@
  *   `data-locale-choice` attributes) is graded by
  *   `tests/locale-switcher.test.ts` instead, which is where a redirect page's
  *   behaviour can actually be asserted.
- * - **One content page per collection per locale (a11y + Lighthouse)**, chosen
- *   by `collectionSampleTargets` from what `dist/` actually contains.
+ * - **One page per collection per locale (a11y + Lighthouse)**, chosen by
+ *   `collectionSampleTargets` from what `dist/` actually contains: the
+ *   collection's first entry page, or its index page when the collection has
+ *   no entry pages (the glossary, GLO-04).
  *
  * refs specs/001-foundation (SCF-03, SCF-06)
  */
@@ -129,6 +131,18 @@ export function auditTargets({ base, locales, builtPaths = [] }) {
  * "First in path order" is a deliberate, boring rule: the sample has to be
  * stable across runs or a budget regression looks like a flake.
  *
+ * ## Entry page preferred, collection index as the fallback (T205)
+ *
+ * A collection whose only page is its index — the glossary is the first, and
+ * GLO-04 asks for exactly one page, not one per term — would otherwise be
+ * audited by nothing at all, because `/<locale>/glossary/` is two segments
+ * deep and the entry-page rule wants three. That is a silent hole in SCF-06:
+ * the requirement is "one representative content page per collection", and
+ * when a collection has no entry pages, its index *is* the representative
+ * page. So each `<locale>/<collection>` pair resolves to its first entry page
+ * if it has one and to its index otherwise — never to both, so the audit
+ * budget still grows by one page per collection per locale.
+ *
  * @param {readonly string[]} entryPaths served paths that exist in `dist/`
  * @param {{ base: string, locales: readonly string[] }} config
  * @returns {string[]}
@@ -136,25 +150,37 @@ export function auditTargets({ base, locales, builtPaths = [] }) {
 export function collectionSampleTargets(entryPaths, { base, locales }) {
   const prefix = normalizeBase(base);
   const localeHomes = new Set(locales.map((locale) => `${prefix}/${locale}/`));
+  /** `locale/collection -> first entry page`, the preferred sample. */
   const byCollection = new Map();
+  /** `locale/collection -> its index page`, used only when there is no entry. */
+  const indexes = new Map();
 
   // Sorted here, not assumed sorted: "first per collection" is only stable if
   // the input order is.
   for (const served of [...entryPaths].sort()) {
     if (localeHomes.has(served)) continue;
-    // `/<base>/<locale>/<collection>/<slug>/` — anything shallower is a
-    // section index, not a content page.
     const rest =
       prefix && served.startsWith(prefix)
         ? served.slice(prefix.length)
         : served;
     const segments = rest.split("/").filter(Boolean);
-    if (segments.length < 3) continue;
+    // `/<base>/<locale>/<collection>/` is the section index;
+    // `/<base>/<locale>/<collection>/<slug>/` is a content page.
+    if (segments.length < 2) continue;
     const [locale, collection] = segments;
     if (!locales.includes(locale)) continue;
     const key = `${locale}/${collection}`;
+
+    if (segments.length === 2) {
+      if (!indexes.has(key)) indexes.set(key, served);
+      continue;
+    }
     if (byCollection.has(key)) continue;
     byCollection.set(key, served);
+  }
+
+  for (const [key, served] of indexes) {
+    if (!byCollection.has(key)) byCollection.set(key, served);
   }
 
   return [...byCollection.values()].sort();

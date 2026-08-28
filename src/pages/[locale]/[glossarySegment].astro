@@ -1,0 +1,650 @@
+---
+/**
+ * The public glossary page (GLO-04).
+ *
+ * > **GLO-04** THE glossary SHALL render as a public bilingual reference
+ * > page, filterable by system (engine, brakes, suspension, …).
+ *
+ * ## One page, two URLs, one component
+ *
+ * The segment is translated — `/en/glossary/` and `/es/glosario/` — so the
+ * file is parameterized on it and `getStaticPaths` reads both values from the
+ * registry in `src/i18n/routes.ts`. Neither locale is a redirect or a
+ * translation of the other: both are built from this component (I18N-01).
+ * `routePathByLocale` is what lets `BaseLayout` emit the right hreflang pair
+ * and lets the locale switcher cross between the two segments instead of
+ * landing on a URL that was never built.
+ *
+ * ## Bilingual by construction
+ *
+ * Every card shows the term in **both** languages and the definition in
+ * **both** languages, page locale first. That is not a nicety here — a
+ * glossary whose Spanish page hid the English term would be useless to
+ * exactly the reader it exists for (someone holding a US parts catalogue in a
+ * Costa Rican taller). Each block carries its own `lang` so a screen reader
+ * switches voice, and so the browser's translate feature leaves the other
+ * language alone.
+ *
+ * ## Filtering
+ *
+ * Filtering is client-side and progressive: the search box and the system
+ * pills are `hidden` in the served HTML and unhidden by the script, so a
+ * visitor without JavaScript sees every term and no dead controls, and the
+ * first render is the complete, indexable page. Each card carries a
+ * pre-normalized `data-haystack` built with the same `normalizeForSearch` the
+ * script uses, so an alias search (`rin` → `aro`, SRCH-02's shape) works with
+ * no index and no fetch. The real search index is T702.
+ *
+ * ## Styling
+ *
+ * Palette, type scale and card anatomy follow
+ * `specs/001-foundation/design/artboards/Glosario.dc.html`, with two
+ * deliberate departures, both required by constraints the handoff itself
+ * lists: the artboard's `faint` (#A99C88) fails WCAG AA on paper and on white
+ * (2.5:1 and 2.7:1 against a 4.5:1 requirement), so secondary text uses
+ * `muted` (#6E6559, 5.3:1); and the Archivo / IBM Plex Mono webfonts are
+ * *named* but not loaded here, because loading a webfont is a site-chrome
+ * decision for the task that restyles the chrome, not something one page
+ * should do to the whole site's performance budget. Declaring the families
+ * means this page picks them up for free the day they are loaded.
+ *
+ * refs specs/001-foundation (GLO-01, GLO-04, I18N-01, I18N-04, I18N-08)
+ */
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  LOCALES,
+  LOCALE_BCP47,
+  isLocale,
+  type Locale,
+} from "../../i18n/routing";
+import { collectionRouteParams, collectionRoutePaths } from "../../i18n/routes";
+import { glossarySystemLabel, t } from "../../i18n/ui";
+import { normalizeForSearch } from "../../lib/text";
+import { formatCount } from "../../lib/glossary-filter";
+import {
+  GLOSSARY_SYSTEMS,
+  canonicalTermOf,
+  type GlossarySystem,
+} from "../../schemas/glossary";
+
+export function getStaticPaths() {
+  return collectionRouteParams("glossary", "glossarySegment");
+}
+
+const { locale: param } = Astro.params;
+if (!isLocale(param)) {
+  throw new Error(`Unknown locale segment: ${String(param)}`);
+}
+const locale: Locale = param;
+const strings = t(locale);
+const routes = collectionRoutePaths("glossary");
+
+/** The other locale, shown alongside the page locale on every card. */
+const otherLocales = LOCALES.filter((candidate) => candidate !== locale);
+/** Page locale first — the handoff's rule for every bilingual block. */
+const readingOrder: Locale[] = [locale, ...otherLocales];
+
+const collator = new Intl.Collator(LOCALE_BCP47[locale], {
+  sensitivity: "base",
+});
+
+const entries = await getCollection("glossary");
+
+/**
+ * One card's worth of already-resolved values. Built here rather than in the
+ * template so the sort key, the DOM id and the search haystack each exist
+ * once.
+ */
+const terms = entries
+  .map((entry) => {
+    const { system, aliases, relatedTerms, prose } = entry.data;
+    const termByLocale = Object.fromEntries(
+      LOCALES.map((each) => [each, canonicalTermOf(entry.data, each)])
+    ) as Record<Locale, string>;
+
+    return {
+      id: entry.id,
+      /** `/` appears in ids derived from nested files; it is not id-safe. */
+      domId: `term-${entry.id.replace(/\//g, "--")}`,
+      system: system as GlossarySystem,
+      aliases,
+      relatedTerms,
+      termByLocale,
+      definitionByLocale: Object.fromEntries(
+        LOCALES.map((each) => [each, prose[each].summary])
+      ) as Record<Locale, string>,
+      haystack: normalizeForSearch(
+        [
+          ...LOCALES.flatMap((each) => [
+            termByLocale[each],
+            prose[each].summary,
+            glossarySystemLabel(t(each), system as GlossarySystem),
+          ]),
+          ...aliases.flatMap((alias) => [alias.term, ...alias.countries]),
+        ].join(" ")
+      ),
+    };
+  })
+  .sort((a, b) =>
+    collator.compare(a.termByLocale[locale], b.termByLocale[locale])
+  );
+
+/** Canonical term per entry id, for rendering `relatedTerms` as real words. */
+const termById = new Map(terms.map((term) => [term.id, term]));
+
+/**
+ * Only systems that actually have a term get a pill: a filter that can only
+ * ever return nothing is a broken control, not a feature. Order follows
+ * `GLOSSARY_SYSTEMS` (service-manual order), never insertion order.
+ */
+const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
+  terms.some((term) => term.system === system)
+);
+---
+
+<BaseLayout
+  locale={locale}
+  routePathByLocale={routes}
+  title={`${strings.glossaryHeading} — ${strings.siteTagline}`}
+  description={strings.glossaryIntro}
+>
+  <section class="glossary" data-glossary>
+    <div class="glossary__intro">
+      <h1>{strings.glossaryHeading}</h1>
+      <p>{strings.glossaryIntro}</p>
+    </div>
+
+    {
+      terms.length === 0 ? (
+        <p class="glossary__empty">{strings.glossaryEmpty}</p>
+      ) : (
+        <>
+          <div class="glossary__toolbar" data-glossary-toolbar hidden>
+            <div class="glossary__search">
+              <label class="visually-hidden" for="glossary-search">
+                {strings.glossarySearchLabel}
+              </label>
+              <svg
+                class="glossary__search-icon"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <input
+                id="glossary-search"
+                type="search"
+                autocomplete="off"
+                data-glossary-search
+                placeholder={strings.glossarySearchPlaceholder}
+              />
+            </div>
+            <div
+              class="glossary__filters"
+              role="group"
+              aria-label={strings.glossaryFilterLabel}
+            >
+              <button type="button" data-system="" aria-pressed="true">
+                {strings.glossaryFilterAll}
+              </button>
+              {systemsInUse.map((system) => (
+                <button type="button" data-system={system} aria-pressed="false">
+                  {glossarySystemLabel(strings, system)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <p
+            class="glossary__count"
+            data-glossary-count
+            data-count-template={strings.glossaryCountTemplate}
+            data-total={String(terms.length)}
+            aria-live="polite"
+          >
+            {formatCount(
+              strings.glossaryCountTemplate,
+              terms.length,
+              terms.length
+            )}
+          </p>
+
+          <ul class="glossary__list" data-glossary-list>
+            {terms.map((term) => (
+              <li
+                class="term"
+                id={term.domId}
+                data-system={term.system}
+                data-haystack={term.haystack}
+              >
+                <div class="term__head">
+                  <h2 class="term__title">
+                    <span class="term__canonical" lang={LOCALE_BCP47[locale]}>
+                      {term.termByLocale[locale]}
+                    </span>
+                    {otherLocales.map((other) => (
+                      <span class="term__gloss" lang={LOCALE_BCP47[other]}>
+                        {term.termByLocale[other]}
+                      </span>
+                    ))}
+                  </h2>
+                  <span class="term__system" data-system={term.system}>
+                    {glossarySystemLabel(strings, term.system)}
+                  </span>
+                </div>
+
+                {readingOrder.map((each) => (
+                  <p class="term__definition" lang={LOCALE_BCP47[each]}>
+                    {term.definitionByLocale[each]}
+                  </p>
+                ))}
+
+                {term.aliases.length > 0 && (
+                  <p class="term__aliases">
+                    <span class="term__label">
+                      {strings.glossaryAliasesLabel}
+                    </span>
+                    {term.aliases.map((alias) => (
+                      <span
+                        class:list={[
+                          "alias",
+                          alias.falseFriend && "alias--false-friend",
+                        ]}
+                      >
+                        <span
+                          class="alias__term"
+                          lang={LOCALE_BCP47[alias.locale]}
+                        >
+                          {alias.term}
+                        </span>
+                        <span class="alias__countries">
+                          {alias.countries.join("/")}
+                        </span>
+                        {alias.falseFriend && (
+                          <span class="alias__warning">
+                            {strings.glossaryFalseFriendLabel}
+                          </span>
+                        )}
+                      </span>
+                    ))}
+                  </p>
+                )}
+
+                {term.relatedTerms.length > 0 && (
+                  <p class="term__related">
+                    <span class="term__label">
+                      {strings.glossaryRelatedLabel}
+                    </span>
+                    {term.relatedTerms.map((id) => {
+                      const target = termById.get(id);
+                      return target ? (
+                        <a class="related" href={`#${target.domId}`}>
+                          {target.termByLocale[locale]}
+                        </a>
+                      ) : null;
+                    })}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+
+          <p class="glossary__none" data-glossary-none hidden>
+            {strings.glossaryNoResults}
+          </p>
+        </>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<script>
+  import { formatCount, matchesFilter } from "../../lib/glossary-filter";
+
+  /**
+   * Client-side filtering (GLO-04). Enhancement only: the toolbar ships
+   * `hidden` and is revealed here, so a visitor with no JavaScript sees the
+   * whole glossary and never a control that does nothing.
+   *
+   * Only DOM wiring lives here — which elements to read, what to toggle. The
+   * decisions (does this card match? what does the counter say?) are pure
+   * functions in `src/lib/glossary-filter.ts`, unit-tested without a browser.
+   */
+  function enhance(root: HTMLElement): void {
+    const toolbar = root.querySelector<HTMLElement>("[data-glossary-toolbar]");
+    const search = root.querySelector<HTMLInputElement>(
+      "[data-glossary-search]"
+    );
+    const count = root.querySelector<HTMLElement>("[data-glossary-count]");
+    const none = root.querySelector<HTMLElement>("[data-glossary-none]");
+    const cards = [...root.querySelectorAll<HTMLElement>(".term")];
+    if (!toolbar || !search || !count || !none) return;
+
+    const template = count.dataset.countTemplate ?? "";
+    const total = Number(count.dataset.total ?? cards.length);
+    const buttons = [
+      ...toolbar.querySelectorAll<HTMLButtonElement>("[data-system]"),
+    ];
+    let system = "";
+
+    function apply(): void {
+      const state = { system, query: search!.value };
+      let shown = 0;
+
+      for (const card of cards) {
+        const visible = matchesFilter(
+          {
+            system: card.dataset.system ?? "",
+            haystack: card.dataset.haystack ?? "",
+          },
+          state
+        );
+        card.hidden = !visible;
+        if (visible) shown += 1;
+      }
+
+      count!.textContent = formatCount(template, shown, total);
+      none!.hidden = shown > 0;
+    }
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        system = button.dataset.system ?? "";
+        for (const other of buttons) {
+          other.setAttribute(
+            "aria-pressed",
+            String((other.dataset.system ?? "") === system)
+          );
+        }
+        apply();
+      });
+    }
+
+    search.addEventListener("input", apply);
+    toolbar.hidden = false;
+    apply();
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>(
+    "[data-glossary]"
+  )) {
+    enhance(root);
+  }
+</script>
+
+<style>
+  /*
+   * Palette from specs/001-foundation/design/HANDOFF-DESIGN.md, scoped to this
+   * page: site-wide design tokens belong to the task that restyles the chrome,
+   * not to the first collection page that needs colours.
+   */
+  .glossary {
+    --paper: #f7f4ee;
+    --panel: #ffffff;
+    --ink: #2b2620;
+    --muted: #6e6559;
+    --muted-strong: #55493c;
+    --line: #e4ddd1;
+    --chip: #efe9dd;
+    --rust: #b0532a;
+    --rust-deep: #93441f;
+    --green: #3e6b4f;
+    --green-tint: #e4efe7;
+    --warn-ink: #8a5e14;
+    --warn-tint: #fdf3e4;
+    --warn-line: #b07a1f;
+
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 75rem;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .glossary__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .glossary__intro h1 {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  .glossary__intro p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+    max-width: 62ch;
+  }
+
+  .glossary__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .glossary__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex: 1 1 18rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: var(--muted);
+  }
+
+  .glossary__search input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 0.875rem;
+    color: var(--ink);
+    min-height: 1.75rem;
+  }
+
+  .glossary__search input::placeholder {
+    color: var(--muted);
+    opacity: 1;
+  }
+
+  .glossary__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .glossary__filters button {
+    font: inherit;
+    font-size: 0.8125rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    min-height: 2.75rem;
+    background: var(--panel);
+    color: var(--muted-strong);
+    cursor: pointer;
+  }
+
+  .glossary__filters button[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+    font-weight: 700;
+  }
+
+  .glossary__count,
+  .glossary__none,
+  .glossary__empty {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .glossary__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .term {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem 1.375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .term[hidden] {
+    display: none;
+  }
+
+  .term__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .term__title {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.625rem;
+    font-size: 1.1875rem;
+    font-weight: 700;
+  }
+
+  .term__gloss {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .term__gloss::before {
+    content: "— ";
+  }
+
+  .term__system {
+    flex: 0 0 auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--green);
+    background: var(--green-tint);
+    border-radius: 4px;
+    padding: 0.1875rem 0.5rem;
+  }
+
+  .term__definition {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--muted-strong);
+  }
+
+  .term__aliases,
+  .term__related {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .term__label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .alias,
+  .related {
+    font-family:
+      "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.75rem;
+    background: var(--chip);
+    border-radius: 4px;
+    padding: 0.125rem 0.5rem;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.375rem;
+  }
+
+  .alias__countries {
+    color: var(--muted);
+  }
+
+  .alias--false-friend {
+    background: var(--warn-tint);
+    border: 1px solid var(--warn-line);
+  }
+
+  .alias__warning {
+    color: var(--warn-ink);
+    font-weight: 600;
+  }
+
+  /*
+   * The handoff's link colour is `rust` on `rust-deep` hover, but these links
+   * sit on a `chip` background rather than on paper or panel: rust there is
+   * 4.22:1, under WCAG AA's 4.5:1 (measured by Pa11y against a populated
+   * page, not estimated). `rust-deep` on `chip` is 5.6:1, so the pair moves
+   * one step darker — accent colour preserved, contrast constraint met.
+   */
+  .related {
+    color: var(--rust-deep);
+  }
+
+  .related:hover {
+    color: var(--ink);
+  }
+
+  @media (max-width: 48rem) {
+    .glossary__list {
+      grid-template-columns: 1fr;
+    }
+
+    .glossary__intro h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>

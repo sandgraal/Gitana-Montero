@@ -132,24 +132,59 @@ export interface AlternateLink {
 }
 
 /**
- * The full `hreflang` set for a page (I18N-04): one link per locale plus
- * `x-default`. `x-default` points at the default locale's URL for the same
- * route, which is also where the root redirect lands when `Accept-Language`
- * matches nothing (I18N-02) — the two rules agree by construction.
+ * A page's route in each locale. Equal to itself in every locale for pages
+ * whose path is locale-independent (`/`), and different per locale wherever
+ * the segment is translated (`/glossary/` ↔ `/glosario/` — see
+ * `src/i18n/routes.ts`).
+ */
+export type LocalizedRoutePaths = Readonly<Record<Locale, string>>;
+
+/** The same locale-independent route in every locale. */
+export function sameRouteInEveryLocale(routePath = "/"): LocalizedRoutePaths {
+  return Object.fromEntries(
+    LOCALES.map((locale) => [locale, routePath])
+  ) as LocalizedRoutePaths;
+}
+
+/**
+ * The full `hreflang` set for a page whose route differs per locale (I18N-04):
+ * one link per locale plus `x-default`.
+ *
+ * This is the general form — {@link alternateLinks} is the special case where
+ * every locale shares one route. Taking a per-locale map rather than a single
+ * path is what makes a translated segment safe: emitting `hreflang="es"
+ * href="/es/glossary/"` for a page that is actually served at `/es/glosario/`
+ * would point at a URL that was never built, which is precisely the
+ * asymmetry `check:hreflang` exists to catch.
+ *
+ * `x-default` points at the default locale's URL, which is also where the root
+ * redirect lands when `Accept-Language` matches nothing (I18N-02) — the two
+ * rules agree by construction.
+ */
+export function localizedAlternateLinks(
+  routes: LocalizedRoutePaths,
+  base?: string
+): AlternateLink[] {
+  const links: AlternateLink[] = LOCALES.map((locale) => ({
+    hreflang: LOCALE_HREFLANG[locale],
+    href: localeHref(locale, routes[locale], base),
+  }));
+  links.push({
+    hreflang: "x-default",
+    href: localeHref(DEFAULT_LOCALE, routes[DEFAULT_LOCALE], base),
+  });
+  return links;
+}
+
+/**
+ * The full `hreflang` set for a page served at the same route in every locale
+ * (I18N-04): one link per locale plus `x-default`.
  */
 export function alternateLinks(
   routePath = "/",
   base?: string
 ): AlternateLink[] {
-  const links: AlternateLink[] = LOCALES.map((locale) => ({
-    hreflang: LOCALE_HREFLANG[locale],
-    href: localeHref(locale, routePath, base),
-  }));
-  links.push({
-    hreflang: "x-default",
-    href: localeHref(DEFAULT_LOCALE, routePath, base),
-  });
-  return links;
+  return localizedAlternateLinks(sameRouteInEveryLocale(routePath), base);
 }
 
 /** Absolute URL for a root-relative href, given the configured `site`. */

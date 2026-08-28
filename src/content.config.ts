@@ -24,6 +24,7 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import { defineEntrySchema } from "./schemas/entry";
 import { communitySchema } from "./schemas/community";
+import { glossaryEntrySchema } from "./schemas/glossary";
 import { vehiclesEntrySchema } from "./schemas/vehicles";
 
 /**
@@ -68,8 +69,14 @@ function entryCollection(
 export const collections = {
   /** VEH-01…03 — generations, markets, engines, transmissions, trims. */
   vehicles: entryCollection("vehicles", vehiclesEntrySchema(baseProse)),
-  /** GLO-01…04 — canonical EN/ES terms and regional aliases. */
-  glossary: entryCollection("glossary"),
+  /**
+   * GLO-01…04 — canonical EN/ES terms and regional aliases.
+   *
+   * Assembled in `src/schemas/glossary.ts` (still through
+   * `defineEntrySchema`) because the canonical-term format is the input to a
+   * merge-blocking check and deserves its own module and its own tests. T205.
+   */
+  glossary: entryCollection("glossary", glossaryEntrySchema),
   /** REF-01, REF-02 — FSM index, fluids, torque master table, capacities. */
   reference: entryCollection("reference"),
   /** GAR-01…05 — the build log for the truck. */
