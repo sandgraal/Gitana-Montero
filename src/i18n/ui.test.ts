@@ -20,7 +20,12 @@ describe("UI strings module (I18N-08)", () => {
       for (const [key, value] of Object.entries(ui[locale])) {
         expect(typeof value, `${locale}.${key}`).toBe("string");
         expect(value.trim(), `${locale}.${key}`).not.toBe("");
-        expect(value, `${locale}.${key}`).not.toMatch(/^(TODO|TBD|FIXME)/i);
+        // Case-sensitive and word-bounded on purpose. The original
+        // `/^(TODO|TBD|FIXME)/i` rejected any Spanish string starting with
+        // "Todo…" — "Todos los sistemas", "Todo el sitio" — which is a
+        // false positive on ordinary copy, not a placeholder. A placeholder
+        // marker is written in caps and stands alone as a word.
+        expect(value, `${locale}.${key}`).not.toMatch(/^(TODO|TBD|FIXME)\b/);
       }
     }
   });
