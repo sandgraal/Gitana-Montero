@@ -6,9 +6,10 @@
  * Sources for each block:
  * - Locale: spec §2 — "`en` (English) or `es` (Costa Rican Spanish, `usted`
  *   register). Never any other value."
- * - Confidence: spec §2 and AGENTS.md — five tiers, `first-hand` "ranks above
- *   `anecdotal`, below `tsb`". See the ordering block for the one relation
- *   the spec leaves open.
+ * - Confidence: spec §2 and AGENTS.md — five tiers, in the total order
+ *   ratified by the owner on 2026-08-27:
+ *   `fsm-confirmed > tsb > community-consensus > first-hand > anecdotal`.
+ *   See the ordering block for what that resolved.
  * - Sources: plan.md — `{ title, url, archiveUrl, accessed, kind }`,
  *   `kind ∈ fsm | tsb | forum | video | vendor | first-hand`; AGENTS.md
  *   requires archiving the URL at citation time, so `archiveUrl` is not
@@ -109,6 +110,21 @@ describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {
     );
   });
 
+  /**
+   * Kept separate from the membership check above on purpose: when a tier is
+   * renamed the membership grader is the one that goes red, and when only the
+   * sequence is wrong this one is, so the failure names the actual mistake.
+   */
+  it.fails("CONFIDENCE_TIERS is in the ratified order, strongest first", () => {
+    expect([...CONFIDENCE_TIERS]).toEqual([
+      "fsm-confirmed",
+      "tsb",
+      "community-consensus",
+      "first-hand",
+      "anecdotal",
+    ]);
+  });
+
   it.fails.each([
     "fsm-confirmed",
     "tsb",
@@ -135,19 +151,29 @@ describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {
    * `CONFIDENCE_TIERS` is ordered strongest evidence first, so a smaller
    * index means stronger evidence.
    *
-   * Only the relations the spec states outright are asserted. Spec §2 lists
-   * the chain `fsm-confirmed › tsb › community-consensus › anecdotal ›
-   * first-hand` but then overrides the position of the last item in prose:
-   * `first-hand` "ranks above `anecdotal`, below `tsb`". Where `first-hand`
-   * sits relative to `community-consensus` is genuinely open, so it is not
-   * graded here — see the T103 report's open questions.
+   * The total order is ratified by the owner (2026-08-27):
+   * `fsm-confirmed > tsb > community-consensus > first-hand > anecdotal`.
+   * Spec §2 had listed the chain with `first-hand` last while its prose said
+   * `first-hand` "ranks above `anecdotal`, below `tsb`"; the ruling puts it
+   * between `community-consensus` and `anecdotal`, and AGENTS.md and spec §2
+   * are being aligned to that conductor-side.
+   *
+   * Consequence worth carrying into T401 (not graded here, PRB-04 is that
+   * task's contract): under this order AGENTS.md's "anything below `tsb`"
+   * and PRB-04's "`community-consensus` or lower" name the same three tiers,
+   * so the caveat rules agree instead of contradicting each other.
+   *
+   * The adjacent pairs pin the sequence; the two non-adjacent pairs are kept
+   * as regression guards, so a reordering that happens to preserve
+   * neighbours still gets caught.
    */
   it.fails.each([
     ["fsm-confirmed", "tsb"],
     ["tsb", "community-consensus"],
-    ["community-consensus", "anecdotal"],
-    ["tsb", "first-hand"],
+    ["community-consensus", "first-hand"],
     ["first-hand", "anecdotal"],
+    ["tsb", "first-hand"],
+    ["community-consensus", "anecdotal"],
   ])("ranks %s above %s", (stronger, weaker) => {
     const tiers: string[] = [...CONFIDENCE_TIERS];
 

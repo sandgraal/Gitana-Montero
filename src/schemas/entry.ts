@@ -21,9 +21,12 @@
  *   never any other value.
  * - `localeSchema` — accepts only those two literals.
  * - `CONFIDENCE_TIERS` — the five tiers of spec §2, ordered **strongest
- *   evidence first** (index 0 = strongest). The graders assert only the
- *   pairwise relations the spec states outright; see
- *   `tests/schemas/entry-primitives.test.ts`.
+ *   evidence first** (index 0 = strongest). The total order is ratified by
+ *   the owner (2026-08-27) and graded exactly:
+ *   `["fsm-confirmed", "tsb", "community-consensus", "first-hand",
+ *   "anecdotal"]`. `first-hand` sits between `community-consensus` and
+ *   `anecdotal`, not at the end of the chain as spec §2 originally listed
+ *   it. See `tests/schemas/entry-primitives.test.ts`.
  * - `confidenceSchema` — accepts only those five tiers.
  * - `SOURCE_KINDS` / `sourceSchema` — plan.md "Content conventions": every
  *   source carries `{ title, url, archiveUrl, accessed, kind }`, all
