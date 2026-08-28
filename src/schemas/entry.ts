@@ -100,8 +100,15 @@ export const CITATION_REQUIRED_TIERS = ["fsm-confirmed", "tsb"] as const;
 
 const BLANK_MESSAGE = "must not be blank";
 
-/** A string that is present *and* says something. */
-const nonBlankString = () =>
+/**
+ * A string that is present *and* says something.
+ *
+ * Exported (T700) so collection schemas built on top of this module reuse the
+ * same "blank is missing" rule instead of each reinventing `z.string().min(1)`
+ * — a bare `min(1)` accepts `" "`, which is exactly the loophole this module
+ * exists to close.
+ */
+export const nonBlankString = () =>
   z
     .string()
     .min(1, { message: BLANK_MESSAGE })
@@ -123,11 +130,16 @@ function isHttpUrl(value: string): boolean {
   }
 }
 
-const httpUrlSchema = () =>
+/**
+ * Exported (T700) for the same reason as `nonBlankString`: every URL any
+ * collection stores — a community's homepage as much as a source document —
+ * goes through this protocol check, never through `.url()` alone.
+ */
+export const httpUrlSchema = () =>
   z.string().refine(isHttpUrl, { message: "must be an http(s) URL" });
 
 /** `YYYY-MM-DD`, the form every `accessed` date is recorded in. */
-const isoDateSchema = () =>
+export const isoDateSchema = () =>
   z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: "must be YYYY-MM-DD" });
 
 /* -------------------------------------------------------------------------
