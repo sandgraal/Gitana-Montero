@@ -407,7 +407,7 @@ export function findEntryConformanceIssues(entry, scannable) {
     isPlainObject(data) && isPlainObject(data.prose)
       ? data.prose.es
       : undefined;
-  if (!isPlainObject(es) && typeof es !== "string") return [];
+  if (!isPlainObject(es)) return [];
 
   // The entry's own id, so a glossary entry is exempt from its own variants.
   const selfId =
