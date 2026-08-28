@@ -82,7 +82,7 @@ the user's own record and is not fact-checked by the site.
 
 - **MIG-01** THE repo/site SHALL be renamed **monterogarage** in one
   coordinated change: repo name, `base` (drops to `/` on Vercel), `site`
-  (monterogarage.com), `src/site.ts`, UI strings, README, and the CI
+  (`https://monterogarage.com`), `src/site.ts`, UI strings, README, and the CI
   base-assertion — with redirects from the old Pages URL for as long as GitHub
   keeps them.
 - **MIG-02** Hosting SHALL move to Vercel (owner decision 2026-08-28,
