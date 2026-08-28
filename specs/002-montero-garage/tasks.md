@@ -57,7 +57,7 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   level, per-record cost masking on public work-logs, showcase toggle
   round-trip. Depends: T2-302. *(SHR-01..03)*
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
-  URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN
+  URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*
 - [ ] **T2-403 [PLATFORM]** Community evidence surfacing: opt-in per-record
   first-hand evidence on problem pages (001 GAR-04 re-cut). Depends: T2-402,
