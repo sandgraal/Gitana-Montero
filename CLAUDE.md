@@ -18,7 +18,7 @@ Agents write all site code and content; the main session conducts.
 - `npm run verify` — every merge-blocking check except link/a11y (CI runs those
   on top); must pass before any commit
 - `npm run dev` / `npm run build` / `npm run check`
-- `npm test` / `npm run test:e2e` / `npm run lint`
+- `npm test` / `npm run lint` (`test:e2e` arrives with T204 — not yet implemented)
 - `npm run check:locales` / `check:citations` / `check:glossary` / `check:links`
 - `npm run gaps` — generates the content backlog report
 
