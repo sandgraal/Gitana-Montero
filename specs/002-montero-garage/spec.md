@@ -44,8 +44,8 @@ the user's own record and is not fact-checked by the site.
   magic link and Google OAuth, and no password flow.
 - **ACC-02** THE account surface SHALL be fully bilingual (I18N-01/08 apply to
   every authenticated view).
-- **ACC-03** A user SHALL be able to delete their account, which deletes all
-  vehicles, records, and stored files (hard delete, 30-day grace).
+- **ACC-03** A user SHALL be able to delete their account; after a 30-day recovery
+  window, all vehicles, records, and stored files SHALL be hard-deleted.
 - **ACC-04** THE site SHALL NOT add third-party analytics or ad SDKs with the
   auth surface (001 boundary survives).
 
