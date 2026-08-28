@@ -43,15 +43,15 @@ const codesOf = (registry: SlugRegistry) =>
   validateSlugRegistry(registry).map((issue) => issue.code);
 
 describe("slug registry — positive controls", () => {
-  it.fails("reports no issue for a complete, collision-free registry", () => {
+  it("reports no issue for a complete, collision-free registry", () => {
     expect(validateSlugRegistry(soundRegistry)).toEqual([]);
   });
 
-  it.fails("reports no issue for an empty registry", () => {
+  it("reports no issue for an empty registry", () => {
     expect(validateSlugRegistry({})).toEqual([]);
   });
 
-  it.fails(
+  it(
     "allows one entry to use the same slug in both locales (many part " +
       "slugs are the same word in EN and ES)",
     () => {
@@ -65,7 +65,7 @@ describe("slug registry — positive controls", () => {
     }
   );
 
-  it.fails(
+  it(
     "allows two collections to reuse a slug — the collection segment " +
       "disambiguates /en/parts/x from /en/problems/x",
     () => {
@@ -84,7 +84,7 @@ describe("slug registry — positive controls", () => {
 });
 
 describe("slug registry — missing mappings (I18N-05)", () => {
-  it.fails.each([
+  it.each([
     ["es", { en: "test-alpha-problem" }],
     ["en", { es: "problema-alfa" }],
   ])("flags an entry with no %s slug", (locale, slugs) => {
@@ -101,19 +101,16 @@ describe("slug registry — missing mappings (I18N-05)", () => {
     });
   });
 
-  it.fails(
-    "flags an entry with no slugs at all as two missing mappings",
-    () => {
-      const issues = validateSlugRegistry({
-        problems: { "test-schema-alpha": {} },
-      });
+  it("flags an entry with no slugs at all as two missing mappings", () => {
+    const issues = validateSlugRegistry({
+      problems: { "test-schema-alpha": {} },
+    });
 
-      expect(issues).toHaveLength(2);
-      expect(issues.map((issue) => issue.locale).sort()).toEqual(["en", "es"]);
-    }
-  );
+    expect(issues).toHaveLength(2);
+    expect(issues.map((issue) => issue.locale).sort()).toEqual(["en", "es"]);
+  });
 
-  it.fails.each(["", "   ", "\t"])(
+  it.each(["", "   ", "\t"])(
     "treats the blank slug %j as missing, not as a slug",
     (slug) => {
       const issues = validateSlugRegistry({
@@ -131,7 +128,7 @@ describe("slug registry — missing mappings (I18N-05)", () => {
 });
 
 describe("slug registry — collisions (I18N-05)", () => {
-  it.fails.each(["en", "es"])(
+  it.each(["en", "es"])(
     "flags two entries claiming the same %s slug in one collection",
     (locale) => {
       const clash = "test-colision";
@@ -161,7 +158,7 @@ describe("slug registry — collisions (I18N-05)", () => {
     }
   );
 
-  it.fails(
+  it(
     "does not treat a cross-locale slug repeat as a collision — " +
       "/en/x and /es/x are different URLs",
     () => {
@@ -178,7 +175,7 @@ describe("slug registry — collisions (I18N-05)", () => {
 });
 
 describe("slug registry — locale keys (spec §2)", () => {
-  it.fails("flags a locale key outside en/es", () => {
+  it("flags a locale key outside en/es", () => {
     const issues = validateSlugRegistry({
       problems: {
         "test-schema-alpha": {
@@ -200,24 +197,21 @@ describe("slug registry — locale keys (spec §2)", () => {
 });
 
 describe("slug registry — reporting", () => {
-  it.fails(
-    "returns every violation in one pass rather than the first one",
-    () => {
-      const issues = validateSlugRegistry({
-        problems: {
-          "test-schema-alpha": { en: "test-colision" },
-          "test-schema-beta": { en: "test-colision", es: "" },
-        },
-      });
+  it("returns every violation in one pass rather than the first one", () => {
+    const issues = validateSlugRegistry({
+      problems: {
+        "test-schema-alpha": { en: "test-colision" },
+        "test-schema-beta": { en: "test-colision", es: "" },
+      },
+    });
 
-      expect(issues.length).toBeGreaterThanOrEqual(3);
-      expect(new Set(issues.map((issue) => issue.code))).toEqual(
-        new Set(["missing-slug", "duplicate-slug"])
-      );
-    }
-  );
+    expect(issues.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(issues.map((issue) => issue.code))).toEqual(
+      new Set(["missing-slug", "duplicate-slug"])
+    );
+  });
 
-  it.fails("names the collection and entry on every issue it reports", () => {
+  it("names the collection and entry on every issue it reports", () => {
     const issues = validateSlugRegistry({
       problems: { "test-schema-alpha": { en: "test-alpha-problem" } },
       parts: { "test-schema-gamma": { es: "repuesto-gama" } },

@@ -104,16 +104,13 @@ const numericProseShapes: [string, string, z.ZodType][] = [
 ];
 
 describe("define time: no numeric field may be declared in prose", () => {
-  it.fails(
-    "accepts a numeric spec in shared data — the figure has to live somewhere",
-    () => {
-      expect(() =>
-        defineEntrySchema({ torqueNm: z.number() }, proseShape)
-      ).not.toThrow();
-    }
-  );
+  it("accepts a numeric spec in shared data — the figure has to live somewhere", () => {
+    expect(() =>
+      defineEntrySchema({ torqueNm: z.number() }, proseShape)
+    ).not.toThrow();
+  });
 
-  it.fails.each(numericProseShapes)(
+  it.each(numericProseShapes)(
     "rejects a prose shape declaring a %s field, naming the field",
     (_label, fieldName, fieldSchema) => {
       expect(() =>
@@ -125,20 +122,17 @@ describe("define time: no numeric field may be declared in prose", () => {
     }
   );
 
-  it.fails(
-    "still accepts an all-string prose shape — only numbers are barred",
-    () => {
-      expect(() =>
-        defineEntrySchema(sharedShape, {
-          ...proseShape,
-          caveat: z.string().optional(),
-          steps: z.array(z.string()),
-        })
-      ).not.toThrow();
-    }
-  );
+  it("still accepts an all-string prose shape — only numbers are barred", () => {
+    expect(() =>
+      defineEntrySchema(sharedShape, {
+        ...proseShape,
+        caveat: z.string().optional(),
+        steps: z.array(z.string()),
+      })
+    ).not.toThrow();
+  });
 
-  it.fails(
+  it(
     "still accepts strings nested in the same containers the numeric " +
       "check recurses through — the rule is about numbers, not about depth",
     () => {
@@ -156,7 +150,7 @@ describe("define time: no numeric field may be declared in prose", () => {
 });
 
 describe("parse time: a figure exists exactly once, in shared data", () => {
-  it.fails("accepts the torque spec at the shared-data top level", () => {
+  it("accepts the torque spec at the shared-data top level", () => {
     const entry = makeValidEntry();
     entry.torqueNm = 88;
 
@@ -166,7 +160,7 @@ describe("parse time: a figure exists exactly once, in shared data", () => {
     expect(outcome.success).toBe(true);
   });
 
-  it.fails.each(["en", "es"])(
+  it.each(["en", "es"])(
     "rejects a torque figure smuggled into `prose.%s`, naming the key",
     (locale) => {
       const entry = makeValidEntry();
@@ -188,7 +182,7 @@ describe("parse time: a figure exists exactly once, in shared data", () => {
     }
   );
 
-  it.fails(
+  it(
     "rejects the same figure duplicated into both locales (AGENTS.md: " +
       "writing a figure twice means the schema is wrong)",
     () => {
@@ -210,7 +204,7 @@ describe("parse time: a figure exists exactly once, in shared data", () => {
     }
   );
 
-  it.fails.each(["en", "es"])(
+  it.each(["en", "es"])(
     "rejects a figure nested one level inside `prose.%s` — the evasion a " +
       "one-level numeric check lets through",
     (locale) => {
@@ -228,7 +222,7 @@ describe("parse time: a figure exists exactly once, in shared data", () => {
     }
   );
 
-  it.fails(
+  it(
     "rejects a nested figure duplicated into both locales — " +
       "prose.en.specs.torqueNm and prose.es.specs.torqueNm are one figure " +
       "written twice",
@@ -248,7 +242,7 @@ describe("parse time: a figure exists exactly once, in shared data", () => {
     }
   );
 
-  it.fails.each(["en", "es"])(
+  it.each(["en", "es"])(
     "rejects a part number smuggled into `prose.%s`",
     (locale) => {
       const entry = makeValidEntry();
@@ -265,7 +259,7 @@ describe("parse time: a figure exists exactly once, in shared data", () => {
     }
   );
 
-  it.fails.each(["en", "es"])(
+  it.each(["en", "es"])(
     "rejects a number in a prose field of `prose.%s`, naming the path",
     (locale) => {
       const entry = makeValidEntry();
@@ -281,16 +275,13 @@ describe("parse time: a figure exists exactly once, in shared data", () => {
     }
   );
 
-  it.fails(
-    "rejects a shared numeric spec supplied as a localized string",
-    () => {
-      const entry: Record<string, unknown> = makeValidEntry();
-      entry["torqueNm"] = "88 N·m";
+  it("rejects a shared numeric spec supplied as a localized string", () => {
+    const entry: Record<string, unknown> = makeValidEntry();
+    entry["torqueNm"] = "88 N·m";
 
-      const outcome = entrySchema().safeParse(entry);
+    const outcome = entrySchema().safeParse(entry);
 
-      expect(outcome.success).toBe(false);
-      expect(issuePaths(outcome)).toContain("torqueNm");
-    }
-  );
+    expect(outcome.success).toBe(false);
+    expect(issuePaths(outcome)).toContain("torqueNm");
+  });
 });

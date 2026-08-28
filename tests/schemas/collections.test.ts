@@ -87,11 +87,11 @@ function schemaOf(collection: unknown): Parsable {
 const registered = () => Object.entries(collections as Record<string, unknown>);
 
 describe("registered content collections enforce the locale rule", () => {
-  it.fails("registers at least one content collection", () => {
+  it("registers at least one content collection", () => {
     expect(registered().length).toBeGreaterThan(0);
   });
 
-  it.fails("gives every registered collection a parsable Zod schema", () => {
+  it("gives every registered collection a parsable Zod schema", () => {
     const entries = registered();
     expect(entries.length).toBeGreaterThan(0);
 
@@ -100,7 +100,7 @@ describe("registered content collections enforce the locale rule", () => {
     }
   });
 
-  it.fails.each(["es", "en"])(
+  it.each(["es", "en"])(
     "every registered collection rejects an entry missing prose.%s, " +
       "naming the field",
     (missing) => {
@@ -120,7 +120,7 @@ describe("registered content collections enforce the locale rule", () => {
     }
   );
 
-  it.fails(
+  it(
     "no registered collection flags a locale when both are present " +
       "(positive control: the rule is completeness, not rejection)",
     () => {
@@ -137,19 +137,16 @@ describe("registered content collections enforce the locale rule", () => {
     }
   );
 
-  it.fails(
-    "no registered collection accepts an entry with no prose at all",
-    () => {
-      const entries = registered();
-      expect(entries.length).toBeGreaterThan(0);
+  it("no registered collection accepts an entry with no prose at all", () => {
+    const entries = registered();
+    expect(entries.length).toBeGreaterThan(0);
 
-      const entry = makeCoreEntry();
-      delete entry.prose;
+    const entry = makeCoreEntry();
+    delete entry.prose;
 
-      for (const [name, collection] of entries) {
-        const outcome = schemaOf(collection).safeParse(entry);
-        expect((outcome as { success: boolean }).success, name).toBe(false);
-      }
+    for (const [name, collection] of entries) {
+      const outcome = schemaOf(collection).safeParse(entry);
+      expect((outcome as { success: boolean }).success, name).toBe(false);
     }
-  );
+  });
 });
