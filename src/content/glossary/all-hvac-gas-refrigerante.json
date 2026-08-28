@@ -1,0 +1,27 @@
+{
+  "id": "all-hvac-gas-refrigerante",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "hvac",
+  "aliases": [
+    {
+      "term": "refrigerant",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-hvac-aire-acondicionado", "all-cooling-refrigerante"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "air conditioning refrigerant",
+      "summary": "The gas that circulates in the air conditioning. In Spanish it is called gas refrigerante, which is not the engine coolant — that is refrigerante on its own, and the two are never mixed up on this site."
+    },
+    "es": {
+      "title": "gas refrigerante",
+      "summary": "El gas que circula en el aire acondicionado. Ojo con la palabra: el refrigerante a secas es el del motor, y en este sitio los dos nunca se confunden."
+    }
+  }
+}

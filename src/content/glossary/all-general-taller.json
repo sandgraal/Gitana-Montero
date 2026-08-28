@@ -1,0 +1,50 @@
+{
+  "id": "all-general-taller",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [
+    {
+      "term": "garage",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
+      "term": "garages",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
+      "term": "workshop",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "workshops",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-general-repuestera", "all-general-mecanico"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
+      "url": "https://guiaautomotrizcr.com/",
+      "archiveUrl": "http://web.archive.org/web/20260606201328/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "repair shop",
+      "summary": "The shop where the vehicle is actually worked on. Costa Rican directories list them as talleres, often specialised — taller mecánico, taller de enderezado y pintura, taller eléctrico."
+    },
+    "es": {
+      "title": "taller",
+      "summary": "El local donde se le hace el trabajo al vehículo. Los directorios ticos los listan como talleres y casi siempre especializados: taller mecánico, taller de enderezado y pintura, taller eléctrico."
+    }
+  }
+}

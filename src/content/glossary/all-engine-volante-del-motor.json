@@ -1,0 +1,21 @@
+{
+  "id": "all-engine-volante-del-motor",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [],
+  "relatedTerms": ["all-transmission-clutch", "all-engine-ciguenal"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "flywheel",
+      "summary": "The mass bolted to the back of the crankshaft that smooths the firing pulses and carries the clutch friction surface and the starter ring gear."
+    },
+    "es": {
+      "title": "volante del motor",
+      "summary": "La masa atornillada atrás del cigüeñal que suaviza los impulsos de combustión y que lleva la superficie de fricción del clutch y la corona de arranque."
+    }
+  }
+}

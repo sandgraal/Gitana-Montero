@@ -1,0 +1,40 @@
+{
+  "id": "all-body-protector-de-carter",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "body",
+  "aliases": [
+    {
+      "term": "sump guard",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "cubrecárter",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-engine-carter", "all-general-todoterreno"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "PRTOFFROAD — Preparación de vehículos 4x4 y offroad",
+      "url": "https://www.prtoffroad.com/",
+      "archiveUrl": "https://web.archive.org/web/20260828191951/https://www.prtoffroad.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "skid plate",
+      "summary": "The steel or aluminium plate under the engine, gearbox or fuel tank that takes the hit from rocks. Fitting one adds weight and can trap heat, so it is chosen for the terrain the vehicle actually sees."
+    },
+    "es": {
+      "title": "protector de cárter",
+      "summary": "La plancha de acero o aluminio bajo el motor, la caja o el tanque que se lleva el golpe de las piedras. Montar uno suma peso y puede retener calor, así que se escoge según el terreno en que de verdad anda el vehículo."
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "all-general-repuesto-original",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [
+    {
+      "term": "OEM",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-general-repuesto-no-original",
+    "all-general-numero-de-parte"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "MITSUPARTES — Repuestos Mitsubishi, Tibás, Costa Rica",
+      "url": "https://www.mitsupartescr.com/",
+      "archiveUrl": "http://web.archive.org/web/20250712163140/http://mitsupartescr.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "OEM part",
+      "summary": "A part made or specified by the vehicle manufacturer, ordered by its own part number. In Costa Rica the parts counter calls it a repuesto original."
+    },
+    "es": {
+      "title": "repuesto original",
+      "summary": "Pieza fabricada o especificada por la fábrica del vehículo, que se pide por su número de parte. En la repuestera tica se le dice así, repuesto original."
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "all-transmission-collarin",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "transmission",
+  "aliases": [
+    {
+      "term": "throwout bearing",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-transmission-clutch"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "release bearing",
+      "summary": "The bearing that pushes on the pressure plate when the pedal goes down. A noise that appears with the pedal down and vanishes with it up is this bearing."
+    },
+    "es": {
+      "title": "collarín",
+      "summary": "El rodamiento que empuja la prensa cuando se pisa el pedal. Un ruido que aparece con el pedal pisado y desaparece al soltarlo es este collarín."
+    }
+  }
+}

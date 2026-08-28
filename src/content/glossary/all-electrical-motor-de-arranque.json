@@ -1,0 +1,32 @@
+{
+  "id": "all-electrical-motor-de-arranque",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "burro de arranque",
+      "locale": "es",
+      "countries": ["MX", "AR"]
+    },
+    {
+      "term": "starter",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-electrical-bateria", "all-engine-volante-del-motor"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "starter motor",
+      "summary": "The motor that cranks the engine. A single loud click with lights that stay bright is usually the solenoid or a cable, not a flat battery."
+    },
+    "es": {
+      "title": "motor de arranque",
+      "summary": "El motor que hace girar el motor para encenderlo. Un solo clic fuerte con las luces sin bajar de intensidad suele ser el solenoide o un cable, no la batería descargada."
+    }
+  }
+}

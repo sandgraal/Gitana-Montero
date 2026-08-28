@@ -1,0 +1,45 @@
+{
+  "id": "all-suspension-rotula",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "suspension",
+  "aliases": [
+    {
+      "term": "ball joints",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-suspension-tijereta",
+    "all-steering-terminal-de-direccion"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Automas — Repuestos Automotrices en Costa Rica",
+      "url": "https://automas.cr/",
+      "archiveUrl": "http://web.archive.org/web/20260828190644/https://automas.cr/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "ball joint",
+      "summary": "The ball-and-socket joint between the control arm and the steering knuckle. Play here is felt as a knock over bumps and as vague steering; a ball joint that separates drops the corner of the vehicle, so it is inspection-and-replace, never wait-and-see."
+    },
+    "es": {
+      "title": "rótula",
+      "summary": "La junta esférica entre la tijereta y la muñeca de la rueda. El juego se siente como un golpeteo en los huecos y como dirección floja. Una rótula que se zafa deja caer esa esquina del vehículo, así que se revisa y se cambia, nunca se espera a ver qué pasa."
+    }
+  }
+}

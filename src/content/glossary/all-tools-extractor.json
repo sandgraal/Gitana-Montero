@@ -1,0 +1,38 @@
+{
+  "id": "all-tools-extractor",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "pullers",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-suspension-rotula",
+    "all-steering-terminal-de-direccion"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "puller",
+      "summary": "The tool that separates a taper joint or draws a bearing off a shaft. Costa Rican catalogues list extractores de rótulas among them; hitting the joint with a hammer instead is how the knuckle gets damaged."
+    },
+    "es": {
+      "title": "extractor",
+      "summary": "La herramienta que separa una unión cónica o saca un rodamiento de su eje. Los catálogos ticos listan extractores de rótulas entre ellos; golpear la unión con martillo en su lugar es la forma de dañar la muñeca."
+    }
+  }
+}

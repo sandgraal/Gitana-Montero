@@ -1,0 +1,38 @@
+{
+  "id": "all-transfer-case-rango-bajo",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "transfer-case",
+  "aliases": [
+    {
+      "term": "reductora",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": [
+    "all-transfer-case-caja-de-transferencia",
+    "all-transfer-case-super-select-4wd-ii"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Super Select II When and Where — Mitsubishi Motors Australia",
+      "url": "https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
+      "archiveUrl": "https://web.archive.org/web/20260828191907/https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "low range",
+      "summary": "The reduction gearing in the transfer case, for steep, slow and loaded work. It is selected stopped or nearly stopped, and it multiplies torque rather than adding power."
+    },
+    "es": {
+      "title": "rango bajo",
+      "summary": "La desmultiplicación de la caja de transferencia, para trabajo lento, empinado o con carga. Se engancha detenido o casi detenido, y lo que hace es multiplicar el par, no dar más potencia."
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "all-tools-gata",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "gato",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "gato hidráulico",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "trolley jack",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-tools-soportes-de-seguridad",
+    "all-wheels-tires-llanta-de-repuesto"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "jack",
+      "summary": "What lifts the vehicle. A jack lifts, it does not hold: nobody goes under a vehicle held up by one, and the lifting points are the ones the manufacturer specifies, not whatever looks solid."
+    },
+    "es": {
+      "title": "gata",
+      "summary": "Lo que levanta el vehículo. La gata levanta, no sostiene: nadie se mete debajo de un vehículo que solo está en la gata, y los puntos de levante son los que indica la fábrica, no los que se vean firmes."
+    }
+  }
+}

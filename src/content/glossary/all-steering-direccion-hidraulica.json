@@ -1,0 +1,32 @@
+{
+  "id": "all-steering-direccion-hidraulica",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "steering",
+  "aliases": [],
+  "relatedTerms": [
+    "all-fluids-liquido-de-direccion-hidraulica",
+    "all-steering-cremallera-de-direccion"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "power steering",
+      "summary": "The hydraulic assistance that makes the steering light at parking speeds, driven by a belt off the engine. If it groans on full lock, check the fluid level and the belt before condemning the pump."
+    },
+    "es": {
+      "title": "dirección hidráulica",
+      "summary": "La asistencia hidráulica que hace liviana la dirección al parquear, movida por una faja del motor. Si gruñe con el volante a tope, revise el nivel del líquido y la faja antes de culpar a la bomba."
+    }
+  }
+}

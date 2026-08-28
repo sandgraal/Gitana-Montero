@@ -1,0 +1,21 @@
+{
+  "id": "all-general-averia",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-taller"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "fault",
+      "summary": "Something that has failed or is failing on the vehicle. Costa Rican speech also says falla for the same idea, and el carro se varó for a vehicle stopped by one."
+    },
+    "es": {
+      "title": "avería",
+      "summary": "Algo que falló o va fallando en el vehículo. En el habla tica también se dice falla, y cuando el carro queda tirado se dice que se varó."
+    }
+  }
+}

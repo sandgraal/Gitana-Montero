@@ -1,0 +1,40 @@
+{
+  "id": "all-brakes-booster-de-freno",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [
+    {
+      "term": "servo",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "servofreno",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-brakes-bomba-principal-de-freno"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "CALIPERS DE FRENO VARIEDAD — Repuestos USA Motors, Costa Rica",
+      "url": "https://repuestosusamotorscr.com/producto/calipers-de-freno-variedad/",
+      "archiveUrl": "https://web.archive.org/web/20260828192236/https://repuestosusamotorscr.com/producto/calipers-de-freno-variedad/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "brake booster",
+      "summary": "The vacuum servo behind the master cylinder that multiplies pedal effort. Costa Rican parts lists call it the booster. A hard pedal with the engine running, or a hiss from the firewall, points here or at its vacuum hose."
+    },
+    "es": {
+      "title": "booster de freno",
+      "summary": "El servo de vacío que va detrás de la bomba principal y multiplica la fuerza del pie. En las listas de repuestos ticas aparece así, como booster. Un pedal duro con el motor encendido, o un silbido detrás del tablero, apunta aquí o a su manguera de vacío."
+    }
+  }
+}

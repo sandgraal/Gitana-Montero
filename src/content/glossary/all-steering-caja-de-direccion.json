@@ -1,0 +1,24 @@
+{
+  "id": "all-steering-caja-de-direccion",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "steering",
+  "aliases": [],
+  "relatedTerms": [
+    "all-steering-cremallera-de-direccion",
+    "all-steering-brazo-pitman"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "steering box",
+      "summary": "The recirculating-ball gear used instead of a rack on many four-wheel-drive vehicles, driving the pitman arm. Its adjustment takes out some free play, but a box worn inside is replaced, not adjusted tighter."
+    },
+    "es": {
+      "title": "caja de dirección",
+      "summary": "El mecanismo de bolas recirculantes que muchas 4x4 llevan en lugar de cremallera, y que mueve el brazo pitman. Su regulación quita algo de juego libre, pero una caja gastada por dentro se cambia, no se aprieta más."
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "all-suspension-resorte-de-hojas",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "suspension",
+  "aliases": [
+    {
+      "term": "ballesta",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "ballestas",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "leaf springs",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-suspension-resorte"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "leaf spring",
+      "summary": "A stack of steel leaves used as a spring, mostly at the rear of load-carrying versions. Cracked leaves and flattened packs are common on trucks that have carried weight for twenty years."
+    },
+    "es": {
+      "title": "resorte de hojas",
+      "summary": "Paquete de hojas de acero que trabaja como resorte, casi siempre atrás en las versiones de carga. En camionetas que llevan veinte años cargando es común encontrar hojas quebradas y paquetes aplanados."
+    }
+  }
+}

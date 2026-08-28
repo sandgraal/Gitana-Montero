@@ -1,0 +1,48 @@
+{
+  "id": "all-general-montero",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [
+    {
+      "term": "Pajero",
+      "locale": "en",
+      "countries": ["AU", "JP", "GB"]
+    },
+    {
+      "term": "Shogun",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "Montero Sport",
+      "locale": "en",
+      "countries": ["US", "CR"]
+    }
+  ],
+  "relatedTerms": [
+    "all-general-carro",
+    "all-transfer-case-super-select-4wd-ii"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "MITSUPARTES — Repuestos Mitsubishi, Tibás, Costa Rica",
+      "url": "https://www.mitsupartescr.com/",
+      "archiveUrl": "http://web.archive.org/web/20250712163140/http://mitsupartescr.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Montero",
+      "summary": "The name Mitsubishi's full-size four-wheel-drive wagon carries in Costa Rica, Spain and the Americas; the same vehicle is the Pajero in most other markets and the Shogun in the United Kingdom. Montero Sport is a different, smaller model and is never a synonym for it."
+    },
+    "es": {
+      "title": "Montero",
+      "summary": "El nombre que lleva en Costa Rica, España y América la camioneta 4x4 grande de Mitsubishi; el mismo vehículo es Pajero en casi todos los demás mercados y Shogun en el Reino Unido. En este sitio la Montero es femenina — se escribe la Montero, nunca el Montero. Montero Sport es otro modelo, más pequeño, y no es sinónimo."
+    }
+  }
+}

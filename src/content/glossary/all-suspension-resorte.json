@@ -1,0 +1,40 @@
+{
+  "id": "all-suspension-resorte",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "suspension",
+  "aliases": [
+    {
+      "term": "muelle",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "muelles",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "coil springs",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-suspension-amortiguador",
+    "all-suspension-barra-de-torsion"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "coil spring",
+      "summary": "The coil that carries the weight at a corner of the vehicle. A sagging spring changes ride height, alignment and headlamp aim; springs are also what makes strut work dangerous without the right compressor."
+    },
+    "es": {
+      "title": "resorte",
+      "summary": "El resorte helicoidal que carga el peso en una esquina del vehículo. Uno vencido cambia la altura, la alineación y la mira de los faroles. Además, es la pieza que hace peligroso desarmar una suspensión sin la prensa correcta."
+    }
+  }
+}

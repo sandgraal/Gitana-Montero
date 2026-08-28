@@ -1,0 +1,57 @@
+{
+  "id": "all-tools-soportes-de-seguridad",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "torre de seguridad",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "torres de seguridad",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "borriqueta",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "borriquetas",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "jack stand",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "axle stand",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "axle stands",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-tools-gata"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "jack stands",
+      "summary": "The stands the vehicle rests on once it is lifted, on firm level ground, with the wheels chocked. Costa Rican workshops also call them burros. This is the single most important safety habit in home mechanics."
+    },
+    "es": {
+      "title": "soportes de seguridad",
+      "summary": "Los soportes sobre los que queda el vehículo una vez levantado, en piso firme y a nivel, con las ruedas calzadas. En los talleres ticos también se les dice burros. Es la costumbre de seguridad más importante de la mecánica casera."
+    }
+  }
+}

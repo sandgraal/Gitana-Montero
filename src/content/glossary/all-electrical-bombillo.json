@@ -1,0 +1,55 @@
+{
+  "id": "all-electrical-bombillo",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "bombilla",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "bombillas",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "ampolleta",
+      "locale": "es",
+      "countries": ["CL"]
+    },
+    {
+      "term": "ampolletas",
+      "locale": "es",
+      "countries": ["CL"]
+    },
+    {
+      "term": "bulbs",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-electrical-farol", "all-electrical-pide-vias"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "bulb",
+      "summary": "The lamp itself, as opposed to the housing it sits in. Costa Rican catalogues list them as bombillos."
+    },
+    "es": {
+      "title": "bombillo",
+      "summary": "La lámpara propiamente dicha, a diferencia del conjunto donde va montada. En los catálogos ticos aparecen así, como bombillos."
+    }
+  }
+}

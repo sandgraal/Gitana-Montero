@@ -1,0 +1,52 @@
+{
+  "id": "all-brakes-disco-de-freno",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [
+    {
+      "term": "rotor",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "rotors",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "brake discs",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-brakes-pastillas-de-freno", "all-brakes-caliper"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Automas — Repuestos Automotrices en Costa Rica",
+      "url": "https://automas.cr/",
+      "archiveUrl": "http://web.archive.org/web/20260828190644/https://automas.cr/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "brake disc",
+      "summary": "The disc the pads clamp. Warping, scoring or a thickness below the manufacturer's limit means machining or replacement; a shudder felt through the pedal usually starts here."
+    },
+    "es": {
+      "title": "disco de freno",
+      "summary": "El disco que aprietan las pastillas. Si está torcido, rayado o por debajo del espesor mínimo que fija la fábrica, se rectifica o se cambia; el pulso que se siente en el pedal casi siempre empieza aquí."
+    }
+  }
+}

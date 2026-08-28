@@ -1,0 +1,45 @@
+{
+  "id": "all-tools-cubo",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "llave de vaso",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "llaves de vaso",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "sockets",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-tools-ratchet", "all-tools-llave"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "socket",
+      "summary": "The cup that fits over a nut or bolt head and drives from a ratchet. Costa Rican catalogues sell them as cubos, in sets and singly."
+    },
+    "es": {
+      "title": "cubo",
+      "summary": "La copa que entra sobre la tuerca o la cabeza del perno y se acciona con ratchet. Los catálogos ticos los venden como cubos, en juegos y por unidad."
+    }
+  }
+}

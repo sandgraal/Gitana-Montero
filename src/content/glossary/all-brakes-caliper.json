@@ -1,0 +1,63 @@
+{
+  "id": "all-brakes-caliper",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [
+    {
+      "term": "mordaza",
+      "locale": "es",
+      "countries": ["ES", "CL"]
+    },
+    {
+      "term": "mordazas",
+      "locale": "es",
+      "countries": ["ES", "CL"]
+    },
+    {
+      "term": "pinza de freno",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "pinzas de freno",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "caliper",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "calipers",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": [
+    "all-brakes-pastillas-de-freno",
+    "all-brakes-disco-de-freno"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "CALIPERS DE FRENO VARIEDAD — Repuestos USA Motors, Costa Rica",
+      "url": "https://repuestosusamotorscr.com/producto/calipers-de-freno-variedad/",
+      "archiveUrl": "https://web.archive.org/web/20260828192236/https://repuestosusamotorscr.com/producto/calipers-de-freno-variedad/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "brake caliper",
+      "summary": "The hydraulic clamp that holds the pads over the disc. A seized piston or a stuck slide pin drags one wheel, cooks that pad and pulls the vehicle to one side under braking."
+    },
+    "es": {
+      "title": "cáliper",
+      "summary": "La mordaza hidráulica que sostiene las pastillas sobre el disco. En los catálogos ticos aparece escrito «caliper». Si se pega el pistón o se traba un perno guía, esa rueda queda frenando, quema las pastillas de ese lado y el vehículo se jala para un lado al frenar."
+    }
+  }
+}

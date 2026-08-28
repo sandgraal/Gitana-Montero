@@ -1,0 +1,57 @@
+{
+  "id": "all-suspension-amortiguador",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "suspension",
+  "aliases": [
+    {
+      "term": "shock",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "shocks",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "damper",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "dampers",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": ["all-suspension-resorte"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Automas — Repuestos Automotrices en Costa Rica",
+      "url": "https://automas.cr/",
+      "archiveUrl": "http://web.archive.org/web/20260828190644/https://automas.cr/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "shock absorber",
+      "summary": "The damper that controls how the spring moves. Worn dampers show up as float over dips, a wheel that patters on washboard gravel and longer stopping distances — replace them in pairs, per axle."
+    },
+    "es": {
+      "title": "amortiguador",
+      "summary": "El elemento que controla el movimiento del resorte. Cuando se gastan, el vehículo flota en los hundidos, la rueda salta en la calle de lastre y la distancia de frenado se alarga. Se cambian en pares, por eje."
+    }
+  }
+}

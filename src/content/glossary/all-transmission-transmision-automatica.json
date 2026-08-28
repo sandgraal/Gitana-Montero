@@ -1,0 +1,32 @@
+{
+  "id": "all-transmission-transmision-automatica",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "transmission",
+  "aliases": [
+    {
+      "term": "automatic",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "auto box",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-fluids-aceite-de-transmision-automatica"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "automatic transmission",
+      "summary": "The automatic gearbox. Fluid condition is the single best clue to its health: dark fluid that smells burnt is a warning, not a maintenance note."
+    },
+    "es": {
+      "title": "transmisión automática",
+      "summary": "La caja automática. El estado del aceite es la mejor pista de su salud: aceite oscuro y con olor a quemado es una advertencia, no un simple recordatorio de mantenimiento."
+    }
+  }
+}

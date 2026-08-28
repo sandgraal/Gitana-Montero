@@ -1,0 +1,73 @@
+{
+  "id": "all-wheels-tires-aro",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "wheels-tires",
+  "aliases": [
+    {
+      "term": "rin",
+      "locale": "es",
+      "countries": ["MX", "CO", "GT", "HN"]
+    },
+    {
+      "term": "rines",
+      "locale": "es",
+      "countries": ["MX", "CO", "GT", "HN"]
+    },
+    {
+      "term": "llanta",
+      "locale": "es",
+      "countries": ["ES", "AR", "CL"],
+      "falseFriend": true
+    },
+    {
+      "term": "llantas",
+      "locale": "es",
+      "countries": ["ES", "AR", "CL"],
+      "falseFriend": true
+    },
+    {
+      "term": "rim",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "rims",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-wheels-tires-llanta",
+    "all-wheels-tires-tuerca-de-rueda",
+    "all-wheels-tires-rueda"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Venta de Llantas en Costa Rica — Aros y Llantas Mundiales",
+      "url": "https://www.arosyllantasmundiales.com/llantas",
+      "archiveUrl": "http://web.archive.org/web/20260516080024/http://arosyllantasmundiales.com/llantas",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Llantas Bridgestone México — Encuentra tu llanta ideal",
+      "url": "https://www.bridgestone.com.mx/",
+      "archiveUrl": "http://web.archive.org/web/20251211025915/https://www.bridgestone.com.mx/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "wheel rim",
+      "summary": "The metal part the tire is mounted on, steel or alloy. Costa Rican shops sell it as the aro and quote its diameter in inches; Mexico and Colombia say rin, and in Spain and Argentina the same metal part is called llanta — which in Costa Rica means the tire instead, so the word has to be read by country."
+    },
+    "es": {
+      "title": "aro",
+      "summary": "La pieza de metal sobre la que se monta la llanta, de acero o de aleación. En Costa Rica se compra como aro y se mide en pulgadas de diámetro. Ojo con las variantes: en España y Argentina a esta misma pieza de metal le dicen «llanta», que aquí es justamente la de hule."
+    }
+  }
+}

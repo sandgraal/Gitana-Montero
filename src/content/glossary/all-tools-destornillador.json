@@ -1,0 +1,40 @@
+{
+  "id": "all-tools-destornillador",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "desarmador",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "desarmadores",
+      "locale": "es",
+      "countries": ["MX"]
+    }
+  ],
+  "relatedTerms": [],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "screwdriver",
+      "summary": "Flat, cross-head or Torx. Using one as a pry bar is how trim clips and knuckles get broken."
+    },
+    "es": {
+      "title": "destornillador",
+      "summary": "Plano, de cruz o Torx. Usarlo como palanca es la forma habitual de quebrar los clips de los acabados y de lastimarse los dedos."
+    }
+  }
+}

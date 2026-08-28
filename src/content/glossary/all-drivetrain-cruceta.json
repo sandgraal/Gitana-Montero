@@ -1,0 +1,32 @@
+{
+  "id": "all-drivetrain-cruceta",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "drivetrain",
+  "aliases": [
+    {
+      "term": "u-joint",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "universal joints",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-drivetrain-cardan", "all-fluids-grasa"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "universal joint",
+      "summary": "The cross-shaped joint at each end of a driveshaft. A dry or notchy one clunks on take-up and, left alone, can let the shaft loose — which is why it is checked whenever the vehicle is on stands."
+    },
+    "es": {
+      "title": "cruceta",
+      "summary": "La junta en cruz en cada extremo del cardán. Seca o trabada suena al arrancar la marcha y, si se deja, puede soltar el eje: por eso se revisa cada vez que el vehículo está en soportes."
+    }
+  }
+}

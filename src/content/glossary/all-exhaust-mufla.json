@@ -1,0 +1,62 @@
+{
+  "id": "all-exhaust-mufla",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "exhaust",
+  "aliases": [
+    {
+      "term": "mofle",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "mofles",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "silenciador",
+      "locale": "es",
+      "countries": ["ES", "AR"]
+    },
+    {
+      "term": "silenciadores",
+      "locale": "es",
+      "countries": ["ES", "AR"]
+    },
+    {
+      "term": "silencer",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": [],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
+      "url": "https://guiaautomotrizcr.com/",
+      "archiveUrl": "http://web.archive.org/web/20260606201328/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "muffler",
+      "summary": "The silencer box in the exhaust. Costa Rican directories list whole shops under muflas, and a mufla shop will usually fabricate a section rather than sell you a whole system."
+    },
+    "es": {
+      "title": "mufla",
+      "summary": "La caja silenciadora del escape. Los directorios ticos listan negocios enteros bajo «muflas», y en una muflería normalmente le fabrican el tramo en vez de venderle el sistema completo."
+    }
+  }
+}

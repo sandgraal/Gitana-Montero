@@ -1,0 +1,44 @@
+{
+  "id": "all-transfer-case-super-select-4wd-ii",
+  "fitment": {
+    "gens": ["gen2-5", "gen3", "gen4"]
+  },
+  "system": "transfer-case",
+  "aliases": [
+    {
+      "term": "SS4-II",
+      "locale": "en",
+      "countries": ["AU", "GB"]
+    },
+    {
+      "term": "Super Select II",
+      "locale": "en",
+      "countries": ["AU", "GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-transfer-case-caja-de-transferencia",
+    "all-transfer-case-diferencial-central",
+    "all-transfer-case-rango-bajo"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Super Select II When and Where — Mitsubishi Motors Australia",
+      "url": "https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
+      "archiveUrl": "https://web.archive.org/web/20260828191907/https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Super Select 4WD II",
+      "summary": "Mitsubishi's four-wheel-drive system with four settings: rear-wheel drive in high range, four-wheel drive in high range with the centre differential open, the same with the centre differential locked, and four-wheel drive in low range with it locked. The open-centre setting is what lets it be driven on pavement in four-wheel drive, which an Easy Select vehicle cannot do."
+    },
+    "es": {
+      "title": "Super Select 4WD II",
+      "summary": "El sistema de tracción de Mitsubishi con cuatro posiciones: tracción trasera en rango alto, tracción en las cuatro ruedas en rango alto con el diferencial central abierto, esa misma con el central bloqueado, y tracción total en rango bajo con el central bloqueado. La posición de central abierto es la que permite andar en asfalto con tracción total, cosa que un vehículo Easy Select no puede hacer."
+    }
+  }
+}

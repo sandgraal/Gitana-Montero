@@ -1,0 +1,27 @@
+{
+  "id": "all-electrical-fusible",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "fuses",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-electrical-rele"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "fuse",
+      "summary": "The sacrificial link that protects a circuit. A fuse that blows again is reporting a fault; fitting a bigger one is how vehicles catch fire."
+    },
+    "es": {
+      "title": "fusible",
+      "summary": "El eslabón que se sacrifica para proteger un circuito. Un fusible que se vuelve a quemar está reportando una falla; ponerle uno más grande es la forma en que se incendian los vehículos."
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "all-general-carro",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [
+    {
+      "term": "coche",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "coches",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-general-montero"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Repuestos para carros en Costa Rica — Repuestos Gigante",
+      "url": "https://repuestosgigante.com/repuestos/",
+      "archiveUrl": "https://web.archive.org/web/20260828192347/https://repuestosgigante.com/repuestos/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
+      "url": "https://guiaautomotrizcr.com/",
+      "archiveUrl": "http://web.archive.org/web/20260606201328/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "car",
+      "summary": "The everyday word for a passenger vehicle in Costa Rica, used for anything from a sedan to a Montero. Spanish prose on this site says carro; vehículo is the neutral form when the sentence needs one."
+    },
+    "es": {
+      "title": "carro",
+      "summary": "La palabra de todos los días en Costa Rica para un vehículo de pasajeros, lo mismo un sedán que una Montero. El texto en español de este sitio dice carro; vehículo queda como forma neutra cuando la frase la necesita."
+    }
+  }
+}

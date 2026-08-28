@@ -1,0 +1,37 @@
+{
+  "id": "all-engine-retenedor",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "retén",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "retenes",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "oil seals",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-engine-empaque", "all-engine-ciguenal"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "oil seal",
+      "summary": "The lip seal on a rotating shaft. Most of the oil under an old Montero comes from one of these rather than from a gasket."
+    },
+    "es": {
+      "title": "retenedor",
+      "summary": "El sello de labio que va en un eje que gira. La mayoría del aceite que aparece debajo de una Montero con años sale de uno de estos y no de un empaque."
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "all-fuel-bomba-de-combustible",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fuel",
+  "aliases": [],
+  "relatedTerms": ["all-fuel-filtro-de-combustible"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "fuel pump",
+      "summary": "The pump that feeds the engine, electric and inside the tank on injected versions. Running the tank very low on a hot day is hard on it, because the fuel is what cools it."
+    },
+    "es": {
+      "title": "bomba de combustible",
+      "summary": "La bomba que alimenta el motor; en las versiones inyectadas es eléctrica y va dentro del tanque. Andar siempre con el tanque casi vacío la castiga, porque es el mismo combustible el que la enfría."
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "all-drivetrain-palier",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "drivetrain",
+  "aliases": [
+    {
+      "term": "semieje",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "halfshaft",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    }
+  ],
+  "relatedTerms": ["all-drivetrain-punta-de-eje", "all-drivetrain-diferencial"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "axle shaft",
+      "summary": "The shaft that carries drive from the differential out to the hub."
+    },
+    "es": {
+      "title": "palier",
+      "summary": "El eje que lleva la tracción desde el diferencial hasta la maza de la rueda."
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "all-body-winch",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "body",
+  "aliases": [
+    {
+      "term": "cabrestante",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-body-bumper", "all-general-todoterreno"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "PRTOFFROAD — Preparación de vehículos 4x4 y offroad",
+      "url": "https://www.prtoffroad.com/",
+      "archiveUrl": "https://web.archive.org/web/20260828191951/https://www.prtoffroad.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "winch",
+      "summary": "The recovery winch, usually mounted in or behind the front bumper. A loaded winch line is one of the most dangerous things on a vehicle: rated shackles, a damper over the line and nobody standing in line with it."
+    },
+    "es": {
+      "title": "winch",
+      "summary": "El winch de rescate, casi siempre montado dentro o detrás del bumper delantero. Un cable de winch en tensión es de lo más peligroso que hay en un vehículo: grilletes certificados, una manta sobre el cable y nadie parado en la línea de tiro."
+    }
+  }
+}

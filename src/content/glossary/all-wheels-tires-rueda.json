@@ -1,0 +1,29 @@
+{
+  "id": "all-wheels-tires-rueda",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "wheels-tires",
+  "aliases": [],
+  "relatedTerms": ["all-wheels-tires-aro", "all-wheels-tires-llanta"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Venta de Llantas en Costa Rica — Aros y Llantas Mundiales",
+      "url": "https://www.arosyllantasmundiales.com/llantas",
+      "archiveUrl": "http://web.archive.org/web/20260516080024/http://arosyllantasmundiales.com/llantas",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "wheel",
+      "summary": "Rim and tire together, as one assembly — what comes off the vehicle when the five nuts are undone."
+    },
+    "es": {
+      "title": "rueda",
+      "summary": "El aro y la llanta juntos, como un solo conjunto: lo que sale del vehículo cuando se aflojan las cinco tuercas."
+    }
+  }
+}

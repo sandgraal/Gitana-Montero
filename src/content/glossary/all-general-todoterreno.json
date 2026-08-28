@@ -1,0 +1,39 @@
+{
+  "id": "all-general-todoterreno",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": [
+    "all-general-overland",
+    "all-transfer-case-caja-de-transferencia"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "PRTOFFROAD — Preparación de vehículos 4x4 y offroad",
+      "url": "https://www.prtoffroad.com/",
+      "archiveUrl": "https://web.archive.org/web/20260828191951/https://www.prtoffroad.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Overland 4x4, Vehículos para la Aventura — CODIGO 4X4",
+      "url": "https://codigo4x4.com/overland-4x4/",
+      "archiveUrl": "https://web.archive.org/web/20260828192031/https://codigo4x4.com/overland-4x4/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "off-road vehicle",
+      "summary": "A vehicle built to leave paved roads: body-on-frame or reinforced structure, high ground clearance and low-range gearing. The Montero is one."
+    },
+    "es": {
+      "title": "todoterreno",
+      "summary": "Vehículo hecho para salirse del asfalto: estructura reforzada, buena altura libre y marcha reducida. La Montero es uno."
+    }
+  }
+}

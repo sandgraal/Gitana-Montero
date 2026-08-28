@@ -1,0 +1,27 @@
+{
+  "id": "all-steering-brazo-loco",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "steering",
+  "aliases": [
+    {
+      "term": "brazo auxiliar",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-steering-brazo-pitman"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "idler arm",
+      "summary": "The arm on the opposite side from the pitman arm that supports the linkage. A worn idler arm is a classic cause of wandering steering on an older four-wheel drive."
+    },
+    "es": {
+      "title": "brazo loco",
+      "summary": "El brazo del lado contrario al pitman que sostiene el varillaje. Un brazo loco gastado es causa clásica de que una 4x4 con años se vaya de lado sola."
+    }
+  }
+}

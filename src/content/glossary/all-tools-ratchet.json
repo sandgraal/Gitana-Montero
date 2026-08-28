@@ -1,0 +1,40 @@
+{
+  "id": "all-tools-ratchet",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "carraca",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "matraca",
+      "locale": "es",
+      "countries": ["MX"]
+    }
+  ],
+  "relatedTerms": ["all-tools-cubo"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "ratchet",
+      "summary": "The handle that drives a socket one way and freewheels the other. Costa Rican tool catalogues list it in English, as the ratchet."
+    },
+    "es": {
+      "title": "ratchet",
+      "summary": "El mango que mueve el cubo en un sentido y gira libre en el otro. Los catálogos de herramienta ticos lo listan así, en inglés."
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "all-body-guardabarros",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "body",
+  "aliases": [
+    {
+      "term": "salpicadera",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "salpicaderas",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "wing",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": [],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "fender",
+      "summary": "The panel over each wheel. In Costa Rica it is also heard as guardafango, and the liner behind it is what keeps mud out of the wiring."
+    },
+    "es": {
+      "title": "guardabarros",
+      "summary": "El panel que cubre cada rueda; en Costa Rica también se le oye guardafango. El forro que va detrás es lo que evita que el barro llegue al cableado."
+    }
+  }
+}

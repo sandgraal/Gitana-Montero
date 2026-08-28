@@ -1,0 +1,29 @@
+{
+  "id": "all-brakes-manguera-de-freno",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [],
+  "relatedTerms": ["all-brakes-liquido-de-frenos", "all-brakes-caliper"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "brake hose",
+      "summary": "The flexible line between the hard line and the caliper. It ages from the inside: a hose that has swollen shut acts like a stuck caliper and can hold a brake on after the pedal is released."
+    },
+    "es": {
+      "title": "manguera de freno",
+      "summary": "La manguera flexible entre la cañería rígida y el cáliper. Se daña por dentro: una manguera hinchada se comporta como un cáliper pegado y puede dejar la rueda frenando después de soltar el pedal."
+    }
+  }
+}

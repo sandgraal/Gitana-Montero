@@ -1,0 +1,30 @@
+{
+  "id": "all-general-itv",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["eu", "cr"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-rtv", "all-general-mot"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Inspección Vehicular — DEKRA Costa Rica",
+      "url": "https://www.dekra.cr/es/inspeccion-vehicular/",
+      "archiveUrl": "https://web.archive.org/web/20260828191803/https://www.dekra.cr/es/inspeccion-vehicular/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "ITV",
+      "summary": "In Spain, the inspección técnica de vehículos — that country's periodic inspection. The abbreviation is also used in Costa Rica by DEKRA for the service Costa Rican law and everyday speech call the RTV, so the country has to be stated whenever the term is used. It never means the British MOT."
+    },
+    "es": {
+      "title": "ITV",
+      "summary": "En España, la inspección técnica de vehículos, o sea la revisión periódica de ese país. La sigla también la usa DEKRA en Costa Rica para el servicio que la ley y el habla tica llaman RTV, así que siempre hay que decir de cuál país se habla. Nunca equivale al MOT británico."
+    }
+  }
+}

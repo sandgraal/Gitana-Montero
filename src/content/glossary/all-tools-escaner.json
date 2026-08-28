@@ -1,0 +1,35 @@
+{
+  "id": "all-tools-escaner",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "diagnostic tool",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "OBD-II",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": [
+    "all-electrical-computadora",
+    "all-interior-luz-de-advertencia"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "scan tool",
+      "summary": "The tool that reads fault codes and live data from the control units. A code is a starting point for diagnosis, never a shopping list."
+    },
+    "es": {
+      "title": "escáner",
+      "summary": "La herramienta que lee los códigos de falla y los datos en vivo de las unidades de control. Un código es el punto de partida del diagnóstico, nunca la lista de compras."
+    }
+  }
+}

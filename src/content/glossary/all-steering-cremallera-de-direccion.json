@@ -1,0 +1,32 @@
+{
+  "id": "all-steering-cremallera-de-direccion",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "steering",
+  "aliases": [
+    {
+      "term": "rack and pinion",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
+      "term": "steering gear",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-steering-direccion-hidraulica"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "steering rack",
+      "summary": "The rack-and-pinion assembly that turns rotation of the wheel into side-to-side movement of the tie rods. Not every Montero has one — several versions use a recirculating-ball steering box instead — so check which your vehicle has before ordering parts."
+    },
+    "es": {
+      "title": "cremallera de dirección",
+      "summary": "El conjunto de cremallera y piñón que convierte el giro del volante en movimiento lateral de las varillas. No todas las Montero la llevan: varias versiones usan caja de dirección de bolas recirculantes, así que revise cuál trae la suya antes de pedir repuestos."
+    }
+  }
+}

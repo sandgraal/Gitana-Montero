@@ -1,0 +1,43 @@
+{
+  "id": "all-suspension-levante-de-suspension",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "suspension",
+  "aliases": [
+    {
+      "term": "lift kit",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
+      "term": "kit de elevación",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": [
+    "all-suspension-barra-de-torsion",
+    "all-general-preparacion"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "PRTOFFROAD — Preparación de vehículos 4x4 y offroad",
+      "url": "https://www.prtoffroad.com/",
+      "archiveUrl": "https://web.archive.org/web/20260828191951/https://www.prtoffroad.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "suspension lift",
+      "summary": "A kit of springs, dampers and spacers that raises the body relative to the axles for clearance and bigger tires. It changes geometry, driveshaft angles and headlamp aim, and in most jurisdictions it changes what an inspection will accept — check the rules for your own country before fitting one."
+    },
+    "es": {
+      "title": "levante de suspensión",
+      "summary": "El conjunto de resortes, amortiguadores y separadores que sube la carrocería respecto a los ejes para ganar espacio y montar llantas más grandes. Cambia la geometría, los ángulos del cardán y la mira de los faroles, y en casi cualquier jurisdicción cambia lo que acepta la revisión: consulte las reglas de su país antes de montar uno."
+    }
+  }
+}

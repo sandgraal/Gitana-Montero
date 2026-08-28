@@ -1,0 +1,27 @@
+{
+  "id": "all-drivetrain-diferencial",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "drivetrain",
+  "aliases": [
+    {
+      "term": "diff",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-transfer-case-bloqueo-del-diferencial"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "differential",
+      "summary": "The gearset in each axle that lets the two wheels turn at different speeds. Front and rear ratios must match on a four-wheel-drive vehicle — mismatched ratios destroy the drivetrain."
+    },
+    "es": {
+      "title": "diferencial",
+      "summary": "El juego de engranajes de cada eje que deja girar las dos ruedas a distinta velocidad. En un 4x4 las relaciones de adelante y atrás tienen que coincidir: si no coinciden, se destruye el tren motriz."
+    }
+  }
+}

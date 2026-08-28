@@ -1,0 +1,40 @@
+{
+  "id": "all-transfer-case-bloqueo-del-diferencial",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "transfer-case",
+  "aliases": [
+    {
+      "term": "diff lock",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "locker",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
+      "term": "bloqueo de diferencial",
+      "locale": "es",
+      "countries": ["ES", "MX"]
+    }
+  ],
+  "relatedTerms": [
+    "all-drivetrain-diferencial",
+    "all-transfer-case-diferencial-central"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "differential lock",
+      "summary": "A mechanism that ties the two output shafts of a differential together so a wheel with no grip cannot take all the drive. It is for slow, low-grip work and is disengaged before returning to a hard surface."
+    },
+    "es": {
+      "title": "bloqueo del diferencial",
+      "summary": "El mecanismo que amarra los dos palieres de un diferencial para que la rueda sin agarre no se lleve toda la tracción. Es para trabajo lento y de poco agarre, y se desconecta antes de volver a superficie dura."
+    }
+  }
+}

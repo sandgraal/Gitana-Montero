@@ -1,0 +1,29 @@
+{
+  "id": "all-general-compatibilidad",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-numero-de-parte", "all-general-repuestos"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Repuestos para carros en Costa Rica — Repuestos Gigante",
+      "url": "https://repuestosgigante.com/repuestos/",
+      "archiveUrl": "https://web.archive.org/web/20260828192347/https://repuestosgigante.com/repuestos/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "fitment",
+      "summary": "Which vehicles a part, a fault or a procedure actually applies to — generation, market, year range, engine, transmission, transfer case. Every entry on this site carries one."
+    },
+    "es": {
+      "title": "compatibilidad",
+      "summary": "A cuáles vehículos le aplica de verdad una pieza, una falla o un procedimiento: generación, mercado, rango de años, motor, transmisión y caja de transferencia. Toda entrada de este sitio lleva la suya. Ojo con traducir fitment como «ajuste»: en español ajuste es otra cosa, es la regulación de una pieza."
+    }
+  }
+}

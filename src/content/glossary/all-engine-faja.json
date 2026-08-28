@@ -1,0 +1,40 @@
+{
+  "id": "all-engine-faja",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "drive belts",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "fan belt",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-engine-faja-de-tiempo", "all-electrical-alternador"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "drive belt",
+      "summary": "The external belt that drives alternator, water pump, power steering and air conditioning. Costa Rican usage is faja; parts catalogues also list correas. A glazed or cracked belt squeals cold and can leave you without charging or steering assistance."
+    },
+    "es": {
+      "title": "faja",
+      "summary": "La faja externa que mueve el alternador, la bomba de agua, la dirección hidráulica y el aire acondicionado. En Costa Rica se le dice faja, aunque los catálogos también la listan como correa. Vidriosa o rajada chilla en frío y puede dejarlo sin carga o sin asistencia de dirección."
+    }
+  }
+}

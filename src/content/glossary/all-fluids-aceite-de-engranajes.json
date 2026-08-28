@@ -1,0 +1,24 @@
+{
+  "id": "all-fluids-aceite-de-engranajes",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fluids",
+  "aliases": [],
+  "relatedTerms": [
+    "all-drivetrain-diferencial",
+    "all-transfer-case-caja-de-transferencia"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "gear oil",
+      "summary": "The heavy oil in manual gearbox, transfer case and differentials. Limited-slip differentials need their own additive or their own oil, and leaving it out makes them chatter in tight turns."
+    },
+    "es": {
+      "title": "aceite de engranajes",
+      "summary": "El aceite pesado de la caja manual, la caja de transferencia y los diferenciales, al que en el taller también se le dice valvulina. Los diferenciales de deslizamiento limitado piden su aditivo o su aceite propio, y sin él castañetean al doblar cerrado."
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "all-drivetrain-tren-motriz",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "drivetrain",
+  "aliases": [],
+  "relatedTerms": [
+    "all-transfer-case-caja-de-transferencia",
+    "all-drivetrain-cardan",
+    "all-drivetrain-diferencial"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "drivetrain",
+      "summary": "Everything that carries power from the gearbox to the wheels: transfer case, driveshafts, differentials and axle shafts. This site's Spanish chrome files it as Tren motriz."
+    },
+    "es": {
+      "title": "tren motriz",
+      "summary": "Todo lo que lleva la fuerza desde la caja hasta las ruedas: caja de transferencia, cardanes, diferenciales y palieres. Es el nombre con que este sitio agrupa el sistema en español."
+    }
+  }
+}

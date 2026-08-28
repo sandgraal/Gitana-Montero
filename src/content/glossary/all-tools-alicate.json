@@ -1,0 +1,40 @@
+{
+  "id": "all-tools-alicate",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "pinza",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "pinzas",
+      "locale": "es",
+      "countries": ["MX"]
+    }
+  ],
+  "relatedTerms": [],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "pliers",
+      "summary": "Combination, long-nose or locking. Costa Rican catalogues list them as alicates and tenazas."
+    },
+    "es": {
+      "title": "alicate",
+      "summary": "De combinación, de punta larga o de presión. Los catálogos ticos los listan como alicates y tenazas."
+    }
+  }
+}

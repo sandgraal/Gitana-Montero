@@ -1,0 +1,30 @@
+{
+  "id": "all-fluids-aceite-de-transmision-automatica",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fluids",
+  "aliases": [
+    {
+      "term": "ATF",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-transmission-transmision-automatica",
+    "all-fluids-liquidos"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "automatic transmission fluid",
+      "summary": "The fluid an automatic gearbox uses as hydraulic medium, coolant and lubricant at once. The specification is not generic; the wrong fluid can make a healthy gearbox shift badly."
+    },
+    "es": {
+      "title": "aceite de transmisión automática",
+      "summary": "El aceite que en una caja automática hace de medio hidráulico, refrigerante y lubricante a la vez. La especificación no es genérica: un aceite equivocado hace que una caja sana cambie mal."
+    }
+  }
+}

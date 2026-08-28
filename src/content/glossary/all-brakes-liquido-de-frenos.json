@@ -1,0 +1,33 @@
+{
+  "id": "all-brakes-liquido-de-frenos",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [],
+  "relatedTerms": [
+    "all-brakes-bomba-principal-de-freno",
+    "all-fluids-liquidos",
+    "all-brakes-purga-de-frenos"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "brake fluid",
+      "summary": "The hydraulic fluid in the brake system. It absorbs water over time, which lowers its boiling point and can put air in the pedal on a long descent — a real risk on Costa Rican mountain roads. Use the grade the vehicle calls for and change it on schedule."
+    },
+    "es": {
+      "title": "líquido de frenos",
+      "summary": "El líquido hidráulico del sistema de frenos. Con el tiempo absorbe agua, lo que le baja el punto de ebullición y puede dejar el pedal esponjoso en una bajada larga — riesgo real en las cuestas de este país. Use el tipo que pide el vehículo y cámbielo cuando toca."
+    }
+  }
+}

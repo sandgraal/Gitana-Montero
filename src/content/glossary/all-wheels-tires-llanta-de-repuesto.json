@@ -1,0 +1,21 @@
+{
+  "id": "all-wheels-tires-llanta-de-repuesto",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "wheels-tires",
+  "aliases": [],
+  "relatedTerms": ["all-wheels-tires-llanta", "all-tools-gata"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "spare tire",
+      "summary": "The spare carried on the vehicle. On a Montero it hangs on the tailgate, which is also where its carrier, lock and cover give trouble. A spare that is flat or badly aged is not a spare."
+    },
+    "es": {
+      "title": "llanta de repuesto",
+      "summary": "La llanta de auxilio que anda el vehículo. En una Montero va colgada en la puerta trasera, y ahí mismo es donde dan problema el portallanta, la chapa y el forro. Una llanta de repuesto desinflada o vencida no cuenta como repuesto."
+    }
+  }
+}
