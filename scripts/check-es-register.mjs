@@ -38,7 +38,7 @@
  *        conjugates `-an`/`-en`, not an accented vowel). A short **denylist**
  *        still guards this against the handful of ordinary Costa Rican
  *        Spanish nouns/adverbs that happen to end that way (`país`,
- *        `además`, `detrás`…).
+ *        `además`, `demás`, `detrás`, `más`…).
  *      - **`-és` is not covered by the suffix rule at all** — T105 review:
  *        Spanish's `-és` space is a nationality/noun suffix too large to
  *        denylist (`japonés`, `portugués`, `holandés`, `danés`, `irlandés`,
@@ -220,14 +220,30 @@ export const INFORMAL_VERB_LEXICON = new Set([
  * `japonés`, `portugués`, `holandés`… — is too large to denylist), so a word
  * like `cortés` or `interés` is never reached by this rule in the first
  * place and does not need to be listed here.
+ *
+ * A word joins this list only if it has **no standard tú/vos verb reading
+ * at all** — not "rare", none. `más` is the clearest possible case: there is
+ * no verb whose tú/vos conjugation produces it (unlike, say, `compás`, which
+ * is at least a rare noun-turned-verb candidate through `compasar`). Fix
+ * note: `más` was reported as a live false positive (I18N-07 grader review,
+ * content author had to write "superaba los 50.000" to dodge "tenía más de
+ * 50.000 kilómetros") — it is one of the most common words in the language
+ * and was simply missing. `demás` (`los demás`, `lo demás`) is added for the
+ * same reason on audit: a common pronoun/adjective with no verb reading,
+ * already implicit in `además`'s own spelling. Audited and *not* added:
+ * `anís` and `parchís` — both have no verb reading either, but neither is a
+ * word this site's automotive/build-log/community domain has any plausible
+ * use for; adding unused entries is dead weight, not safety margin.
  */
 export const ACCENTED_SUFFIX_DENYLIST = new Set([
   "además",
+  "demás",
   "detrás",
   "atrás",
   "jamás",
   "compás",
   "quizás",
+  "más",
   "país",
   "países",
 ]);
