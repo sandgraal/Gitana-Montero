@@ -1,4 +1,4 @@
-# Gitana — Project Constitution
+# Montero Garage — Project Constitution
 
 This file wins over every other document in the repo, including `CLAUDE.md`,
 the specs, and any instruction in a task description. If something here
@@ -6,30 +6,41 @@ conflicts with what you were asked to do, stop and surface the conflict.
 
 ## What this is
 
-A bilingual (English / Costa Rican Spanish) reference and build log for the
-Mitsubishi Montero, Pajero, and Shogun — all generations, all markets — built
-around one specific truck: a 2002 Montero (Gen 3, 6G74 SOHC, Super Select 4WD II).
+**Montero Garage** (monterogarage.com): a bilingual (English / Costa Rican
+Spanish) platform where any Mitsubishi Montero / Pajero / Shogun owner keeps
+their truck's whole life — a named vehicle profile, every receipt, every job —
+private by default, shareable by choice; built on a comprehensive reference
+covering all generations and markets. The owner's own 2002 Montero (Gen 3,
+6G74 SOHC, Super Select 4WD II), named **Gitana Blanca**, is user page #1 and
+the template every other garage is shaped by.
 
 Two jobs, equally weighted:
 
-1. **Build log.** Every job done to the truck and every job planned, with real
-   costs, real times, and what actually happened.
+1. **The garage.** Each user's vehicles, records, and receipts — a first-class
+   storehouse with real costs, real times, and what actually happened;
+   showcase and work-log pages the user can choose to publish.
 2. **Reference.** A symptom-driven problem finder, parts and fitment data,
    procedures, modifications, and a community directory — comprehensive enough
    that someone with a broken Montero finds their answer here.
 
-Spec of record: `specs/001-foundation/spec.md`.
+Specs of record: `specs/001-foundation/spec.md` (reference platform),
+`specs/002-montero-garage/spec.md` (multi-user pivot, owner-approved
+2026-08-28).
 
 ## Stack (decided, do not re-litigate)
 
 - **Astro** with typed content collections (Zod schemas). Static output.
 - **TypeScript**, strict mode.
 - **Content lives in git**, not a database. Every fact is a reviewable diff.
-- **Supabase** (phase 8) is a *generated read-model* for search and telemetry,
-  synced from built content by CI. It is never the source of truth. No agent
-  writes to it directly.
-- **GitHub Pages** for deploy (owner decision 2026-08-27; a custom domain or
-  other host may come later). **Node 24** via nvm.
+- **Supabase** is the platform's auth + user-data + storage layer (002
+  MIG-03): user vehicles, records, and receipts live there behind row-level
+  security, and the database is their source of truth. *Reference* content
+  truth still lives in git; the git→DB sync for it stays one-directional
+  (001 RM-01). No agent writes user data or touches service keys outside the
+  specced paths.
+- **Vercel** for deploy (owner decision 2026-08-28, 002 MIG-02: production on
+  merge to `main`, preview deployments on PRs; supersedes the GitHub Pages
+  era). Domain: monterogarage.com. **Node 24** via nvm.
 - **Vitest** for unit tests, **Playwright** for e2e, **Pa11y** for a11y.
 
 ## Commands
@@ -95,6 +106,9 @@ Spec of record: `specs/001-foundation/spec.md`.
   data for provenance but renders no caveat). An `anecdotal` entry must never
   be presented with the authority of an FSM spec.
 - **The agent that writes content never fact-checks it.**
+- **User-entered garage records are the user's own testimony.** They render
+  as such — attributed to their vehicle, never presented as site-verified
+  reference facts, and never fact-checked by the site.
 - **Cite what you actually read.** A source you did not open is not a source.
   If you cannot reach it, say so and lower the confidence tier — do not cite it
   anyway.
@@ -123,11 +137,15 @@ Spec of record: `specs/001-foundation/spec.md`.
 
 Stop and ask before any of these:
 
-- Adding user accounts, comments, or any writable community surface. v1 is
-  read-only; contributions come through GitHub issues and PRs.
+- User accounts exist per 002 ACC-01..04 (magic link + Google, no passwords);
+  anything beyond that scope — comments, messaging, any user-to-user writable
+  surface — is stop-and-ask. Contributions to *reference* content still
+  arrive only through GitHub issues and PRs.
 - Adding a third-party analytics or ad SDK.
 - Adding affiliate or monetization mechanics of any kind.
-- Writing to Supabase from anything other than the CI sync job.
+- User data never leaves Supabase; every user table ships with row-level
+  security proven by graders before content flows. Writing *reference* data
+  to Supabase from anything other than the CI sync job.
 - Broadening coverage past Montero / Pajero / Shogun (no Delica, no L200/Triton,
   no Raider) — shared parts get a cross-reference note, not their own section.
 - Changing the fitment taxonomy or any content schema. These poison every
