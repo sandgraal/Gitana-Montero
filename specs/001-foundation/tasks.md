@@ -4,8 +4,10 @@ Task breakdown for `spec.md`, ordered per `plan.md`. Every task cites the
 acceptance criteria it satisfies. `[TEST]` tasks author failing graders
 **before** their paired `[PLATFORM]` task, by a separate agent instance
 (AGENTS.md separation rule). `[CONTENT]` tasks ship both locales in one PR and
-get concurrent fact-check + bilingual-edit passes. Commit messages reference
-this spec: `type(scope): …, refs specs/001-foundation`.
+get concurrent fact-check + bilingual-edit passes. `[DESIGN]` tasks are run by
+the conductor with the owner in the main session (Claude Design Artifact — not
+a worktree subagent); deliverables merge via a normal PR. Commit messages
+reference this spec: `type(scope): …, refs specs/001-foundation`.
 
 The eligible frontier = every unchecked task whose predecessors (same section,
 or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
@@ -33,6 +35,23 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 - [ ] **T206 [CONTENT]** Glossary seed: ~150 core terms (systems, major components, tools, fluids) with CR-canonical ES, regional aliases, bilingual definitions. Depends: T205. *(GLO-01, GLO-03)*
 - [ ] **T207 [CONTENT]** Reference data: FSM section index (citations only), fluid chart, torque master table, capacities/dimensions — fitment-scoped, every value cited. Depends: T203. *(REF-01, REF-02)*
 - [ ] **T208 [CONTENT]** VIN/option-code decoder data. Depends: T203. *(REF-01)*
+
+### Design
+- [ ] **T209 [DESIGN]** Claude Design canvas for core page templates: problem page
+  (safety-notice + confidence-caveat rendering, EN and ES artboards), vehicle
+  selector states, garage timeline, glossary page, site chrome w/ locale switcher
+  (mobile + desktop). Owner refines in the Artifact; exports land in
+  `specs/001-foundation/design/` with a `HANDOFF-DESIGN.md` (palette, type scale,
+  spacing, component notes). Input package assembled at dispatch: T104 schema field
+  lists incl. confidence enum + sources block; T102 UI-strings module (both locales,
+  real ES strings for length testing); spec excerpts PRB-03, PRB-04, FIT-03, GAR-01,
+  GAR-02; two bilingual content fixtures written for this task (one problem entry
+  with safety notice + low-confidence caveat, one garage entry); constraints
+  (mobile-first viewports, T106 Lighthouse budget, owner brand preferences or a
+  note that the canvas proposes them). Depends: T102, T104. Runs parallel to
+  T201–T203; must complete before T204, T205 (page), T301, T401, T402 dispatch —
+  their dispatch prompts must reference HANDOFF-DESIGN.md. *(PRB-03, PRB-04,
+  FIT-03, GAR-01, I18N-03, I18N-08)*
 
 ## Phase 3 — Garage / build log
 - [ ] **T301 [PLATFORM]** Garage schema + entry page + timeline view. Depends: T203. *(GAR-01)*
