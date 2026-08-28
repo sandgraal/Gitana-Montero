@@ -94,8 +94,12 @@ Triage + safety (bilingual, always):
   time/cost/parts; cross-links to problem/procedure as bordered mini-chips.
 - **Glossary** ([Glosario](artboards/Glosario.dc.html)): search placeholder
   demonstrates alias search; system filter pills (active=ink); term cards:
-  ES term large + EN gloss, system tag color-coded, definitions in BOTH
-  languages, alias chips with country tags (Plex Mono).
+  system tag color-coded, definitions in BOTH languages, alias chips with
+  country tags (Plex Mono). *(Owner ruling 2026-08-28, supersedes the
+  artboard on this one point: the headword is the PAGE LOCALE's own term —
+  EN page leads English, ES page leads the CR term — not ES-first on both.
+  Sort order follows the headword. No confidence caveat on term cards —
+  see the AGENTS.md glossary carve-out of the same date.)*
 - **Icons**: inline stroke SVG only (2px stroke, 16/20/24 grid) — truck,
   clock, warning triangle, info circle, search, chevron, hamburger, ×.
   Never emoji.

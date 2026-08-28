@@ -90,8 +90,10 @@ Spec of record: `specs/001-foundation/spec.md`.
 - **Every entity carries a confidence tier**, one of:
   `fsm-confirmed` › `tsb` › `community-consensus` › `first-hand` › `anecdotal`
   (total order ratified by the owner 2026-08-27). Anything below `tsb` renders
-  with a visible caveat in both languages. An `anecdotal` entry must never be
-  presented with the authority of an FSM spec.
+  with a visible caveat in both languages — except glossary terms (owner
+  ruling 2026-08-28: terminology is not a repair fact; the tier stays in the
+  data for provenance but renders no caveat). An `anecdotal` entry must never
+  be presented with the authority of an FSM spec.
 - **The agent that writes content never fact-checks it.**
 - **Cite what you actually read.** A source you did not open is not a source.
   If you cannot reach it, say so and lower the confidence tier — do not cite it
