@@ -58,8 +58,9 @@ description).
 ## Verify before reporting
 
 `npm run verify` (schema, locales, citations, glossary, build) — paste the
-tail. Check the task's box in `tasks.md` in your final commit. Push, confirm
-with `git ls-remote origin <branch>`.
+tail. Check the task's box in `tasks.md` in your final commit. End every
+commit with the trailer `X-Agent-Role: content-researcher` (the audit trail
+for the separation rule). Push, confirm with `git ls-remote origin <branch>`.
 
 ## Report (final message)
 

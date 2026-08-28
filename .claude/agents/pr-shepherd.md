@@ -10,9 +10,11 @@ review thread resolved, the independent passes clean (code-reviewer for
 code; fact-checker AND bilingual-editor for content), and no conflicts
 merges without asking. Anything less does not.
 
-Work in the branch's worktree (`pwd`, `git branch --show-current`). Source
-nvm before any npm command:
-`export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use 24 >/dev/null &&`.
+Work in the branch's worktree (`pwd`, `git branch --show-current`). Before
+any npm/node command:
+`export PATH="$HOME/.nvm/versions/node/v24.19.0/bin:$PATH" &&`
+(no system Node; sourcing `nvm.sh` via `.` is blocked by the subagent Bash
+guard — the direct PATH export is the working form).
 
 ## 1. Open or update the PR
 
@@ -76,9 +78,12 @@ head SHA, zero unresolved threads, and the conductor told you every
 required independent pass is clean.
 
 `gh pr merge <n> --squash --delete-branch` (never `--admin`, never bypass
-protection). Then `git fetch origin main` and confirm the squash commit is
-on `main` (`git log origin/main -1 --format=%H%n%s`). Remove your worktree
-only if the conductor asked.
+protection). Collect the distinct `X-Agent-Role:` trailers from the branch's
+commits (`git log origin/main..HEAD --format=%B | grep '^X-Agent-Role:' | sort -u`)
+and pass them into the squash commit body with `--body` so the role audit
+trail survives the squash. Then `git fetch origin main` and confirm the
+squash commit is on `main` (`git log origin/main -1 --format=%H%n%s`).
+Remove your worktree only if the conductor asked.
 
 ## Report (final message)
 

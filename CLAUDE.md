@@ -26,9 +26,10 @@ validation is `node scripts/validate-routing.mjs` and `bash -n .claude/hooks/*.s
 
 ## Environment — this machine is unusual
 
-- **No system Node.** Source nvm in every shell before npm/node:
-  `export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use 24 >/dev/null &&`
-  Never put `nvm use` behind a pipe — the subshell discards the PATH change.
+- **No system Node.** Prefix every shell that runs npm/node with
+  `export PATH="$HOME/.nvm/versions/node/v24.19.0/bin:$PATH" &&`
+  Subagent worktree shells cannot source `nvm.sh` via `.` (Bash guard blocks
+  it) — the direct PATH export is the form that works everywhere.
 - **This volume (`/Volumes/Samsung T9`) has silently dropped writes before.**
   After every push: `git ls-remote origin <branch>` to confirm it landed, and
   `git show --stat HEAD` to confirm the commit is what you think it is.
