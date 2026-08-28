@@ -1,5 +1,29 @@
 name: CI
 
+# ──────────────────────────────────────────────────────────────────────────
+# SCF-03  every `verify` step plus link check and a11y, merge-blocking.
+# SCF-05  deploy to GitHub Pages on merge to `main`; upload the built site as
+#         a downloadable artifact on pull requests (no preview deployments —
+#         owner decision 2026-08-27).
+# SCF-06  Lighthouse accessibility ≥ 95 / performance ≥ 90 as a CI budget.
+#
+# ## The job *names* below are load-bearing — do not rename them
+#
+# `main`'s branch protection requires these three status checks by their
+# display name:
+#
+#   • "Harness validation"
+#   • "Verify (check · lint · test · locales · citations · glossary · build)"
+#   • "Links + a11y"
+#
+# A required context that never reports does not fail a PR, it *hangs* it
+# forever, which is worse than a red run because nothing points at the cause.
+# So a new gate goes inside one of these three jobs unless whoever adds it
+# also updates the required contexts on `main` (repo settings → branches).
+# That is why the Lighthouse budgets live in "Links + a11y" rather than in a
+# job of their own: they are merge-blocking today, with no settings change.
+# ──────────────────────────────────────────────────────────────────────────
+
 on:
   pull_request:
   push:
@@ -8,6 +32,16 @@ on:
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Least privilege by default; the deploy job widens its own scope.
+permissions:
+  contents: read
+
+env:
+  # Both audits drive an installed Chrome instead of downloading one
+  # (`.puppeteerrc.cjs`). This path is the Google Chrome the ubuntu runner
+  # image ships; `resolveChromePath()` fails loudly if it ever moves.
+  CHROME_PATH: /usr/bin/google-chrome
 
 jobs:
   harness:
@@ -25,8 +59,6 @@ jobs:
           bash -n .claude/hooks/guard-dangerous-git.sh
           bash -n .claude/hooks/pre-commit-verify.sh
 
-  # ── The jobs below activate when Phase 1 (T101–T106) lands a package.json.
-  # Until then they no-op green so the harness can merge its own scaffolding.
   verify:
     name: Verify (check · lint · test · locales · citations · glossary · build)
     runs-on: ubuntu-latest
@@ -35,15 +67,60 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || '' }}
-      - name: Verify
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # GitHub Pages project-site paths are case-sensitive: if `base` and the
+      # repository name ever disagree by so much as one letter, the build is
+      # green, the deploy succeeds, and every asset 404s on the live site.
+      # Nothing else in the pipeline can see that — `check:hreflang` derives
+      # its expectations from the same `base`, so it agrees with the mistake.
+      # (After `npm ci`: `astro.config.mjs` imports `astro/config`.)
+      - name: Assert astro `base` matches the repository name
         run: |
-          if [ -f package.json ]; then
-            npm ci
-            npm run verify
-          else
-            echo "package.json not present yet (pre-T101); skipping."
+          base="$(node -e 'import("./astro.config.mjs").then(m => process.stdout.write(String(m.default.base ?? "/")))')"
+          repo="${GITHUB_REPOSITORY#*/}"
+          if [ "$base" != "/$repo" ]; then
+            echo "astro.config.mjs base is '$base' but this repository is '$repo'." >&2
+            echo "GitHub Pages serves a project site at /$repo/ and the path is case-sensitive." >&2
+            echo "Set base to '/$repo' — or, if the site moved to a custom domain, update this check with it." >&2
+            exit 1
           fi
+          echo "base '$base' matches repository '$repo'."
+
+      - name: Verify
+        run: npm run verify
+
+      # SCF-05, PR half: the built site, downloadable from the run summary.
+      # Uploaded on every event so a main-branch run keeps the same evidence.
+      - name: Upload built site (downloadable artifact)
+        # Pinned to a commit SHA, not a tag — see the pinning note on the
+        # deploy job.
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: site-dist
+          path: dist/
+          retention-days: 14
+          if-no-files-found: error
+
+      # SCF-05, deploy half: the same `dist/` this job just verified, packaged
+      # for `actions/deploy-pages`. Only on `main`, and only from a push —
+      # a pull_request run must never produce a deployable artifact.
+      #
+      # NOTE on `.nojekyll`: it is deliberately absent, and that is only safe
+      # on this path. `upload-pages-artifact` + `deploy-pages` publish a
+      # tarball directly and never run Jekyll, so nothing strips leading-
+      # underscore directories. If this repo is ever switched back to a
+      # *branch* deploy (repo settings → Pages → "Deploy from a branch"),
+      # `.nojekyll` becomes MANDATORY at the site root: Jekyll silently drops
+      # `dist/_astro/`, which is every stylesheet and script the site has.
+      - name: Package built site for GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: dist/
 
   links-a11y:
     name: Links + a11y
@@ -53,13 +130,97 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || '' }}
-      - name: Link check + a11y
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # SCF-02/SCF-03 split: the link check is deliberately outside `verify`
+      # because it reaches the network, and a source dying overnight must not
+      # break `npm run verify` on a laptop with no signal. Policy (ruled
+      # 2026-08-27, GAP-01): a source fails only when **both** its `url` and
+      # its `archiveUrl` are unreachable — a dead original with a live archive
+      # is a gaps-report item, not a merge blocker. The policy lives in
+      # `scripts/check-links.mjs`; do not re-implement it here.
+      - name: Link check
+        run: npm run check:links
+
+      # The a11y gate is two independent checks against the same built site:
+      # Pa11y for WCAG 2.1 AA rule violations, Lighthouse for SCF-06's score
+      # budgets. Both need `dist/`, so this job builds it — `astro build`
+      # rather than `npm run build`, because `astro check` already ran (and
+      # will run again) in the `verify` job and repeating it here buys nothing
+      # but a slower gate.
+      - name: Build site for audits
+        run: npx astro build
+
+      - name: Accessibility (Pa11y, WCAG2AA)
+        run: npm run test:a11y
+
+      - name: Lighthouse budgets (a11y ≥ 95, performance ≥ 90)
+        run: npm run test:lighthouse
+
+  # SCF-05: publish on merge to `main`, and only after every merge-blocking
+  # gate is green — a red `main` must not reach the live site even though
+  # branch protection already makes a red merge hard.
+  #
+  # ## Why the Pages-path actions are pinned to commit SHAs
+  #
+  # `pages: write` + `id-token: write` on `main` is the highest privilege
+  # anything in this repo holds: whatever runs here can publish arbitrary
+  # bytes to the live site. Tags are mutable — `@v4` is a pointer its owner
+  # can move, so a compromised or retagged release would be picked up silently
+  # on the next merge. The three actions on that path (`upload-artifact`,
+  # `upload-pages-artifact`, `deploy-pages`) are therefore pinned to immutable
+  # commit SHAs with the version in a trailing comment. Bumping one is a
+  # deliberate, reviewable diff: resolve the new tag with
+  # `gh api repos/<owner>/<repo>/git/ref/tags/<tag> --jq .object.sha`.
+  #
+  # `checkout` and `setup-node` stay on tags: they run in the read-only gate
+  # jobs, and this job does not use them at all.
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: [harness, verify, links-a11y]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      # The only privileges this workflow ever asks for. `deploy-pages` uses
+      # the built-in GITHUB_TOKEN and OIDC — there is no deploy secret to
+      # store, rotate or leak.
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Deployments serialise on the environment, never on the branch: two
+    # merges in quick succession must publish in order, not cancel each other.
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    steps:
+      # `deploy-pages` fails with a bare "Not Found"/"Get Pages site failed"
+      # when the repository's Pages source is still "Deploy from a branch" —
+      # a message that says nothing about the one setting that fixes it. This
+      # step names it instead. (Owner action, not an agent's: the publishing
+      # source is repository infrastructure.)
+      - name: Preflight — Pages must publish from GitHub Actions
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ -f package.json ]; then
-            npm ci
-            npm run check:links --if-present
-            npm run test:a11y --if-present
-          else
-            echo "package.json not present yet (pre-T101); skipping."
+          build_type="$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type' 2>/dev/null || echo "unconfigured")"
+          if [ "$build_type" != "workflow" ]; then
+            echo "GitHub Pages build_type is '${build_type}', not 'workflow'." >&2
+            echo "Set Settings → Pages → Build and deployment → Source = 'GitHub Actions'." >&2
+            echo "Equivalent API call:" >&2
+            echo "  gh api -X POST repos/${GITHUB_REPOSITORY}/pages -f build_type=workflow   # when unconfigured" >&2
+            echo "  gh api -X PUT  repos/${GITHUB_REPOSITORY}/pages -f build_type=workflow   # when already on a branch source" >&2
+            exit 1
           fi
+          echo "Pages publishes from GitHub Actions."
+
+      # Consumes the `github-pages` artifact the `verify` job uploaded, so the
+      # bytes that go live are the exact bytes the gates passed on — not a
+      # re-build that could differ.
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

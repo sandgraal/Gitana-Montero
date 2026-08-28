@@ -53,9 +53,18 @@ This repo is built by a conducted fleet of AI agents — see `AGENTS.md`
 ```bash
 nvm use 24
 npm install
-npm run verify   # everything CI runs
-npm run dev      # http://localhost:4321/Gitana-Montero/
+npm run verify          # every merge-blocking check except link/a11y
+npm run dev             # http://localhost:4321/Gitana-Montero/
+
+# The three gates CI adds on top of `verify`, all against the built site:
+npm run check:links     # cited sources reachable (network)
+npm run test:a11y       # Pa11y, WCAG 2.1 AA
+npm run test:lighthouse # accessibility ≥ 95, performance ≥ 90 (SCF-06)
 ```
+
+`test:a11y` and `test:lighthouse` need `dist/` (run `npm run build` first) and
+an installed Chrome. Neither downloads a browser: set `CHROME_PATH` if yours
+is somewhere unusual — the error message lists the paths that were tried.
 
 The site is served under a base path (`base` in `astro.config.mjs`), so local
 URLs include it: `/Gitana-Montero/en/` and `/Gitana-Montero/es/`.
