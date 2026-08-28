@@ -1,0 +1,73 @@
+---
+/**
+ * Locale switcher (I18N-03).
+ *
+ * Renders a link to the *same route* in every other locale, and records the
+ * click so the root redirect honours the choice on later visits. Persistence
+ * is written by `locale-preference.ts`, which this component loads once.
+ *
+ * Every option is labelled with the language's own native name — shared data
+ * from `routing.ts`, not translated prose, so it exists exactly once.
+ */
+import {
+  LOCALES,
+  LOCALE_BCP47,
+  LOCALE_HREFLANG,
+  LOCALE_NATIVE_NAME,
+  localeHref,
+  type Locale,
+} from "../i18n/routing";
+import { t } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+  routePath: string;
+}
+
+const { locale, routePath } = Astro.props;
+const strings = t(locale);
+---
+
+<nav class="locale-switcher" aria-label={strings.languageSwitcherLabel}>
+  <span class="locale-switcher__label" id="locale-switcher-label"
+    >{strings.languageLabel}</span
+  >
+  <ul aria-labelledby="locale-switcher-label">
+    {
+      LOCALES.map((option) => (
+        <li>
+          <a
+            href={localeHref(option, routePath)}
+            hreflang={LOCALE_HREFLANG[option]}
+            lang={LOCALE_BCP47[option]}
+            data-locale-choice={option}
+            aria-current={option === locale ? "true" : undefined}
+            title={option === locale ? strings.languageCurrent : undefined}
+          >
+            {LOCALE_NATIVE_NAME[option]}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  import { rememberLocaleFromClick } from "../i18n/locale-preference";
+
+  rememberLocaleFromClick(document);
+</script>
+
+<style>
+  .locale-switcher ul {
+    display: inline-flex;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .locale-switcher [aria-current="true"] {
+    font-weight: 700;
+  }
+</style>
