@@ -41,8 +41,9 @@ exists, `npm install`, source nvm in every shell, read task line + spec tags
 
 `npm run check` passes; `npm test` shows your tests reported as *expected
 failures*, not errors. Paste the tail of the output. Then commit
-`test(scope): [TEST] T### …, refs specs/001-foundation`, push, confirm with
-`git ls-remote origin <branch>`.
+`test(scope): [TEST] T### …, refs specs/001-foundation`, ending with the
+trailer `X-Agent-Role: test-writer` (T901 audits separation through these),
+push, confirm with `git ls-remote origin <branch>`.
 
 ## Report (final message)
 
