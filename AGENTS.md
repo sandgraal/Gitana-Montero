@@ -79,7 +79,11 @@ Specs of record: `specs/001-foundation/spec.md` (reference platform),
   intervals, pressures, clearances, and fitment are locale-independent `data`,
   stored once and rendered into both languages. Never duplicate a number into a
   per-locale field. If you find yourself writing the same figure twice, the
-  schema is wrong — stop and report it.
+  schema is wrong — stop and report it. Exception (owner ruling 2026-08-28):
+  count descriptors that are part of a component's NAME — "24-valve",
+  "five-speed", "veinticuatro válvulas", like "SOHC" or "V6" — are naming,
+  not specs; volatile popularity metrics (member counts and the like) are the
+  reverse case and never render as exact figures in prose.
 - **Costa Rican Spanish, `usted` register.** Procedures address the reader as
   `usted` throughout. No `tú`, no `vos` in reference content.
 - **The glossary is authoritative for terminology.** Canonical Costa Rican terms
@@ -100,11 +104,13 @@ Specs of record: `specs/001-foundation/spec.md` (reference platform),
   build error. "It's a Montero thing" is not a fitment.
 - **Every entity carries a confidence tier**, one of:
   `fsm-confirmed` › `tsb` › `community-consensus` › `first-hand` › `anecdotal`
-  (total order ratified by the owner 2026-08-27). Anything below `tsb` renders
-  with a visible caveat in both languages — except glossary terms (owner
-  ruling 2026-08-28: terminology is not a repair fact; the tier stays in the
-  data for provenance but renders no caveat). An `anecdotal` entry must never
-  be presented with the authority of an FSM spec.
+  (total order ratified by the owner 2026-08-27). `fsm-confirmed` means
+  **factory-documented**: the FSM, official spec sheets, factory brochures and
+  catalogues — manufacturer primary literature (owner ruling 2026-08-28).
+  Anything below `tsb` renders with a visible caveat in both languages —
+  except glossary terms (owner ruling 2026-08-28: terminology is not a repair
+  fact; the tier stays in the data for provenance but renders no caveat). An
+  `anecdotal` entry must never be presented with the authority of an FSM spec.
 - **The agent that writes content never fact-checks it.**
 - **User-entered garage records are the user's own testimony.** They render
   as such — attributed to their vehicle, never presented as site-verified
