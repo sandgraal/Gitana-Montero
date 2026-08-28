@@ -55,7 +55,7 @@ PRs. Accounts, comments, and submissions are explicitly out of scope (§9).
 ### 3.2 Internationalization (I18N)
 
 - **I18N-01** THE site SHALL serve every page under both `/en/…` and `/es/…` path prefixes with neither locale privileged.
-- **I18N-02** WHEN a request hits the site root `/`, THE site SHALL redirect to the visitor's preferred locale per `Accept-Language`, defaulting to `/en/` when no preference matches.
+- **I18N-02** WHEN a request hits the site root `/`, THE site SHALL redirect to the visitor's preferred locale per `Accept-Language`, defaulting to `/en/` when no preference matches. *(2026-08-27: GitHub Pages (SCF-05) offers no server-side request hook, so the redirect is client-side — `navigator.languages`, the browser mirror of `Accept-Language`, through the same negotiation function a server would call — with a `noindex` bilingual chooser page and a `<noscript>` meta-refresh to `/en/` as fallback. Consequence: a no-JS visitor always lands on `/en/`, consistent with the stated default. The negotiation logic is server-shaped so an edge redirect can adopt it unchanged if the host ever allows one.)*
 - **I18N-03** WHEN a visitor uses the locale switcher, THE site SHALL navigate to the same page in the other locale and SHALL persist the choice for subsequent visits.
 - **I18N-04** THE site SHALL emit `hreflang` link pairs plus `x-default` on every page, and a CI check SHALL fail when any page's pair is missing or asymmetric.
 - **I18N-05** WHERE a collection page has per-locale slugs (e.g. `/en/problems/…`, `/es/problemas/…`), THE slug registry SHALL map each entry to exactly one slug per locale, and a CI check SHALL fail on collisions or missing mappings.
