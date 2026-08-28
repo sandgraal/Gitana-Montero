@@ -46,20 +46,28 @@ const baseProse = {
   summary: z.string(),
 };
 
+/** The shape a collection gets until the phase task that owns it lands. */
+const baseEntrySchema = () => defineEntrySchema({}, baseProse);
+
 /**
  * One collection loaded from `src/content/<name>/`.
  *
- * `schema` defaults to the base entry shape, which is still what most
- * collections get: their own fields arrive with the phase task that owns
- * them. A collection whose task *has* landed passes the schema that task
- * built — always via `defineEntrySchema` in `src/schemas/<name>.ts`, so the
- * `{ id, fitment, …, prose: { en, es } }` envelope is identical either way
- * and `tests/schemas/collections.test.ts` grades both forms the same.
+ * Most collections still get `baseEntrySchema()`: their own fields arrive
+ * with the phase task that owns them. A collection whose task *has* landed
+ * passes the schema that task built — always via `defineEntrySchema` in
+ * `src/schemas/<name>.ts`, so the `{ id, fitment, …, prose: { en, es } }`
+ * envelope is identical either way and `tests/schemas/collections.test.ts`
+ * grades both forms the same.
+ *
+ * Generic in the schema, and required rather than defaulted (T205): Astro
+ * derives `entry.data` from `z.infer` of whatever type this parameter
+ * *declares*, so annotating it as the base `z.ZodType` erased every
+ * collection's data to `unknown` and any page reading a collection lost its
+ * types. A generic with a default value would need an unsound cast to keep
+ * the default, so every collection names its schema instead — one visible
+ * word per line, and no collection is silently on the base shape.
  */
-function entryCollection(
-  name: string,
-  schema: z.ZodType = defineEntrySchema({}, baseProse)
-) {
+function entryCollection<S extends z.ZodType>(name: string, schema: S) {
   return defineCollection({
     loader: glob({ pattern: ENTRY_PATTERN, base: `./src/content/${name}` }),
     schema,
@@ -78,17 +86,17 @@ export const collections = {
    */
   glossary: entryCollection("glossary", glossaryEntrySchema),
   /** REF-01, REF-02 — FSM index, fluids, torque master table, capacities. */
-  reference: entryCollection("reference"),
+  reference: entryCollection("reference", baseEntrySchema()),
   /** GAR-01…05 — the build log for the truck. */
-  garage: entryCollection("garage"),
+  garage: entryCollection("garage", baseEntrySchema()),
   /** PRB-01…06 — the symptom-driven problem finder. */
-  problems: entryCollection("problems"),
+  problems: entryCollection("problems", baseEntrySchema()),
   /** PRT-01…03 — parts, fitment, supersession chains. */
-  parts: entryCollection("parts"),
+  parts: entryCollection("parts", baseEntrySchema()),
   /** PRC-01…03 — step-by-step procedures. */
-  procedures: entryCollection("procedures"),
+  procedures: entryCollection("procedures", baseEntrySchema()),
   /** MOD-01, MOD-02 — modifications and their tradeoffs. */
-  mods: entryCollection("mods"),
+  mods: entryCollection("mods", baseEntrySchema()),
   /** COM-01, COM-02 — the bilingual community directory (T700). */
   community: entryCollection("community", communitySchema),
 };
