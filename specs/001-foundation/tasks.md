@@ -20,7 +20,7 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 - [ ] **T103 [TEST]** Graders for the entry-schema contract: `prose.en`+`prose.es` both required (a one-locale fixture must fail), shared-data/prose split (no numeric spec fields inside prose schemas), slug-registry uniqueness per locale. Expected-failure markers. Depends: T101. *(I18N-05, I18N-06, SCF-04)*
 - [ ] **T104 [PLATFORM]** Base entry schemas in `src/content.config.ts`: shared `data` + locale-keyed `prose` (both required), `fitment` placeholder type, `confidence` enum, `sources` array with archiveUrl. Per-locale slug registry. Activates T103 graders. Depends: T103 merged. *(I18N-05, I18N-06, SCF-01, SCF-04)*
 - [ ] **T105 [PLATFORM]** Check scripts: `check:locales`, `check:citations`, `check:glossary` (stub until glossary exists), `check:links`, ES `usted`-register lint, `npm run verify` aggregator. Depends: T104. *(SCF-02, I18N-07, REF-02)*
-- [ ] **T106 [PLATFORM]** CI workflow: verify + link check + a11y + Lighthouse budgets, merge-blocking; Vercel deploy config; **prove the gate**: a deliberate one-locale entry on a scratch branch must fail CI (attach the red run to the PR); bilingual issue templates + PR template. Depends: T105. *(SCF-03, SCF-05, SCF-06, SCF-07)*
+- [ ] **T106 [PLATFORM]** CI workflow: verify + link check + a11y + Lighthouse budgets, merge-blocking; GitHub Pages deploy config (Pages deploy on merge to `main`, built-site artifact upload on PRs); **prove the gate**: a deliberate one-locale entry on a scratch branch must fail CI (attach the red run to the PR); bilingual issue templates + PR template. Depends: T105. *(SCF-03, SCF-05, SCF-06, SCF-07)*
 
 ## Phase 2 — Taxonomy, fitment, glossary, reference
 

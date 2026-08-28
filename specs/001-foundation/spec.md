@@ -48,7 +48,7 @@ PRs. Accounts, comments, and submissions are explicitly out of scope (§9).
 - **SCF-02** WHEN `npm run verify` runs at the repo root, THE pipeline SHALL execute check, lint, unit tests, locale check, citation check, glossary check, and build, and SHALL exit non-zero if any step fails.
 - **SCF-03** WHEN a pull request is opened, THE CI workflow SHALL run every `verify` step plus link check and a11y check, and SHALL block merge on any failure.
 - **SCF-04** IF a content entry fails its collection's Zod schema, THEN THE build SHALL fail with an error naming the file and field.
-- **SCF-05** THE repository SHALL deploy to Vercel on merge to `main` with preview deployments on PRs.
+- **SCF-05** THE repository SHALL deploy to GitHub Pages on merge to `main`; WHEN a pull request runs CI, THE workflow SHALL upload the built site as a downloadable artifact (no live preview deployments for now — owner decision 2026-08-27).
 - **SCF-06** THE site SHALL meet a Lighthouse accessibility score ≥ 95 and performance ≥ 90 on the home page and one representative content page per collection, enforced as a CI budget.
 - **SCF-07** THE repository SHALL contain bilingual GitHub issue templates (report-a-problem, correct-a-fact, suggest-a-mod) and a PR template that requires fitment and source citations for content changes.
 
