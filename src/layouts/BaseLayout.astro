@@ -1,0 +1,88 @@
+---
+/**
+ * The layout every localized page uses. It owns the three things that must be
+ * true of every page in this site:
+ *
+ *  - `<html lang>` matches the locale (I18N-01),
+ *  - a full `hreflang` set — one link per locale plus `x-default` — is emitted
+ *    (I18N-04), verified after every build by `npm run check:hreflang`,
+ *  - all chrome text comes from the typed UI-strings module (I18N-08).
+ */
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import {
+  LOCALE_BCP47,
+  absoluteUrl,
+  alternateLinks,
+  localeHref,
+  splitLocalePath,
+  type Locale,
+} from "../i18n/routing";
+import { t } from "../i18n/ui";
+import { warnIfSiteUnset } from "../i18n/site-url";
+
+interface Props {
+  locale: Locale;
+  /** Page title, already localized. */
+  title: string;
+  /** Meta description, already localized. */
+  description?: string;
+  /**
+   * Locale-independent route (`/`, `/problems/`). Defaults to the current URL
+   * with the base path and locale prefix removed.
+   */
+  routePath?: string;
+}
+
+const { locale, title, description, routePath } = Astro.props;
+
+const route = routePath ?? splitLocalePath(Astro.url.pathname).routePath;
+const alternates = alternateLinks(route);
+const canonicalHref = localeHref(locale, route);
+
+warnIfSiteUnset(Astro.site, Astro.url.pathname);
+
+const strings = t(locale);
+---
+
+<!doctype html>
+<html lang={LOCALE_BCP47[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={absoluteUrl(canonicalHref, Astro.site)} />
+    {
+      alternates.map((alternate) => (
+        <link
+          rel="alternate"
+          hreflang={alternate.hreflang}
+          href={absoluteUrl(alternate.href, Astro.site)}
+        />
+      ))
+    }
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{strings.skipToContent}</a>
+    <SiteHeader locale={locale} routePath={route} />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter locale={locale} />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .skip-link:focus {
+    position: static;
+    display: inline-block;
+    padding: 0.5rem;
+  }
+</style>

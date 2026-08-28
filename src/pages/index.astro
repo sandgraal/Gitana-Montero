@@ -1,17 +1,85 @@
 ---
-// Scaffold placeholder home page. i18n routing (/en/, /es/, root redirect,
-// hreflang) lands in T102 — this page exists only so `astro build` has an
-// entry point during platform scaffolding.
+/**
+ * Root redirect shim (I18N-02).
+ *
+ * `/` is not a page — it is a language decision. It sends the visitor to the
+ * locale they already chose, else the best match for their browser's language
+ * preferences, else `/en/`.
+ *
+ * Why client-side: the site builds to static output on GitHub Pages, which has
+ * no server hook to read `Accept-Language` on `/`. `navigator.languages` is the
+ * same preference list that header is built from, and it is fed through the
+ * same `negotiateLocale()` used everywhere else — so if this ever moves to a
+ * host with edge redirects, the decision does not change, only where it runs.
+ * With JavaScript off, the `<noscript>` meta-refresh takes the documented
+ * default of `/en/`, and the language links below always work.
+ *
+ * This page is deliberately `noindex` and carries no `hreflang` set: it has no
+ * content of its own. `scripts/check-hreflang.mjs` lists it as an explicit
+ * exemption so the omission stays visible rather than looking like a bug.
+ */
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  LOCALE_BCP47,
+  LOCALE_HREFLANG,
+  LOCALE_NATIVE_NAME,
+  localeHref,
+} from "../i18n/routing";
+import { allUi, ui } from "../i18n/ui";
+
+const defaultHref = localeHref(DEFAULT_LOCALE, "/");
+const title = LOCALES.map((locale) => ui[locale].rootRedirectTitle).join(" · ");
 ---
 
-<html lang="en">
+<!doctype html>
+<html lang={LOCALE_BCP47[DEFAULT_LOCALE]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Gitana — Montero reference (scaffold)</title>
+    <meta name="robots" content="noindex, follow" />
+    <title>{title}</title>
+    <noscript>
+      <meta http-equiv="refresh" content={`0; url=${defaultHref}`} />
+    </noscript>
   </head>
   <body>
-    <h1>Gitana — Montero reference &amp; build log</h1>
-    <p>Platform scaffold. i18n routing lands in T102.</p>
+    {
+      allUi.map(({ locale, strings }) => (
+        <section lang={LOCALE_BCP47[locale]}>
+          <h1>{strings.rootRedirectTitle}</h1>
+          <p>{strings.rootRedirectMessage}</p>
+          <p>{strings.rootRedirectManual}</p>
+        </section>
+      ))
+    }
+    <nav aria-label={ui[DEFAULT_LOCALE].languageSwitcherLabel}>
+      <ul>
+        {
+          LOCALES.map((locale) => (
+            <li>
+              <a
+                href={localeHref(locale, "/")}
+                hreflang={LOCALE_HREFLANG[locale]}
+                lang={LOCALE_BCP47[locale]}
+                data-locale-choice={locale}
+              >
+                {LOCALE_NATIVE_NAME[locale]}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
   </body>
 </html>
+
+<script>
+  import {
+    redirectRootToLocale,
+    rememberLocaleFromClick,
+  } from "../i18n/locale-preference";
+
+  rememberLocaleFromClick(document);
+  redirectRootToLocale(window);
+</script>

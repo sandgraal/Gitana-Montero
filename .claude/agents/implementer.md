@@ -19,8 +19,9 @@ report is read by a machine-like conductor, so return facts, not prose.
    main checkout (`git worktree list` shows its path), copy it. Then
    `npm install` (or `npm ci` when a lockfile exists).
 3. Every shell that runs node/npm must start with
-   `export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm use 24 >/dev/null &&`
-   (no system Node on this machine; never put `nvm use` behind a pipe).
+   `export PATH="$HOME/.nvm/versions/node/v24.19.0/bin:$PATH" &&`
+   (no system Node on this machine, and sourcing `nvm.sh` via `.` is blocked
+   by the subagent Bash guard — the direct PATH export is the working form).
 4. Read the task line, its spec tags in `specs/001-foundation/spec.md`, the
    build notes in `plan.md`, any `specs/001-foundation/HANDOFF-T###.md`
    addressed to you, and `AGENTS.md`. Write down the acceptance criteria and
@@ -42,8 +43,9 @@ report is read by a machine-like conductor, so return facts, not prose.
   explicitly include one and you need it, stop and report.
 - Never `--no-verify`, never force-push without `--force-with-lease`, never
   edit `AGENTS.md`, `spec.md`, or `.claude/`.
-- Commit messages: `type(scope): …, refs specs/001-foundation`. Small commits
-  are fine; the PR is squash-merged.
+- Commit messages: `type(scope): …, refs specs/001-foundation`, ending with
+  the trailer `X-Agent-Role: implementer` (T901 audits the separation rule
+  through these trailers). Small commits are fine; the PR is squash-merged.
 - Check the task's box in `specs/001-foundation/tasks.md` in your final commit.
 
 ## Verify before reporting

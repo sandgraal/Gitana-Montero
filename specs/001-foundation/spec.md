@@ -32,7 +32,7 @@ PRs. Accounts, comments, and submissions are explicitly out of scope (§9).
 | **Fitment** | A structured query over the vehicle taxonomy: `{gens, markets?, years?, engines?, transmissions?, transferCases?, trims?, drive?}`. Resolved by the shared fitment engine; an entry's fitment names every vehicle its facts apply to |
 | **Locale** | `en` (English) or `es` (Costa Rican Spanish, `usted` register). Never any other value |
 | **Entry** | One document in a content collection: shared locale-independent `data` + locale-keyed `prose` with both locales required |
-| **Confidence tier** | `fsm-confirmed` › `tsb` › `community-consensus` › `anecdotal` › `first-hand`. `first-hand` = verified on the project truck; ranks above `anecdotal`, below `tsb`, and is flagged as single-vehicle evidence |
+| **Confidence tier** | `fsm-confirmed` › `tsb` › `community-consensus` › `first-hand` › `anecdotal`. `first-hand` = verified on the project truck, flagged as single-vehicle evidence. *(2026-08-27: owner ratified the total order — `first-hand` sits between `community-consensus` and `anecdotal`, resolving the prior ambiguity between this table and AGENTS.md's enumeration)* |
 | **Canonical term** | The Costa Rican Spanish term the glossary designates for a concept; the only form allowed in ES prose |
 | **Alias** | A regional variant of a canonical term (MX/ES/CO/AR/PE…), stored in the glossary for search only |
 | **Gaps report** | Generated backlog: entries failing completeness heuristics (missing fix paths, uncited specs, dead links, uncovered fitment combinations) |
@@ -55,7 +55,7 @@ PRs. Accounts, comments, and submissions are explicitly out of scope (§9).
 ### 3.2 Internationalization (I18N)
 
 - **I18N-01** THE site SHALL serve every page under both `/en/…` and `/es/…` path prefixes with neither locale privileged.
-- **I18N-02** WHEN a request hits the site root `/`, THE site SHALL redirect to the visitor's preferred locale per `Accept-Language`, defaulting to `/en/` when no preference matches.
+- **I18N-02** WHEN a request hits the site root `/`, THE site SHALL redirect to the visitor's preferred locale per `Accept-Language`, defaulting to `/en/` when no preference matches. *(2026-08-27: GitHub Pages (SCF-05) offers no server-side request hook, so the redirect is client-side — `navigator.languages`, the browser mirror of `Accept-Language`, through the same negotiation function a server would call — with a `noindex` bilingual chooser page and a `<noscript>` meta-refresh to `/en/` as fallback. Consequence: a no-JS visitor always lands on `/en/`, consistent with the stated default. The negotiation logic is server-shaped so an edge redirect can adopt it unchanged if the host ever allows one.)*
 - **I18N-03** WHEN a visitor uses the locale switcher, THE site SHALL navigate to the same page in the other locale and SHALL persist the choice for subsequent visits.
 - **I18N-04** THE site SHALL emit `hreflang` link pairs plus `x-default` on every page, and a CI check SHALL fail when any page's pair is missing or asymmetric.
 - **I18N-05** WHERE a collection page has per-locale slugs (e.g. `/en/problems/…`, `/es/problemas/…`), THE slug registry SHALL map each entry to exactly one slug per locale, and a CI check SHALL fail on collisions or missing mappings.

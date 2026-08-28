@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "verify": "astro check && eslint . && prettier --check . && vitest run && astro build"
+    "check:hreflang": "node scripts/check-hreflang.mjs",
+    "verify": "astro check && eslint . && prettier --check . && vitest run && astro build && npm run check:hreflang"
   },
   "dependencies": {
     "astro": "^7.2.9"
@@ -24,9 +25,11 @@
     "@astrojs/check": "^0.9.10",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.0.0",
+    "astro-eslint-parser": "^3.1.0",
     "eslint": "^10.9.1",
     "eslint-plugin-astro": "^3.1.0",
     "globals": "^17.11.0",
+    "jsdom": "^28.1.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.9.3",
