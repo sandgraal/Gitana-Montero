@@ -1,0 +1,73 @@
+{
+  "id": "combos-gen3-au",
+  "kind": "combination",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["au"]
+  },
+  "generation": "gen3",
+  "market": "au",
+  "coverage": "partial",
+  "offerings": [
+    {
+      "years": {
+        "from": 2003,
+        "to": null
+      },
+      "engine": "6g74-sohc",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["glx", "gls"]
+    },
+    {
+      "years": {
+        "from": 2003,
+        "to": null
+      },
+      "engine": "6g75",
+      "transmission": "automatic-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["glx", "gls", "exceed"]
+    },
+    {
+      "years": {
+        "from": 2003,
+        "to": null
+      },
+      "engine": "4m41",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["glx", "gls"]
+    },
+    {
+      "years": {
+        "from": 2003,
+        "to": null
+      },
+      "engine": "4m41",
+      "transmission": "automatic-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["glx", "gls", "exceed"]
+    }
+  ],
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Third generation, Australian market",
+      "summary": "Powertrain pairings for the third-generation Pajero in Australia, taken from a single factory brochure and its specification tables. The petrol split is unusual and worth knowing before buying parts: automatic petrol cars use the larger V6 and manual petrol cars keep the smaller one. The diesel was available with either gearbox, and the top grade was automatic only. Ranges open at the brochure's model year and are left open because the brochure does not state an end. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
+    },
+    "es": {
+      "title": "Tercera generación, mercado australiano",
+      "summary": "Combinaciones de tren motriz para el Pajero de tercera generación en Australia, tomadas de un único folleto de fábrica y de sus tablas de especificaciones. El reparto de los motores de gasolina es poco habitual y conviene conocerlo antes de comprar repuestos: los automáticos de gasolina llevan el V6 de mayor cilindrada y los manuales de gasolina conservan el menor. El diésel se ofreció con cualquiera de las dos cajas, y el acabado tope de gama fue solo automático. Los rangos arrancan en el año modelo del folleto y quedan abiertos porque el folleto no indica un final. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "20th-anniversary",
+  "kind": "trim",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"]
+  },
+  "markets": ["us"],
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors North America — Montero features and specifications (mechanical), 2004 model year",
+      "url": "https://www.mitsubishicars.com/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "archiveUrl": "https://web.archive.org/web/20031220004634/http://www.mitsubishicars.com:80/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "20th Anniversary",
+      "summary": "A commemorative North American trim listed alongside the two regular ones on the factory specification sheet, mechanically identical to them and distinguished by wheels and interior appointments."
+    },
+    "es": {
+      "title": "20th Anniversary",
+      "summary": "Un acabado conmemorativo norteamericano que aparece junto a los dos regulares en la hoja de especificaciones de fábrica, mecánicamente idéntico a ellos y diferenciado por los aros y por los detalles interiores."
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "id": "combos-gen4-global",
+  "kind": "combination",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["global"]
+  },
+  "generation": "gen4",
+  "market": "global",
+  "coverage": "partial",
+  "offerings": [
+    {
+      "years": {
+        "from": 2018,
+        "to": 2018
+      },
+      "engine": "6g75",
+      "transmission": "automatic-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["gls"]
+    },
+    {
+      "years": {
+        "from": 2018,
+        "to": 2018
+      },
+      "engine": "6g72-sohc",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["gl"]
+    },
+    {
+      "years": {
+        "from": 2018,
+        "to": 2018
+      },
+      "engine": "6g72-sohc",
+      "transmission": "automatic-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["gls"]
+    },
+    {
+      "years": {
+        "from": 2018,
+        "to": 2018
+      },
+      "engine": "6g72-sohc",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["gls"]
+    },
+    {
+      "years": {
+        "from": 2018,
+        "to": 2018
+      },
+      "engine": "4m41",
+      "transmission": "automatic-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["gls"]
+    },
+    {
+      "years": {
+        "from": 2018,
+        "to": 2018
+      },
+      "engine": "4m40",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["gl"]
+    },
+    {
+      "years": {
+        "from": 2018,
+        "to": 2018
+      },
+      "engine": "4m40",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["gls"]
+    }
+  ],
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — Pajero 18MY general-export specifications sheet",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "archiveUrl": "https://web.archive.org/web/20180128021206/http://www.mitsubishi-motors.com:80/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Fourth generation, general export",
+      "summary": "Powertrain pairings for the fourth-generation Pajero as published on the factory general-export specification sheet for a single model year, which is why the year range on every row is that one year. The sheet is the strongest source in this collection: it names each column's model code, engine, gearbox and grade outright. Every version on it uses the same transfer case. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
+    },
+    "es": {
+      "title": "Cuarta generación, exportación general",
+      "summary": "Combinaciones de tren motriz para el Pajero de cuarta generación tal como aparecen en la hoja de especificaciones de exportación general de fábrica de un solo año modelo, y por eso el rango de años de cada fila es ese único año. Esa hoja es la fuente más sólida de esta colección: nombra de forma explícita el código de modelo, el motor, la caja y el acabado de cada columna. Todas las versiones que aparecen en ella usan la misma caja de transferencia. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
+    }
+  }
+}

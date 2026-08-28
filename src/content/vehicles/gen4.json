@@ -1,0 +1,80 @@
+{
+  "id": "gen4",
+  "kind": "generation",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["uk", "au", "jdm", "eu", "me", "global"]
+  },
+  "chassisCodes": ["V80", "V90", "V93W", "V96W", "V97W", "V98W"],
+  "production": {
+    "from": 2006,
+    "to": 2021
+  },
+  "marketNames": [
+    {
+      "market": "uk",
+      "name": "Shogun"
+    },
+    {
+      "market": "au",
+      "name": "Pajero"
+    },
+    {
+      "market": "jdm",
+      "name": "Pajero"
+    },
+    {
+      "market": "eu",
+      "name": "Pajero"
+    },
+    {
+      "market": "me",
+      "name": "Pajero"
+    },
+    {
+      "market": "global",
+      "name": "Pajero"
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "Mitsubishi Motors — Pajero Selected as Historic Car by the Japan Automotive Hall of Fame (news release, 7 November 2023)",
+      "url": "https://www.mitsubishi-motors.com/en/newsroom/newsrelease/2023/20231107_1.html",
+      "archiveUrl": "https://web.archive.org/web/20260828154503/https://www.mitsubishi-motors.com/en/newsroom/newsrelease/2023/20231107_1.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors — Pajero 18MY general-export specifications sheet",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "archiveUrl": "https://web.archive.org/web/20180128021206/http://www.mitsubishi-motors.com:80/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors — Pajero models: five-door GLS, GLX and GL grades",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/models/5door_gls.html",
+      "archiveUrl": "https://web.archive.org/web/20160315095249/http://www.mitsubishi-motors.com:80/en/showroom/pajero/models/5door_gls.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Fourth generation",
+      "summary": "The last of the line, and the longest-lived: a revised monocoque on the third generation's architecture, with Super Select 4WD II on every version, common-rail diesel and a variable-valve-timing petrol V6. It was never sold in North America, so a North American fitment against this generation is a mistake rather than a gap."
+    },
+    "es": {
+      "title": "Cuarta generación",
+      "summary": "La última de la línea, y la de vida más larga: un monocasco revisado sobre la arquitectura de la tercera generación, con Super Select 4WD II en todas las versiones, diésel de riel común y un V6 de gasolina con distribución variable. Nunca se vendió en Norteamérica, así que una aplicación norteamericana contra esta generación es un error, no un vacío de información."
+    }
+  }
+}

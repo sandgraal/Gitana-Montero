@@ -1,0 +1,36 @@
+{
+  "id": "limited",
+  "kind": "trim",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"]
+  },
+  "markets": ["us"],
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors North America — Montero features and specifications (mechanical), 2004 model year",
+      "url": "https://www.mitsubishicars.com/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "archiveUrl": "https://web.archive.org/web/20031220004634/http://www.mitsubishicars.com:80/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Limited",
+      "summary": "The upper North American third-generation trim: the full-time transfer case, the sequential-shift five-speed automatic and a limited-slip rear differential as standard equipment rather than as a package."
+    },
+    "es": {
+      "title": "Limited",
+      "summary": "El acabado superior norteamericano de tercera generación: caja de transferencia permanente, automática secuencial de cinco velocidades y diferencial trasero de deslizamiento limitado como equipo de serie y no como paquete opcional."
+    }
+  }
+}

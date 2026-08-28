@@ -1,0 +1,52 @@
+{
+  "id": "4g54",
+  "kind": "engine",
+  "fitment": {
+    "gens": ["gen1", "gen2"]
+  },
+  "engineFamily": "4g54",
+  "fuel": "petrol",
+  "displacementCc": 2555,
+  "valvetrain": "sohc",
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Astron engine — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Astron_engine",
+      "archiveUrl": "https://web.archive.org/web/20260815151959/https://en.wikipedia.org/wiki/Mitsubishi_Astron_engine",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1986 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1986_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502215724/https://fueleconomy.gov/feg/bymodel/1986_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1989 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1989_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502212911/https://fueleconomy.gov/feg/bymodel/1989_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "4G54 petrol four",
+      "summary": "The carburetted Astron four that carried the first generation in North America before the petrol V6 arrived, and that stayed in the range into the second generation. Later versions moved to fuel injection; because the changeover year differs by market, no fuel system is recorded on this entry."
+    },
+    "es": {
+      "title": "Motor de gasolina 4G54, cuatro cilindros",
+      "summary": "El cuatro cilindros Astron de carburador que movió la primera generación en Norteamérica antes de que llegara el V6 de gasolina, y que siguió en la gama ya entrada la segunda generación. Las versiones posteriores pasaron a inyección; como el año del cambio varía según el mercado, esta entrada no registra sistema de alimentación."
+    }
+  }
+}

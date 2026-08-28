@@ -1,0 +1,28 @@
+{
+  "id": "uk",
+  "kind": "market",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["uk"]
+  },
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "United Kingdom",
+      "summary": "The British market, where the truck was sold as the Shogun, after the Japanese word for general. Early cars carried Colt Shogun badging."
+    },
+    "es": {
+      "title": "Reino Unido",
+      "summary": "El mercado británico, donde el vehículo se vendió como Shogun, por la palabra japonesa para general. Las primeras unidades llevaron la insignia Colt Shogun."
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "xls",
+  "kind": "trim",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"]
+  },
+  "markets": ["us"],
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors North America — Montero features and specifications (mechanical), 2004 model year",
+      "url": "https://www.mitsubishicars.com/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "archiveUrl": "https://web.archive.org/web/20031220004634/http://www.mitsubishicars.com:80/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "XLS",
+      "summary": "The lower of the two North American third-generation trims for most of the run. In its earlier years it carried the part-time transfer case and the four-speed automatic; by the later years the whole range had moved to the full-time transfer case and the five-speed automatic."
+    },
+    "es": {
+      "title": "XLS",
+      "summary": "El menor de los dos acabados norteamericanos de tercera generación durante casi todo el ciclo. En sus primeros años llevó la caja de transferencia de conexión manual y la automática de cuatro velocidades; para los últimos años toda la gama había pasado a la caja de transferencia permanente y a la automática de cinco velocidades."
+    }
+  }
+}

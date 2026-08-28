@@ -1,0 +1,53 @@
+{
+  "id": "6g72-sohc",
+  "kind": "engine",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "engineFamily": "6g72",
+  "fuel": "petrol",
+  "displacementCc": 2972,
+  "valvetrain": "sohc",
+  "fuelSystem": "mpi",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — Pajero 18MY general-export specifications sheet",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "archiveUrl": "https://web.archive.org/web/20180128021206/http://www.mitsubishi-motors.com:80/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi 6G7 engine — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_6G7_engine",
+      "archiveUrl": "https://web.archive.org/web/20260804110625/https://en.wikipedia.org/wiki/Mitsubishi_6G7_engine",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1989 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1989_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502212911/https://fueleconomy.gov/feg/bymodel/1989_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "6G72 SOHC petrol V6",
+      "summary": "The single-overhead-cam petrol V6 with the longest service in the model line: it entered on the first generation and was still on the factory export sheet for the fourth. It ran with twelve valves early and twenty-four later, both single-cam, which is a common source of confusion when ordering parts."
+    },
+    "es": {
+      "title": "Motor de gasolina 6G72 SOHC, V6",
+      "summary": "El V6 de gasolina de árbol de levas único con la vida más larga de toda la línea: entró con la primera generación y todavía figuraba en la hoja de exportación de fábrica de la cuarta. Se fabricó con doce válvulas al principio y con veinticuatro después, siempre de un solo árbol de levas por bancada, lo cual confunde con frecuencia a la hora de pedir repuestos."
+    }
+  }
+}

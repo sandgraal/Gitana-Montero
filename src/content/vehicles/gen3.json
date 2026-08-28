@@ -1,0 +1,89 @@
+{
+  "id": "gen3",
+  "kind": "generation",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us", "uk", "au", "jdm", "eu", "global"]
+  },
+  "chassisCodes": [
+    "V60",
+    "V70",
+    "V63W",
+    "V65W",
+    "V68W",
+    "V73W",
+    "V75W",
+    "V77W"
+  ],
+  "production": {
+    "from": 1999,
+    "to": 2006
+  },
+  "marketNames": [
+    {
+      "market": "us",
+      "name": "Montero"
+    },
+    {
+      "market": "uk",
+      "name": "Shogun"
+    },
+    {
+      "market": "au",
+      "name": "Pajero"
+    },
+    {
+      "market": "jdm",
+      "name": "Pajero"
+    },
+    {
+      "market": "eu",
+      "name": "Pajero"
+    },
+    {
+      "market": "global",
+      "name": "Pajero"
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Third generation",
+      "summary": "The generation the project truck belongs to. It replaced the ladder frame with a monocoque body with an integrated frame, moved to rack-and-pinion steering and fully independent suspension front and rear, and carried the refined Super Select 4WD II transfer case. It was the last generation sold in North America, where it was withdrawn after the final model year listed in this entry's production range."
+    },
+    "es": {
+      "title": "Tercera generación",
+      "summary": "La generación a la que pertenece el vehículo del proyecto. Sustituyó el chasis de escalera por una carrocería monocasco con bastidor integrado, pasó a dirección de cremallera y a suspensión independiente adelante y atrás, y montó la caja de transferencia Super Select 4WD II ya refinada. Fue la última generación que se vendió en Norteamérica, donde salió de catálogo al cerrar el rango de producción que registra esta entrada."
+    }
+  }
+}

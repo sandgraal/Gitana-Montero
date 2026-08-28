@@ -1,0 +1,30 @@
+{
+  "id": "automatic-3-speed",
+  "kind": "transmission",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us"]
+  },
+  "transmissionType": "automatic",
+  "gears": 3,
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1986 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1986_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502215724/https://fueleconomy.gov/feg/bymodel/1986_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Three-speed automatic",
+      "summary": "The earliest automatic recorded for the model in North America, listed for a single first-generation model year before a four-speed replaced it. The sales years that predate the federal fuel-economy database are unrecorded here."
+    },
+    "es": {
+      "title": "Caja automática de tres velocidades",
+      "summary": "La caja automática más antigua registrada para el modelo en Norteamérica, listada en un solo año modelo de la primera generación antes de que la sustituyera una de cuatro velocidades. Los años de venta anteriores al inicio de la base de datos federal de consumo no están registrados aquí."
+    }
+  }
+}

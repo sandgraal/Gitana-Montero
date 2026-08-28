@@ -1,0 +1,113 @@
+{
+  "id": "combos-gen1-us",
+  "kind": "combination",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us"]
+  },
+  "generation": "gen1",
+  "market": "us",
+  "coverage": "partial",
+  "offerings": [
+    {
+      "years": {
+        "from": 1986,
+        "to": 1986
+      },
+      "engine": "4g54",
+      "transmission": "automatic-3-speed",
+      "transferCase": "easy-select"
+    },
+    {
+      "years": {
+        "from": 1986,
+        "to": 1990
+      },
+      "engine": "4g54",
+      "transmission": "manual-5-speed",
+      "transferCase": "easy-select"
+    },
+    {
+      "years": {
+        "from": 1987,
+        "to": 1988
+      },
+      "engine": "4g54",
+      "transmission": "automatic-4-speed",
+      "transferCase": "easy-select"
+    },
+    {
+      "years": {
+        "from": 1989,
+        "to": 1991
+      },
+      "engine": "6g72-sohc",
+      "transmission": "automatic-4-speed",
+      "transferCase": "easy-select"
+    },
+    {
+      "years": {
+        "from": 1989,
+        "to": 1991
+      },
+      "engine": "6g72-sohc",
+      "transmission": "manual-5-speed",
+      "transferCase": "easy-select"
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1986 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1986_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502215724/https://fueleconomy.gov/feg/bymodel/1986_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1987 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1987_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502212424/https://fueleconomy.gov/feg/bymodel/1987_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1989 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1989_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502212911/https://fueleconomy.gov/feg/bymodel/1989_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1991 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1991_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502213333/https://fueleconomy.gov/feg/bymodel/1991_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "Mitsubishi Motors — Forty years of Mitsubishi pickup success (news release, 18 September 2018): Easy Select 4WD and Super Select 4WD",
+      "url": "https://www.mitsubishi-motors.com/en/newsroom/newsrelease/2018/20180918_1.html",
+      "archiveUrl": "https://web.archive.org/web/20260828154537/https://www.mitsubishi-motors.com/en/newsroom/newsrelease/2018/20180918_1.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "First generation, United States market",
+      "summary": "Engine and gearbox pairings for the first-generation Montero in North America, taken year by year from the federal fuel-economy database, which lists every certified configuration for a model year. The transfer case is not in that database; it is filed as the part-time system because period literature states that part-time four-wheel drive was standard across the generation. The earliest sales years predate the database and are unrecorded. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
+    },
+    "es": {
+      "title": "Primera generación, mercado de Estados Unidos",
+      "summary": "Combinaciones de motor y caja para el Montero de primera generación en Norteamérica, tomadas año por año de la base de datos federal de consumo, que lista todas las configuraciones certificadas de cada año modelo. La caja de transferencia no está en esa base: se clasifica como el sistema de conexión manual porque la documentación de la época indica que la doble tracción de conexión manual era de serie en toda la generación. Los primeros años de venta son anteriores a la base de datos y no están registrados. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
+    }
+  }
+}

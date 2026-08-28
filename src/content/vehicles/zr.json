@@ -1,0 +1,36 @@
+{
+  "id": "zr",
+  "kind": "trim",
+  "fitment": {
+    "gens": ["gen2", "gen2-5", "gen3"],
+    "markets": ["jdm"]
+  },
+  "markets": ["jdm"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "ZR",
+      "summary": "The Japanese entry grade of the later generations, and the one that kept the manual gearbox in the catalogue after the upper grades had gone automatic-only."
+    },
+    "es": {
+      "title": "ZR",
+      "summary": "El acabado de entrada japonés de las generaciones tardías, y el que mantuvo la caja manual en el catálogo después de que los acabados superiores quedaran solo con automática."
+    }
+  }
+}

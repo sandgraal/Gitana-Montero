@@ -1,0 +1,42 @@
+{
+  "id": "easy-select",
+  "kind": "transfer-case",
+  "fitment": {
+    "gens": ["gen1", "gen3"]
+  },
+  "transferCaseFamily": "easy-select",
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — Forty years of Mitsubishi pickup success (news release, 18 September 2018): Easy Select 4WD and Super Select 4WD",
+      "url": "https://www.mitsubishi-motors.com/en/newsroom/newsrelease/2018/20180918_1.html",
+      "archiveUrl": "https://web.archive.org/web/20260828154537/https://www.mitsubishi-motors.com/en/newsroom/newsrelease/2018/20180918_1.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Easy Select part-time four-wheel drive",
+      "summary": "Mitsubishi's part-time transfer case: rear-wheel drive on the road, locked four-wheel drive in high or low range, and no centre differential, so four-wheel drive must not be used on dry pavement. Read the classification carefully — the factory brand name Easy Select is used on later trucks, while first-generation literature simply calls the system part-time four-wheel drive, and the North American third-generation specification sheet calls it part-time four-wheel drive with a two-speed transfer case. This entry files all of those under one family because they are the same kind of system, not because the brand name appears in every source."
+    },
+    "es": {
+      "title": "Tracción de conexión manual Easy Select",
+      "summary": "La caja de transferencia de conexión manual de Mitsubishi: tracción trasera en carretera, tracción en las cuatro ruedas bloqueada en rango alto o bajo, y sin diferencial central, por lo que no se debe circular con doble tracción en pavimento seco. Conviene leer la clasificación con cuidado: el nombre comercial Easy Select se usa en vehículos posteriores, mientras que la documentación de la primera generación habla simplemente de tracción de conexión manual, y la hoja de especificaciones norteamericana de la tercera generación la llama tracción de conexión manual con caja de transferencia de dos rangos. Esta entrada agrupa todo eso en una sola familia porque se trata del mismo tipo de sistema, no porque el nombre comercial aparezca en todas las fuentes."
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "id": "combos-gen2-jdm",
+  "kind": "combination",
+  "fitment": {
+    "gens": ["gen2"],
+    "markets": ["jdm"]
+  },
+  "generation": "gen2",
+  "market": "jdm",
+  "coverage": "partial",
+  "offerings": [
+    {
+      "years": {
+        "from": 1993,
+        "to": null
+      },
+      "engine": "6g74-dohc",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1993,
+        "to": null
+      },
+      "engine": "6g72-sohc",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1993,
+        "to": null
+      },
+      "engine": "6g72-sohc",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1994,
+        "to": null
+      },
+      "engine": "4m40",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1994,
+        "to": null
+      },
+      "engine": "4m40",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1994,
+        "to": null
+      },
+      "engine": "4d56",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1994,
+        "to": null
+      },
+      "engine": "4d56",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select"
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "Super Select — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Super_Select",
+      "archiveUrl": "https://web.archive.org/web/20260619135909/https://en.wikipedia.org/wiki/Super_Select",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Second generation, Japanese market",
+      "summary": "Powertrain pairings recorded for the second-generation Pajero in Japan, read off dated catalogue listings that give the type designation, displacement and gearbox of each grade on sale. Each range opens at the earliest listing consulted and is left open at the end, because no source consulted states when the pairing stopped. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
+    },
+    "es": {
+      "title": "Segunda generación, mercado japonés",
+      "summary": "Combinaciones de tren motriz registradas para el Pajero de segunda generación en Japón, leídas de listados de catálogo fechados que dan la designación de tipo, la cilindrada y la caja de cada acabado a la venta. Cada rango arranca en el listado más antiguo consultado y queda abierto al final, porque ninguna fuente consultada dice cuándo dejó de ofrecerse la combinación. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
+    }
+  }
+}

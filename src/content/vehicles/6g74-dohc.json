@@ -1,0 +1,53 @@
+{
+  "id": "6g74-dohc",
+  "kind": "engine",
+  "fitment": {
+    "gens": ["gen2"]
+  },
+  "engineFamily": "6g74",
+  "fuel": "petrol",
+  "displacementCc": 3496,
+  "valvetrain": "dohc",
+  "fuelSystem": "mpi",
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1995 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1995_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502215816/https://fueleconomy.gov/feg/bymodel/1995_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi 6G7 engine — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_6G7_engine",
+      "archiveUrl": "https://web.archive.org/web/20260804110625/https://en.wikipedia.org/wiki/Mitsubishi_6G7_engine",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "6G74 DOHC petrol V6",
+      "summary": "The twin-cam, twenty-four-valve version of the larger petrol V6, introduced mid-way through the second generation together with a bigger transmission and transfer case. North American emissions listings of the period name it explicitly as the twin-cam unit, which is how a second-generation car can be told apart from the single-cam engine that replaced it."
+    },
+    "es": {
+      "title": "Motor de gasolina 6G74 DOHC, V6",
+      "summary": "La versión de doble árbol de levas y veinticuatro válvulas del V6 de gasolina grande, introducida a mitad de la segunda generación junto con una caja de cambios y una caja de transferencia de mayor tamaño. Los listados de emisiones norteamericanos de la época lo nombran expresamente como el motor de doble árbol, y así se distingue un vehículo de segunda generación del que llevó después el motor de árbol único."
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "4m41",
+  "kind": "engine",
+  "fitment": {
+    "gens": ["gen3", "gen4"]
+  },
+  "engineFamily": "4m41",
+  "fuel": "diesel",
+  "displacementCc": 3200,
+  "valvetrain": "dohc",
+  "fuelSystem": "di-d",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — Pajero 18MY general-export specifications sheet",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "archiveUrl": "https://web.archive.org/web/20180128021206/http://www.mitsubishi-motors.com:80/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "4M41 DI-D turbo-diesel four",
+      "summary": "The direct-injection turbo-diesel four that arrived with the third generation and became the mainstream diesel of the fourth. It is a twin-cam, sixteen-valve engine; on the fourth generation it moved to common-rail injection with a particulate filter. Diesel versions also moved the intercooler from the top of the engine to the front of the vehicle."
+    },
+    "es": {
+      "title": "Motor turbodiésel 4M41 DI-D, cuatro cilindros",
+      "summary": "El cuatro cilindros turbodiésel de inyección directa que llegó con la tercera generación y se volvió el diésel principal de la cuarta. Es un motor de doble árbol de levas y dieciséis válvulas; en la cuarta generación pasó a inyección por riel común con filtro de partículas. En las versiones diésel el intercooler también se movió de la parte superior del motor al frente del vehículo."
+    }
+  }
+}

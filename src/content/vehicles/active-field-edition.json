@@ -1,0 +1,29 @@
+{
+  "id": "active-field-edition",
+  "kind": "trim",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["jdm"]
+  },
+  "markets": ["jdm"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Active Field Edition",
+      "summary": "A Japanese special edition of the third generation, built on an existing grade with its own exterior and interior treatment and a navigation and rear-camera package."
+    },
+    "es": {
+      "title": "Active Field Edition",
+      "summary": "Una edición especial japonesa de la tercera generación, montada sobre un acabado existente con tratamiento propio por fuera y por dentro y con un paquete de navegación y cámara de reversa."
+    }
+  }
+}

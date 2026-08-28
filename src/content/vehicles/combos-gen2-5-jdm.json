@@ -1,0 +1,77 @@
+{
+  "id": "combos-gen2-5-jdm",
+  "kind": "combination",
+  "fitment": {
+    "gens": ["gen2-5"],
+    "markets": ["jdm"]
+  },
+  "generation": "gen2-5",
+  "market": "jdm",
+  "coverage": "partial",
+  "offerings": [
+    {
+      "years": {
+        "from": 1997,
+        "to": null
+      },
+      "engine": "6g74-gdi",
+      "transmission": "automatic-5-speed",
+      "transferCase": "super-select",
+      "trims": ["zr", "exceed", "super-exceed"]
+    },
+    {
+      "years": {
+        "from": 1998,
+        "to": null
+      },
+      "engine": "4m40",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select",
+      "trims": ["zr", "exceed", "super-exceed"]
+    },
+    {
+      "years": {
+        "from": 1998,
+        "to": null
+      },
+      "engine": "4m40",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select",
+      "trims": ["zr"]
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "Super Select — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Super_Select",
+      "archiveUrl": "https://web.archive.org/web/20260619135909/https://en.wikipedia.org/wiki/Super_Select",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Second generation facelift, Japanese market",
+      "summary": "Powertrain pairings recorded for the facelifted second-generation Pajero in Japan. The direct-injection petrol V6 and the sequential-shift five-speed automatic arrived together with this revision; the turbo-diesel stayed on the four-speed automatic and kept a manual option on the entry grade. Smaller four-cylinder petrol engines were also offered and are not representable in this taxonomy, so they are absent rather than excluded. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
+    },
+    "es": {
+      "title": "Segunda generación con rediseño, mercado japonés",
+      "summary": "Combinaciones de tren motriz registradas para el Pajero de segunda generación con rediseño en Japón. El V6 de gasolina de inyección directa y la automática secuencial de cinco velocidades llegaron juntos con esta revisión; el turbodiésel se mantuvo con la automática de cuatro velocidades y conservó la opción manual en el acabado de entrada. También se ofrecieron motores de gasolina de cuatro cilindros de menor cilindrada que esta taxonomía no puede representar, así que están ausentes y no excluidos. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
+    }
+  }
+}
