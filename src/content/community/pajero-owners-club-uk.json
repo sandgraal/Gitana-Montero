@@ -1,0 +1,45 @@
+{
+  "id": "pajero-owners-club-uk",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["uk"]
+  },
+  "communityType": "forum",
+  "regions": ["GB"],
+  "languages": ["en"],
+  "activity": "very-active",
+  "activityAssessed": "2026-08-28",
+  "url": "https://www.pocuk.com/forums/",
+  "confidence": "first-hand",
+  "sources": [
+    {
+      "title": "The Mitsubishi Pajero Owners Club (POCUK) — forum index",
+      "url": "https://www.pocuk.com/forums/",
+      "archiveUrl": "http://web.archive.org/web/20250729114416/http://www.pocuk.com/forums/",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Pajero Owners Club UK (POCUK)",
+      "summary": "The UK's long-running free-to-join club for Pajero, Shogun, Montero and Challenger owners, built around a large phpBB forum. Its \"Main technical forum\" alone carried over 50,000 topics and 330,000 posts the last time it was checked, with a new post the same month — this is one of the biggest English-language technical archives for the platform anywhere.",
+      "goodFor": [
+        "UK-specific concerns: MOT/servicing, insurance, SVA/import paperwork",
+        "A dedicated 4M41 (3.2 DiD) subforum and a Gen 4 (2006-on) subforum",
+        "A DIY workshop section and a technical FAQ built up over two decades",
+        "Sheer volume — most fault symptoms already have a thread"
+      ]
+    },
+    "es": {
+      "title": "Pajero Owners Club UK (POCUK)",
+      "summary": "El club británico de ingreso gratuito para dueños de Pajero, Shogun, Montero y Challenger de mayor trayectoria en su categoría, construido sobre un foro phpBB muy grande. Solo su \"Main technical forum\" superaba los 50.000 temas y los 330.000 mensajes en la última revisión, con una publicación ese mismo mes — es uno de los archivos técnicos en inglés de mayor tamaño que existen para esta plataforma.",
+      "goodFor": [
+        "Temas propios del Reino Unido: ITV (MOT), seguros, trámites de importación (SVA)",
+        "Un subforo dedicado al motor 4M41 (3.2 DiD) y otro para la Gen 4 (desde 2006)",
+        "Una sección de taller DIY y un FAQ técnico acumulado a lo largo de dos décadas",
+        "El volumen: la mayoría de los síntomas de falla ya tienen un hilo abierto"
+      ]
+    }
+  }
+}

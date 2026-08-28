@@ -1,0 +1,37 @@
+{
+  "id": "club-mitsubishi-montero-costa-rica-4x4",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["cr"]
+  },
+  "communityType": "club",
+  "regions": ["CR"],
+  "languages": ["es-CR"],
+  "activity": "active",
+  "activityAssessed": "2026-08-28",
+  "url": "https://www.facebook.com/Montero4X4CR/",
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "Club Mitsubishi Montero Costa Rica 4x4",
+      "summary": "A Heredia-based Costa Rican Montero club whose main presence is a public Facebook page with a large local following and ongoing engagement at last check, rather than a members-only group — anyone can read it without joining anything. Its own motto, \"more than a club, a family,\" sets the tone: local meet-ups and peer support rather than a technical archive.",
+      "goodFor": [
+        "Finding other Montero owners in Costa Rica for meet-ups and convoys",
+        "Word-of-mouth recommendations for talleres (repair shops) and repuesteros (parts sellers) in the Central Valley",
+        "Costa Rican Spanish context for ownership questions specific to local roads, climate and fuel",
+        "A public page — no membership approval needed just to read it"
+      ]
+    },
+    "es": {
+      "title": "Club Mitsubishi Montero Costa Rica 4x4",
+      "summary": "Un club costarricense de Montero con sede en Heredia, cuya presencia principal es una página pública de Facebook con muchos seguidores locales y actividad continua en la última revisión, no un grupo cerrado — cualquiera puede leerla sin necesidad de unirse. Su propio lema promete trato de familia, no solo membresía formal: el tono es de encuentros locales y apoyo entre dueños, no un archivo técnico.",
+      "goodFor": [
+        "Encontrar a otros dueños de Montero en Costa Rica para encuentros y caravanas",
+        "Recomendaciones de boca en boca sobre talleres y repuestos en el Valle Central",
+        "Contexto en español costarricense para dudas de propietario propias de las carreteras, el clima y el combustible locales",
+        "Una página pública — no hace falta que aprueben su ingreso solo para leerla"
+      ]
+    }
+  }
+}

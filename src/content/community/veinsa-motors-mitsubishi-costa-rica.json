@@ -1,0 +1,43 @@
+{
+  "id": "veinsa-motors-mitsubishi-costa-rica",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3"],
+    "markets": ["cr"]
+  },
+  "communityType": "vendor",
+  "regions": ["CR"],
+  "languages": ["es-CR"],
+  "activity": "very-active",
+  "activityAssessed": "2026-08-28",
+  "url": "https://mitsubishi.cr/contacto/",
+  "confidence": "first-hand",
+  "sources": [
+    {
+      "title": "Contacto Agencia Mitsubishi — Mitsubishi Costa Rica (Veinsa Motors)",
+      "url": "https://mitsubishi.cr/contacto/",
+      "archiveUrl": "https://web.archive.org/web/20260828153105/https://mitsubishi.cr/contacto/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Mitsubishi Costa Rica (Veinsa Motors) — official dealer network",
+      "summary": "The official Mitsubishi agency in Costa Rica, operated by Veinsa Motors, offering new-vehicle sales, a specialised service workshop, and original (OEM) repuestos across its branch network. Fitment is recorded as the generations Veinsa's own market history actually covers — the Gen 4 Pajero/Montero was never sold new in the US or Costa Rica market, so it is excluded here rather than assumed.",
+      "goodFor": [
+        "Original OEM parts sourcing for a Costa Rican-market Montero",
+        "Warranty-relevant or dealer-level diagnostic and repair work",
+        "A multi-branch network rather than a single shop, with posted service hours"
+      ]
+    },
+    "es": {
+      "title": "Mitsubishi Costa Rica (Veinsa Motors) — red de agencias oficiales",
+      "summary": "La agencia oficial de Mitsubishi en Costa Rica, operada por Veinsa Motors, con venta de vehículos nuevos, taller de servicio especializado y repuestos originales en toda su red de sucursales. El ajuste (fitment) se registra según las generaciones que realmente cubre la historia de mercado de Veinsa — la Gen 4 del Pajero/Montero nunca se vendió como vehículo nuevo en el mercado de EE. UU. ni de Costa Rica, así que se excluye aquí en lugar de asumirla.",
+      "goodFor": [
+        "Conseguir repuestos originales para una Montero de mercado costarricense",
+        "Trabajo de diagnóstico y reparación relevante para la garantía o a nivel de agencia",
+        "Una red de varias sucursales, no un solo taller, con horarios de servicio publicados"
+      ]
+    }
+  }
+}

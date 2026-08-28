@@ -1,0 +1,33 @@
+{
+  "id": "amigos-montero-raider-4x4-costa-rica",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["cr"]
+  },
+  "communityType": "facebook-group",
+  "regions": ["CR"],
+  "languages": ["es-CR"],
+  "activity": "quiet",
+  "activityAssessed": "2026-08-28",
+  "url": "https://www.facebook.com/groups/140427739772064/",
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "Amigos Montero y Raider 4x4 Costa Rica",
+      "summary": "A public Facebook group for Costa Rican owners of the Montero and, per its own name, the (out-of-scope-here) Dodge Raider — the Mitsubishi-built badge-engineered cousin some Costa Rican owners cross-shop with. Confirmed to exist and be publicly readable, but its page carried no visible description or activity signal at the last check, so treat it as a smaller, lower-traffic second option alongside Club Mitsubishi Montero Costa Rica 4x4 rather than a primary source.",
+      "goodFor": [
+        "A second, smaller Costa Rican peer group if the main club page does not answer a question",
+        "Owners who cross-shop or cross-wrench between the Montero and the Raider"
+      ]
+    },
+    "es": {
+      "title": "Amigos Montero y Raider 4x4 Costa Rica",
+      "summary": "Un grupo público de Facebook para dueños costarricenses de Montero y, según su propio nombre, del Dodge Raider (fuera del alcance de este sitio) — el primo con insignia distinta construido por Mitsubishi que algunos dueños costarricenses también consideran. Se confirmó que existe y se puede leer públicamente, pero su página no mostraba descripción ni señales de actividad visibles en la última revisión, así que trátelo como una segunda opción de menor tamaño junto al Club Mitsubishi Montero Costa Rica 4x4, y no como fuente principal.",
+      "goodFor": [
+        "Una segunda opción costarricense, de menor tamaño, si la página del club principal no resuelve una duda",
+        "Dueños que también tienen o comparan el Montero con el Raider"
+      ]
+    }
+  }
+}

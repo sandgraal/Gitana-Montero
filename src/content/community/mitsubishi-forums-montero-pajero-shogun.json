@@ -1,0 +1,45 @@
+{
+  "id": "mitsubishi-forums-montero-pajero-shogun",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["global"]
+  },
+  "communityType": "forum",
+  "regions": ["001"],
+  "languages": ["en"],
+  "activity": "active",
+  "activityAssessed": "2026-08-28",
+  "url": "https://www.mitsubishi-forums.com/forums/montero-challenger-pajero-shogun-forum.17/",
+  "confidence": "first-hand",
+  "sources": [
+    {
+      "title": "Montero, Challenger, Pajero & Shogun Forum | Mitsubishi Forums",
+      "url": "https://www.mitsubishi-forums.com/forums/montero-challenger-pajero-shogun-forum.17/",
+      "archiveUrl": "https://web.archive.org/web/20260828153216/https://www.mitsubishi-forums.com/forums/montero-challenger-pajero-shogun-forum.17/",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Montero, Challenger, Pajero & Shogun Forum (Mitsubishi Forums)",
+      "summary": "A dedicated English-language subforum on the general Mitsubishi Forums site covering every generation of Montero, Pajero, and Shogun (plus the related Challenger). Threads run from workshop-manual links and DIY/FAQ collections to specific fault diagnosis on individual trucks.",
+      "goodFor": [
+        "Cross-generation troubleshooting threads (electrical, transfer case, engine codes)",
+        "A pinned wiki and DIY/FAQ index for Montero, Challenger, Pajero and Shogun",
+        "Workshop manual links shared by other owners",
+        "A large enough English-speaking membership that older threads (2006 on) are still searchable history"
+      ]
+    },
+    "es": {
+      "title": "Foro Montero, Challenger, Pajero y Shogun (Mitsubishi Forums)",
+      "summary": "Subforo en inglés dentro del sitio general Mitsubishi Forums, dedicado a todas las generaciones de Montero, Pajero y Shogun (además del Challenger emparentado). Los temas van desde enlaces a manuales de taller y recopilaciones de DIY/FAQ hasta el diagnóstico de fallas puntuales en un carro específico.",
+      "goodFor": [
+        "Hilos de diagnóstico entre generaciones (eléctrico, caja de transferencia, códigos de motor)",
+        "Un índice fijo tipo wiki y FAQ para Montero, Challenger, Pajero y Shogun",
+        "Enlaces a manuales de taller compartidos por otros dueños",
+        "Una comunidad de habla inglesa lo bastante grande como para que los temas viejos (desde 2006) sigan siendo un historial útil de búsqueda"
+      ]
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "pajero-4wd-club-of-victoria",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["au"]
+  },
+  "communityType": "forum",
+  "regions": ["AU"],
+  "languages": ["en"],
+  "activity": "very-active",
+  "activityAssessed": "2026-08-28",
+  "url": "https://www.pajeroforum.com.au/",
+  "confidence": "first-hand",
+  "sources": [
+    {
+      "title": "Pajero 4WD Club of Victoria — Public Forum",
+      "url": "https://www.pajeroforum.com.au/",
+      "archiveUrl": "https://web.archive.org/web/20260828153402/https://www.pajeroforum.com.au/",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Pajero 4WD Club of Victoria — public forum",
+      "summary": "An Australian club forum (vBulletin) open to the public, organised by vehicle generation, with active new-member introduction threads and posts within hours of the last check — a genuinely live community, not an archive.",
+      "goodFor": [
+        "AU-market Pajero specifics and generation-specific subforums",
+        "Local meet-ups and club membership for Victoria-based owners",
+        "Fast turnaround on questions — new posts show up within hours",
+        "A separate \"new to the forum\" section for first-time posters"
+      ]
+    },
+    "es": {
+      "title": "Pajero 4WD Club of Victoria — foro público",
+      "summary": "Un foro de club australiano (vBulletin) abierto al público, organizado por generación del vehículo, con hilos de presentación de nuevos miembros activos y publicaciones de apenas horas antes de la última revisión — una comunidad realmente viva, no un archivo muerto.",
+      "goodFor": [
+        "Particularidades del Pajero de mercado australiano y subforos por generación",
+        "Encuentros locales y membresía de club para dueños en Victoria",
+        "Respuesta rápida a las consultas — las publicaciones nuevas aparecen en cuestión de horas",
+        "Una sección aparte para quien recién se une al foro"
+      ]
+    }
+  }
+}

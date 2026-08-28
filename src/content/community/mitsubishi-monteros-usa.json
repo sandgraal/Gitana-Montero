@@ -1,0 +1,33 @@
+{
+  "id": "mitsubishi-monteros-usa",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["global"]
+  },
+  "communityType": "facebook-group",
+  "regions": ["001"],
+  "languages": ["en"],
+  "activity": "quiet",
+  "activityAssessed": "2026-08-28",
+  "url": "https://www.facebook.com/groups/1524789904446511/",
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "Mitsubishi Monteros USA",
+      "summary": "A public Facebook group that describes itself as open to \"the worldwide owners of all Mitsubishi 4x4 vehicles\" across all generations, despite the US-flavoured name. Confirmed to exist and be publicly readable at the last check; Facebook does not expose post-recency data to a logged-out visitor, so this entry is deliberately conservative on activity level rather than guessing.",
+      "goodFor": [
+        "English-language peer support outside any single regional forum",
+        "Owners of any generation, since the group explicitly welcomes all of them"
+      ]
+    },
+    "es": {
+      "title": "Mitsubishi Monteros USA",
+      "summary": "Un grupo público de Facebook que se describe como abierto a \"dueños de todo el mundo de todos los vehículos 4x4 de Mitsubishi\" en cualquier generación, a pesar del nombre con sabor estadounidense. Se confirmó que existe y se puede leer públicamente en la última revisión; Facebook no muestra a un visitante sin sesión iniciada datos sobre qué tan reciente es la actividad, así que esta ficha es deliberadamente conservadora sobre el nivel de actividad en lugar de adivinar.",
+      "goodFor": [
+        "Apoyo entre dueños en inglés, fuera de cualquier foro regional específico",
+        "Dueños de cualquier generación, ya que el grupo declara dar la bienvenida a todas"
+      ]
+    }
+  }
+}
