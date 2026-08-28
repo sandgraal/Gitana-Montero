@@ -349,8 +349,16 @@ function findNumericField(
   return null;
 }
 
-/** Field names the entry shape owns; a collection may not redeclare them. */
-const RESERVED_ENTRY_FIELDS: readonly string[] = [
+/**
+ * Field names the entry shape owns; a collection may not redeclare them.
+ *
+ * Exported so T105's `check:citations` (REF-02) can tell the fixed entry
+ * envelope apart from collection-specific shared data without re-listing this
+ * set — the id/fitment/confidence/sources/prose fields are structural, never
+ * "a numeric spec" in the citation sense, even though `fitment.years` holds
+ * numbers.
+ */
+export const RESERVED_ENTRY_FIELDS: readonly string[] = [
   "id",
   "fitment",
   "confidence",
