@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; color: #2B2620; }
+    a { color: #B0532A; } a:hover { color: #93441F; }
+  </style>
+</helmet>
+<div style="width: 1200px; min-height: 860px; background: #F7F4EE; padding: 36px 40px; display: flex; flex-direction: column; gap: 32px; box-sizing: border-box;">
+
+  <h1 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #6E6559;">Vehicle selector — three states (FIT-03)</h1>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #A99C88;">STATE 1 — no vehicle set (header idle)</span>
+    <div style="background: #2B2620; border-radius: 8px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;">
+      <span style="color: #C9BFAF; font-size: 14px;">Browsing all vehicles</span>
+      <button style="display: flex; align-items: center; gap: 8px; background: #B0532A; color: #FFF; border: none; border-radius: 6px; padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M7 17l1.5-4.5h7L17 17M8.5 12.5 10 8h4l1.5 4.5"></path><circle cx="7.5" cy="19" r="1.5"></circle><circle cx="16.5" cy="19" r="1.5"></circle></svg>
+        Select your vehicle
+      </button>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #A99C88;">STATE 2 — picker open (gen → market → year → engine)</span>
+    <div style="background: #FFFFFF; border: 1px solid #E4DDD1; border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 8px 24px rgba(43,38,32,0.08);">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #6E6559;">Generation</span>
+        <div style="display: flex; gap: 8px;">
+          <button style="border: 1px solid #E4DDD1; background: #FFF; border-radius: 6px; padding: 10px 14px; font-size: 13px; cursor: pointer;">Gen 1 · L040</button>
+          <button style="border: 1px solid #E4DDD1; background: #FFF; border-radius: 6px; padding: 10px 14px; font-size: 13px; cursor: pointer;">Gen 2 · V20/V40</button>
+          <button style="border: 2px solid #B0532A; background: #FBEEE6; border-radius: 6px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #93441F; cursor: pointer;">Gen 3 · V60/V70</button>
+          <button style="border: 1px solid #E4DDD1; background: #FFF; border-radius: 6px; padding: 10px 14px; font-size: 13px; cursor: pointer;">Gen 4 · V80/V90</button>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #6E6559;">Market</span>
+          <div style="border: 1px solid #E4DDD1; border-radius: 6px; padding: 10px 12px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; background: #FFF;">
+            <span>US / Canada — Montero</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6559" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #6E6559;">Year</span>
+          <div style="border: 1px solid #E4DDD1; border-radius: 6px; padding: 10px 12px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; background: #FFF; font-family: 'IBM Plex Mono', monospace;">
+            <span>2002</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6559" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #6E6559;">Engine</span>
+          <div style="border: 1px solid #E4DDD1; border-radius: 6px; padding: 10px 12px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; background: #FFF; font-family: 'IBM Plex Mono', monospace;">
+            <span>6G74 SOHC 3.5L</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6559" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #E4DDD1; padding-top: 16px;">
+        <span style="font-size: 13px; color: #6E6559;">Impossible combinations are filtered out as you pick.</span>
+        <div style="display: flex; gap: 10px;">
+          <button style="border: 1px solid #E4DDD1; background: #FFF; border-radius: 6px; padding: 10px 18px; font-size: 14px; cursor: pointer;">Clear</button>
+          <button style="border: none; background: #B0532A; color: #FFF; border-radius: 6px; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer;">Set vehicle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #A99C88;">STATE 3 — vehicle set, filtering a listing (persists across pages and locales)</span>
+    <div style="background: #FFFFFF; border: 1px solid #E4DDD1; border-radius: 10px; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; gap: 8px; background: #2B2620; color: #F7F4EE; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-family: 'IBM Plex Mono', monospace;">
+            Gen 3 · US · 2002 · 6G74
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9BFAF" stroke-width="2" stroke-linecap="round" style="cursor: pointer;"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+          </span>
+          <span style="font-size: 13px; color: #3E6B4F; font-weight: 600;">14 of 31 problems fit your truck</span>
+        </div>
+        <a href="#" style="font-size: 13px;">Change vehicle</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #E4DDD1; border-radius: 6px; padding: 12px 16px; background: #FFF;">
+          <span style="font-size: 14px; font-weight: 600;">Front sway-bar end links wear out and knock</span>
+          <span style="font-size: 12px; font-weight: 700; color: #8A5E14; background: #FDF3E4; border-radius: 4px; padding: 4px 8px;">drive gently</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #E4DDD1; border-radius: 6px; padding: 12px 16px; background: #FFF;">
+          <span style="font-size: 14px; font-weight: 600;">Transfer-case chain stretch in Super Select II</span>
+          <span style="font-size: 12px; font-weight: 700; color: #8A5E14; background: #FDF3E4; border-radius: 4px; padding: 4px 8px;">drive gently</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #EDE7DB; border-radius: 6px; padding: 12px 16px; background: #FBF9F4; opacity: 0.55;">
+          <span style="font-size: 14px;">GDI injector carbon build-up <span style="font-size: 12px; color: #A99C88;">— does not fit: 6G74 GDI only</span></span>
+          <span style="font-size: 12px; color: #A99C88;">filtered</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1200, "h": 1460, "title": "Problem page — EN (desktop)", "page": "page-1" },
+    { "file": "ProblemaES.dc.html", "x": 1300, "y": 0, "w": 1200, "h": 1460, "title": "Página de problema — ES (desktop)", "page": "page-1" },
+    { "file": "ChromeMovil.dc.html", "x": 2600, "y": 0, "w": 390, "h": 844, "title": "Site chrome — mobile", "page": "page-1" },
+    { "file": "Selector.dc.html", "x": 0, "y": 1600, "w": 1200, "h": 860, "title": "Vehicle selector — states", "page": "page-1" },
+    { "file": "Glosario.dc.html", "x": 1300, "y": 1600, "w": 1200, "h": 1020, "title": "Glossary page", "page": "page-1" },
+    { "file": "Taller.dc.html", "x": 0, "y": 2760, "w": 1200, "h": 1180, "title": "Garage timeline", "page": "page-1" },
+    { "file": "DireccionOscura.dc.html", "x": 0, "y": 0, "w": 700, "h": 900, "title": "Alternate — Night workshop", "page": "page-2" },
+    { "file": "DireccionVerde.dc.html", "x": 800, "y": 0, "w": 700, "h": 900, "title": "Alternate — Expedition green", "page": "page-2" }
+  ],
+  "annotations": [
+    { "id": "direction-note", "x": 0, "y": -170, "w": 560, "text": "Proposed direction: field manual with Costa Rican warmth.\nType: Archivo (UI + display) with IBM Plex Mono for data (part numbers, dates, fitment).\nPalette: warm paper #F7F4EE, ink #2B2620, rust accent #B0532A, Montero green #3E6B4F for positive states; amber/red reserved for triage and safety.\nTwo alternate directions on the Directions page — pick, mix, or redline anything here.", "page": "page-1" },
+    { "id": "sample-data-note", "x": 2600, "y": 900, "w": 390, "text": "All costs, times, odometer readings and source links are SAMPLE data for layout only — real entries come from the garage backfill (T303) and problem research (T403).", "page": "page-1" },
+    { "id": "alternates-note", "x": 0, "y": -140, "w": 480, "text": "Direction alternates, low-fi on purpose. The main templates are built in the proposed direction; these show how far the same bones can move. Say the word and any of these becomes the direction.", "page": "page-2" }
+  ],
+  "pages": [
+    { "id": "page-1", "name": "Templates" },
+    { "id": "page-2", "name": "Directions" }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" }
+}
