@@ -61,13 +61,16 @@ function schemaOf(collection: unknown): Parsable {
         })
       : schema;
 
-  if (
-    typeof resolved !== "object" ||
-    resolved === null ||
-    typeof (resolved as Parsable).safeParse !== "function"
-  ) {
+  const isZodSchema =
+    typeof resolved === "object" &&
+    resolved !== null &&
+    typeof (resolved as { safeParse?: unknown }).safeParse === "function" &&
+    typeof (resolved as { parse?: unknown }).parse === "function" &&
+    typeof (resolved as { _def?: unknown })._def === "object";
+
+  if (!isZodSchema) {
     throw new Error(
-      "collection schema is not parsable — every collection registered in " +
+      "collection schema is not a Zod schema — every collection registered in " +
         "src/content.config.ts must define a Zod schema (SCF-01)"
     );
   }
