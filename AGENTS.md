@@ -82,9 +82,10 @@ Spec of record: `specs/001-foundation/spec.md`.
 - **Every entity carries an explicit fitment.** A fact with no fitment is a
   build error. "It's a Montero thing" is not a fitment.
 - **Every entity carries a confidence tier**, one of:
-  `fsm-confirmed` › `tsb` › `community-consensus` › `anecdotal` › `first-hand`.
-  Anything below `tsb` renders with a visible caveat in both languages. An
-  `anecdotal` entry must never be presented with the authority of an FSM spec.
+  `fsm-confirmed` › `tsb` › `community-consensus` › `first-hand` › `anecdotal`
+  (total order ratified by the owner 2026-08-27). Anything below `tsb` renders
+  with a visible caveat in both languages. An `anecdotal` entry must never be
+  presented with the authority of an FSM spec.
 - **The agent that writes content never fact-checks it.**
 - **Cite what you actually read.** A source you did not open is not a source.
   If you cannot reach it, say so and lower the confidence tier — do not cite it
