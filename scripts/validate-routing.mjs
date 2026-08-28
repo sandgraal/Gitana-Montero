@@ -43,7 +43,11 @@ for (const role of requiredRoles) {
   if (!existsSync(def) || statSync(def).size === 0)
     fail(`missing or empty agent role definition: ${role}`);
   const d = policy.roleDefaults?.[role];
-  if (!d || !expectedModels.includes(d.model) || !validEfforts.includes(d.effort))
+  if (
+    !d ||
+    !expectedModels.includes(d.model) ||
+    !validEfforts.includes(d.effort)
+  )
     fail(`invalid default for role: ${role}`);
 }
 
@@ -65,7 +69,8 @@ const requiredOpus = [
   "phase-closing-review",
 ];
 for (const t of requiredOpus)
-  if (!policy.hardOpusTriggers?.includes(t)) fail(`missing hard Opus trigger: ${t}`);
+  if (!policy.hardOpusTriggers?.includes(t))
+    fail(`missing hard Opus trigger: ${t}`);
 
 const requiredHaikuForbidden = [
   "any-content-entry",
@@ -77,7 +82,8 @@ const requiredHaikuForbidden = [
   "schema-change",
 ];
 for (const c of requiredHaikuForbidden)
-  if (!policy.haikuForbidden?.includes(c)) fail(`missing haiku prohibition: ${c}`);
+  if (!policy.haikuForbidden?.includes(c))
+    fail(`missing haiku prohibition: ${c}`);
 
 if (
   !policy.escalation?.sonnetToOpus?.includes("hard-opus-trigger") ||
@@ -91,7 +97,8 @@ for (const f of [
   "AGENTS.md",
 ]) {
   const p = join(repoRoot, f);
-  if (!existsSync(p) || statSync(p).size === 0) fail(`missing harness resource: ${f}`);
+  if (!existsSync(p) || statSync(p).size === 0)
+    fail(`missing harness resource: ${f}`);
 }
 
 console.log(

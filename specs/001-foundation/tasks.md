@@ -13,7 +13,7 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 ## Phase 1 — Platform scaffold & i18n
 
 ### Scaffold
-- [ ] **T101 [PLATFORM]** Init Astro project: TS strict, static output, content collections config, `npm run dev/build/check/lint/format:check/test` scripts, Vitest, Prettier, ESLint, `.nvmrc` 24. *(SCF-01)*
+- [x] **T101 [PLATFORM]** Init Astro project: TS strict, static output, content collections config, `npm run dev/build/check/lint/format:check/test` scripts, Vitest, Prettier, ESLint, `.nvmrc` 24. *(SCF-01)*
 - [ ] **T102 [PLATFORM]** i18n routing: `/en/` + `/es/` prefixes, root redirect on `Accept-Language` with `/en/` fallback, sticky locale switcher, hreflang pairs + `x-default` on every page, typed UI-strings module with lint gate on hard-coded strings. Depends: T101. *(I18N-01, I18N-02, I18N-03, I18N-04, I18N-08)*
 - [ ] **T103 [TEST]** Graders for the entry-schema contract: `prose.en`+`prose.es` both required (a one-locale fixture must fail), shared-data/prose split (no numeric spec fields inside prose schemas), slug-registry uniqueness per locale. Expected-failure markers. Depends: T101. *(I18N-05, I18N-06, SCF-04)*
 - [ ] **T104 [PLATFORM]** Base entry schemas in `src/content.config.ts`: shared `data` + locale-keyed `prose` (both required), `fitment` placeholder type, `confidence` enum, `sources` array with archiveUrl. Per-locale slug registry. Activates T103 graders. Depends: T103 merged. *(I18N-05, I18N-06, SCF-01, SCF-04)*

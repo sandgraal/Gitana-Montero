@@ -1,0 +1,39 @@
+{
+  "name": "gitana-montero",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "verify": "astro check && eslint . && prettier --check . && vitest run && astro build"
+  },
+  "dependencies": {
+    "astro": "^7.2.9"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.0.0",
+    "eslint": "^10.9.1",
+    "eslint-plugin-astro": "^3.1.0",
+    "globals": "^17.11.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.68.0",
+    "vitest": "^4.1.11"
+  },
+  "notes": {
+    "typescript": "Pinned to ^5.9.3, not the ^7.x line currently resolvable: @astrojs/check's peerDependency is '^5.0.0 || ^6.0.0' and typescript-eslint's is '>=4.8.4 <6.1.0' — both exclude TS 7 as of this writing. Bump this pin only once those peer ranges do."
+  }
+}

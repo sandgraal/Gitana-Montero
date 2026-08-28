@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+coverage/
+playwright-report/
+test-results/
+package-lock.json
+
+# Harness/spec/docs predate the tooling scaffold (T101) and are out of scope
+# hygiene: reformatting them is a drive-by unrelated to this task, not a
+# constitution rule. scripts/ is NOT ignored — T105's check tooling lands
+# there and must stay format-enforced.
+.claude/
+.github/
+specs/
+AGENTS.md
+CLAUDE.md
+README.md
