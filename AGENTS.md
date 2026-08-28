@@ -28,7 +28,8 @@ Spec of record: `specs/001-foundation/spec.md`.
 - **Supabase** (phase 8) is a *generated read-model* for search and telemetry,
   synced from built content by CI. It is never the source of truth. No agent
   writes to it directly.
-- **Vercel** for deploy. **Node 24** via nvm.
+- **GitHub Pages** for deploy (owner decision 2026-08-27; a custom domain or
+  other host may come later). **Node 24** via nvm.
 - **Vitest** for unit tests, **Playwright** for e2e, **Pa11y** for a11y.
 
 ## Commands
