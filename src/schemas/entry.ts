@@ -83,6 +83,17 @@ export type ConfidenceTier = (typeof CONFIDENCE_TIERS)[number];
 
 export const confidenceSchema = z.enum(CONFIDENCE_TIERS);
 
+/**
+ * Tiers whose whole meaning is "a document says so": claiming one while citing
+ * nothing is a structural falsehood, so `defineEntrySchema` rejects it.
+ *
+ * The weaker tiers stay citable-but-not-required on purpose — `first-hand` is
+ * the owner's own truck and `anecdotal` is by definition unsourced. Per-figure
+ * citation (REF-02, "every numeric spec carries a source") is `check:citations`
+ * in T105; this is only the tier/evidence contradiction a schema can see.
+ */
+export const CITATION_REQUIRED_TIERS = ["fsm-confirmed", "tsb"] as const;
+
 /* -------------------------------------------------------------------------
  * Shared string primitives
  * ---------------------------------------------------------------------- */
@@ -224,11 +235,62 @@ const CHILD_DEF_KEYS = [
 
 type ZodDef = Record<string, unknown> & { type?: unknown };
 
-function defOf(candidate: unknown): ZodDef | null {
+function isNumericValue(value: unknown): boolean {
+  return typeof value === "number" || typeof value === "bigint";
+}
+
+/**
+ * `z.literal(88)` and `z.enum(NumericEnum)` carry their numbers as *values*,
+ * not as a numeric `_def.type` — `z.literal(88)._def` is
+ * `{ type: "literal", values: [88] }`. A difficulty of 1–5 (PRB-01, PRC-01) is
+ * naturally spelled as a numeric literal union, so this is the likeliest
+ * numeric field anyone would actually write into prose.
+ */
+function hasNumericValues(def: ZodDef): boolean {
+  if (def.type === "literal") {
+    const { values } = def;
+    return Array.isArray(values) && values.some(isNumericValue);
+  }
+
+  if (def.type === "enum") {
+    const { entries } = def;
+    if (typeof entries !== "object" || entries === null) return false;
+    return Object.values(entries).some(isNumericValue);
+  }
+
+  return false;
+}
+
+/**
+ * The guard **fails closed**: anything that looks like a schema but whose
+ * internals this code cannot read is treated as a fault, not as clean. A
+ * silent `null` here would wave a whole subtree past the numeric check the
+ * moment `astro/zod` renames a `_def` key — exactly the kind of drift that
+ * would otherwise surface as a torque figure duplicated into two locales.
+ */
+function defOf(candidate: unknown, path: string): ZodDef | null {
   if (typeof candidate !== "object" || candidate === null) return null;
+
   const { _def: def } = candidate as { _def?: unknown };
-  if (typeof def !== "object" || def === null) return null;
-  return def as ZodDef;
+  if (
+    typeof def === "object" &&
+    def !== null &&
+    typeof (def as ZodDef).type === "string"
+  ) {
+    return def as ZodDef;
+  }
+
+  const { safeParse } = candidate as { safeParse?: unknown };
+  if (typeof safeParse === "function") {
+    throw new Error(
+      `cannot verify the prose field \`${path}\`: it parses like a schema but ` +
+        `exposes no readable \`_def.type\`, so the "numbers are never ` +
+        `translated" guard cannot see inside it. Build prose fields from ` +
+        `\`astro/zod\` schemas (AGENTS.md). refs specs/001-foundation`
+    );
+  }
+
+  return null;
 }
 
 function joinPath(path: string, key: string): string {
@@ -248,7 +310,7 @@ function findNumericField(
   path: string,
   seen: Set<object>
 ): string | null {
-  const def = defOf(schema);
+  const def = defOf(schema, path);
   if (def === null) return null;
   if (seen.has(def)) return null;
   seen.add(def);
@@ -256,6 +318,8 @@ function findNumericField(
   if (typeof def.type === "string" && NUMERIC_DEF_TYPES.has(def.type)) {
     return path;
   }
+
+  if (hasNumericValues(def)) return path;
 
   const shape = def["shape"];
   if (typeof shape === "object" && shape !== null) {
@@ -397,7 +461,31 @@ export function defineEntrySchema<
         .object({ en: proseLocaleSchema, es: proseLocaleSchema })
         .strict(),
     })
-    .strict();
+    .strict()
+    .superRefine((entry, ctx) => {
+      const { confidence, sources } = entry as {
+        confidence?: unknown;
+        sources?: unknown;
+      };
+
+      if (
+        typeof confidence === "string" &&
+        (CITATION_REQUIRED_TIERS as readonly string[]).includes(confidence) &&
+        Array.isArray(sources) &&
+        sources.length === 0
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["sources"],
+          message:
+            `confidence \`${confidence}\` claims a document says so, but this ` +
+            `entry cites nothing: an entry at ` +
+            `${CITATION_REQUIRED_TIERS.join(" or ")} needs at least one ` +
+            `source (AGENTS.md "cite what you actually read"). Lower the tier ` +
+            `or add the citation. refs specs/001-foundation`,
+        });
+      }
+    });
 }
 
 /** The locale-keyed prose half of any entry, for consumers that render it. */

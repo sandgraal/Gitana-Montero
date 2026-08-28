@@ -14,7 +14,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { z } from "astro/zod";
-import { defineEntrySchema } from "./entry";
+import { CITATION_REQUIRED_TIERS, defineEntrySchema } from "./entry";
 
 const shared = { torqueNm: z.number() };
 const prose = { title: z.string(), summary: z.string() };
@@ -60,6 +60,21 @@ const numericEvasions: [string, z.ZodType][] = [
     "z.array(z.object({ deep: z.object({ n: z.bigint() }) })).optional()",
     z.array(z.object({ deep: z.object({ n: z.bigint() }) })).optional(),
   ],
+  // Numbers carried as literal *values* rather than as a numeric type. A
+  // difficulty of 1–5 (PRB-01, PRC-01) is naturally spelled this way, which
+  // makes it the likeliest numeric prose field anyone would really write.
+  ["z.literal(88)", z.literal(88)],
+  [
+    "z.union([z.literal(1), z.literal(2)])",
+    z.union([z.literal(1), z.literal(2)]),
+  ],
+  ["z.literal([1, 'one'])", z.literal([1, "one"])],
+  ["z.literal(88n)", z.literal(88n)],
+  ["z.enum({ ONE: 1 })", z.enum({ ONE: 1 })],
+  [
+    "z.object({ difficulty: z.literal([1, 2, 3, 4, 5]) })",
+    z.object({ difficulty: z.literal([1, 2, 3, 4, 5]) }),
+  ],
 ];
 
 describe("numeric-prose guard", () => {
@@ -81,6 +96,35 @@ describe("numeric-prose guard", () => {
     expect(() =>
       defineEntrySchema(shared, { ...prose, steps: step })
     ).not.toThrow();
+  });
+
+  it("still accepts string literals and string enums in prose", () => {
+    expect(() =>
+      defineEntrySchema(shared, {
+        ...prose,
+        tone: z.literal("warning"),
+        severity: z.enum(["low", "high"]),
+      })
+    ).not.toThrow();
+  });
+
+  /**
+   * Fails closed. A hand-rolled parser, or an `astro/zod` upgrade that renamed
+   * `_def.type`, would otherwise be waved through as "nothing numeric found"
+   * and take its whole subtree with it.
+   */
+  it("refuses a prose field it cannot inspect, rather than assuming it clean", () => {
+    const opaque = {
+      safeParse: () => ({ success: true, data: 88 }),
+      parse: () => 88,
+    };
+
+    expect(() =>
+      defineEntrySchema(shared, {
+        ...prose,
+        sneaky: opaque as unknown as z.ZodType,
+      })
+    ).toThrow(/sneaky/);
   });
 });
 
@@ -106,7 +150,9 @@ describe("blank prose strings", () => {
     id: "test-schema-alpha",
     fitment: { gens: ["gen3"] },
     torqueNm: 88,
-    confidence: "tsb",
+    // `first-hand` is the owner's own truck, so it needs no citation — see the
+    // citation-tier block below.
+    confidence: "first-hand",
     sources: [],
     prose: {
       en: { title: "T", summary: "S", steps },
@@ -129,4 +175,56 @@ describe("blank prose strings", () => {
   it("accepts the same entry once the string says something", () => {
     expect(schema().safeParse(entry(["ok", "listo"])).success).toBe(true);
   });
+});
+
+describe("citation-required confidence tiers", () => {
+  const source = {
+    title: "TEST fixture source — not a real document",
+    url: "https://example.invalid/test-schema/source",
+    archiveUrl:
+      "https://web.archive.org/web/20260101000000/" +
+      "https://example.invalid/test-schema/source",
+    accessed: "2026-08-27",
+    kind: "fsm",
+  };
+
+  const entry = (confidence: string, sources: unknown[]) => ({
+    id: "test-schema-alpha",
+    fitment: { gens: ["gen3"] },
+    torqueNm: 88,
+    confidence,
+    sources,
+    prose: {
+      en: { title: "T", summary: "S" },
+      es: { title: "T", summary: "S" },
+    },
+  });
+
+  const schema = () => defineEntrySchema(shared, prose);
+
+  it.each([...CITATION_REQUIRED_TIERS])(
+    "rejects an entry claiming `%s` while citing nothing",
+    (tier) => {
+      const outcome = schema().safeParse(entry(tier, []));
+
+      expect(outcome.success).toBe(false);
+      expect(
+        outcome.error?.issues.map((issue) => issue.path.join("."))
+      ).toContain("sources");
+    }
+  );
+
+  it.each([...CITATION_REQUIRED_TIERS])(
+    "accepts `%s` once the entry cites something",
+    (tier) => {
+      expect(schema().safeParse(entry(tier, [source])).success).toBe(true);
+    }
+  );
+
+  it.each(["community-consensus", "first-hand", "anecdotal"])(
+    "leaves `%s` free to carry no source",
+    (tier) => {
+      expect(schema().safeParse(entry(tier, [])).success).toBe(true);
+    }
+  );
 });
