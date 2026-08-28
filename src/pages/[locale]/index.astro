@@ -7,6 +7,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { LOCALES, isLocale, type Locale } from "../../i18n/routing";
 import { t } from "../../i18n/ui";
+import { SITE_NAME } from "../../site";
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale } }));
@@ -23,7 +24,7 @@ const strings = t(locale);
 <BaseLayout
   locale={locale}
   routePath="/"
-  title={`${strings.siteName} — ${strings.siteTagline}`}
+  title={`${SITE_NAME} — ${strings.siteTagline}`}
   description={strings.homeIntro}
 >
   <h1>{strings.homeHeading}</h1>

@@ -3,6 +3,7 @@
 import LocaleSwitcher from "./LocaleSwitcher.astro";
 import { localeHref, type Locale } from "../i18n/routing";
 import { t } from "../i18n/ui";
+import { SITE_NAME } from "../site";
 
 interface Props {
   locale: Locale;
@@ -15,7 +16,7 @@ const strings = t(locale);
 
 <header>
   <a class="brand" href={localeHref(locale, "/")}>
-    <strong>{strings.siteName}</strong>
+    <strong>{SITE_NAME}</strong>
     <span>{strings.siteTagline}</span>
   </a>
   <nav aria-label={strings.navLabel}>

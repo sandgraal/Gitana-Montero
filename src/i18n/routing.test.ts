@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_LOCALE,
   LOCALES,
+  LOCALE_BCP47,
+  LOCALE_HREFLANG,
   acceptLanguageFromNavigator,
   absoluteUrl,
   alternateLinks,
@@ -103,7 +105,7 @@ describe("alternateLinks (I18N-04)", () => {
   it("emits one link per locale plus x-default", () => {
     expect(alternateLinks("/", BASE)).toEqual([
       { hreflang: "en", href: "/Gitana-Montero/en/" },
-      { hreflang: "es-CR", href: "/Gitana-Montero/es/" },
+      { hreflang: "es", href: "/Gitana-Montero/es/" },
       { hreflang: "x-default", href: "/Gitana-Montero/en/" },
     ]);
   });
@@ -112,8 +114,36 @@ describe("alternateLinks (I18N-04)", () => {
     const links = alternateLinks("/problems/x/", BASE);
     const hrefs = Object.fromEntries(links.map((l) => [l.hreflang, l.href]));
     expect(hrefs["en"]).toBe("/Gitana-Montero/en/problems/x/");
-    expect(hrefs["es-CR"]).toBe("/Gitana-Montero/es/problems/x/");
+    expect(hrefs["es"]).toBe("/Gitana-Montero/es/problems/x/");
     expect(hrefs["x-default"]).toBe(hrefs["en"]);
+  });
+
+  it("does not region-lock Spanish: an es-MX or es-ES reader still matches", () => {
+    // hreflang is a targeting signal. `es-CR` would exclude every Spanish
+    // speaker outside Costa Rica and drop them to x-default (English),
+    // privileging one locale over the other against I18N-01.
+    const tags = alternateLinks("/", BASE).map((link) => link.hreflang);
+    expect(tags).toContain("es");
+    expect(tags).not.toContain("es-CR");
+  });
+});
+
+describe("locale tags", () => {
+  it("describes the document as Costa Rican Spanish", () => {
+    expect(LOCALE_BCP47.es).toBe("es-CR");
+    expect(LOCALE_BCP47.en).toBe("en");
+  });
+
+  it("targets all Spanish with hreflang, while lang stays region-tagged", () => {
+    expect(LOCALE_HREFLANG.es).toBe("es");
+    expect(LOCALE_HREFLANG.es).not.toBe(LOCALE_BCP47.es);
+    expect(LOCALE_HREFLANG.en).toBe(LOCALE_BCP47.en);
+  });
+
+  it("keeps the hreflang tag as the primary subtag of the lang tag", () => {
+    for (const locale of LOCALES) {
+      expect(LOCALE_BCP47[locale].split("-")[0]).toBe(LOCALE_HREFLANG[locale]);
+    }
   });
 });
 

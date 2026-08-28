@@ -22,6 +22,7 @@ import {
   DEFAULT_LOCALE,
   LOCALES,
   LOCALE_BCP47,
+  LOCALE_HREFLANG,
   LOCALE_NATIVE_NAME,
   localeHref,
 } from "../i18n/routing";
@@ -59,7 +60,7 @@ const title = LOCALES.map((locale) => ui[locale].rootRedirectTitle).join(" · ")
             <li>
               <a
                 href={localeHref(locale, "/")}
-                hreflang={LOCALE_BCP47[locale]}
+                hreflang={LOCALE_HREFLANG[locale]}
                 lang={LOCALE_BCP47[locale]}
                 data-locale-choice={locale}
               >

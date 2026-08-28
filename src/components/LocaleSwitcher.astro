@@ -12,6 +12,7 @@
 import {
   LOCALES,
   LOCALE_BCP47,
+  LOCALE_HREFLANG,
   LOCALE_NATIVE_NAME,
   localeHref,
   type Locale,
@@ -37,7 +38,7 @@ const strings = t(locale);
         <li>
           <a
             href={localeHref(option, routePath)}
-            hreflang={LOCALE_BCP47[option]}
+            hreflang={LOCALE_HREFLANG[option]}
             lang={LOCALE_BCP47[option]}
             data-locale-choice={option}
             aria-current={option === locale ? "true" : undefined}

@@ -9,15 +9,16 @@
  * error, so `astro check` catches a missing locale before review does. ES is
  * Costa Rican Spanish in the `usted` register (AGENTS.md).
  *
- * This module holds *only* prose. Locale-independent values (URLs, native
- * language names, numbers) belong in `src/site.ts` or `src/i18n/routing.ts`
- * so a fact is never stored twice.
+ * This module holds *only* prose. Locale-independent values — URLs, the site
+ * name, native language names, and every figure — belong in `src/site.ts` or
+ * `src/i18n/routing.ts` and are interpolated in, so a fact is never stored
+ * twice.
  */
 
 import { LOCALES, type Locale } from "./routing";
+import { TRUCK_YEAR } from "../site";
 
 export interface UiStrings {
-  readonly siteName: string;
   readonly siteTagline: string;
   readonly skipToContent: string;
   readonly navHome: string;
@@ -40,17 +41,15 @@ export interface UiStrings {
 }
 
 const en: UiStrings = {
-  siteName: "Gitana",
   siteTagline: "Montero, Pajero and Shogun reference and build log",
   skipToContent: "Skip to content",
   navHome: "Home",
-  navLabel: "Main",
+  navLabel: "Main navigation",
   languageLabel: "Language",
   languageSwitcherLabel: "Choose a language",
   languageCurrent: "Current language",
   homeHeading: "Montero, Pajero and Shogun — reference and build log",
-  homeIntro:
-    "This site is the complete build log of one 2002 Mitsubishi Montero and a reference for every generation, in English and Costa Rican Spanish.",
+  homeIntro: `This site is the complete build log of one ${TRUCK_YEAR} Mitsubishi Montero and a reference for every generation, in English and Costa Rican Spanish.`,
   homeStatus:
     "Under construction: the bilingual platform is in place, the reference content lands next.",
   footerSourceLabel: "Source code on GitHub",
@@ -66,28 +65,26 @@ const en: UiStrings = {
 };
 
 const es: UiStrings = {
-  siteName: "Gitana",
   siteTagline: "Referencia y bitácora del Montero, Pajero y Shogun",
   skipToContent: "Saltar al contenido",
   navHome: "Inicio",
-  navLabel: "Principal",
+  navLabel: "Navegación principal",
   languageLabel: "Idioma",
   languageSwitcherLabel: "Elija un idioma",
   languageCurrent: "Idioma actual",
   homeHeading: "Montero, Pajero y Shogun — referencia y bitácora",
-  homeIntro:
-    "Este sitio es la bitácora completa de un Mitsubishi Montero 2002 y una referencia para todas las generaciones, en inglés y en español de Costa Rica.",
+  homeIntro: `Este sitio es la bitácora completa de un solo Mitsubishi Montero ${TRUCK_YEAR} y una referencia para todas las generaciones, en inglés y en español de Costa Rica.`,
   homeStatus:
-    "En construcción: la plataforma bilingüe ya está lista y el contenido de referencia viene después.",
+    "En construcción: la plataforma bilingüe está lista; el contenido de referencia viene a continuación.",
   footerSourceLabel: "Código fuente en GitHub",
   footerIssuesLabel: "Reporte un problema o corrija un dato",
   footerDisclaimer:
-    "Material de referencia únicamente. Para trabajos críticos de seguridad, consulte a un mecánico calificado.",
+    "Material de referencia únicamente. En trabajos críticos para la seguridad, consulte a un mecánico calificado.",
   notFoundTitle: "Página no encontrada",
-  notFoundMessage: "Esa página no existe o fue movida.",
+  notFoundMessage: "Esa página no existe o cambió de dirección.",
   notFoundHomeLink: "Ir a la página de inicio",
   rootRedirectTitle: "Elija un idioma",
-  rootRedirectMessage: "Le estamos llevando a su idioma…",
+  rootRedirectMessage: "Redirigiendo a la versión en su idioma…",
   rootRedirectManual: "Si no pasa nada, elija un idioma:",
 };
 

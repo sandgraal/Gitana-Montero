@@ -26,11 +26,30 @@ export const LOCALE_NATIVE_NAME: Record<Locale, string> = {
   es: "Español",
 };
 
-/** BCP-47 tags emitted in `hreflang` / `<html lang>`. */
+/**
+ * BCP-47 tags for `<html lang>` and any `lang`/`hreflang` attribute that
+ * describes *this* document. Region-tagged on purpose: the prose really is
+ * Costa Rican Spanish (AGENTS.md — `usted` register, CR vocabulary), and
+ * saying so helps screen readers and translation tools.
+ */
 export const LOCALE_BCP47: Record<Locale, string> = {
   en: "en",
-  // Costa Rican Spanish (AGENTS.md): the register is `usted`, CR vocabulary.
   es: "es-CR",
+};
+
+/**
+ * Tags for `<link rel="alternate" hreflang>`. Deliberately *not* region-tagged.
+ *
+ * hreflang is a targeting signal, not a description: `es-CR` tells a search
+ * engine "serve this to Spanish speakers in Costa Rica", so a reader in Mexico
+ * or Spain matches no alternate and gets dropped to `x-default` — i.e. English.
+ * That would privilege one locale over the other, against I18N-01. The page
+ * still declares itself `es-CR` via {@link LOCALE_BCP47}; only the targeting
+ * signal is broadened.
+ */
+export const LOCALE_HREFLANG: Record<Locale, string> = {
+  en: "en",
+  es: "es",
 };
 
 export function isLocale(value: unknown): value is Locale {
@@ -123,7 +142,7 @@ export function alternateLinks(
   base?: string
 ): AlternateLink[] {
   const links: AlternateLink[] = LOCALES.map((locale) => ({
-    hreflang: LOCALE_BCP47[locale],
+    hreflang: LOCALE_HREFLANG[locale],
     href: localeHref(locale, routePath, base),
   }));
   links.push({

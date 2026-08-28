@@ -1,5 +1,7 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { LOCALES } from "./routing";
+import { SITE_NAME, TRUCK_YEAR } from "../site";
 import { allUi, t, ui } from "./ui";
 
 describe("UI strings module (I18N-08)", () => {
@@ -30,13 +32,31 @@ describe("UI strings module (I18N-08)", () => {
     }
   });
 
-  it("translates prose rather than copying English through", () => {
-    // Brand names are legitimately identical; sentences are not.
+  it("translates every string — nothing is copied through untranslated", () => {
+    // Locale-independent values (the site name, URLs, figures) live in
+    // src/site.ts, so no key here may be byte-identical across locales.
     const shared = Object.keys(ui.en).filter(
       (key) =>
         ui.en[key as keyof typeof ui.en] === ui.es[key as keyof typeof ui.es]
     );
-    expect(shared).toEqual(["siteName"]);
+    expect(shared).toEqual([]);
+  });
+
+  it("stores no figure per locale — numbers are interpolated, not retyped", () => {
+    // AGENTS.md: "if you find yourself writing the same figure twice, the
+    // schema is wrong". The truck's model year comes from src/site.ts.
+    expect(ui.en.homeIntro).toContain(String(TRUCK_YEAR));
+    expect(ui.es.homeIntro).toContain(String(TRUCK_YEAR));
+
+    const source = readFileSync(new URL("./ui.ts", import.meta.url), "utf8");
+    expect(source).not.toContain(String(TRUCK_YEAR));
+  });
+
+  it("keeps the site name out of the per-locale records", () => {
+    for (const locale of LOCALES) {
+      expect(Object.keys(ui[locale])).not.toContain("siteName");
+      expect(Object.values(ui[locale])).not.toContain(SITE_NAME);
+    }
   });
 
   it("t() returns the strings for the requested locale", () => {

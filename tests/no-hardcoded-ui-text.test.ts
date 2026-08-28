@@ -59,6 +59,18 @@ describe("gitana/no-hardcoded-ui-text (I18N-08)", () => {
           errors: [{ messageId: "hardcodedAttribute" }],
         },
         {
+          // The component-prop bypass: BaseLayout renders `description` into
+          // <meta name="description">, so a literal here ships EN-only copy.
+          filename: "src/pages/Bad.astro",
+          code: `---\nimport BaseLayout from "../layouts/BaseLayout.astro";\n---\n<BaseLayout locale="en" description="An English-only summary." />`,
+          errors: [{ messageId: "hardcodedAttribute" }],
+        },
+        {
+          filename: "src/pages/Bad.astro",
+          code: `---\nimport BaseLayout from "../layouts/BaseLayout.astro";\n---\n<BaseLayout title="Home" />`,
+          errors: [{ messageId: "hardcodedAttribute" }],
+        },
+        {
           filename: "src/components/Bad.astro",
           code: `---\nconst x = 1;\n---\n<p>Total: {x} items</p>`,
           errors: [

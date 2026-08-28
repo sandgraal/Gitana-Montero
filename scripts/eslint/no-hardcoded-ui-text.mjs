@@ -22,7 +22,14 @@
  * diff and has to be justified in review.
  */
 
-/** Attributes whose literal value is read aloud or shown to a person. */
+/**
+ * Attributes whose literal value is read aloud or shown to a person.
+ *
+ * `title` and `description` also cover the component-prop case — a layout
+ * invoked as `<BaseLayout title="Home" description="…">` ships those straight
+ * into `<title>` and `<meta name="description">`, in one language, with no
+ * other rule to catch it.
+ */
 const USER_FACING_ATTRIBUTES = new Set([
   "alt",
   "aria-description",
@@ -30,6 +37,7 @@ const USER_FACING_ATTRIBUTES = new Set([
   "aria-placeholder",
   "aria-roledescription",
   "aria-valuetext",
+  "description",
   "placeholder",
   "title",
 ]);

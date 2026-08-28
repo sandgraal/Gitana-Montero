@@ -7,7 +7,12 @@
  * with its own `lang`. It is not a localized page and therefore carries no
  * `hreflang` set — `scripts/check-hreflang.mjs` exempts it explicitly.
  */
-import { LOCALE_BCP47, DEFAULT_LOCALE, localeHref } from "../i18n/routing";
+import {
+  LOCALE_BCP47,
+  LOCALE_HREFLANG,
+  DEFAULT_LOCALE,
+  localeHref,
+} from "../i18n/routing";
 import { allUi } from "../i18n/ui";
 
 const title = allUi.map(({ strings }) => strings.notFoundTitle).join(" · ");
@@ -29,7 +34,11 @@ const title = allUi.map(({ strings }) => strings.notFoundTitle).join(" · ");
             <h1>{strings.notFoundTitle}</h1>
             <p>{strings.notFoundMessage}</p>
             <p>
-              <a href={localeHref(locale, "/")} hreflang={LOCALE_BCP47[locale]}>
+              <a
+                href={localeHref(locale, "/")}
+                hreflang={LOCALE_HREFLANG[locale]}
+                data-locale-choice={locale}
+              >
                 {strings.notFoundHomeLink}
               </a>
             </p>
@@ -39,3 +48,11 @@ const title = allUi.map(({ strings }) => strings.notFoundTitle).join(" · ");
     </main>
   </body>
 </html>
+
+<script>
+  // A 404 is a locale fork like any other: if the visitor picks a language
+  // here, that is an explicit choice and the root redirect must honour it.
+  import { rememberLocaleFromClick } from "../i18n/locale-preference";
+
+  rememberLocaleFromClick(document);
+</script>

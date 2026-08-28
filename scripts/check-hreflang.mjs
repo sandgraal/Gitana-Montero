@@ -152,14 +152,30 @@ function alternateKey(alternates) {
  */
 export async function auditDist({ distDir, base, site, locales }) {
   const problems = [];
+
+  // A hard failure, not a warning: I18N-04 says the check SHALL fail. Without
+  // `site` every href degrades to root-relative, the "hrefs must be absolute"
+  // arm below disarms itself, and the audit would pass green while shipping
+  // hreflang that search engines ignore.
+  if (!site) {
+    problems.push(
+      "astro.config.mjs has no `site`, so hreflang and canonical hrefs cannot " +
+        "be absolute. Search engines require absolute hreflang URLs — set `site`."
+    );
+  }
+
   if (!existsSync(distDir)) {
-    return [
-      `dist directory not found: ${distDir} — run \`astro build\` first.`,
-    ];
+    problems.push(
+      `dist directory not found: ${distDir} — run \`astro build\` first.`
+    );
+    return problems;
   }
 
   const files = await collectHtmlFiles(distDir);
-  if (files.length === 0) return [`no HTML files found in ${distDir}.`];
+  if (files.length === 0) {
+    problems.push(`no HTML files found in ${distDir}.`);
+    return problems;
+  }
 
   const pages = new Map();
   for (const file of files) {
@@ -357,12 +373,8 @@ async function main() {
     process.exitCode = 1;
     return;
   }
-  if (!site) {
-    console.warn(
-      "check:hreflang — astro.config.mjs has no `site`; hreflang hrefs cannot be absolute. " +
-        "Search engines require absolute hreflang URLs."
-    );
-  }
+  // A missing `site` is reported by auditDist as a failure, not here as a
+  // warning — one place decides, so the unit tests cover the real behaviour.
   const distDir = path.resolve(REPO_ROOT, process.argv[2] ?? "dist");
   const problems = await auditDist({ distDir, base, site, locales });
 
