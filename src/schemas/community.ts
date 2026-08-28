@@ -100,15 +100,27 @@ import {
  *
  * The list is COM-01's enumeration, one member per named kind — "groups" is
  * `facebook-group` and "channels" is `youtube-channel`, the forms the task
- * spelled out. Nothing beyond the spec's list is invented here; a kind the
- * directory turns out to need (WhatsApp and Telegram groups are the likely
- * ones in Central America) is a negotiated addition to this vocabulary, not
- * a value a content entry may improvise.
+ * spelled out. Nothing here is invented: a kind the directory turns out to
+ * need is a negotiated addition to this vocabulary, never a value a content
+ * entry may improvise.
+ *
+ * `whatsapp-group` and `telegram-group` are that negotiation, resolved.
+ * T700 shipped without them and flagged the gap; **the owner ruled on
+ * 2026-08-28 that both are first-class community types**, and spec §8's
+ * enumeration was widened to match. The reason is COM-02: in Costa Rica and
+ * the rest of Central America a WhatsApp group is frequently *the* place a
+ * model's owners actually talk, so leaving it out would have pushed exactly
+ * the communities COM-02 makes first-class into `club` or `forum` — an
+ * appendix by mislabelling. They remain distinct from the `whatsapp` and
+ * `telegram` *link* kinds below, which describe a secondary presence of a
+ * community that is primarily something else.
  */
 export const COMMUNITY_TYPES = [
   "forum",
   "subreddit",
   "facebook-group",
+  "whatsapp-group",
+  "telegram-group",
   "discord",
   "club",
   "youtube-channel",
@@ -277,10 +289,13 @@ export const languageTagSchema = z.string().refine(isLanguageTag, {
  * either hard-code English into data or duplicate one URL's name across two
  * prose blocks. The page renders the kind.
  *
- * These are platform identities, so the list is not `COMMUNITY_TYPES`:
- * `whatsapp` and `telegram` are perfectly good *secondary* presences for a
- * club that is primarily something else, whereas whether they can be a
- * community's primary kind is a vocabulary question left open above.
+ * These are platform identities, so the list is deliberately not
+ * `COMMUNITY_TYPES` — the two vocabularies answer different questions and a
+ * value may appear in both. `whatsapp` here is "this club also has a WhatsApp
+ * group you can join"; `whatsapp-group` there is "this entry *is* a WhatsApp
+ * group" (owner ruling, 2026-08-28). A club with a WhatsApp side-channel is
+ * `communityType: "club"` plus a `whatsapp` link; the group itself is an
+ * entry of its own.
  */
 export const LINK_KINDS = [
   "website",

@@ -146,6 +146,50 @@ describe("community type (COM-01)", () => {
       "communityType"
     );
   });
+
+  // Owner ruling, 2026-08-28: messaging-app groups are first-class types, not
+  // a `club`/`forum` approximation. Pinned by name rather than left to the
+  // `it.each` above, because the point is that these two specific members
+  // exist — an `it.each` over the array would keep passing if they vanished.
+  it.each(["whatsapp-group", "telegram-group"])(
+    "makes `%s` a first-class community type (owner ruling 2026-08-28)",
+    (communityType) => {
+      expect(COMMUNITY_TYPES).toContain(communityType);
+      expect(accepts(makeCommunity({ communityType }))).toBe(true);
+    }
+  );
+
+  it(
+    "accepts a Costa Rican WhatsApp group as itself — COM-02's reason for " +
+      "the ruling",
+    () => {
+      expect(
+        paths(
+          makeCommunity({
+            communityType: "whatsapp-group",
+            regions: ["CR"],
+            languages: ["es-CR"],
+          })
+        )
+      ).toEqual([]);
+    }
+  );
+
+  it("keeps the type and link vocabularies distinct", () => {
+    // `whatsapp` is a link kind, not a community type; `whatsapp-group` is a
+    // community type, not a link kind. A club with a WhatsApp side-channel is
+    // the former, the group itself is the latter.
+    expect(COMMUNITY_TYPES).not.toContain("whatsapp");
+    expect(LINK_KINDS).not.toContain("whatsapp-group");
+    expect(
+      accepts(
+        makeCommunity({
+          communityType: "club",
+          links: [{ kind: "whatsapp", url: "https://chat.example.invalid/cr" }],
+        })
+      )
+    ).toBe(true);
+  });
 });
 
 describe("activity level (COM-01)", () => {
