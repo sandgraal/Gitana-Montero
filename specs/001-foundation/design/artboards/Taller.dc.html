@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; color: #2B2620; }
+    a { color: #B0532A; } a:hover { color: #93441F; }
+  </style>
+</helmet>
+<div style="width: 1200px; min-height: 1180px; background: #F7F4EE; padding: 36px 40px; display: flex; flex-direction: column; gap: 28px; box-sizing: border-box;">
+
+  <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <h1 style="margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.3px;">Garage — build log</h1>
+      <span style="font-size: 14px; color: #6E6559;">Every job done to Gitana, and every job planned. Real costs, real times.</span>
+    </div>
+    <div style="display: flex; gap: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">
+      <div style="display: flex; flex-direction: column; align-items: flex-end;">
+        <span style="color: #A99C88; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Odometer</span>
+        <span style="font-weight: 600; font-size: 16px;">198,420 mi</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end;">
+        <span style="color: #A99C88; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Entries</span>
+        <span style="font-weight: 600; font-size: 16px;">47</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end;">
+        <span style="color: #A99C88; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Planned</span>
+        <span style="font-weight: 600; font-size: 16px; color: #B0532A;">5</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 8px;">
+    <span style="font-size: 13px; font-weight: 700; background: #2B2620; color: #F7F4EE; border-radius: 999px; padding: 8px 16px;">Timeline</span>
+    <span style="font-size: 13px; font-weight: 500; border: 1px solid #E4DDD1; color: #55493C; border-radius: 999px; padding: 8px 16px; background: #FFF;">Current state</span>
+    <span style="font-size: 13px; font-weight: 500; border: 1px solid #E4DDD1; color: #55493C; border-radius: 999px; padding: 8px 16px; background: #FFF;">Planned work</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; position: relative; padding-left: 30px;">
+    <div style="position: absolute; left: 8px; top: 8px; bottom: 8px; width: 2px; background: #E4DDD1;"></div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 26px; position: relative;">
+      <div style="position: absolute; left: -28px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #B0532A; border: 3px solid #F7F4EE;"></div>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #A99C88;">2026-07-19 · 198,420 mi</span>
+      <div style="background: #FFF; border: 1px solid #E4DDD1; border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong style="font-size: 17px;">Front sway-bar end links replaced</strong>
+          <span style="font-size: 12px; font-weight: 700; color: #2F5E3F; background: #E4EFE7; border-radius: 4px; padding: 4px 10px;">done</span>
+        </div>
+        <div style="display: flex; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #55493C;">
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">1.2 h actual</span>
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">$38 parts</span>
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">2 parts</span>
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">1 procedure</span>
+        </div>
+        <span style="font-size: 14px; line-height: 1.6; color: #55493C;">Both links had visible play. Knock over washboard is gone. Old links kept as trail spares. First-hand outcome linked on the problem page →</span>
+        <div style="display: flex; gap: 8px;">
+          <span style="font-size: 12px; color: #B0532A; border: 1px solid #E9CDBB; background: #FBEEE6; border-radius: 4px; padding: 3px 8px;">photos · 4</span>
+          <a href="#" style="font-size: 12px; border: 1px solid #E4DDD1; border-radius: 4px; padding: 3px 8px; text-decoration: none;">problem: sway-bar links</a>
+          <a href="#" style="font-size: 12px; border: 1px solid #E4DDD1; border-radius: 4px; padding: 3px 8px; text-decoration: none;">procedure: link replacement</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 26px; position: relative;">
+      <div style="position: absolute; left: -28px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #B0532A; border: 3px solid #F7F4EE;"></div>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #A99C88;">2026-06-02 · 197,880 mi</span>
+      <div style="background: #FFF; border: 1px solid #E4DDD1; border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong style="font-size: 17px;">Oil and filter change — full synthetic</strong>
+          <span style="font-size: 12px; font-weight: 700; color: #2F5E3F; background: #E4EFE7; border-radius: 4px; padding: 4px 10px;">done</span>
+        </div>
+        <div style="display: flex; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #55493C;">
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">0.7 h actual</span>
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">$52 parts + fluids</span>
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">2 parts</span>
+        </div>
+        <span style="font-size: 14px; line-height: 1.6; color: #55493C;">Routine interval. No metal on the drain plug magnet. Next due by the chart at 202,880 mi.</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; position: relative;">
+      <div style="position: absolute; left: -28px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #FFF; border: 3px solid #B0532A;"></div>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #A99C88;">planned · priority 1</span>
+      <div style="background: #FBF9F4; border: 1.5px dashed #C9BFAF; border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong style="font-size: 17px;">Timing belt + water pump (6G74)</strong>
+          <span style="font-size: 12px; font-weight: 700; color: #8A5E14; background: #FDF3E4; border-radius: 4px; padding: 4px 10px;">planned</span>
+        </div>
+        <div style="display: flex; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #55493C;">
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">est. 6–8 h</span>
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">est. $$$</span>
+          <span style="background: #EFE9DD; border-radius: 4px; padding: 3px 8px;">7 parts</span>
+        </div>
+        <span style="font-size: 14px; line-height: 1.6; color: #55493C;">Due by age, not miles. Doing tensioner, idlers and seals in the same pass. Two parts still missing from the parts list — flagged in the gaps report.</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -38,7 +38,7 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 - [ ] **T208 [CONTENT]** VIN/option-code decoder data. Depends: T203. *(REF-01)*
 
 ### Design
-- [ ] **T209 [DESIGN]** Claude Design canvas for core page templates: problem page
+- [x] **T209 [DESIGN]** Claude Design canvas for core page templates: problem page
   (safety-notice + confidence-caveat rendering, EN and ES artboards), vehicle
   selector states, garage timeline, glossary page, site chrome w/ locale switcher
   (mobile + desktop). Owner refines in the Artifact; exports land in

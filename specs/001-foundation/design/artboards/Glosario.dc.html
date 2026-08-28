@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; color: #2B2620; }
+    a { color: #B0532A; } a:hover { color: #93441F; }
+  </style>
+</helmet>
+<div style="width: 1200px; min-height: 1020px; background: #F7F4EE; padding: 36px 40px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.3px;">Glossary · Glosario</h1>
+    <span style="font-size: 14px; color: #6E6559;">Canonical Costa Rican terms used across the site. Regional variants are searchable aliases, never prose.</span>
+  </div>
+
+  <div style="display: flex; gap: 12px; align-items: center;">
+    <div style="flex-grow: 1; display: flex; align-items: center; gap: 10px; background: #FFF; border: 1px solid #E4DDD1; border-radius: 8px; padding: 12px 16px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A99C88" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <span style="font-size: 14px; color: #A99C88;">Search any variant — rin, goma, refacción…</span>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <span style="font-size: 13px; font-weight: 700; background: #2B2620; color: #F7F4EE; border-radius: 999px; padding: 9px 16px;">All systems</span>
+      <span style="font-size: 13px; border: 1px solid #E4DDD1; color: #55493C; border-radius: 999px; padding: 9px 16px; background: #FFF;">Brakes</span>
+      <span style="font-size: 13px; border: 1px solid #E4DDD1; color: #55493C; border-radius: 999px; padding: 9px 16px; background: #FFF;">Suspension</span>
+      <span style="font-size: 13px; border: 1px solid #E4DDD1; color: #55493C; border-radius: 999px; padding: 9px 16px; background: #FFF;">Wheels &amp; tires</span>
+      <span style="font-size: 13px; border: 1px solid #E4DDD1; color: #55493C; border-radius: 999px; padding: 9px 16px; background: #FFF;">Engine</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+
+    <div style="background: #FFF; border: 1px solid #E4DDD1; border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <strong style="font-size: 19px;">llanta</strong>
+          <span style="font-size: 14px; color: #6E6559;">— tire</span>
+        </div>
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #3E6B4F; background: #E4EFE7; border-radius: 4px; padding: 3px 8px;">wheels &amp; tires</span>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #55493C;">The rubber tire mounted on the wheel. In CR usage <em>llanta</em> is the tire itself, never the metal wheel — that is the <a href="#">aro</a>.</p>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #55493C;">La llanta de caucho montada en el aro. En el uso costarricense, <em>llanta</em> es solo el neumático, nunca la pieza metálica — esa es el <a href="#">aro</a>.</p>
+      <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 11px; color: #A99C88; text-transform: uppercase; letter-spacing: 1px;">aliases</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #EFE9DD; border-radius: 4px; padding: 2px 8px;">goma <span style="color: #A99C88;">PR/DO</span></span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #EFE9DD; border-radius: 4px; padding: 2px 8px;">neumático <span style="color: #A99C88;">ES/CL</span></span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #EFE9DD; border-radius: 4px; padding: 2px 8px;">caucho <span style="color: #A99C88;">VE</span></span>
+      </div>
+    </div>
+
+    <div style="background: #FFF; border: 1px solid #E4DDD1; border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <strong style="font-size: 19px;">aro</strong>
+          <span style="font-size: 14px; color: #6E6559;">— wheel / rim</span>
+        </div>
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #3E6B4F; background: #E4EFE7; border-radius: 4px; padding: 3px 8px;">wheels &amp; tires</span>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #55493C;">The metal wheel the tire mounts on. Gen 3 factory sizes are catalogued per trim in the reference data.</p>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #55493C;">La pieza metálica donde se monta la llanta. Las medidas de fábrica de la Gen 3 están catalogadas por versión en los datos de referencia.</p>
+      <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 11px; color: #A99C88; text-transform: uppercase; letter-spacing: 1px;">aliases</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #EFE9DD; border-radius: 4px; padding: 2px 8px;">rin <span style="color: #A99C88;">MX/CO</span></span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #EFE9DD; border-radius: 4px; padding: 2px 8px;">llanta <span style="color: #A99C88;">ES — ¡ojo!</span></span>
+      </div>
+    </div>
+
+    <div style="background: #FFF; border: 1px solid #E4DDD1; border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <strong style="font-size: 19px;">pastillas de freno</strong>
+          <span style="font-size: 14px; color: #6E6559;">— brake pads</span>
+        </div>
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #7A2E2E; background: #F6E3D8; border-radius: 4px; padding: 3px 8px;">brakes</span>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #55493C;">Friction pads clamped by the caliper. Safety-critical: pad specs and torque values always carry a source.</p>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #55493C;">Las pastillas de fricción que aprieta la mordaza. Crítico para la seguridad: las especificaciones y torques siempre llevan fuente.</p>
+      <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 11px; color: #A99C88; text-transform: uppercase; letter-spacing: 1px;">aliases</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #EFE9DD; border-radius: 4px; padding: 2px 8px;">balatas <span style="color: #A99C88;">MX</span></span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #EFE9DD; border-radius: 4px; padding: 2px 8px;">fibras <span style="color: #A99C88;">CO</span></span>
+      </div>
+    </div>
+
+    <div style="background: #FFF; border: 1px solid #E4DDD1; border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <strong style="font-size: 19px;">repuestos</strong>
+          <span style="font-size: 14px; color: #6E6559;">— spare parts</span>
+        </div>
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #4A5568; background: #E8EDF2; border-radius: 4px; padding: 3px 8px;">general</span>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #55493C;">Replacement parts. Part numbers are shared data: stored once, rendered into both languages, never invented.</p>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #55493C;">Las piezas de repuesto. Los números de parte son datos compartidos: se guardan una vez, se muestran en ambos idiomas y nunca se inventan.</p>
+      <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 11px; color: #A99C88; text-transform: uppercase; letter-spacing: 1px;">aliases</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #EFE9DD; border-radius: 4px; padding: 2px 8px;">refacciones <span style="color: #A99C88;">MX</span></span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #EFE9DD; border-radius: 4px; padding: 2px 8px;">recambios <span style="color: #A99C88;">ES</span></span>
+      </div>
+    </div>
+  </div>
+
+  <span style="font-size: 13px; color: #A99C88; text-align: center;">Showing 4 of ~150 terms · A–Z index and system filters above</span>
+</div>
+</x-dc>
+</body>
+</html>
