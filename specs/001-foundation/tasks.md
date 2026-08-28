@@ -28,12 +28,12 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 - [ ] **T201 [CONTENT]** Vehicle taxonomy data: all generations w/ chassis codes + years, markets, engines, transmissions, transfer cases, trims, valid combinations per gen/market/year. Sourced (FSM indexes, factory literature). Depends: T106. *(VEH-01, VEH-02, VEH-03)*
 - [ ] **T202 [TEST]** Fitment engine graders: resolution against taxonomy, nonexistent-ID and impossible-combination failures, deterministic entry↔vehicle matching, boundary-year tables (1999 Gen 2.5/Gen 3 overlap). Depends: T201. *(FIT-01, FIT-02, FIT-04)*
 - [ ] **T203 [PLATFORM]** Fitment engine in `src/lib/fitment/`: query type, resolver, build-time validation of every entry's fitment. Activates T202 graders. Depends: T202 merged. *(FIT-01, FIT-02, FIT-04)*
-- [ ] **T204 [PLATFORM]** Vehicle selector UI: gen/market/year/engine picker, persists across pages and locales, filters collection listings. Depends: T203. *(FIT-03)*
+- [ ] **T204 [PLATFORM]** Vehicle selector UI: gen/market/year/engine picker, persists across pages and locales, filters collection listings. Owns introducing Playwright + `npm run test:e2e` (T106 review: the constitution's e2e slot is unfilled; first browser-level UI task takes it, incl. a browser-level locale-switcher/selector persistence smoke). Depends: T203. *(FIT-03)*
 
 ### Glossary & reference
 - [ ] **T205 [PLATFORM]** Glossary schema + `check:glossary` real implementation (canonical-term conformance scan of ES prose) + public glossary page w/ system filter. Note: the T104 base schema requires `fitment`+`confidence` on every collection, glossary included; if glossary terms need that relaxed, it is a negotiated schema change (AGENTS.md stop-and-ask), not a drive-by fix. Same applies to T701 community entries. Depends: T106. *(GLO-01, GLO-02, GLO-04)*
 - [ ] **T206 [CONTENT]** Glossary seed: ~150 core terms (systems, major components, tools, fluids) with CR-canonical ES, regional aliases, bilingual definitions. Depends: T205. *(GLO-01, GLO-03)*
-- [ ] **T207 [CONTENT]** Reference data: FSM section index (citations only), fluid chart, torque master table, capacities/dimensions — fitment-scoped, every value cited. Depends: T203. *(REF-01, REF-02)*
+- [ ] **T207 [CONTENT]** Reference data: FSM section index (citations only), fluid chart, torque master table, capacities/dimensions — fitment-scoped, every value cited. Note (T106 review): the schema change adding this collection's numeric fields is the FIRST live exercise of check:citations on real content (until then only scratch fixtures have reached it) — the paired schema work must demonstrate the check firing on its fields. Depends: T203. *(REF-01, REF-02)*
 - [ ] **T208 [CONTENT]** VIN/option-code decoder data. Depends: T203. *(REF-01)*
 
 ### Design
@@ -67,7 +67,7 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 - [ ] **T405 [CONTENT]** Gen 1 + Gen 4 problem sets, wave 1 (~10 each; Gen 4 high-level per §9). Depends: T401. *(PRB-01…PRB-06)*
 
 ## Phase 5 — Parts & procedures
-- [ ] **T501 [PLATFORM]** Parts schema (supersession chains, conflict-on-duplicate-OEM-number build failure) + page template. Depends: T203. *(PRT-01, PRT-02, PRT-03)*
+- [ ] **T501 [PLATFORM]** Parts schema (supersession chains, conflict-on-duplicate-OEM-number build failure) + page template. Note (T106 review): numeric fields added here must come with proof that check:citations fires on them uncited (same rule as T207). Depends: T203. *(PRT-01, PRT-02, PRT-03)*
 - [ ] **T502 [PLATFORM]** Procedures schema (torque/fluid by reference ID only — inlined numbers fail check:citations) + page template w/ safety-critical flag. Note (T105 review): check:citations is entry-level today (entry cites ≥1 source); PRC-03 needs per-value attribution — this task designs it. Depends: T203, T207. *(PRC-01, PRC-02, PRC-03)*
 - [ ] **T503 [CONTENT]** Parts wave 1: every part referenced by T303/T403/T404 garage+problem entries. Depends: T501, gaps report. *(PRT-01, PRT-02)*
 - [ ] **T504 [CONTENT]** Procedures wave 1: maintenance set (oil, filters, timing belt 6G74, diffs/tcase fluid, brakes, plugs) — bilingual, cited, safety-flagged where due. Depends: T502. *(PRC-01, PRC-02, PRC-03)*

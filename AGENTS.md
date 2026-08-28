@@ -39,7 +39,9 @@ Spec of record: `specs/001-foundation/spec.md`.
 - `npm run check` — `astro check` (types + content schema validation)
 - `npm run lint` / `npm run format:check`
 - `npm test` — Vitest unit tests
-- `npm run test:e2e` — Playwright
+- `npm run test:e2e` — Playwright (not yet implemented — arrives with T204, the
+  first browser-level UI task; until then the container-API dist tests carry
+  the markup contracts)
 - `npm run check:locales` — every entry has both `en` and `es` prose
 - `npm run check:citations` — every numeric spec carries a source
 - `npm run check:glossary` — translated prose uses canonical glossary terms
