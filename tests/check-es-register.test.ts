@@ -70,6 +70,14 @@ const NEGATIVE_SENTENCES: readonly string[] = [
   "Corte tiras de tela para limpiar el aceite derramado.",
   "El mercado japonés ofrece piezas de repuesto originales para este motor.",
   "Un modelo japonés no es lo mismo que uno ensamblado en otro país.",
+  // I18N-07 grader review — verified false positives on "más" (T701 content
+  // review had to rephrase around these; kept verbatim so the corpus is not
+  // quietly re-selected around whatever the implementation currently does).
+  "El odómetro marcaba que la camioneta tenía más de 50.000 kilómetros.",
+  "Más que un club, una familia.",
+  "El manual técnico se explica además del taller mecánico local.",
+  "No hay nada más que revisar antes de cerrar el capó.",
+  "Quizás el filtro esté sucio, pero lo demás del sistema funciona bien.",
 ];
 
 describe("classifyWord — CR-Spanish table", () => {
@@ -118,11 +126,13 @@ describe("classifyWord — targeted word list", () => {
   const negatives = [
     // Non-verb words ending in the suffix rule's stressed vowel + s (á/í only).
     "además",
+    "demás",
     "detrás",
     "atrás",
     "jamás",
     "compás",
     "quizás",
+    "más",
     "país",
     "países",
     // The -és nationality/noun space — no longer suffix-matched at all
