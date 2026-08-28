@@ -10,8 +10,8 @@ and the template every other garage is shaped by.
 **ES** · Plataforma bilingüe donde cualquier dueño de un Mitsubishi
 Montero / Pajero / Shogun guarda la vida entera de su carro — un perfil del
 vehículo con nombre, cada factura, cada trabajo — privado por defecto y
-compartido por decisión suya. Está construida sobre una referencia que cubre
-todas las generaciones (1982–2021) y todos los mercados. El Montero 2002 del
+compartido por decisión suya. La respalda una referencia para todas las
+generaciones (1982–2021) y todos los mercados. El Montero 2002 del
 dueño (Gen 3, 6G74, Super Select 4WD II), **Gitana Blanca**, es la página de
 usuario #1 y la plantilla de la que salen todas las demás.
 
@@ -108,5 +108,6 @@ combustible o sistemas SRS.
 
 **EN:** An independent enthusiast site. Not affiliated with Mitsubishi Motors.
 Montero, Pajero and Shogun are trademarks of their respective owners.
-**ES:** Un sitio independiente de aficionados. Sin afiliación con Mitsubishi
-Motors. Montero, Pajero y Shogun son marcas de sus respectivos dueños.
+**ES:** Un sitio independiente, hecho por aficionados. Sin afiliación a
+Mitsubishi Motors. Montero, Pajero y Shogun son marcas de sus respectivos
+dueños.

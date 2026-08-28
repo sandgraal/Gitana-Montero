@@ -91,7 +91,7 @@ const en: UiStrings = {
   languageSwitcherLabel: "Choose a language",
   languageCurrent: "Current language",
   homeHeading: "Keep your Montero's whole life in one place",
-  homeIntro: `${SITE_NAME} is where any Montero, Pajero or Shogun owner keeps their truck's whole life — every job, every receipt, every part — on top of a reference covering every generation and market. It starts with ${TRUCK_NAME}, a ${TRUCK_YEAR} Mitsubishi Montero, in English and Costa Rican Spanish.`,
+  homeIntro: `${SITE_NAME} is where a Montero, Pajero or Shogun owner keeps their truck's whole life: every job, every receipt, every part. Behind it sits a reference covering every generation and market. It starts with ${TRUCK_NAME}, a ${TRUCK_YEAR} Mitsubishi Montero, in English and Costa Rican Spanish.`,
   homeStatus:
     "Under construction: the bilingual platform is in place; the garage and the reference content land next.",
   footerSourceLabel: "Source code on GitHub",
@@ -150,7 +150,7 @@ const es: UiStrings = {
   languageSwitcherLabel: "Elija un idioma",
   languageCurrent: "Idioma actual",
   homeHeading: "Guarde la vida entera de su Montero en un solo lugar",
-  homeIntro: `${SITE_NAME} es donde cualquier dueño de un Montero, Pajero o Shogun guarda la vida entera de su carro — cada trabajo, cada factura, cada repuesto — sobre una referencia que cubre todas las generaciones y todos los mercados. Empieza con ${TRUCK_NAME}, un Mitsubishi Montero ${TRUCK_YEAR}, en inglés y en español de Costa Rica.`,
+  homeIntro: `${SITE_NAME} es donde el dueño de un Montero, Pajero o Shogun guarda la vida entera de su carro: cada trabajo, cada factura, cada repuesto. Lo respalda una referencia para todas las generaciones y todos los mercados. Todo empieza con ${TRUCK_NAME}, un Mitsubishi Montero ${TRUCK_YEAR}, en inglés y en español de Costa Rica.`,
   homeStatus:
     "En construcción: la plataforma bilingüe está lista; el taller y el contenido de referencia vienen a continuación.",
   footerSourceLabel: "Código fuente en GitHub",
@@ -158,7 +158,7 @@ const es: UiStrings = {
   footerDisclaimer:
     "Material de referencia únicamente. En trabajos críticos para la seguridad, consulte a un mecánico calificado.",
   footerNotAffiliated:
-    "Un sitio independiente de aficionados. Sin afiliación con Mitsubishi Motors.",
+    "Un sitio independiente, hecho por aficionados. Sin afiliación a Mitsubishi Motors.",
   notFoundTitle: "Página no encontrada",
   notFoundMessage: "Esa página no existe o cambió de dirección.",
   notFoundHomeLink: "Ir a la página de inicio",
