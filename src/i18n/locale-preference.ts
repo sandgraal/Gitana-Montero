@@ -23,8 +23,15 @@ import {
   type Locale,
 } from "./routing";
 
-export const LOCALE_STORAGE_KEY = "gitana:locale";
-export const LOCALE_COOKIE_NAME = "gitana_locale";
+/*
+ * Client-side keys are namespaced to the site (renamed with it in T2-101).
+ * Both are origin-scoped, and the origin changes at the T2-102 Vercel/DNS
+ * cutover anyway, so no reader loses a preference they would otherwise have
+ * kept. Nothing reads these literals directly — every consumer imports the
+ * constant — so the name lives in exactly one place.
+ */
+export const LOCALE_STORAGE_KEY = "monterogarage:locale";
+export const LOCALE_COOKIE_NAME = "monterogarage_locale";
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
 /** Read a locale out of a `document.cookie` string. Pure, for testing. */

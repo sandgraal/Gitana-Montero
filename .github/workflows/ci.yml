@@ -78,14 +78,28 @@ jobs:
       # Nothing else in the pipeline can see that — `check:hreflang` derives
       # its expectations from the same `base`, so it agrees with the mistake.
       # (After `npm ci`: `astro.config.mjs` imports `astro/config`.)
-      - name: Assert astro `base` matches the repository name
+      #
+      # The expectation is derived from `GITHUB_REPOSITORY`, never hard-coded,
+      # which is exactly what made the T2-101 rename (`Gitana-Montero` →
+      # `monterogarage`, 002 MIG-01) a one-line change in `astro.config.mjs`:
+      # the check followed the repository by construction.
+      #
+      # THIS STEP RETIRES WITH T2-102. Once hosting moves to Vercel behind
+      # monterogarage.com the site is served at the domain root, `base`
+      # becomes "/", and "base must equal /<RepoName>" stops being true — it
+      # is a GitHub-Pages-project-site rule and nothing else. Delete this step
+      # in the same commit that sets `base: "/"`; do not "fix" it by allowing
+      # "/" here while Pages is still the live deploy, because that is
+      # precisely the silent every-asset-404 this step exists to catch.
+      - name: Assert astro `base` matches the repository name (GitHub Pages only — retires with T2-102)
         run: |
           base="$(node -e 'import("./astro.config.mjs").then(m => process.stdout.write(String(m.default.base ?? "/")))')"
           repo="${GITHUB_REPOSITORY#*/}"
           if [ "$base" != "/$repo" ]; then
             echo "astro.config.mjs base is '$base' but this repository is '$repo'." >&2
             echo "GitHub Pages serves a project site at /$repo/ and the path is case-sensitive." >&2
-            echo "Set base to '/$repo' — or, if the site moved to a custom domain, update this check with it." >&2
+            echo "Set base to '/$repo' — or, once the site is served from monterogarage.com" >&2
+            echo "on Vercel (T2-102), set base to '/' and delete this step." >&2
             exit 1
           fi
           echo "base '$base' matches repository '$repo'."

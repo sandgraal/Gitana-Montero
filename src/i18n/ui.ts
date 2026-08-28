@@ -16,7 +16,7 @@
  */
 
 import { LOCALES, type Locale } from "./routing";
-import { TRUCK_YEAR } from "../site";
+import { SITE_NAME, TRUCK_NAME, TRUCK_YEAR } from "../site";
 import type { GlossarySystem } from "../schemas/glossary";
 
 /**
@@ -48,6 +48,12 @@ export interface UiStrings extends GlossarySystemStrings {
   readonly footerSourceLabel: string;
   readonly footerIssuesLabel: string;
   readonly footerDisclaimer: string;
+  /**
+   * MIG-05 — the standing "independent enthusiast site, not affiliated with
+   * Mitsubishi Motors" notice. Ships in the footer of every page from the
+   * rename onward, in both locales.
+   */
+  readonly footerNotAffiliated: string;
   readonly notFoundTitle: string;
   readonly notFoundMessage: string;
   readonly notFoundHomeLink: string;
@@ -75,7 +81,8 @@ export interface UiStrings extends GlossarySystemStrings {
 }
 
 const en: UiStrings = {
-  siteTagline: "Montero, Pajero and Shogun reference and build log",
+  siteTagline:
+    "Montero, Pajero and Shogun — your garage and the reference behind it",
   skipToContent: "Skip to content",
   navHome: "Home",
   navGlossary: "Glossary",
@@ -83,14 +90,16 @@ const en: UiStrings = {
   languageLabel: "Language",
   languageSwitcherLabel: "Choose a language",
   languageCurrent: "Current language",
-  homeHeading: "Montero, Pajero and Shogun — reference and build log",
-  homeIntro: `This site is the complete build log of one ${TRUCK_YEAR} Mitsubishi Montero and a reference for every generation, in English and Costa Rican Spanish.`,
+  homeHeading: "Keep your Montero's whole life in one place",
+  homeIntro: `${SITE_NAME} is where any Montero, Pajero or Shogun owner keeps their truck's whole life — every job, every receipt, every part — on top of a reference covering every generation and market. It starts with ${TRUCK_NAME}, a ${TRUCK_YEAR} Mitsubishi Montero, in English and Costa Rican Spanish.`,
   homeStatus:
-    "Under construction: the bilingual platform is in place, the reference content lands next.",
+    "Under construction: the bilingual platform is in place; the garage and the reference content land next.",
   footerSourceLabel: "Source code on GitHub",
   footerIssuesLabel: "Report a problem or correct a fact",
   footerDisclaimer:
     "Reference material only. For safety-critical work, consult a qualified mechanic.",
+  footerNotAffiliated:
+    "An independent enthusiast site. Not affiliated with Mitsubishi Motors.",
   notFoundTitle: "Page not found",
   notFoundMessage: "That page does not exist, or it has moved.",
   notFoundHomeLink: "Go to the home page",
@@ -131,7 +140,8 @@ const en: UiStrings = {
 };
 
 const es: UiStrings = {
-  siteTagline: "Referencia y bitácora del Montero, Pajero y Shogun",
+  siteTagline:
+    "Montero, Pajero y Shogun — su taller y la referencia que lo respalda",
   skipToContent: "Saltar al contenido",
   navHome: "Inicio",
   navGlossary: "Glosario",
@@ -139,14 +149,16 @@ const es: UiStrings = {
   languageLabel: "Idioma",
   languageSwitcherLabel: "Elija un idioma",
   languageCurrent: "Idioma actual",
-  homeHeading: "Montero, Pajero y Shogun — referencia y bitácora",
-  homeIntro: `Este sitio es la bitácora completa de un solo Mitsubishi Montero ${TRUCK_YEAR} y una referencia para todas las generaciones, en inglés y en español de Costa Rica.`,
+  homeHeading: "Guarde la vida entera de su Montero en un solo lugar",
+  homeIntro: `${SITE_NAME} es donde cualquier dueño de un Montero, Pajero o Shogun guarda la vida entera de su carro — cada trabajo, cada factura, cada repuesto — sobre una referencia que cubre todas las generaciones y todos los mercados. Empieza con ${TRUCK_NAME}, un Mitsubishi Montero ${TRUCK_YEAR}, en inglés y en español de Costa Rica.`,
   homeStatus:
-    "En construcción: la plataforma bilingüe está lista; el contenido de referencia viene a continuación.",
+    "En construcción: la plataforma bilingüe está lista; el taller y el contenido de referencia vienen a continuación.",
   footerSourceLabel: "Código fuente en GitHub",
   footerIssuesLabel: "Reporte un problema o corrija un dato",
   footerDisclaimer:
     "Material de referencia únicamente. En trabajos críticos para la seguridad, consulte a un mecánico calificado.",
+  footerNotAffiliated:
+    "Un sitio independiente de aficionados. Sin afiliación con Mitsubishi Motors.",
   notFoundTitle: "Página no encontrada",
   notFoundMessage: "Esa página no existe o cambió de dirección.",
   notFoundHomeLink: "Ir a la página de inicio",

@@ -2,7 +2,7 @@
 /**
  * Validates .claude/routing/routing-policy.json and the agent-role files it
  * governs. Run in CI and before conducting. Port of Bryndle's
- * validate-routing.sh, adapted to the Gitana seven-role harness.
+ * validate-routing.sh, adapted to the Montero Garage seven-role harness.
  */
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";

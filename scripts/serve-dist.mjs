@@ -5,7 +5,7 @@
  * (`scripts/check-lighthouse.mjs`) both need the *built* site over HTTP, on
  * the same path prefix GitHub Pages serves it from. Serving `dist/` at the
  * server root instead would 404 every asset — the build writes absolute URLs
- * under `base` (`/Gitana-Montero/_astro/…`), so a root-mounted preview
+ * under `base` (`/monterogarage/_astro/…`), so a root-mounted preview
  * silently strips the CSS and audits an unstyled page: colour-contrast checks
  * pass on a page nobody will ever see, and the performance numbers describe a
  * document that is not the artifact.

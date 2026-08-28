@@ -52,7 +52,7 @@ export const REPO_ROOT = path.resolve(
   ".."
 );
 
-/** `"/Gitana-Montero"` — no trailing slash, `""` when the site is at root. */
+/** `"/monterogarage"` — no trailing slash, `""` when the site is at root. */
 export function normalizeBase(base) {
   const trimmed = String(base ?? "")
     .trim()
@@ -69,7 +69,7 @@ export function normalizeBase(base) {
  * a page that failed to build is a page that cannot be audited, and inventing
  * its URL would fail the audit for the wrong reason.
  *
- * @returns {Promise<string[]>} sorted served paths, e.g. `/Gitana-Montero/en/`
+ * @returns {Promise<string[]>} sorted served paths, e.g. `/monterogarage/en/`
  */
 export async function builtServedPaths({ distDir, base }) {
   const prefix = normalizeBase(base);

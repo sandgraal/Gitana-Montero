@@ -16,7 +16,7 @@
  * `lhci` adds a server, a build-context model and a config file that has to
  * restate the audited URLs as literals — and this repo derives every served
  * path from `astro.config.mjs` on purpose (`scripts/lib/audit-targets.mjs`),
- * so a second hard-coded copy of `/Gitana-Montero/en/` in a `.lighthouserc`
+ * so a second hard-coded copy of `/monterogarage/en/` in a `.lighthouserc`
  * is exactly the drift `check:hreflang` was written to prevent. The part of
  * `lhci` this spec actually asks for is the assertion step, which is the
  * `BUDGETS` table below.
