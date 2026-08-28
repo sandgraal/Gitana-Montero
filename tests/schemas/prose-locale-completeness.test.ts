@@ -58,14 +58,14 @@ const proseFor = (locale: string) =>
 const bothLocales = () => ({ en: makeProseEn(), es: makeProseEs() });
 
 describe("entry prose: both locales required (I18N-06)", () => {
-  it.fails("accepts an entry that carries both `en` and `es` prose", () => {
+  it("accepts an entry that carries both `en` and `es` prose", () => {
     const outcome = entrySchema().safeParse(makeValidEntry());
 
     expect(issuePaths(outcome)).toEqual([]);
     expect(outcome.success).toBe(true);
   });
 
-  it.fails.each([
+  it.each([
     ["en", "es"],
     ["es", "en"],
   ])(
@@ -82,7 +82,7 @@ describe("entry prose: both locales required (I18N-06)", () => {
     }
   );
 
-  it.fails("rejects an entry whose `prose` is an empty object", () => {
+  it("rejects an entry whose `prose` is an empty object", () => {
     const entry = makeValidEntry();
     entry.prose = {};
 
@@ -94,7 +94,7 @@ describe("entry prose: both locales required (I18N-06)", () => {
     );
   });
 
-  it.fails("rejects an entry with no `prose` key at all", () => {
+  it("rejects an entry with no `prose` key at all", () => {
     const entry = makeValidEntry();
     delete entry.prose;
 
@@ -104,7 +104,7 @@ describe("entry prose: both locales required (I18N-06)", () => {
     expect(issuePaths(outcome)).toContain("prose");
   });
 
-  it.fails.each(["en", "es"])(
+  it.each(["en", "es"])(
     "rejects `prose.%s = null` — null is not an escape hatch for a locale",
     (locale) => {
       const entry = makeValidEntry();
@@ -117,7 +117,7 @@ describe("entry prose: both locales required (I18N-06)", () => {
     }
   );
 
-  it.fails.each(["en", "es"])(
+  it.each(["en", "es"])(
     "rejects a `prose.%s` that is present but empty — a stub is not a locale",
     (locale) => {
       const entry = makeValidEntry();
@@ -135,7 +135,7 @@ describe("entry prose: both locales required (I18N-06)", () => {
     }
   );
 
-  it.fails.each(["en", "es"])(
+  it.each(["en", "es"])(
     "rejects a whitespace-only field in `prose.%s` — blank is still missing",
     (locale) => {
       const entry = makeValidEntry();
@@ -151,34 +151,28 @@ describe("entry prose: both locales required (I18N-06)", () => {
     }
   );
 
-  it.fails(
-    "rejects a third locale key in `prose` — spec §2 allows en and es only",
-    () => {
-      const entry = makeValidEntry();
-      entry.prose = { ...bothLocales(), pt: makeProseEn() };
+  it("rejects a third locale key in `prose` — spec §2 allows en and es only", () => {
+    const entry = makeValidEntry();
+    entry.prose = { ...bothLocales(), pt: makeProseEn() };
 
-      const outcome = entrySchema().safeParse(entry);
+    const outcome = entrySchema().safeParse(entry);
 
-      expect(outcome.success).toBe(false);
-      expect(unrecognizedKeys(outcome)).toContain("pt");
-    }
-  );
+    expect(outcome.success).toBe(false);
+    expect(unrecognizedKeys(outcome)).toContain("pt");
+  });
 
-  it.fails(
-    "has no exceptions field that lets one locale ship alone (I18N-06)",
-    () => {
-      const entry = makeValidEntry();
-      entry.prose = { en: makeProseEn() };
-      entry["localeExceptions"] = ["es"];
-      entry["translationPending"] = true;
+  it("has no exceptions field that lets one locale ship alone (I18N-06)", () => {
+    const entry = makeValidEntry();
+    entry.prose = { en: makeProseEn() };
+    entry["localeExceptions"] = ["es"];
+    entry["translationPending"] = true;
 
-      const outcome = entrySchema().safeParse(entry);
+    const outcome = entrySchema().safeParse(entry);
 
-      expect(outcome.success).toBe(false);
-      expect(issuePaths(outcome)).toContain("prose.es");
-      expect(unrecognizedKeys(outcome)).toEqual(
-        expect.arrayContaining(["localeExceptions", "translationPending"])
-      );
-    }
-  );
+    expect(outcome.success).toBe(false);
+    expect(issuePaths(outcome)).toContain("prose.es");
+    expect(unrecognizedKeys(outcome)).toEqual(
+      expect.arrayContaining(["localeExceptions", "translationPending"])
+    );
+  });
 });

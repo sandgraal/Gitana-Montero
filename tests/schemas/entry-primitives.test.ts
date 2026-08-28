@@ -57,11 +57,11 @@ const malformedFitments: [string, unknown][] = [
 ];
 
 describe("locale enum (spec §2: en and es, never any other value)", () => {
-  it.fails("LOCALES is exactly ['en', 'es'], in that order", () => {
+  it("LOCALES is exactly ['en', 'es'], in that order", () => {
     expect([...LOCALES]).toEqual(["en", "es"]);
   });
 
-  it.fails.each([
+  it.each([
     ["en", true],
     ["es", true],
     ["EN", false],
@@ -85,7 +85,7 @@ describe("locale enum (spec §2: en and es, never any other value)", () => {
    * activation — and the implementer is not allowed to edit `tests/` to fix
    * it. A factory row is one argument under either reading.
    */
-  it.fails.each<[string, () => unknown]>([
+  it.each<[string, () => unknown]>([
     ["null", () => null],
     ["undefined", () => undefined],
     ["the number 1", () => 1],
@@ -98,7 +98,7 @@ describe("locale enum (spec §2: en and es, never any other value)", () => {
 });
 
 describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {
-  it.fails("CONFIDENCE_TIERS holds exactly the five named tiers", () => {
+  it("CONFIDENCE_TIERS holds exactly the five named tiers", () => {
     expect([...CONFIDENCE_TIERS].sort()).toEqual(
       [
         "anecdotal",
@@ -115,7 +115,7 @@ describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {
    * renamed the membership grader is the one that goes red, and when only the
    * sequence is wrong this one is, so the failure names the actual mistake.
    */
-  it.fails("CONFIDENCE_TIERS is in the ratified order, strongest first", () => {
+  it("CONFIDENCE_TIERS is in the ratified order, strongest first", () => {
     expect([...CONFIDENCE_TIERS]).toEqual([
       "fsm-confirmed",
       "tsb",
@@ -125,7 +125,7 @@ describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {
     ]);
   });
 
-  it.fails.each([
+  it.each([
     "fsm-confirmed",
     "tsb",
     "community-consensus",
@@ -135,7 +135,7 @@ describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {
     expect(confidenceSchema.safeParse(tier).success).toBe(true);
   });
 
-  it.fails.each([
+  it.each([
     "unknown",
     "fsm",
     "FSM-CONFIRMED",
@@ -167,7 +167,7 @@ describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {
    * as regression guards, so a reordering that happens to preserve
    * neighbours still gets caught.
    */
-  it.fails.each([
+  it.each([
     ["fsm-confirmed", "tsb"],
     ["tsb", "community-consensus"],
     ["community-consensus", "first-hand"],
@@ -182,7 +182,7 @@ describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {
     expect(tiers.indexOf(stronger)).toBeLessThan(tiers.indexOf(weaker));
   });
 
-  it.fails("requires a confidence tier on every entry", () => {
+  it("requires a confidence tier on every entry", () => {
     const entry = makeValidEntry();
     delete entry.confidence;
 
@@ -194,11 +194,11 @@ describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {
 });
 
 describe("sources (plan.md conventions, AGENTS.md archive-at-citation)", () => {
-  it.fails("accepts a fully-formed source", () => {
+  it("accepts a fully-formed source", () => {
     expect(sourceSchema.safeParse(makeSource()).success).toBe(true);
   });
 
-  it.fails.each(["title", "url", "archiveUrl", "accessed", "kind"])(
+  it.each(["title", "url", "archiveUrl", "accessed", "kind"])(
     "rejects a source missing `%s`",
     (field) => {
       const source: Record<string, unknown> = makeSource();
@@ -211,13 +211,13 @@ describe("sources (plan.md conventions, AGENTS.md archive-at-citation)", () => {
     }
   );
 
-  it.fails("SOURCE_KINDS holds exactly the six kinds plan.md names", () => {
+  it("SOURCE_KINDS holds exactly the six kinds plan.md names", () => {
     expect([...SOURCE_KINDS].sort()).toEqual(
       ["first-hand", "forum", "fsm", "tsb", "vendor", "video"].sort()
     );
   });
 
-  it.fails.each(["blog", "guess", "chatgpt", "FSM", ""])(
+  it.each(["blog", "guess", "chatgpt", "FSM", ""])(
     "rejects the source kind %j",
     (kind) => {
       const outcome = sourceSchema.safeParse({ ...makeSource(), kind });
@@ -227,7 +227,7 @@ describe("sources (plan.md conventions, AGENTS.md archive-at-citation)", () => {
     }
   );
 
-  it.fails.each(["not-a-url", "example.invalid/x", "javascript:alert(1)"])(
+  it.each(["not-a-url", "example.invalid/x", "javascript:alert(1)"])(
     "rejects the malformed source url %j",
     (url) => {
       const outcome = sourceSchema.safeParse({ ...makeSource(), url });
@@ -237,20 +237,17 @@ describe("sources (plan.md conventions, AGENTS.md archive-at-citation)", () => {
     }
   );
 
-  it.fails(
-    "names the indexed path when a source inside an entry is malformed",
-    () => {
-      const entry = makeValidEntry();
-      delete entry.sources?.[0]?.archiveUrl;
+  it("names the indexed path when a source inside an entry is malformed", () => {
+    const entry = makeValidEntry();
+    delete entry.sources?.[0]?.archiveUrl;
 
-      const outcome = entrySchema().safeParse(entry);
+    const outcome = entrySchema().safeParse(entry);
 
-      expect(outcome.success).toBe(false);
-      expect(issuePaths(outcome)).toContain("sources.0.archiveUrl");
-    }
-  );
+    expect(outcome.success).toBe(false);
+    expect(issuePaths(outcome)).toContain("sources.0.archiveUrl");
+  });
 
-  it.fails("requires a `sources` array on every entry", () => {
+  it("requires a `sources` array on every entry", () => {
     const entry = makeValidEntry();
     delete entry.sources;
 
@@ -262,7 +259,7 @@ describe("sources (plan.md conventions, AGENTS.md archive-at-citation)", () => {
 });
 
 describe("fitment placeholder (AGENTS.md: no fact without a fitment)", () => {
-  it.fails("accepts a fitment naming one or more generations", () => {
+  it("accepts a fitment naming one or more generations", () => {
     expect(fitmentSchema.safeParse({ gens: ["gen3"] }).success).toBe(true);
     expect(
       fitmentSchema.safeParse({ gens: ["gen2", "gen3"], markets: ["cr", "us"] })
@@ -270,14 +267,14 @@ describe("fitment placeholder (AGENTS.md: no fact without a fitment)", () => {
     ).toBe(true);
   });
 
-  it.fails.each(malformedFitments)(
+  it.each(malformedFitments)(
     "rejects a fitment with %s",
     (_label, candidate) => {
       expect(fitmentSchema.safeParse(candidate).success).toBe(false);
     }
   );
 
-  it.fails("requires `fitment` on every entry", () => {
+  it("requires `fitment` on every entry", () => {
     const entry = makeValidEntry();
     delete entry.fitment;
 
@@ -289,7 +286,7 @@ describe("fitment placeholder (AGENTS.md: no fact without a fitment)", () => {
 });
 
 describe("entry identity and unknown fields (SCF-04)", () => {
-  it.fails("requires a non-empty `id`", () => {
+  it("requires a non-empty `id`", () => {
     const withoutId = makeValidEntry();
     delete withoutId.id;
     const blankId = makeValidEntry();
@@ -299,7 +296,7 @@ describe("entry identity and unknown fields (SCF-04)", () => {
     expect(issuePaths(entrySchema().safeParse(blankId))).toContain("id");
   });
 
-  it.fails("names an unknown top-level field instead of stripping it", () => {
+  it("names an unknown top-level field instead of stripping it", () => {
     const entry: Record<string, unknown> = makeValidEntry();
     entry["torqueNM"] = 88;
 
