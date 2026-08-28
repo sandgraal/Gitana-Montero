@@ -11,17 +11,17 @@
   "offerings": [
     {
       "years": {
-        "from": 2004,
+        "from": 2000,
         "to": null
       },
       "engine": "6g72-sohc",
       "transmission": "automatic-4-speed",
       "transferCase": "super-select-ii",
-      "trims": ["zr", "exceed", "active-field-edition"]
+      "trims": ["zr", "exceed", "active-field-edition", "20th-anniversary"]
     },
     {
       "years": {
-        "from": 2004,
+        "from": 2000,
         "to": null
       },
       "engine": "6g72-sohc",
@@ -31,43 +31,43 @@
     },
     {
       "years": {
-        "from": 2004,
+        "from": 1999,
         "to": 2005
       },
       "engine": "6g74-gdi",
       "transmission": "automatic-5-speed",
       "transferCase": "super-select-ii",
-      "trims": ["exceed", "super-exceed"]
+      "trims": ["exceed", "super-exceed", "20th-anniversary"]
     },
     {
       "years": {
-        "from": 2004,
-        "to": 2005
+        "from": 1999,
+        "to": 2004
       },
       "engine": "6g74-gdi",
       "transmission": "automatic-4-speed",
       "transferCase": "super-select-ii",
-      "trims": ["exceed"]
+      "trims": ["zr", "exceed"]
     },
     {
       "years": {
-        "from": 2004,
-        "to": 2005
+        "from": 1999,
+        "to": 2004
       },
       "engine": "4m41",
       "transmission": "automatic-4-speed",
       "transferCase": "super-select-ii",
-      "trims": ["exceed"]
+      "trims": ["zr", "exceed"]
     },
     {
       "years": {
-        "from": 2004,
-        "to": 2005
+        "from": 1999,
+        "to": 2004
       },
       "engine": "4m41",
       "transmission": "automatic-5-speed",
       "transferCase": "super-select-ii",
-      "trims": ["exceed", "super-exceed"]
+      "trims": ["exceed", "super-exceed", "20th-anniversary"]
     },
     {
       "years": {
@@ -93,11 +93,11 @@
   "prose": {
     "en": {
       "title": "Third generation, Japanese market",
-      "summary": "Powertrain pairings for the third-generation Pajero in Japan, read off dated catalogue listings that give each grade's type designation, displacement and gearbox. The direct-injection petrol V6 and the direct-injection diesel are closed at the last listing that shows them, because the following listing no longer does. Only listings from the second half of the generation were consulted, so the opening years are unrecorded. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
+      "summary": "Powertrain pairings for the third-generation Pajero in Japan, read off dated catalogue listings that give each grade's type designation, displacement and gearbox. Every dated listing on the cited catalogue page was tabulated, and each row opens at the first listing that shows it and closes at the last. A row left open at the end is one the final listing still shows. The diesel and the direct-injection petrol V6 opened the generation; the smaller petrol V6 joined the year after, and the largest petrol V6 only appears in the final listing. The catalogue names more Japanese grades than this taxonomy has trim entries for, so several rows carry only the trims already recorded; the rest are a known gap, not a claim that they did not exist. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
     },
     "es": {
       "title": "Tercera generación, mercado japonés",
-      "summary": "Combinaciones de tren motriz para el Pajero de tercera generación en Japón, leídas de listados de catálogo fechados que dan la designación de tipo, la cilindrada y la caja de cada acabado. El V6 de gasolina de inyección directa y el diésel de inyección directa se cierran en el último listado que los muestra, porque el listado siguiente ya no los incluye. Solo se consultaron listados de la segunda mitad de la generación, así que los primeros años quedan sin registrar. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
+      "summary": "Combinaciones de tren motriz para el Pajero de tercera generación en Japón, leídas de listados de catálogo fechados que dan la designación de tipo, la cilindrada y la caja de cada acabado. Se tabuló cada listado fechado de la página de catálogo citada, y cada fila abre en el primer listado que la muestra y cierra en el último. Una fila que queda abierta al final es una que el último listado todavía muestra. El diésel y el V6 de gasolina de inyección directa abrieron la generación; el V6 de gasolina menor se sumó al año siguiente, y el V6 de gasolina de mayor cilindrada solo aparece en el último listado. El catálogo nombra más acabados japoneses de los que esta taxonomía tiene registrados, así que varias filas llevan solo los acabados ya registrados; el resto es un vacío conocido y no una afirmación de que no existieran. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
     }
   }
 }

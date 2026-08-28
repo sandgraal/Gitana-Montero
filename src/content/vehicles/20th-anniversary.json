@@ -3,10 +3,10 @@
   "kind": "trim",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["us"]
+    "markets": ["us", "jdm"]
   },
-  "markets": ["us"],
-  "confidence": "fsm-confirmed",
+  "markets": ["us", "jdm"],
+  "confidence": "community-consensus",
   "sources": [
     {
       "title": "Mitsubishi Motors North America — Montero features and specifications (mechanical), 2004 model year",
@@ -14,16 +14,23 @@
       "archiveUrl": "https://web.archive.org/web/20031220004634/http://www.mitsubishicars.com:80/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
       "accessed": "2026-08-28",
       "kind": "vendor"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
       "title": "20th Anniversary",
-      "summary": "A commemorative North American trim listed alongside the two regular ones on the factory specification sheet, mechanically identical to them and distinguished by wheels and interior appointments."
+      "summary": "A commemorative trim sold in two markets. In North America the factory specification sheet lists it alongside the two regular trims, mechanically identical to them and distinguished by wheels and interior appointments. Japan had its own commemorative package earlier in the generation, offered across the petrol and diesel engines of the day. The North American listing is factory literature; the Japanese one comes from a catalogue archive, which is why this entry does not claim the stronger tier."
     },
     "es": {
       "title": "20th Anniversary",
-      "summary": "Un acabado conmemorativo norteamericano que aparece junto a los dos regulares en la hoja de especificaciones de fábrica, mecánicamente idéntico a ellos y diferenciado por los aros y por los detalles interiores."
+      "summary": "Un acabado conmemorativo vendido en dos mercados. En Norteamérica la hoja de especificaciones de fábrica lo lista junto a los dos acabados regulares, mecánicamente idéntico a ellos y diferenciado por los aros y por los detalles interiores. Japón tuvo su propio paquete conmemorativo antes dentro de la misma generación, ofrecido sobre los motores de gasolina y diésel de entonces. El listado norteamericano es documentación de fábrica; el japonés viene de un archivo de catálogos, y por eso esta entrada no reclama el nivel superior."
     }
   }
 }

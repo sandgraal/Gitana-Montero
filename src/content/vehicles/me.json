@@ -2,10 +2,10 @@
   "id": "me",
   "kind": "market",
   "fitment": {
-    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "gens": ["gen2-5", "gen4"],
     "markets": ["me"]
   },
-  "confidence": "community-consensus",
+  "confidence": "fsm-confirmed",
   "sources": [
     {
       "title": "Mitsubishi Motors — Pajero 18MY general-export specifications sheet",
@@ -25,11 +25,11 @@
   "prose": {
     "en": {
       "title": "Middle East and the Gulf states",
-      "summary": "The Gulf Cooperation Council market. Factory export sheets list these versions under their own regulation code, separate from the European emissions classes, and Gulf specification often differs in equipment and in engine availability from the European one."
+      "summary": "The Gulf Cooperation Council market. Factory export sheets list these versions under their own regulation code, separate from the European emissions classes, and Gulf specification differs from the European one in equipment and in engine availability."
     },
     "es": {
       "title": "Medio Oriente y los países del Golfo",
-      "summary": "El mercado del Consejo de Cooperación del Golfo. Las hojas de exportación de fábrica listan estas versiones bajo su propio código de reglamento, aparte de las clases de emisiones europeas, y la especificación del Golfo suele diferir de la europea en equipamiento y en la disponibilidad de motores."
+      "summary": "El mercado del Consejo de Cooperación del Golfo. Las hojas de exportación de fábrica listan estas versiones bajo su propio código de reglamento, aparte de las clases de emisiones europeas, y la especificación del Golfo difiere de la europea en equipamiento y en la disponibilidad de motores."
     }
   }
 }

@@ -3,7 +3,7 @@
   "kind": "generation",
   "fitment": {
     "gens": ["gen4"],
-    "markets": ["uk", "au", "jdm", "eu", "me", "global"]
+    "markets": ["cr", "uk", "au", "jdm", "eu", "me", "global"]
   },
   "chassisCodes": ["V80", "V90", "V93W", "V96W", "V97W", "V98W"],
   "production": {
@@ -11,6 +11,10 @@
     "to": 2021
   },
   "marketNames": [
+    {
+      "market": "cr",
+      "name": "Montero"
+    },
     {
       "market": "uk",
       "name": "Shogun"

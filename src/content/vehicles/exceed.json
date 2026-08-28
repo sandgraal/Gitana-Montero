@@ -2,7 +2,7 @@
   "id": "exceed",
   "kind": "trim",
   "fitment": {
-    "gens": ["gen2", "gen2-5", "gen3"],
+    "gens": ["gen1", "gen2", "gen2-5", "gen3"],
     "markets": ["au", "jdm"]
   },
   "markets": ["au", "jdm"],
@@ -28,16 +28,23 @@
       "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
       "accessed": "2026-08-28",
       "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
     }
   ],
   "prose": {
     "en": {
       "title": "Exceed",
-      "summary": "A long-running upper grade, used in Japan since the first generation and in Australia as the top of the third-generation range. Japanese catalogues subdivide it further with roman numerals; those subdivisions are recorded here under this one trim."
+      "summary": "A long-running upper grade: it appeared on the first generation as the flagship badge and was still the top of the third-generation range in Australia. Japanese catalogues subdivide it further with roman numerals and with suffixed variants; those subdivisions are recorded here under this one trim."
     },
     "es": {
       "title": "Exceed",
-      "summary": "Un acabado superior de larga trayectoria, usado en Japón desde la primera generación y en Australia como tope de gama de la tercera. Los catálogos japoneses lo subdividen con números romanos; esas subdivisiones se registran aquí bajo este único acabado."
+      "summary": "Un acabado superior de larga trayectoria: apareció en la primera generación como emblema tope de gama y todavía era el más alto de la tercera generación en Australia. Los catálogos japoneses lo subdividen con números romanos y con variantes con sufijo; esas subdivisiones se registran aquí bajo este único acabado."
     }
   }
 }

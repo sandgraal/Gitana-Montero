@@ -3,7 +3,7 @@
   "kind": "generation",
   "fitment": {
     "gens": ["gen1"],
-    "markets": ["us", "uk", "au", "jdm", "eu", "global"]
+    "markets": ["us", "cr", "uk", "au", "jdm", "eu", "global"]
   },
   "chassisCodes": ["L040", "L140"],
   "production": {
@@ -13,6 +13,10 @@
   "marketNames": [
     {
       "market": "us",
+      "name": "Montero"
+    },
+    {
+      "market": "cr",
       "name": "Montero"
     },
     {
@@ -53,6 +57,13 @@
       "kind": "vendor"
     },
     {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1984 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1984_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502212625/https://fueleconomy.gov/feg/bymodel/1984_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
       "title": "US Department of Energy / EPA fueleconomy.gov — 1986 Mitsubishi Montero",
       "url": "https://www.fueleconomy.gov/feg/bymodel/1986_Mitsubishi_Montero.shtml",
       "archiveUrl": "https://web.archive.org/web/20250502215724/https://fueleconomy.gov/feg/bymodel/1986_Mitsubishi_Montero.shtml",
@@ -70,11 +81,11 @@
   "prose": {
     "en": {
       "title": "First generation",
-      "summary": "The truck that started the line: a body-on-frame four-wheel drive launched in a short-wheelbase three-door and joined a year later by a long-wheelbase five-door. It was sold as the Montero across the Americas, as the Shogun in the United Kingdom and as the Pajero everywhere else, and its platform outlived it under licence as the Hyundai Galloper. Four-wheel drive was part-time throughout, with no centre differential."
+      "summary": "The truck that started the line: a body-on-frame four-wheel drive launched as a short-wheelbase three-door and joined a year later by a long-wheelbase five-door. It was sold as the Montero across the Americas, as the Shogun in the United Kingdom and as the Pajero everywhere else, and its platform outlived it under licence as the Hyundai Galloper. The cited source describes this generation as a whole as using a traditional four-wheel drive system that had to be stopped to engage, and says part-time four-wheel drive was standard on every model from the revision that brought the petrol V6."
     },
     "es": {
       "title": "Primera generación",
-      "summary": "El vehículo que abrió la línea: un cuatro por cuatro de chasis independiente, lanzado como tres puertas de batalla corta y ampliado un año después con una carrocería de cinco puertas y batalla larga. Se vendió como Montero en América, como Shogun en el Reino Unido y como Pajero en el resto del mundo, y su plataforma le sobrevivió bajo licencia en el Hyundai Galloper. La doble tracción fue siempre de conexión manual, sin diferencial central."
+      "summary": "El vehículo que abrió la línea: un cuatro por cuatro de chasis independiente, lanzado como tres puertas de distancia entre ejes corta y ampliado un año después con una carrocería de cinco puertas y distancia entre ejes larga. Se vendió como Montero en América, como Shogun en el Reino Unido y como Pajero en el resto del mundo, y su plataforma le sobrevivió bajo licencia en el Hyundai Galloper. La fuente citada describe esta generación en conjunto como equipada con un sistema de doble tracción tradicional, que había que detener el vehículo para engranar, y afirma que la tracción conectable (part-time) fue de serie en todos los modelos desde la revisión que trajo el V6 de gasolina."
     }
   }
 }

@@ -6,7 +6,7 @@
   },
   "engineFamily": "6g74",
   "fuel": "petrol",
-  "displacementCc": 3496,
+  "displacementCc": 3497,
   "valvetrain": "dohc",
   "fuelSystem": "mpi",
   "confidence": "community-consensus",
@@ -38,16 +38,23 @@
       "archiveUrl": "https://web.archive.org/web/20260804110625/https://en.wikipedia.org/wiki/Mitsubishi_6G7_engine",
       "accessed": "2026-08-28",
       "kind": "forum"
+    },
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
       "title": "6G74 DOHC petrol V6",
-      "summary": "The twin-cam, twenty-four-valve version of the larger petrol V6, introduced mid-way through the second generation together with a bigger transmission and transfer case. North American emissions listings of the period name it explicitly as the twin-cam unit, which is how a second-generation car can be told apart from the single-cam engine that replaced it."
+      "summary": "The twin-cam, twenty-four-valve version of the larger petrol V6, introduced mid-way through the second generation together with a bigger transmission and transfer case. North American emissions listings of the period name it explicitly as the twin-cam unit, which is how a second-generation car can be told apart from the one that later carried the single-cam engine. The factory brochure that gives this family's bore and stroke states its capacity as the figure recorded here; Japanese registration listings for the same family print one cubic centimetre less, which is a rounding difference in the registration document rather than a different engine."
     },
     "es": {
       "title": "Motor de gasolina 6G74 DOHC, V6",
-      "summary": "La versión de doble árbol de levas y veinticuatro válvulas del V6 de gasolina grande, introducida a mitad de la segunda generación junto con una caja de cambios y una caja de transferencia de mayor tamaño. Los listados de emisiones norteamericanos de la época lo nombran expresamente como el motor de doble árbol, y así se distingue un vehículo de segunda generación del que llevó después el motor de árbol único."
+      "summary": "La versión de doble árbol de levas y veinticuatro válvulas del V6 de gasolina grande, introducida a mitad de la segunda generación junto con una caja de cambios y una caja de transferencia de mayor tamaño. Los listados de emisiones norteamericanos de la época lo nombran expresamente como el motor de doble árbol, y así se distingue un vehículo de segunda generación del que llevó después el motor de árbol único. El folleto de fábrica que da el diámetro y la carrera de esta familia declara la cilindrada que se registra aquí; los listados de registro japoneses de la misma familia imprimen un centímetro cúbico menos, y eso es una diferencia de redondeo del documento de registro, no un motor distinto."
     }
   }
 }

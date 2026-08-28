@@ -4,16 +4,20 @@
   "parentGeneration": "gen2",
   "fitment": {
     "gens": ["gen2-5"],
-    "markets": ["us", "uk", "au", "jdm", "eu", "me", "global"]
+    "markets": ["us", "cr", "uk", "au", "jdm", "eu", "me", "global"]
   },
   "chassisCodes": ["V20", "V30", "V40", "V55W"],
   "production": {
     "from": 1997,
-    "to": 2000
+    "to": 1999
   },
   "marketNames": [
     {
       "market": "us",
+      "name": "Montero"
+    },
+    {
+      "market": "cr",
       "name": "Montero"
     },
     {
@@ -75,11 +79,11 @@
   "prose": {
     "en": {
       "title": "Second generation (facelift)",
-      "summary": "The mid-cycle revision of the second generation, known in the community as Gen 2.5. In Japan it brought the first direct-injection petrol V6 the company built and a new sequential-shift automatic; for general export and the Gulf states it brought the wide blister-flare bodywork, new lighting and standard front airbags on the top petrol V6. It is filed as its own generation because a vehicle from the overlap years can legitimately match both this and the third generation."
+      "summary": "The mid-cycle revision of the second generation, known in the community as Gen 2.5. In Japan it brought the first direct-injection petrol V6 the company built and a new sequential-shift automatic; for general export and the Gulf states it brought the wide blister-flare bodywork, new lighting and standard front airbags on the top petrol V6. It is filed as its own generation because a vehicle from the overlap years can legitimately match both this and the third generation. The production range recorded here is the Japanese one; North America kept selling this body for one model year after Japan stopped building it, which the federal fuel-economy listings show."
     },
     "es": {
       "title": "Segunda generación (rediseño)",
-      "summary": "La revisión de medio ciclo de la segunda generación, conocida en la comunidad como Gen 2.5. En Japón trajo el primer V6 de gasolina de inyección directa que fabricó la compañía y una caja automática secuencial nueva; para exportación general y los países del Golfo trajo los guardabarros anchos, la óptica nueva y las bolsas de aire delanteras de serie en el V6 de gasolina superior. Se registra como generación aparte porque un vehículo de los años de traslape puede corresponder legítimamente tanto a esta como a la tercera generación."
+      "summary": "La revisión de medio ciclo de la segunda generación, conocida en la comunidad como Gen 2.5. En Japón trajo el primer V6 de gasolina de inyección directa que fabricó la compañía y una caja automática secuencial nueva; para exportación general y los países del Golfo trajo los guardabarros anchos, las luces nuevas y las bolsas de aire delanteras de serie en el V6 de gasolina superior. Se registra como generación aparte porque un vehículo de los años de traslape puede corresponder legítimamente tanto a esta como a la tercera generación. El rango de producción que se registra aquí es el japonés; Norteamérica siguió vendiendo esta carrocería un año modelo después de que Japón dejara de fabricarla, y así aparece en los listados federales de consumo."
     }
   }
 }

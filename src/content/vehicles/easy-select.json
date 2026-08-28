@@ -2,7 +2,7 @@
   "id": "easy-select",
   "kind": "transfer-case",
   "fitment": {
-    "gens": ["gen1", "gen3"]
+    "gens": ["gen1", "gen2", "gen3"]
   },
   "transferCaseFamily": "easy-select",
   "confidence": "community-consensus",
@@ -27,16 +27,30 @@
       "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
       "accessed": "2026-08-28",
       "kind": "forum"
+    },
+    {
+      "title": "Super Select — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Super_Select",
+      "archiveUrl": "https://web.archive.org/web/20260619135909/https://en.wikipedia.org/wiki/Super_Select",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
       "title": "Easy Select part-time four-wheel drive",
-      "summary": "Mitsubishi's part-time transfer case: rear-wheel drive on the road, locked four-wheel drive in high or low range, and no centre differential, so four-wheel drive must not be used on dry pavement. Read the classification carefully — the factory brand name Easy Select is used on later trucks, while first-generation literature simply calls the system part-time four-wheel drive, and the North American third-generation specification sheet calls it part-time four-wheel drive with a two-speed transfer case. This entry files all of those under one family because they are the same kind of system, not because the brand name appears in every source."
+      "summary": "Mitsubishi's part-time transfer case: rear-wheel drive on the road, locked four-wheel drive in high or low range, and no centre differential. Because the axles are locked together in four-wheel drive, the system must not be used on dry pavement — without a centre differential the drivetrain has no way to absorb the difference in front and rear wheel speed through a turn. Read the classification carefully: the factory brand name Easy Select is used on later trucks, while first-generation literature simply calls the system part-time four-wheel drive, the Japanese catalogue prints part-time against the second-generation grades that used it, and the North American third-generation specification sheet calls it part-time four-wheel drive with a two-speed transfer case. This entry files all of those under one family because they are the same kind of system, not because the brand name appears in every source."
     },
     "es": {
-      "title": "Tracción de conexión manual Easy Select",
-      "summary": "La caja de transferencia de conexión manual de Mitsubishi: tracción trasera en carretera, tracción en las cuatro ruedas bloqueada en rango alto o bajo, y sin diferencial central, por lo que no se debe circular con doble tracción en pavimento seco. Conviene leer la clasificación con cuidado: el nombre comercial Easy Select se usa en vehículos posteriores, mientras que la documentación de la primera generación habla simplemente de tracción de conexión manual, y la hoja de especificaciones norteamericana de la tercera generación la llama tracción de conexión manual con caja de transferencia de dos rangos. Esta entrada agrupa todo eso en una sola familia porque se trata del mismo tipo de sistema, no porque el nombre comercial aparezca en todas las fuentes."
+      "title": "Doble tracción de conexión manual Easy Select",
+      "summary": "La caja de transferencia conectable (part-time, de conexión manual) de Mitsubishi: tracción trasera en carretera, tracción en las cuatro ruedas bloqueada en rango alto o bajo, y sin diferencial central. Como los ejes quedan solidarios al ir en cuatro por cuatro, el sistema no se debe usar en pavimento seco: sin diferencial central la transmisión no tiene cómo absorber la diferencia de velocidad entre las ruedas delanteras y las traseras en una curva. Conviene leer la clasificación con cuidado: el nombre comercial Easy Select se usa en vehículos posteriores, mientras que la documentación de la primera generación habla simplemente de tracción conectable, el catálogo japonés imprime conectable frente a los acabados de segunda generación que la llevaban, y la hoja de especificaciones norteamericana de la tercera generación la llama tracción conectable con caja de transferencia de dos rangos. Esta entrada agrupa todo eso en una sola familia porque se trata del mismo tipo de sistema, no porque el nombre comercial aparezca en todas las fuentes."
     }
   }
 }

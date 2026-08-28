@@ -2,7 +2,7 @@
   "id": "us",
   "kind": "market",
   "fitment": {
-    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "gens": ["gen1", "gen2", "gen2-5", "gen3"],
     "markets": ["us"]
   },
   "confidence": "community-consensus",
@@ -32,11 +32,11 @@
   "prose": {
     "en": {
       "title": "United States and Canada",
-      "summary": "The North American market, where the truck was badged Montero. Sales ran from the first generation through the third; the fourth generation was never offered here."
+      "summary": "The North American market, where the truck was badged Montero. Sales ran from the first generation through the third; the fourth generation was never offered here, which is why no generation after the third names this market."
     },
     "es": {
       "title": "Estados Unidos y Canadá",
-      "summary": "El mercado norteamericano, donde el vehículo se vendió con el nombre Montero. Estuvo en catálogo desde la primera hasta la tercera generación; la cuarta nunca se ofreció aquí."
+      "summary": "El mercado norteamericano, donde el vehículo se vendió con el nombre Montero. Estuvo en catálogo desde la primera hasta la tercera generación; la cuarta nunca se ofreció aquí, y por eso ninguna generación posterior a la tercera nombra este mercado."
     }
   }
 }

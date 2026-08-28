@@ -19,6 +19,13 @@
       "kind": "vendor"
     },
     {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
       "title": "Mitsubishi 6G7 engine — Wikipedia",
       "url": "https://en.wikipedia.org/wiki/Mitsubishi_6G7_engine",
       "archiveUrl": "https://web.archive.org/web/20260804110625/https://en.wikipedia.org/wiki/Mitsubishi_6G7_engine",
@@ -33,13 +40,6 @@
       "kind": "vendor"
     },
     {
-      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
-      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
-      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
-      "accessed": "2026-08-28",
-      "kind": "vendor"
-    },
-    {
       "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
       "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
       "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
@@ -50,11 +50,11 @@
   "prose": {
     "en": {
       "title": "6G75 petrol V6",
-      "summary": "The largest petrol V6 in the line, a single-overhead-cam twenty-four-valve unit on a taller block than the engine below it. It arrived on the third generation, replaced the smaller V6 in North America part-way through that generation, and gained variable valve timing on the fourth."
+      "summary": "The largest petrol V6 in the line, a single-overhead-cam twenty-four-valve unit on a taller block than the engine below it. It arrived on the third generation, replaced the smaller V6 in North America part-way through that generation, and gained variable valve timing on the fourth. Two factory documents agree on the capacity recorded here; Japanese registration listings print one cubic centimetre less."
     },
     "es": {
       "title": "Motor de gasolina 6G75, V6",
-      "summary": "El V6 de gasolina de mayor cilindrada de la línea, de árbol de levas único y veinticuatro válvulas, sobre un bloque más alto que el del motor inmediatamente inferior. Llegó con la tercera generación, sustituyó al V6 menor en Norteamérica a mitad de esa generación y recibió distribución variable en la cuarta."
+      "summary": "El V6 de gasolina de mayor cilindrada de la línea, de árbol de levas único y veinticuatro válvulas, sobre un bloque más alto que el del motor inferior. Llegó con la tercera generación, sustituyó al V6 menor en Norteamérica a mitad de esa generación y recibió distribución variable en la cuarta. Dos documentos de fábrica coinciden en la cilindrada que se registra aquí; los listados de registro japoneses imprimen un centímetro cúbico menos."
     }
   }
 }

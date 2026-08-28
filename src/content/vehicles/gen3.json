@@ -3,7 +3,7 @@
   "kind": "generation",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["us", "uk", "au", "jdm", "eu", "global"]
+    "markets": ["us", "cr", "uk", "au", "jdm", "eu", "global"]
   },
   "chassisCodes": [
     "V60",
@@ -13,7 +13,8 @@
     "V68W",
     "V73W",
     "V75W",
-    "V77W"
+    "V77W",
+    "V78W"
   ],
   "production": {
     "from": 1999,
@@ -22,6 +23,10 @@
   "marketNames": [
     {
       "market": "us",
+      "name": "Montero"
+    },
+    {
+      "market": "cr",
       "name": "Montero"
     },
     {
@@ -79,11 +84,11 @@
   "prose": {
     "en": {
       "title": "Third generation",
-      "summary": "The generation the project truck belongs to. It replaced the ladder frame with a monocoque body with an integrated frame, moved to rack-and-pinion steering and fully independent suspension front and rear, and carried the refined Super Select 4WD II transfer case. It was the last generation sold in North America, where it was withdrawn after the final model year listed in this entry's production range."
+      "summary": "The generation the project truck belongs to. It replaced the ladder frame with a monocoque body with an integrated frame, moved to rack-and-pinion steering and fully independent suspension front and rear, and introduced the refined Super Select 4WD II transfer case. It was the last generation sold in North America, where it was withdrawn after the final model year in this entry's production range."
     },
     "es": {
       "title": "Tercera generación",
-      "summary": "La generación a la que pertenece el vehículo del proyecto. Sustituyó el chasis de escalera por una carrocería monocasco con bastidor integrado, pasó a dirección de cremallera y a suspensión independiente adelante y atrás, y montó la caja de transferencia Super Select 4WD II ya refinada. Fue la última generación que se vendió en Norteamérica, donde salió de catálogo al cerrar el rango de producción que registra esta entrada."
+      "summary": "La generación a la que pertenece el vehículo del proyecto. Sustituyó el chasis de escalera por una carrocería monocasco con bastidor integrado, pasó a dirección de cremallera y a suspensión independiente adelante y atrás, y estrenó la caja de transferencia Super Select 4WD II ya refinada. Fue la última generación que se vendió en Norteamérica, donde salió de catálogo al cerrar el rango de producción que registra esta entrada."
     }
   }
 }

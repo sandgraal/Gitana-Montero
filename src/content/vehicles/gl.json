@@ -26,11 +26,11 @@
   "prose": {
     "en": {
       "title": "GL",
-      "summary": "The base general-export grade of the fourth generation, offered with the manual gearbox and a higher seating count than the grades above it."
+      "summary": "The base general-export grade of the fourth generation, offered with the manual gearbox and with more seats than the grades above it."
     },
     "es": {
       "title": "GL",
-      "summary": "El acabado base de exportación general de la cuarta generación, ofrecido con caja manual y con una capacidad de asientos mayor que la de los acabados superiores."
+      "summary": "El acabado base de exportación general de la cuarta generación, ofrecido con caja manual y con más plazas que los acabados superiores."
     }
   }
 }

@@ -12,7 +12,7 @@
     {
       "years": {
         "from": 1997,
-        "to": null
+        "to": 1999
       },
       "engine": "6g74-gdi",
       "transmission": "automatic-5-speed",
@@ -21,8 +21,8 @@
     },
     {
       "years": {
-        "from": 1998,
-        "to": null
+        "from": 1997,
+        "to": 1999
       },
       "engine": "4m40",
       "transmission": "automatic-4-speed",
@@ -31,8 +31,8 @@
     },
     {
       "years": {
-        "from": 1998,
-        "to": null
+        "from": 1997,
+        "to": 1998
       },
       "engine": "4m40",
       "transmission": "manual-5-speed",
@@ -67,11 +67,11 @@
   "prose": {
     "en": {
       "title": "Second generation facelift, Japanese market",
-      "summary": "Powertrain pairings recorded for the facelifted second-generation Pajero in Japan. The direct-injection petrol V6 and the sequential-shift five-speed automatic arrived together with this revision; the turbo-diesel stayed on the four-speed automatic and kept a manual option on the entry grade. Smaller four-cylinder petrol engines were also offered and are not representable in this taxonomy, so they are absent rather than excluded. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
+      "summary": "Powertrain pairings recorded for the facelifted second-generation Pajero in Japan. The direct-injection petrol V6 and the sequential-shift five-speed automatic arrived together with this revision; the turbo-diesel stayed on the four-speed automatic and kept a manual option on the entry grade. Every dated listing on the cited catalogue page was tabulated, and each row opens at the first listing that shows it and closes at the last. A row left open at the end is one the final listing still shows. Two things in the catalogue are absent because this taxonomy cannot hold them: a smaller four-cylinder petrol engine, and the variable-valve-timing engine unique to the homologation special whose chassis code this generation records. The catalogue names more Japanese grades than this taxonomy has trim entries for, so several rows carry only the trims already recorded; the rest are a known gap, not a claim that they did not exist. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
     },
     "es": {
       "title": "Segunda generación con rediseño, mercado japonés",
-      "summary": "Combinaciones de tren motriz registradas para el Pajero de segunda generación con rediseño en Japón. El V6 de gasolina de inyección directa y la automática secuencial de cinco velocidades llegaron juntos con esta revisión; el turbodiésel se mantuvo con la automática de cuatro velocidades y conservó la opción manual en el acabado de entrada. También se ofrecieron motores de gasolina de cuatro cilindros de menor cilindrada que esta taxonomía no puede representar, así que están ausentes y no excluidos. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
+      "summary": "Combinaciones de tren motriz registradas para el Pajero de segunda generación con rediseño en Japón. El V6 de gasolina de inyección directa y la automática secuencial de cinco velocidades llegaron juntos con esta revisión; el turbodiésel se mantuvo con la automática de cuatro velocidades y conservó la opción manual en el acabado de entrada. Se tabuló cada listado fechado de la página de catálogo citada, y cada fila abre en el primer listado que la muestra y cierra en el último. Una fila que queda abierta al final es una que el último listado todavía muestra. Dos cosas del catálogo quedan ausentes porque esta taxonomía no las puede contener: un motor de gasolina de cuatro cilindros menor, y el motor de distribución variable exclusivo del modelo de homologación cuyo código de chasis sí registra esta generación. El catálogo nombra más acabados japoneses de los que esta taxonomía tiene registrados, así que varias filas llevan solo los acabados ya registrados; el resto es un vacío conocido y no una afirmación de que no existieran. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
     }
   }
 }

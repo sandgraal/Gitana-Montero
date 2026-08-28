@@ -6,22 +6,22 @@
   },
   "engineFamily": "6g74",
   "fuel": "petrol",
-  "displacementCc": 3496,
+  "displacementCc": 3497,
   "valvetrain": "sohc",
   "fuelSystem": "mpi",
-  "confidence": "community-consensus",
+  "confidence": "fsm-confirmed",
   "sources": [
-    {
-      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
-      "url": "https://www.mitsubishicars.com/montero/specs.html",
-      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
-      "accessed": "2026-08-28",
-      "kind": "vendor"
-    },
     {
       "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
       "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
       "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
       "accessed": "2026-08-28",
       "kind": "vendor"
     },
@@ -43,11 +43,11 @@
   "prose": {
     "en": {
       "title": "6G74 SOHC petrol V6",
-      "summary": "The single-overhead-cam, twenty-four-valve, port-injected version of the larger petrol V6 — the engine in the project truck. It is the export counterpart of the direct-injection engine sold in Japan, and it is a different unit from the twin-cam version that preceded it in the second generation."
+      "summary": "The single-overhead-cam, twenty-four-valve, port-injected version of the larger petrol V6 — the engine in the project truck. It is the export counterpart of the direct-injection engine sold in Japan, and it is a different unit from the twin-cam version that preceded it in the second generation. The factory brochure that gives this family's bore and stroke states its capacity as the figure recorded here; Japanese registration listings for the same family print one cubic centimetre less, which is a rounding difference in the registration document rather than a different engine."
     },
     "es": {
       "title": "Motor de gasolina 6G74 SOHC, V6",
-      "summary": "La versión de árbol de levas único, veinticuatro válvulas e inyección en el múltiple del V6 de gasolina grande: es el motor del vehículo del proyecto. Es la contraparte de exportación del motor de inyección directa que se vendió en Japón, y es una unidad distinta del doble árbol de levas que lo precedió en la segunda generación."
+      "summary": "La versión de árbol de levas único, veinticuatro válvulas e inyección en el múltiple del V6 de gasolina grande: es el motor del vehículo del proyecto. Es la contraparte de exportación del motor de inyección directa que se vendió en Japón, y es una unidad distinta del doble árbol de levas que lo precedió en la segunda generación. El folleto de fábrica que da el diámetro y la carrera de esta familia declara la cilindrada que se registra aquí; los listados de registro japoneses de la misma familia imprimen un centímetro cúbico menos, y eso es una diferencia de redondeo del documento de registro, no un motor distinto."
     }
   }
 }

@@ -7,7 +7,7 @@
   },
   "engineFamily": "6g74",
   "fuel": "petrol",
-  "displacementCc": 3496,
+  "displacementCc": 3497,
   "valvetrain": "dohc",
   "fuelSystem": "gdi",
   "confidence": "community-consensus",
@@ -39,16 +39,23 @@
       "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
       "accessed": "2026-08-28",
       "kind": "forum"
+    },
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
       "title": "6G74 GDI petrol V6",
-      "summary": "The gasoline-direct-injection version of the larger petrol V6, the first direct-injection V6 the company produced. It was a Japanese-market engine: export cars of the same generations kept port injection, so a direct-injection fitment outside Japan should be treated as an imported vehicle rather than a local one."
+      "summary": "The gasoline-direct-injection version of the larger petrol V6, the first direct-injection V6 the company produced. It was a Japanese-market engine: export cars of the same generations kept port injection, so a direct-injection fitment outside Japan should be treated as an imported vehicle rather than a local one. The factory brochure that gives this family's bore and stroke states its capacity as the figure recorded here; Japanese registration listings for the same family print one cubic centimetre less, which is a rounding difference in the registration document rather than a different engine."
     },
     "es": {
       "title": "Motor de gasolina 6G74 GDI, V6",
-      "summary": "La versión de inyección directa de gasolina del V6 grande, el primer V6 de inyección directa que produjo la compañía. Fue un motor del mercado japonés: los vehículos de exportación de esas mismas generaciones conservaron la inyección en el múltiple, de modo que una aplicación de inyección directa fuera de Japón corresponde a un carro importado y no a uno de venta local."
+      "summary": "La versión de inyección directa de gasolina del V6 grande, el primer V6 de inyección directa que produjo la compañía. Fue un motor del mercado japonés: los vehículos de exportación de esas mismas generaciones conservaron la inyección en el múltiple, de modo que conviene tratar una aplicación de inyección directa fuera de Japón como un carro importado y no como uno de venta local. El folleto de fábrica que da el diámetro y la carrera de esta familia declara la cilindrada que se registra aquí; los listados de registro japoneses de la misma familia imprimen un centímetro cúbico menos, y eso es una diferencia de redondeo del documento de registro, no un motor distinto."
     }
   }
 }
