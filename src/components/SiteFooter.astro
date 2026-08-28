@@ -1,0 +1,32 @@
+---
+/** Site footer chrome. All text via `t()` (I18N-08); URLs are shared data. */
+import { type Locale } from "../i18n/routing";
+import { t } from "../i18n/ui";
+import { ISSUES_URL, REPO_URL } from "../site";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale);
+---
+
+<footer>
+  <p>{strings.footerDisclaimer}</p>
+  <ul>
+    <li><a href={REPO_URL}>{strings.footerSourceLabel}</a></li>
+    <li><a href={ISSUES_URL}>{strings.footerIssuesLabel}</a></li>
+  </ul>
+</footer>
+
+<style>
+  footer ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

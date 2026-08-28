@@ -1,0 +1,32 @@
+---
+/**
+ * Home page, one build per locale (I18N-01). Neither locale is privileged:
+ * both are generated from the same route by the same code, and `/en/` has no
+ * shortcut that `/es/` lacks.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { LOCALES, isLocale, type Locale } from "../../i18n/routing";
+import { t } from "../../i18n/ui";
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({ params: { locale } }));
+}
+
+const { locale: param } = Astro.params;
+if (!isLocale(param)) {
+  throw new Error(`Unknown locale segment: ${String(param)}`);
+}
+const locale: Locale = param;
+const strings = t(locale);
+---
+
+<BaseLayout
+  locale={locale}
+  routePath="/"
+  title={`${strings.siteName} — ${strings.siteTagline}`}
+  description={strings.homeIntro}
+>
+  <h1>{strings.homeHeading}</h1>
+  <p>{strings.homeIntro}</p>
+  <p>{strings.homeStatus}</p>
+</BaseLayout>

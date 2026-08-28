@@ -4,6 +4,12 @@
     "strict": true,
     "verbatimModuleSyntax": true
   },
-  "include": [".astro/types.d.ts", "src/**/*", "scripts/**/*", "*.config.*"],
+  "include": [
+    ".astro/types.d.ts",
+    "src/**/*",
+    "scripts/**/*",
+    "tests/**/*",
+    "*.config.*"
+  ],
   "exclude": ["dist"]
 }

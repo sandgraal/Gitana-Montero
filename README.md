@@ -54,7 +54,14 @@ This repo is built by a conducted fleet of AI agents — see `AGENTS.md`
 nvm use 24
 npm install
 npm run verify   # everything CI runs
+npm run dev      # http://localhost:4321/Gitana-Montero/
 ```
+
+The site is served under a base path (`base` in `astro.config.mjs`), so local
+URLs include it: `/Gitana-Montero/en/` and `/Gitana-Montero/es/`.
+`/Gitana-Montero/` itself is a redirect shim that picks a locale — it is not a
+page. Both locales are always built; `npm run check:hreflang` fails the build
+if any page's `en`/`es` pair or `x-default` is missing or asymmetric.
 
 ## Safety note / Nota de seguridad
 

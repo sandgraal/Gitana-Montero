@@ -1,0 +1,41 @@
+---
+/**
+ * Not-found page (I18N-08: error pages translated in both locales).
+ *
+ * A 404 is served for URLs that may carry no usable locale at all, so this
+ * page refuses to guess: it renders in every locale at once, each block marked
+ * with its own `lang`. It is not a localized page and therefore carries no
+ * `hreflang` set — `scripts/check-hreflang.mjs` exempts it explicitly.
+ */
+import { LOCALE_BCP47, DEFAULT_LOCALE, localeHref } from "../i18n/routing";
+import { allUi } from "../i18n/ui";
+
+const title = allUi.map(({ strings }) => strings.notFoundTitle).join(" · ");
+---
+
+<!doctype html>
+<html lang={LOCALE_BCP47[DEFAULT_LOCALE]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, follow" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main>
+      {
+        allUi.map(({ locale, strings }) => (
+          <section lang={LOCALE_BCP47[locale]}>
+            <h1>{strings.notFoundTitle}</h1>
+            <p>{strings.notFoundMessage}</p>
+            <p>
+              <a href={localeHref(locale, "/")} hreflang={LOCALE_BCP47[locale]}>
+                {strings.notFoundHomeLink}
+              </a>
+            </p>
+          </section>
+        ))
+      }
+    </main>
+  </body>
+</html>
