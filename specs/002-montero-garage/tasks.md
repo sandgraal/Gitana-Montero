@@ -39,9 +39,8 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
 ## Phase P2 — The garage
 
 - [ ] **T2-301 [PLATFORM]** Vehicle profile: create/edit, display name,
-  taxonomy identity via the 001 fitment engine (Depends: 001 T203), photos,
-  odometer. Garage dashboard per HANDOFF-DESIGN's timeline direction.
-  Depends: T2-202, 001-T203. *(GAR-01′)*
+  taxonomy identity via the 001 fitment engine, photos, odometer. Garage
+  dashboard per HANDOFF-DESIGN.md's timeline direction. Depends: T2-202, 001-T203. *(GAR-01′)*
 - [ ] **T2-302 [PLATFORM]** Records + receipts: dated typed records, cost/time/
   odometer, attachment upload to private storage, vendor/date/amount fields,
   typed references into reference collections. Depends: T2-301. *(GAR-02′, GAR-05′)*
