@@ -89,12 +89,27 @@ export function makeProseEs(): TestProseLocale {
  */
 export function makeValidEntry(): TestEntry {
   return {
+    ...makeCoreEntry(),
+    torqueNm: 88,
+    oemPartNumber: "TEST-MB000001",
+  };
+}
+
+/**
+ * Only the fields every entry shares, with no collection-specific extras.
+ *
+ * The collection-level graders parse this against each *real* registered
+ * schema, where an extra field would be an unrecognized key and would muddy
+ * the issue list they assert on. Real collections will require fields this
+ * fixture does not carry; that is fine, because those graders assert on the
+ * `prose.*` paths specifically rather than on overall success.
+ */
+export function makeCoreEntry(): TestEntry {
+  return {
     id: "test-schema-alpha",
     fitment: { gens: ["gen3"] },
     confidence: "fsm-confirmed",
     sources: [makeSource()],
-    torqueNm: 88,
-    oemPartNumber: "TEST-MB000001",
     prose: { en: makeProseEn(), es: makeProseEs() },
   };
 }

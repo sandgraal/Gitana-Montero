@@ -76,12 +76,24 @@ describe("locale enum (spec §2: en and es, never any other value)", () => {
     expect(localeSchema.safeParse(candidate).success).toBe(accepted);
   });
 
-  it.fails.each([null, undefined, 1, ["en"], { locale: "en" }])(
-    "localeSchema rejects the non-string %j",
-    (candidate) => {
-      expect(localeSchema.safeParse(candidate).success).toBe(false);
-    }
-  );
+  /**
+   * Each row wraps its candidate in a factory rather than listing the value
+   * directly. A bare array row (`["en"]`) in a mixed table is ambiguous:
+   * Vitest 4.1.11 passes it through as a single argument, but a runner that
+   * chose to spread it instead would turn this grader permanently red after
+   * activation — and the implementer is not allowed to edit `tests/` to fix
+   * it. A factory row is one argument under either reading.
+   */
+  it.fails.each<[string, () => unknown]>([
+    ["null", () => null],
+    ["undefined", () => undefined],
+    ["the number 1", () => 1],
+    ["the array ['en']", () => ["en"]],
+    ["the object { locale: 'en' }", () => ({ locale: "en" })],
+    ["a boolean", () => true],
+  ])("localeSchema rejects %s", (_label, makeCandidate) => {
+    expect(localeSchema.safeParse(makeCandidate()).success).toBe(false);
+  });
 });
 
 describe("confidence tiers (spec §2, AGENTS.md 'Facts')", () => {

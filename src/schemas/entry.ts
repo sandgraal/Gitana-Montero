@@ -28,18 +28,36 @@
  * - `SOURCE_KINDS` / `sourceSchema` — plan.md "Content conventions": every
  *   source carries `{ title, url, archiveUrl, accessed, kind }`, all
  *   required. AGENTS.md requires the archive URL at citation time.
+ *   **`url` and `archiveUrl` must reject non-http(s) schemes.** Note that
+ *   `z.string().url()` in `astro/zod` accepts `javascript:alert(1)`, so a
+ *   bare `.url()` is not enough — constrain the protocol.
  * - `fitmentSchema` — the T104 *placeholder* shape (spec §2 "Fitment"):
  *   `gens` required and non-empty, the rest optional. Validating gen/market/
  *   engine IDs against the taxonomy is FIT-02, i.e. T203, not T104.
  * - `defineEntrySchema(shared, prose)` — the one factory every collection
  *   schema is built from. It produces
  *   `{ id, fitment, confidence, sources, ...shared, prose: { en, es } }`
- *   where both locales are required with no escape hatch (I18N-06), the
- *   per-locale prose objects and the entry object reject unknown keys
- *   (SCF-04 wants a named field, not a silent strip), and the factory
- *   **throws at define time** if the prose shape declares a numeric field —
- *   the structural half of AGENTS.md "numbers are never translated". The
- *   thrown error must name the offending field.
+ *   where:
+ *   - both locales are required with no escape hatch (I18N-06);
+ *   - the per-locale prose objects and the entry object reject unknown keys
+ *     (SCF-04 wants a named field, not a silent strip);
+ *   - **prose string fields reject blank and whitespace-only values** — a
+ *     present-but-empty locale is a locale that is lacking, which is the
+ *     obvious loophole for shipping a monolingual entry past I18N-06;
+ *   - **`id` rejects the empty string** for the same reason;
+ *   - the factory **throws at define time** if the prose shape declares a
+ *     numeric field — the structural half of AGENTS.md "numbers are never
+ *     translated". The thrown error must name the offending field. The check
+ *     recurses: `optional` / `nullable` / `default` wrappers and `array`,
+ *     `object`, `union`, `tuple` and `record` children all count, and
+ *     `bigint` counts as numeric. A one-level check is not a check —
+ *     `specs: z.object({ torqueNm: z.number() })` duplicates a figure per
+ *     locale exactly like a top-level field would.
+ *
+ * `defineEntrySchema` is also the only sanctioned way to build a collection
+ * schema. `src/content.config.ts` must call it rather than hand-rolling a
+ * shape, because `tests/schemas/collections.test.ts` grades the *registered*
+ * collections, not just this factory.
  *
  * Activation: delete this stub body, implement for real, then remove the
  * `.fails` marker from each grader in `tests/schemas/` and delete
