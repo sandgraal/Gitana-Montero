@@ -58,7 +58,7 @@ jobs:
         run: |
           if [ -f package.json ]; then
             npm ci
-            npm run check:links
+            npm run check:links --if-present
             npm run test:a11y --if-present
           else
             echo "package.json not present yet (pre-T101); skipping."

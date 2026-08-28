@@ -14,7 +14,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "verify": "astro check && eslint . && prettier --check . && vitest run && astro build"
   },
   "dependencies": {
     "astro": "^7.2.9"
@@ -31,5 +32,8 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.68.0",
     "vitest": "^4.1.11"
+  },
+  "notes": {
+    "typescript": "Pinned to ^5.9.3, not the ^7.x line currently resolvable: @astrojs/check's peerDependency is '^5.0.0 || ^6.0.0' and typescript-eslint's is '>=4.8.4 <6.1.0' — both exclude TS 7 as of this writing. Bump this pin only once those peer ranges do."
   }
 }
