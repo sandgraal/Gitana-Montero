@@ -23,6 +23,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import { defineEntrySchema } from "./schemas/entry";
+import { communitySchema } from "./schemas/community";
 
 /**
  * Files whose name starts with `_` are drafts/notes and are never loaded, per
@@ -43,11 +44,23 @@ const baseProse = {
   summary: z.string(),
 };
 
-/** One collection, base entry shape, loaded from `src/content/<name>/`. */
-function entryCollection(name: string) {
+/**
+ * One collection loaded from `src/content/<name>/`.
+ *
+ * `schema` defaults to the base entry shape, which is still what most
+ * collections get: their own fields arrive with the phase task that owns
+ * them. A collection whose task *has* landed passes the schema that task
+ * built — always via `defineEntrySchema` in `src/schemas/<name>.ts`, so the
+ * `{ id, fitment, …, prose: { en, es } }` envelope is identical either way
+ * and `tests/schemas/collections.test.ts` grades both forms the same.
+ */
+function entryCollection(
+  name: string,
+  schema: z.ZodType = defineEntrySchema({}, baseProse)
+) {
   return defineCollection({
     loader: glob({ pattern: ENTRY_PATTERN, base: `./src/content/${name}` }),
-    schema: defineEntrySchema({}, baseProse),
+    schema,
   });
 }
 
@@ -68,6 +81,6 @@ export const collections = {
   procedures: entryCollection("procedures"),
   /** MOD-01, MOD-02 — modifications and their tradeoffs. */
   mods: entryCollection("mods"),
-  /** COM-01, COM-02 — the bilingual community directory. */
-  community: entryCollection("community"),
+  /** COM-01, COM-02 — the bilingual community directory (T700). */
+  community: entryCollection("community", communitySchema),
 };
