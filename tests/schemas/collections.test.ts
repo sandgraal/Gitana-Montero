@@ -61,14 +61,20 @@ function schemaOf(collection: unknown): Parsable {
         })
       : schema;
 
-  const isZodSchema =
+  // Detection deliberately relies on the *public* parsing surface only.
+  // `_def` is a Zod v3 back-compat getter (the canonical v4 internal is
+  // `_zod.def`); asserting on it couples an activated grader to a Zod
+  // implementation detail, so a version bump that drops the alias would turn
+  // these graders permanently red against a perfectly correct schema. It also
+  // bought nothing: a hand-rolled non-Zod parser is still caught by the
+  // locale graders below, which assert on real `safeParse` outcomes.
+  const isParsable =
     typeof resolved === "object" &&
     resolved !== null &&
     typeof (resolved as { safeParse?: unknown }).safeParse === "function" &&
-    typeof (resolved as { parse?: unknown }).parse === "function" &&
-    typeof (resolved as { _def?: unknown })._def === "object";
+    typeof (resolved as { parse?: unknown }).parse === "function";
 
-  if (!isZodSchema) {
+  if (!isParsable) {
     throw new Error(
       "collection schema is not a Zod schema — every collection registered in " +
         "src/content.config.ts must define a Zod schema (SCF-01)"
