@@ -4,18 +4,34 @@
 
 Task: T### · Spec tags: <!-- e.g. PRB-01, GLO-02 -->
 
-## Content checklist (delete if platform-only PR)
+## Content checklist / Lista para contenido (delete if platform-only PR)
 
-- [ ] Every entry has both `prose.en` and `prose.es`
-- [ ] Every numeric spec lives in shared `data`, not prose, and carries a source
-- [ ] No invented part numbers — every number traces to an opened source
-- [ ] Fitment declared and resolvable for every entry
-- [ ] Confidence tier honest; sources archived (archiveUrl)
-- [ ] ES prose: `usted` register, canonical glossary terms
+Required for any PR that adds or edits an entry. / Obligatorio para todo PR
+que agregue o modifique una entrada.
+
+- [ ] Every entry has both `prose.en` and `prose.es` / Cada entrada tiene
+      `prose.en` y `prose.es`
+- [ ] Every numeric spec lives in shared `data`, not prose, and carries a
+      source / Toda especificación numérica vive en `data` compartido, con fuente
+- [ ] No invented part numbers — every number traces to an opened source /
+      Ningún número de parte inventado — cada número viene de una fuente abierta
+- [ ] **Fitment** declared and resolvable for every entry / **Aplicación**
+      (fitment) declarada y resoluble en cada entrada
+- [ ] Confidence tier honest; sources archived (`archiveUrl`) / Nivel de
+      confianza honesto; fuentes archivadas (`archiveUrl`)
+- [ ] ES prose: `usted` register, canonical glossary terms / Prosa en español:
+      registro de `usted`, términos canónicos del glosario
 
 ## Proof
 
 <!-- Commands run + one-line results (npm run verify, etc.) -->
+
+<!--
+CI gates this PR on: Harness validation · Verify · Links + a11y (Pa11y WCAG2AA
+plus the SCF-06 Lighthouse budgets). The built site is attached to the Verify
+run as the `site-dist` artifact — download it from the run summary to inspect
+the pages this branch produces. Merging to `main` publishes to GitHub Pages.
+-->
 
 ## Passes
 
