@@ -16,6 +16,7 @@ import {
   canonicalTermIssue,
   canonicalTermOf,
   glossaryEntrySchema,
+  readsAsAlternation,
 } from "../../src/schemas/glossary.ts";
 import { issuePaths, issuesOf } from "../helpers/schema-outcome.ts";
 
@@ -215,6 +216,51 @@ describe("canonicalTermIssue", () => {
   it("rejects a term longer than the maximum", () => {
     expect(canonicalTermIssue("a".repeat(TERM_MAX_LENGTH))).toBeNull();
     expect(canonicalTermIssue("a".repeat(TERM_MAX_LENGTH + 1))).not.toBeNull();
+  });
+
+  /*
+   * The slash rule. An earlier revision rejected every `/`, which blocked
+   * real single forms — and because the same rule governs `aliases`, a
+   * reader typing `A/C` into the glossary search could never match anything
+   * (GLO-03). Both directions are pinned so neither half regresses.
+   */
+  describe("slash: single forms accepted, alternations rejected", () => {
+    it.each([
+      "A/C",
+      "ABS/EBD",
+      "4WD/2WD",
+      "P/N",
+      "km/h",
+      "compresor de A/C",
+      "sensor ABS/EBD trasero",
+    ])("accepts the slash-joined single form %j", (value) => {
+      expect(canonicalTermIssue(value)).toBeNull();
+      expect(readsAsAlternation(value)).toBe(false);
+    });
+
+    it.each([
+      "aro / rin",
+      "aro/ rin",
+      "aro /rin",
+      "aro|rin",
+      "aro | rin",
+      "cambios/transmisión",
+      "pastillas/balatas de freno",
+    ])("rejects the alternation %j", (value) => {
+      expect(canonicalTermIssue(value)).not.toBeNull();
+      expect(readsAsAlternation(value)).toBe(true);
+    });
+
+    it("says a slash inside one term is fine, in the message", () => {
+      expect(canonicalTermIssue("aro / rin")).toContain("A/C");
+    });
+
+    it("lets an alias carry a slash-joined form, so search can find it", () => {
+      const entry = makeGlossaryEntry();
+      entry.aliases = [{ term: "A/C", locale: "es", countries: ["MX", "CR"] }];
+      entry.relatedTerms = [];
+      expect(issuesOf(parse(entry))).toEqual([]);
+    });
   });
 
   it("is enforced by the schema on the canonical term field", () => {

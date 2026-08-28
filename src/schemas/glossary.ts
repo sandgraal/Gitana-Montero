@@ -51,6 +51,17 @@
  *   unchanged — claiming `fsm-confirmed` for a word nobody can point at in a
  *   document fails at parse time.
  *
+ * **Owner ruling, 2026-08-28 — the confidence caveat does not apply to this
+ * collection.** AGENTS.md renders a visible caveat on anything below `tsb`,
+ * because presenting an `anecdotal` repair claim with the authority of an FSM
+ * spec can cost a reader money or safety. A glossary entry makes no repair
+ * claim: it records what a part is *called*. A caveat on "in Costa Rica the
+ * tire is the llanta" would be noise on every card and would train readers to
+ * ignore the caveat where it does matter. `confidence` therefore stays in the
+ * data for provenance and for the gaps report, and the page renders no
+ * caveat. The carve-out is recorded against AGENTS.md by the conductor; it is
+ * specific to `glossary` and extends to no other collection.
+ *
  * ## What deliberately is *not* here
  *
  * Cross-collection references (`this term is explained by problem X`) are
@@ -77,7 +88,10 @@ import {
 
 /**
  * The system a term belongs to. These are **ids**, not labels: the words a
- * visitor reads are `glossarySystems` in `src/i18n/ui.ts`, in both locales.
+ * visitor reads live in `src/i18n/ui.ts` under the `glossarySystem.<id>` keys
+ * and are read through `glossarySystemLabel(strings, system)`, in both
+ * locales. The key set is derived from this array by a mapped type, so adding
+ * a system here without naming it in both locales is a type error.
  *
  * Ordered roughly the way a service manual is: powertrain, then chassis, then
  * body and support systems, with `general` last for terms that belong to no
@@ -128,6 +142,52 @@ export const CANONICAL_TERM_PROSE_FIELD = "title";
 export const TERM_MAX_LENGTH = 60;
 
 /**
+ * Longest either side of a `/` may be while the slash still reads as part of
+ * one term rather than as "or".
+ *
+ * Slash-joined single forms in this domain are abbreviations — `A/C`,
+ * `ABS/EBD`, `4WD/2WD`, `P/N`, `km/h` — and abbreviations are short. A side
+ * longer than this is a whole word, and two whole words either side of a
+ * slash is an alternation (`cambios/transmisión`).
+ */
+const SLASH_SIDE_MAX_LENGTH = 4;
+
+/**
+ * Whether `value` reads as two alternative forms rather than one term.
+ *
+ * Two candidate forms crammed into one field (`aro / rin`, `aro|rin`) would
+ * make the conformance gate search ES prose for a string no author ever
+ * writes, so they are rejected. A slash *inside* a single form is not: an
+ * earlier revision rejected every `/`, which blocked `A/C` and `ABS/EBD` as
+ * canonical terms and — because the same rule governs `aliases` — meant a
+ * reader typing `A/C` into the glossary search could never match anything
+ * (GLO-03).
+ *
+ * Three signals, in order of how certain they are:
+ *
+ * 1. `|` anywhere. No automotive term contains a pipe; it is only ever "or".
+ * 2. Whitespace next to the separator (`aro / rin`, `aro/ rin`). Nobody
+ *    spaces out an abbreviation's slash.
+ * 3. A slash-containing token with a side longer than
+ *    {@link SLASH_SIDE_MAX_LENGTH}. This is the only heuristic of the three,
+ *    and it fails in the safe direction: a genuinely long slash-joined single
+ *    form would be rejected at parse time with a message naming the fix,
+ *    which an author sees immediately — whereas the old rule silently pushed
+ *    `A/C` out of the glossary entirely.
+ */
+export function readsAsAlternation(value: string): boolean {
+  if (/\|/.test(value)) return true;
+  if (/\s\/|\/\s/.test(value)) return true;
+
+  return value
+    .split(/\s+/)
+    .filter((token) => token.includes("/"))
+    .some((token) =>
+      token.split("/").some((side) => side.length > SLASH_SIDE_MAX_LENGTH)
+    );
+}
+
+/**
  * Why a string is not usable as a canonical term, or `null` when it is.
  *
  * The rules are all "this is not a bare lexical form". They exist because
@@ -165,10 +225,12 @@ export function canonicalTermIssue(value: string): string | null {
       "entry, not part of the canonical form (GLO-01)"
     );
   }
-  if (/[/|]/.test(value)) {
+  if (readsAsAlternation(value)) {
     return (
-      "must not contain `/` or `|` — one entry designates exactly one " +
-      "canonical form per locale; the other forms are `aliases` (GLO-01)"
+      "reads as two alternative forms — one entry designates exactly one " +
+      "canonical form per locale, and the other forms are `aliases`. " +
+      "A slash inside a single term (`A/C`, `ABS/EBD`, `4WD/2WD`) is fine " +
+      "(GLO-01)"
     );
   }
   return null;

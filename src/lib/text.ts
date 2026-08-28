@@ -46,11 +46,21 @@ export function normalizeForSearch(value: string): string {
  * inverted the moment the pattern ends in a non-ASCII letter) and quietly
  * fails to match at end of sentence. Comparing token *sequences* is exact,
  * Unicode-safe, and gives multi-word terms (`pastillas de freno`) for free.
+ *
+ * **An internal hyphen joins, it does not split.** `goma-espuma` is one
+ * token, not `goma` + `espuma`. Splitting on the hyphen made a hyphenated
+ * compound match its first element, so a glossary variant `goma` fired on
+ * `goma-espuma` — a false positive in a merge-blocking gate, and a direct
+ * contradiction of the "cannot match inside another word" guarantee the scan
+ * is built on. Only the ASCII hyphen joins, and only between two word
+ * characters: a trailing `goma-` still yields `goma`, and an em dash used as
+ * punctuation (`rin — goma`) still separates.
  */
 export function tokenize(
   text: string
 ): { value: string; index: number; length: number }[] {
-  const pattern = /[\p{L}\p{N}][\p{L}\p{M}\p{N}]*/gu;
+  const pattern =
+    /[\p{L}\p{N}][\p{L}\p{M}\p{N}]*(?:-[\p{L}\p{N}][\p{L}\p{M}\p{N}]*)*/gu;
   const tokens: { value: string; index: number; length: number }[] = [];
   for (const match of text.matchAll(pattern)) {
     tokens.push({

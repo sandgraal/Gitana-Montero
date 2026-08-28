@@ -100,16 +100,15 @@ const en: UiStrings = {
   glossaryHeading: "Glossary",
   glossaryIntro:
     "The Costa Rican terms this site uses, with their English equivalents. Regional variants are recorded as searchable aliases and never used in the Spanish text.",
-  glossarySearchLabel: "Search terms and regional variants",
+  glossarySearchLabel: "Search for terms and regional variants",
   glossarySearchPlaceholder: "Search any variant — rin, goma, balatas…",
   glossaryFilterLabel: "Filter by system",
   glossaryFilterAll: "All systems",
   glossaryAliasesLabel: "Also called",
-  glossaryFalseFriendLabel: "means something else here",
+  glossaryFalseFriendLabel: "means something else in Costa Rica",
   glossaryRelatedLabel: "See also",
   glossaryNoResults: "No terms match that search or filter.",
-  glossaryEmpty:
-    "The glossary has no terms yet. The first set of terms lands with the glossary seed.",
+  glossaryEmpty: "The glossary has no terms yet.",
   glossaryCountTemplate: "Showing {shown} of {total} terms",
   "glossarySystem.engine": "Engine",
   "glossarySystem.fuel": "Fuel system",
@@ -156,26 +155,20 @@ const es: UiStrings = {
   rootRedirectManual: "Si no pasa nada, elija un idioma:",
   glossaryHeading: "Glosario",
   glossaryIntro:
-    "Los términos costarricenses que usa este sitio, con su equivalente en inglés. Las variantes de otros países quedan registradas como alias que se pueden buscar y nunca se usan en el texto en español.",
+    "Los términos costarricenses que usa este sitio, con su equivalente en inglés. Las variantes regionales quedan registradas como alias que se pueden buscar y nunca se usan en el texto en español.",
   glossarySearchLabel: "Busque términos y variantes regionales",
   glossarySearchPlaceholder: "Busque cualquier variante — rin, goma, balatas…",
-  glossaryFilterLabel: "Filtrar por sistema",
-  // "Todos los sistemas" is the literal pair for the EN label, but
-  // `ui.test.ts`'s placeholder guard is `/^(TODO|TBD|FIXME)/i`, which any
-  // Spanish string starting with "Todo…" trips. Reported as a finding on the
-  // T205 branch rather than edited — the grader is not this task's to change,
-  // and "Cualquier sistema" is idiomatic for a filter reset either way.
-  glossaryFilterAll: "Cualquier sistema",
+  glossaryFilterLabel: "Filtre por sistema",
+  glossaryFilterAll: "Todos los sistemas",
   glossaryAliasesLabel: "También se le dice",
-  glossaryFalseFriendLabel: "aquí significa otra cosa",
+  glossaryFalseFriendLabel: "en Costa Rica significa otra cosa",
   glossaryRelatedLabel: "Vea también",
   glossaryNoResults: "Ningún término coincide con esa búsqueda o ese filtro.",
-  glossaryEmpty:
-    "El glosario todavía no tiene términos. Los primeros llegan con la carga inicial del glosario.",
-  glossaryCountTemplate: "Mostrando {shown} de {total} términos",
+  glossaryEmpty: "El glosario todavía no tiene términos.",
+  glossaryCountTemplate: "Se muestran {shown} de {total} términos",
   "glossarySystem.engine": "Motor",
-  "glossarySystem.fuel": "Combustible",
-  "glossarySystem.cooling": "Enfriamiento",
+  "glossarySystem.fuel": "Sistema de combustible",
+  "glossarySystem.cooling": "Refrigeración",
   "glossarySystem.exhaust": "Escape",
   "glossarySystem.transmission": "Transmisión",
   "glossarySystem.transfer-case": "Caja de transferencia",
@@ -189,7 +182,7 @@ const es: UiStrings = {
   "glossarySystem.body": "Carrocería",
   "glossarySystem.interior": "Interior y acabados",
   "glossarySystem.tools": "Herramientas",
-  "glossarySystem.fluids": "Fluidos",
+  "glossarySystem.fluids": "Líquidos",
   "glossarySystem.general": "Términos generales",
 };
 

@@ -13,14 +13,18 @@
  *
  * refs specs/001-foundation (SCF-02, GLO-01, GLO-02)
  */
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import {
   CANONICAL_TERM_PROSE_FIELD,
   MIN_SCANNABLE_ALIAS_LENGTH,
+  UI_STRING_EXEMPTIONS,
   auditGlossary,
   buildGlossaryIndex,
+  extractUiEsStrings,
   findAliasUsages,
+  findUiStringIssues,
   normalizeForSearch,
   tokenize,
 } from "../scripts/check-glossary.mjs";
@@ -302,6 +306,70 @@ describe("canonical-term conformance in ES prose", () => {
     expect(messages([short, prose("El ac del motor.")])).toEqual([]);
   });
 
+  it("never matches inside a hyphenated compound", () => {
+    // An internal hyphen joins the token rather than splitting it. Before
+    // that fix `goma-espuma` tokenized to ["goma","espuma"], so the variant
+    // `goma` fired on it — a false positive in a merge-blocking gate, and a
+    // direct contradiction of "cannot match inside another word".
+    expect(messages([llanta, prose("Selle con goma-espuma nueva.")])).toEqual(
+      []
+    );
+    // …and the bare word on its own is still caught, so the fix did not just
+    // turn the rule off.
+    expect(codes([llanta, prose("Selle con goma nueva.")])).toEqual([
+      "non-canonical-term",
+    ]);
+  });
+
+  it("never scans a variant with a one-character token", () => {
+    // `A/C` tokenizes to ["a","c"], which would match punctuated prose such
+    // as "la A. C. del taller".
+    const ac = term({
+      id: "aire-acondicionado",
+      es: "aire acondicionado",
+      en: "air conditioning",
+      aliases: [{ term: "A/C", locale: "es", countries: ["MX", "CR"] }],
+    });
+    expect(messages([ac, prose("Revise la A. C. del taller.")])).toEqual([]);
+  });
+
+  /*
+   * The no-morphological-expansion silence, pinned (C6). These are the one
+   * place recall is knowingly traded away, so a future stemming change has to
+   * break a test rather than silently widen a merge-blocking gate.
+   */
+  describe("no morphological expansion (pinned negatives)", () => {
+    const pads = term({
+      id: "pastillas-de-freno",
+      es: "pastillas de freno",
+      en: "brake pads",
+      aliases: [{ term: "balatas", locale: "es", countries: ["MX"] }],
+    });
+    const wheel = term({
+      id: "aro",
+      es: "aro",
+      en: "wheel",
+      aliases: [{ term: "rin", locale: "es", countries: ["MX", "CO"] }],
+    });
+
+    it("a declared plural does not catch the singular", () => {
+      expect(messages([pads, prose("Cambie una balata.")])).toEqual([]);
+    });
+
+    it("a declared singular does not catch the plural", () => {
+      expect(messages([wheel, prose("Compró cuatro rines.")])).toEqual([]);
+    });
+
+    it("the declared form itself is still caught (control)", () => {
+      expect(codes([pads, prose("Cambie las balatas.")])).toEqual([
+        "non-canonical-term",
+      ]);
+      expect(codes([wheel, prose("Compró un rin.")])).toEqual([
+        "non-canonical-term",
+      ]);
+    });
+  });
+
   it("reports every occurrence in every prose field", () => {
     const entry = {
       collection: "problems",
@@ -425,6 +493,154 @@ describe("buildGlossaryIndex", () => {
     const index = buildGlossaryIndex([prose("Nada que ver.")] as never[]);
     expect(index.glossary).toEqual([]);
     expect(index.scannable).toEqual([]);
+  });
+
+  it("records every deliberately-unscanned variant with its reason", () => {
+    // A silently dropped variant is a gate that has stopped working without
+    // anyone noticing, so exclusions are data, not just an absence.
+    const index = buildGlossaryIndex([
+      term({
+        id: "aro",
+        es: "aro",
+        en: "wheel",
+        aliases: [
+          { term: "rin", locale: "es", countries: ["MX"] },
+          {
+            term: "llanta",
+            locale: "es",
+            countries: ["ES"],
+            falseFriend: true,
+          },
+          { term: "ll", locale: "es", countries: ["ES"] },
+        ],
+      }),
+      llanta,
+    ] as never[]);
+
+    const skipped = Object.fromEntries(
+      index.skipped.map((entry: { term: string; reason: string }) => [
+        entry.term,
+        entry.reason,
+      ])
+    );
+    expect(skipped["llanta"]).toBe("marked falseFriend");
+    expect(skipped["ll"]).toBe("shorter than the minimum scannable length");
+    expect(index.skipped.every((e: { ownerId: string }) => e.ownerId)).toBe(
+      true
+    );
+  });
+
+  it("names the canonical-collision exclusions rather than only counting them", () => {
+    const aro = term({
+      id: "aro",
+      es: "aro",
+      en: "wheel",
+      aliases: [{ term: "llanta", locale: "es", countries: ["ES"] }],
+    });
+    const index = buildGlossaryIndex([aro, llanta] as never[]);
+    const collision = index.skipped.find(
+      (entry: { term: string }) => entry.term === "llanta"
+    );
+    expect(collision).toMatchObject({
+      term: "llanta",
+      reason: "is also a canonical term",
+      ownerId: "aro",
+      ownerFile: "src/content/glossary/aro.yaml",
+    });
+  });
+});
+
+describe("the ES UI strings are scanned too (I18N-08 chrome is prose)", () => {
+  const uiSource = (body: string) => `const es: UiStrings = {\n${body}\n};\n`;
+
+  it("flags a regional variant in a chrome string, naming the key", () => {
+    const problems = findUiStringIssues(
+      uiSource('  navGoma: "Revise la goma",'),
+      buildGlossaryIndex([llanta] as never[]).scannable
+    );
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toMatchObject({
+      file: "src/i18n/ui.ts",
+      field: "es.navGoma",
+      term: "goma",
+      canonical: "llanta",
+    });
+  });
+
+  it("is clean when the chrome uses canonical terms", () => {
+    expect(
+      findUiStringIssues(
+        uiSource('  navLlanta: "Revise la llanta",'),
+        buildGlossaryIndex([llanta] as never[]).scannable
+      )
+    ).toEqual([]);
+  });
+
+  it("exempts glossarySearchPlaceholder by name, and only it", () => {
+    const scannable = buildGlossaryIndex([llanta] as never[]).scannable;
+    expect(UI_STRING_EXEMPTIONS.has("glossarySearchPlaceholder")).toBe(true);
+    expect(
+      findUiStringIssues(
+        uiSource('  glossarySearchPlaceholder: "Busque goma o neumático",'),
+        scannable
+      )
+    ).toEqual([]);
+    expect(
+      findUiStringIssues(
+        uiSource('  glossarySearchLabel: "Busque goma o neumático",'),
+        scannable
+      )
+    ).not.toEqual([]);
+  });
+
+  it("gives every exemption a stated reason", () => {
+    for (const [key, reason] of UI_STRING_EXEMPTIONS) {
+      expect(typeof reason, key).toBe("string");
+      expect(reason.trim().length, key).toBeGreaterThan(20);
+    }
+  });
+
+  it("does not scan the EN block", () => {
+    const source =
+      'const en: UiStrings = {\n  x: "Check the goma",\n};\n' +
+      uiSource('  y: "Revise la llanta",');
+    expect(
+      findUiStringIssues(
+        source,
+        buildGlossaryIndex([llanta] as never[]).scannable
+      )
+    ).toEqual([]);
+  });
+});
+
+describe("extractUiEsStrings", () => {
+  it("reads keys and values, quoted keys included", () => {
+    const source =
+      "const es: UiStrings = {\n" +
+      '  navHome: "Inicio",\n' +
+      '  "glossarySystem.brakes": "Frenos",\n' +
+      "};\n";
+    expect(extractUiEsStrings(source)).toEqual([
+      { key: "navHome", value: "Inicio" },
+      { key: "glossarySystem.brakes", value: "Frenos" },
+    ]);
+  });
+
+  it("returns nothing when the block is absent", () => {
+    expect(extractUiEsStrings("export const x = 1;")).toEqual([]);
+  });
+
+  it("reads the real src/i18n/ui.ts ES block", () => {
+    // Guards the regex against the real file's shape drifting away from it —
+    // an extractor that silently reads nothing is an audit that passes by
+    // auditing nothing.
+    const source = readFileSync(
+      new URL("../src/i18n/ui.ts", import.meta.url),
+      "utf8"
+    );
+    const found = extractUiEsStrings(source);
+    expect(found.length).toBeGreaterThan(20);
+    expect(found.map((pair) => pair.key)).toContain("glossaryHeading");
   });
 });
 

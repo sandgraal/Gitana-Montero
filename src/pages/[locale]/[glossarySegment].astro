@@ -35,18 +35,32 @@
  * script uses, so an alias search (`rin` → `aro`, SRCH-02's shape) works with
  * no index and no fetch. The real search index is T702.
  *
+ * ## The headword — owner ruling, 2026-08-28
+ *
+ * **The locale's own term leads.** On `/es/glosario/` the big word is the
+ * Costa Rican term and the English one is the gloss; on `/en/glossary/` it is
+ * the other way round. The artboard shows the ES term leading on both pages,
+ * and the owner ruled for per-locale leading instead: an English reader
+ * scanning ~150 cards needs their own headword to scan by, and I18N-01's
+ * "neither locale privileged" applies to the card as much as to the URL. The
+ * conductor is recording the deviation in HANDOFF-DESIGN.md.
+ *
  * ## Styling
  *
  * Palette, type scale and card anatomy follow
- * `specs/001-foundation/design/artboards/Glosario.dc.html`, with two
- * deliberate departures, both required by constraints the handoff itself
- * lists: the artboard's `faint` (#A99C88) fails WCAG AA on paper and on white
- * (2.5:1 and 2.7:1 against a 4.5:1 requirement), so secondary text uses
- * `muted` (#6E6559, 5.3:1); and the Archivo / IBM Plex Mono webfonts are
- * *named* but not loaded here, because loading a webfont is a site-chrome
- * decision for the task that restyles the chrome, not something one page
- * should do to the whole site's performance budget. Declaring the families
- * means this page picks them up for free the day they are loaded.
+ * `specs/001-foundation/design/artboards/Glosario.dc.html`, with three
+ * deliberate departures, all required by constraints the handoff itself
+ * lists:
+ *
+ * 1. The artboard's `faint` (#A99C88) fails WCAG AA on paper and on white
+ *    (2.5:1 and 2.7:1 against a 4.5:1 requirement), so secondary text uses
+ *    `muted` (#6E6559, 5.3:1).
+ * 2. `See also` links sit on a `chip` background, where the handoff's `rust`
+ *    measures 4.22:1 under Pa11y — they use `rust-deep` (5.6:1) instead.
+ * 3. The Archivo / IBM Plex Mono webfonts are *named* but not loaded here:
+ *    loading a webfont is a site-chrome decision (T204 owns it), not
+ *    something one page should do to the whole site's performance budget.
+ *    Declaring the families means this page picks them up the day they load.
  *
  * refs specs/001-foundation (GLO-01, GLO-04, I18N-01, I18N-04, I18N-08)
  */
