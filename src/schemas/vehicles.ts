@@ -46,10 +46,33 @@
  * a field of the entry rather than a list on the offering for the same reason:
  * the same powertrain usually ran different years in different markets.
  *
- * An offering's `trims` is an assertion about **every** trim listed; omitting
- * it means "not recorded at trim granularity", which the resolver must treat as
- * *unknown*, not as *impossible* (VEH-03 is about rejecting combinations that
- * never existed, and an unrecorded trim is not evidence of absence).
+ * ### When absence means *impossible* and when it means *unknown*
+ *
+ * VEH-03's rejectability rests entirely on this distinction, so it is data
+ * rather than convention. These are the four rules the resolver (T203)
+ * implements; `coverage` on each combination entry is what makes rules 1 and 2
+ * distinguishable at all:
+ *
+ * 1. **A tuple absent from a `coverage: "complete"` entry is impossible.**
+ *    `complete` is a claim that the sourced offerings are the *whole* list for
+ *    that generation and market, so within that scope the world is closed and
+ *    an unlisted tuple is a combination that never existed. Rejectable.
+ * 2. **A tuple absent from a `coverage: "partial"` entry is unknown.** The
+ *    entry only claims that what it lists existed. Never rejectable.
+ * 3. **A (generation, market) pair with no combination entry at all is
+ *    unknown, never impossible.** During T201's incremental build most pairs
+ *    are simply unwritten, and answering "that vehicle never existed" because
+ *    nobody has typed it up yet is a confident wrong answer on the spine —
+ *    the failure mode this taxonomy exists to prevent. Missing scope belongs
+ *    in the gaps report (GAP-01), not in a build error.
+ * 4. **An offering's `trims` is an assertion about every trim listed;**
+ *    omitting it means "not recorded at trim granularity" — unknown, not
+ *    impossible, and unaffected by `coverage`, which is a claim about the
+ *    offering list and not about any offering's internals.
+ *
+ * The asymmetry is deliberate: a wrong *impossible* silently hides a real
+ * vehicle from a reader who owns it, while a wrong *unknown* only fails to
+ * catch a typo. Only an explicit, sourced `complete` buys the stronger answer.
  *
  * ## What this module deliberately does not do
  *
@@ -214,6 +237,29 @@ export const TRANSFER_CASE_FAMILIES = [
 ] as const;
 
 export type TransferCaseFamily = (typeof TRANSFER_CASE_FAMILIES)[number];
+
+/* -------------------------------------------------------------------------
+ * Combination coverage — VEH-03
+ * ---------------------------------------------------------------------- */
+
+/**
+ * How much of its (generation, market) scope a combination entry claims to
+ * cover — the difference between "this tuple never existed" and "nobody has
+ * written it down yet" (rules 1 and 2 in the VEH-03 section above).
+ *
+ * - `complete` — the offerings are the whole list for this generation and
+ *   market. An unlisted tuple is *impossible* and the resolver may reject it.
+ * - `partial` — the offerings are what has been sourced so far. An unlisted
+ *   tuple is *unknown* and is never rejected; the missing coverage is gaps-report
+ *   material (GAP-01).
+ *
+ * Required, with no default. A default would pick one of those readings on the
+ * author's behalf, and the whole point of the field is that the closed-world
+ * claim be made deliberately by someone who checked a source.
+ */
+export const COMBINATION_COVERAGE = ["complete", "partial"] as const;
+
+export type CombinationCoverage = (typeof COMBINATION_COVERAGE)[number];
 
 /* -------------------------------------------------------------------------
  * Shared primitives
@@ -442,6 +488,12 @@ export const VEHICLE_KIND_SHAPES = {
   combination: {
     generation: generationIdSchema,
     market: marketSchema,
+    /**
+     * Whether `offerings` is the whole list for this scope. Decides whether an
+     * unlisted tuple is impossible or merely unknown — see the VEH-03 section
+     * of the module docstring.
+     */
+    coverage: z.enum(COMBINATION_COVERAGE),
     offerings: offeringsSchema,
   },
 } as const satisfies Record<VehicleKind, z.ZodRawShape>;
@@ -650,9 +702,9 @@ function checkKindShape(
 /**
  * An entry's fitment has to agree with what the entry is about. A generation
  * entry whose fitment names a different generation, or a combination entry
- * whose fitment omits the generation it describes, is incoherent in a way no
- * downstream page could recover from — and it is the cheapest possible check,
- * because both halves are in the same file.
+ * whose fitment does not name exactly the generation and market it describes,
+ * is incoherent in a way no downstream page could recover from — and it is the
+ * cheapest possible check, because both halves are in the same file.
  */
 function checkFitmentCoherence(
   entry: VehicleEntryShape,
@@ -700,28 +752,46 @@ function checkFitmentCoherence(
 
   if (kind !== "combination") return;
 
+  /*
+   * Both halves of the scope are checked the same way, and both exactly.
+   *
+   * `fitment.markets` is optional in the base fitment shape, where omitting it
+   * correctly means "no market restriction" — a torque figure applies in every
+   * market. A combination entry is the one place that reading is wrong: the
+   * entry's every fact is scoped to one market by construction, so an omitted
+   * `markets` would publish a single market's powertrain list as if it were
+   * global. Requiring it here does not change the base rule; it says this kind
+   * of entry has no unrestricted-market form.
+   *
+   * Exact rather than "includes" for the same reason the generation kind is
+   * exact: a fitment naming *more* than the entry's scope claims the entry's
+   * facts cover vehicles it says nothing about.
+   */
   const { generation, market } = entry;
-  if (typeof generation === "string" && !genList.includes(generation)) {
-    ctx.addIssue({
-      code: "custom",
-      path: ["fitment", "gens"],
-      message:
-        `this entry records combinations for \`${generation}\`, so its ` +
-        `fitment must include that generation (VEH-03)`,
-    });
+  if (typeof generation === "string") {
+    if (genList.length !== 1 || genList[0] !== generation) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["fitment", "gens"],
+        message:
+          `this entry records combinations for \`${generation}\` only, so its ` +
+          `fitment is exactly ["${generation}"], not ` +
+          `${JSON.stringify(genList)} (VEH-03)`,
+      });
+    }
   }
-  if (
-    typeof market === "string" &&
-    marketList.length > 0 &&
-    !marketList.includes(market)
-  ) {
-    ctx.addIssue({
-      code: "custom",
-      path: ["fitment", "markets"],
-      message:
-        `this entry records combinations for the \`${market}\` market, so its ` +
-        `fitment must include that market (VEH-03)`,
-    });
+  if (typeof market === "string") {
+    if (marketList.length !== 1 || marketList[0] !== market) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["fitment", "markets"],
+        message:
+          `this entry records combinations for the \`${market}\` market only, ` +
+          `so its fitment is exactly ["${market}"], not ` +
+          `${JSON.stringify(marketList)} — an omitted \`markets\` would ` +
+          `publish one market's powertrains as if they were global (VEH-03)`,
+      });
+    }
   }
 }
 

@@ -19,6 +19,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "astro/zod";
 import {
   CHASSIS_CODE_PATTERN,
+  COMBINATION_COVERAGE,
   ENGINE_FAMILIES,
   ENGINE_FAMILY_FUEL,
   GENERATION_IDS,
@@ -107,6 +108,7 @@ function combination(
     fitment: { gens: ["gen3"], markets: ["cr"] },
     generation: "gen3",
     market: "cr",
+    coverage: "complete",
     offerings: [
       {
         years: { from: 2000, to: 2006 },
@@ -369,9 +371,25 @@ describe("fitment coherence with the node's own subject", () => {
     ).toContain("fitment.markets");
   });
 
-  it("accepts a combination entry that leaves fitment.markets unset", () => {
-    expect(messages(combination({ fitment: { gens: ["gen3"] } }))).toBe("");
+  it("rejects a combination entry that leaves fitment.markets unset", () => {
+    // The base fitment shape treats an absent `markets` as "no market
+    // restriction", which is right for a torque figure and wrong for an entry
+    // whose every fact is scoped to one market: it would publish one market's
+    // powertrain list as global.
+    const entry = combination({ fitment: { gens: ["gen3"] } });
+    expect(paths(entry)).toContain("fitment.markets");
+    expect(messages(entry)).toMatch(/as if they were global/);
   });
+
+  it.each([
+    ["gens", { gens: ["gen3", "gen4"], markets: ["cr"] }, "fitment.gens"],
+    ["markets", { gens: ["gen3"], markets: ["cr", "us"] }, "fitment.markets"],
+  ])(
+    "rejects a combination entry whose fitment.%s is broader than its scope",
+    (_half, fitment, path) => {
+      expect(paths(combination({ fitment }))).toContain(path);
+    }
+  );
 
   it("rejects a generation that is its own parent", () => {
     expect(paths(generation({ parentGeneration: "gen3" }))).toContain(
@@ -470,6 +488,53 @@ describe("transmissions and transfer cases (VEH-01)", () => {
         })
       )
     ).toContain("transferCaseFamily");
+  });
+});
+
+describe("coverage — impossible vs merely unrecorded (VEH-03)", () => {
+  it.each(COMBINATION_COVERAGE)("accepts coverage `%s`", (coverage) => {
+    expect(messages(combination({ coverage }))).toBe("");
+  });
+
+  it("requires coverage, with no default reading of the offering list", () => {
+    const { coverage: _dropped, ...rest } = combination();
+    void _dropped;
+    // A default would decide on the author's behalf whether an unlisted tuple
+    // is impossible or unknown — the one judgement this field exists to make
+    // explicit.
+    expect(paths(rest)).toContain("coverage");
+    expect(messages(rest)).toMatch(/kind: combination/);
+  });
+
+  it("rejects a coverage value outside the two readings", () => {
+    expect(paths(combination({ coverage: "mostly" }))).toContain("coverage");
+    expect(paths(combination({ coverage: true }))).toContain("coverage");
+  });
+
+  it("offers coverage on combination entries only", () => {
+    // A generation entry has no offering list, so the closed-world claim is
+    // meaningless there and must be reported as a foreign field.
+    expect(paths(generation({ coverage: "complete" }))).toContain("coverage");
+  });
+
+  it("keeps coverage independent of an offering's trim granularity", () => {
+    // Rule 4: `coverage` is a claim about the offering list, not about any
+    // offering's internals, so a complete entry may still omit trims.
+    expect(
+      messages(
+        combination({
+          coverage: "complete",
+          offerings: [
+            {
+              years: { from: 2000, to: 2006 },
+              engine: "6g74-sohc",
+              transmission: "v5a51-5at",
+              transferCase: "super-select-ii",
+            },
+          ],
+        })
+      )
+    ).toBe("");
   });
 });
 
