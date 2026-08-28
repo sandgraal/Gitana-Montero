@@ -1,0 +1,45 @@
+{
+  "id": "expedition-portal-mitsubishi-forum",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["global"]
+  },
+  "communityType": "forum",
+  "regions": ["001"],
+  "languages": ["en"],
+  "activity": "very-active",
+  "activityAssessed": "2026-08-28",
+  "url": "https://forum.expeditionportal.com/forums/mitsubishi.94/",
+  "confidence": "first-hand",
+  "sources": [
+    {
+      "title": "Mitsubishi — Expedition Portal forum",
+      "url": "https://forum.expeditionportal.com/forums/mitsubishi.94/",
+      "archiveUrl": "https://web.archive.org/web/20260828153423/https://forum.expeditionportal.com/forums/mitsubishi.94/",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Expedition Portal — Mitsubishi forum",
+      "summary": "The Mitsubishi section of Expedition Portal, an overland-travel and vehicle-build forum. It carries pinned build-thread collections specific to the Montero/Pajero (separate from the Montero Sport and Raider threads that also live in this section, both outside this site's scope) and reference threads like a Gen 2.5 capacities/part-numbers/specialty-tools list, with posts within months of the last check.",
+      "goodFor": [
+        "Overland/expedition-focused Montero and Pajero builds",
+        "A pinned \"Collection of ExPo Montero Build Threads 2.0\" index",
+        "A Gen 2.5 (NL) capacities, part numbers and specialty tools reference thread",
+        "Cross-pollination with the wider overland-vehicle community (roof racks, storage, long-range fuel)"
+      ]
+    },
+    "es": {
+      "title": "Expedition Portal — foro de Mitsubishi",
+      "summary": "La sección de Mitsubishi dentro de Expedition Portal, un foro de viajes overland y preparación de vehículos. Tiene recopilaciones fijas de hilos de preparación específicos de la Montero/Pajero (aparte de los hilos sobre el Montero Sport y el Raider que también están en esta sección, ambos fuera del alcance de este sitio) y temas de referencia como una lista de capacidades, números de parte y herramientas especiales de la Gen 2.5, con publicaciones de apenas meses antes de la última revisión.",
+      "goodFor": [
+        "Preparación de la Montero y el Pajero orientada a viajes overland",
+        "Un índice fijo de \"Collection of ExPo Montero Build Threads 2.0\"",
+        "Un hilo de referencia con capacidades, números de parte y herramientas especiales de la Gen 2.5 (NL)",
+        "Contacto con la comunidad overland en general (parrillas de techo, almacenamiento, combustible de largo alcance)"
+      ]
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "veinsa-motors-mitsubishi-costa-rica",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["cr"]
+  },
+  "communityType": "vendor",
+  "regions": ["CR"],
+  "languages": ["es-CR"],
+  "activity": "very-active",
+  "activityAssessed": "2026-08-28",
+  "url": "https://mitsubishi.cr/contacto/",
+  "links": [{ "kind": "website", "url": "https://veinsamotors.com/" }],
+  "confidence": "first-hand",
+  "sources": [
+    {
+      "title": "Contacto Agencia Mitsubishi — Mitsubishi Costa Rica (Veinsa Motors)",
+      "url": "https://mitsubishi.cr/contacto/",
+      "archiveUrl": "https://web.archive.org/web/20260828153105/https://mitsubishi.cr/contacto/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Mitsubishi Costa Rica (Veinsa Motors) — dealer network",
+      "summary": "The Mitsubishi agency site for Costa Rica, self-described in its own page metadata as part of the \"Veinsa Brands Network,\" listing new-vehicle sales, a specialised service workshop, and original (OEM) repuestos as its three services, spread across 11 branch locations shown on the page, in San José, Alajuela, Heredia, Guanacaste and Limón, including branches in San Carlos and Guápiles. The site's own navigation also labels it \"Mitsubishi Motors Authorized Distributor\" (nav chrome, a dead link, not body copy). Fitment here is recorded as every generation rather than a subset — the page itself is a contact/branch-locator page with no model history, so no generation-specific claim is attributed to it.",
+      "goodFor": [
+        "Original OEM parts sourcing for a Costa Rican-market Montero",
+        "Dealer-level diagnostic and repair work",
+        "A multi-branch network across several provinces, not a single shop, with posted service hours"
+      ]
+    },
+    "es": {
+      "title": "Mitsubishi Costa Rica (Veinsa Motors) — red de agencias",
+      "summary": "El sitio de la agencia Mitsubishi para Costa Rica, que en los metadatos de su propia página se describe como parte de la \"Veinsa Brands Network\", con venta de vehículos nuevos, taller de servicio especializado y repuestos originales (OEM) como sus tres servicios, repartidos en 11 sucursales que muestra la página, en San José, Alajuela, Heredia, Guanacaste y Limón, incluidas sucursales en San Carlos y Guápiles. La navegación del propio sitio también lo identifica como \"Mitsubishi Motors Authorized Distributor\" (texto de navegación, un enlace muerto, no contenido de la página). La compatibilidad (fitment) se registra aquí como todas las generaciones, no un subconjunto — la página en sí es de contacto y ubicación de sucursales, sin historia de modelos, así que no se le atribuye ninguna afirmación sobre generaciones específicas.",
+      "goodFor": [
+        "Conseguir repuestos originales (OEM) para una Montero de mercado costarricense",
+        "Trabajo de diagnóstico y reparación a nivel de agencia",
+        "Una red de varias sucursales en distintas provincias, no un solo taller, con horarios de servicio publicados"
+      ]
+    }
+  }
+}

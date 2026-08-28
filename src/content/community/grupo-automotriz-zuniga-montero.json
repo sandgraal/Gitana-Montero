@@ -1,0 +1,43 @@
+{
+  "id": "grupo-automotriz-zuniga-montero",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["cr"]
+  },
+  "communityType": "shop",
+  "regions": ["CR"],
+  "languages": ["es-CR"],
+  "activity": "active",
+  "activityAssessed": "2024-02-20",
+  "url": "https://grupoautomotrizzuniga.com/producto/repuestos-mitsubishi-montero/",
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Repuestos Mitsubishi Montero — Grupo Automotriz Zúñiga",
+      "url": "https://grupoautomotrizzuniga.com/producto/repuestos-mitsubishi-montero/",
+      "archiveUrl": "http://web.archive.org/web/20240220224103/https://grupoautomotrizzuniga.com/producto/repuestos-mitsubishi-montero/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Grupo Automotriz Zúñiga — Montero repuestos",
+      "summary": "A Costa Rican repuestos shop in San Joaquín de Flores, Heredia, listing body, engine and drivetrain parts specifically for the Montero (bumpers, lights, doors, llantas and aros, plus engine and drivetrain components) with a WhatsApp contact line for quotes. The page does not specify if the repuestos are new or used, so that distinction is not claimed here. The citation is an archived snapshot from February 2024 — today's live site only returned a rate-limit response (HTTP 429) to repeated automated checks, so the confidence tier and dates below reflect a 2024 read, not a reconfirmed one.",
+      "goodFor": [
+        "Montero body panels and glass in the Heredia/San Joaquín de Flores area",
+        "Drivetrain parts: differentials, transmission units (cajas de transmisión), driveshafts, steering racks",
+        "A WhatsApp quote line alongside a landline number"
+      ]
+    },
+    "es": {
+      "title": "Grupo Automotriz Zúñiga — repuestos para Montero",
+      "summary": "Una repuestera costarricense en San Joaquín de Flores, Heredia, con repuestos de carrocería, motor y tren motriz específicamente para la Montero (bumpers, faroles, puertas, llantas y aros, además de repuestos de motor y tren motriz), con línea de WhatsApp para cotizaciones. La página no indica si los repuestos son nuevos o usados, así que esa distinción no se afirma aquí. La cita es una captura archivada de febrero de 2024 — hoy el sitio en vivo solo devolvió una respuesta de límite de tráfico (HTTP 429) ante revisiones automatizadas repetidas, así que el nivel de confianza y las fechas de abajo reflejan una lectura de 2024, no una reconfirmada.",
+      "goodFor": [
+        "Repuestos de carrocería y vidrios de Montero en la zona de Heredia/San Joaquín de Flores",
+        "Repuestos de tren motriz: diferenciales, cajas de transmisión, ejes de transmisión, cremalleras de dirección",
+        "Línea de WhatsApp para cotizar, además de un número fijo"
+      ]
+    }
+  }
+}
