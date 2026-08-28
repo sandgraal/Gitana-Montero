@@ -15,7 +15,8 @@ Agents write all site code and content; the main session conducts.
 
 ## Commands
 
-- `npm run verify` — everything CI runs; must pass before any commit
+- `npm run verify` — every merge-blocking check except link/a11y (CI runs those
+  on top); must pass before any commit
 - `npm run dev` / `npm run build` / `npm run check`
 - `npm test` / `npm run test:e2e` / `npm run lint`
 - `npm run check:locales` / `check:citations` / `check:glossary` / `check:links`
