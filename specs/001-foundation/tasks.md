@@ -20,7 +20,7 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 - [x] **T103 [TEST]** Graders for the entry-schema contract: `prose.en`+`prose.es` both required (a one-locale fixture must fail), shared-data/prose split (no numeric spec fields inside prose schemas), slug-registry uniqueness per locale. Expected-failure markers. Depends: T101. *(I18N-05, I18N-06, SCF-04)*
 - [x] **T104 [PLATFORM]** Base entry schemas: implement the T103 seam — pure-Zod building blocks in `src/schemas/entry.ts` + `src/schemas/slugs.ts` (stub signatures and grader-enforced contract are binding), registered via `defineCollection` in `src/content.config.ts` — shared `data` + locale-keyed `prose` (both required), `fitment` placeholder type, `confidence` enum (order per spec §2, ratified 2026-08-27), `sources` array with archiveUrl. Per-locale slug registry. Activates T103 graders; update/delete `src/scaffold.smoke.test.ts` (asserts empty collections). Depends: T103 merged. *(I18N-05, I18N-06, SCF-01, SCF-04)*
 - [ ] **T105 [PLATFORM]** Check scripts: `check:locales`, `check:citations`, `check:glossary` (stub until glossary exists), `check:links`, ES `usted`-register lint, `npm run verify` aggregator (extend the existing verify script, never replace it). Must also enforce `data.id` === file-derived Astro entry id for every entry (T104 review: the two ids can silently diverge). Depends: T104. *(SCF-02, I18N-07, REF-02)*
-- [ ] **T106 [PLATFORM]** CI workflow: verify + link check + a11y + Lighthouse budgets, merge-blocking; GitHub Pages deploy config (Pages deploy on merge to `main`, built-site artifact upload on PRs); **prove the gate**: a deliberate one-locale entry on a scratch branch must fail CI (attach the red run to the PR); bilingual issue templates + PR template. Depends: T105. *(SCF-03, SCF-05, SCF-06, SCF-07)*
+- [ ] **T106 [PLATFORM]** CI workflow: verify + link check + a11y + Lighthouse budgets, merge-blocking; GitHub Pages deploy config (Pages deploy on merge to `main`, built-site artifact upload on PRs); **prove the gate**: a scratch branch with a one-locale entry, an uncited numeric spec, AND a tú/vos register slip must each fail CI (attach the red runs to the PR — T105 review: the committed tree has zero entries, so this is the checks' first end-to-end proof); bilingual issue templates + PR template. `check:links` merge-blocks only on both-`url`-and-`archiveUrl` unreachable (ruling 2026-08-27, per GAP-01). Depends: T105. *(SCF-03, SCF-05, SCF-06, SCF-07)*
 
 ## Phase 2 — Taxonomy, fitment, glossary, reference
 
@@ -68,7 +68,7 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 
 ## Phase 5 — Parts & procedures
 - [ ] **T501 [PLATFORM]** Parts schema (supersession chains, conflict-on-duplicate-OEM-number build failure) + page template. Depends: T203. *(PRT-01, PRT-02, PRT-03)*
-- [ ] **T502 [PLATFORM]** Procedures schema (torque/fluid by reference ID only — inlined numbers fail check:citations) + page template w/ safety-critical flag. Depends: T203, T207. *(PRC-01, PRC-02, PRC-03)*
+- [ ] **T502 [PLATFORM]** Procedures schema (torque/fluid by reference ID only — inlined numbers fail check:citations) + page template w/ safety-critical flag. Note (T105 review): check:citations is entry-level today (entry cites ≥1 source); PRC-03 needs per-value attribution — this task designs it. Depends: T203, T207. *(PRC-01, PRC-02, PRC-03)*
 - [ ] **T503 [CONTENT]** Parts wave 1: every part referenced by T303/T403/T404 garage+problem entries. Depends: T501, gaps report. *(PRT-01, PRT-02)*
 - [ ] **T504 [CONTENT]** Procedures wave 1: maintenance set (oil, filters, timing belt 6G74, diffs/tcase fluid, brakes, plugs) — bilingual, cited, safety-flagged where due. Depends: T502. *(PRC-01, PRC-02, PRC-03)*
 
@@ -79,7 +79,7 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 ## Phase 7 — Community, search, gaps
 - [ ] **T701 [CONTENT]** Community directory: EN + ES communities first-class (forums, subreddits, FB groups, Discords, YouTube, vendors, shops) tagged by region/language/gen/activity. Depends: T106. *(COM-01, COM-02)*
 - [ ] **T702 [PLATFORM]** Client-side search per locale incl. glossary aliases + part numbers. Depends: T206, T403. *(SRCH-01, SRCH-02)*
-- [ ] **T703 [PLATFORM]** `npm run gaps` full implementation per GAP-01, wired into CI as a non-blocking report artifact. Depends: T401, T501, T502. *(GAP-01, PRB-06)*
+- [ ] **T703 [PLATFORM]** `npm run gaps` full implementation per GAP-01, wired into CI as a non-blocking report artifact. Includes dead-original-with-live-archive source links (check:links warns, gaps reports — 2026-08-27 ruling) and the internal-reference resolution half of check:links, deferred from T105 (no cross-entry references existed pre-fitment; T203's resolver is the dependency). Depends: T401, T501, T502. *(GAP-01, PRB-06)*
 
 ## Phase 8 — Supabase read-model
 - [ ] **T801 [TEST]** Sync graders: idempotency, one-directionality, per-language tsvector search behavior. Depends: T703. *(RM-01, RM-02)*
