@@ -68,6 +68,17 @@
  * (AGENTS.md) — the first time a researcher found a Montero club in a country
  * nobody had thought to enumerate.
  *
+ * **This buys openness at the cost of an ICU dependency.** The shape and
+ * canonicality gates are pure (a regex and `Intl.getCanonicalLocales`), but
+ * the third gate — "is this code actually assigned?" — is answered by
+ * `Intl.DisplayNames`, so it moves with whatever CLDR data the running Node
+ * ships. A future ICU release could in principle assign a code that is
+ * unassigned today, or retire one. The tripwire is deliberate and lives in
+ * `community.test.ts`: the pinned `it.each` tables of accepted codes (`CR`,
+ * `013`, `419`, `001`, `es-CR`, `zh-Hans`, …) and rejected ones (`UK`, `ZZ`,
+ * `XX`, `999`, …) turn a CLDR shift into a red test naming the code that
+ * moved, rather than a content entry silently gaining or losing validity.
+ *
  * refs specs/001-foundation (COM-01, COM-02)
  */
 import { z } from "astro/zod";
@@ -158,14 +169,21 @@ const regionDisplayNames = new Intl.DisplayNames(["en"], {
 /**
  * A region code CLDR actually assigns.
  *
- * Three gates, each closing a different hole:
- * 1. shape — `CR` or `013`, so a country name or a slug is rejected outright;
+ * Three gates, each closing a different hole, in order — a value rejected by
+ * an earlier gate never reaches a later one:
+ * 1. shape — `CR` or `013`. A country name, a slug (`costa-rica`), alpha-3
+ *    (`CRI`) and wrong case (`cr`) all die here, before any `Intl` call;
  * 2. canonicality — `Intl.getCanonicalLocales` maps `UK` to `GB`, so the
  *    non-standard alias is rejected in favour of the one code the rest of the
  *    site will match on. One place, one code, or filtering silently splits;
  * 3. assignment — `Intl.DisplayNames` echoes the input back for unassigned
  *    codes (`XX`, `999`), which is how a typo is caught. `ZZ` resolves to
  *    "Unknown Region" and so survives that gate; it is excluded by name.
+ *
+ * Gate 3 is the ICU/CLDR-dependent one — it answers "does the running Node's
+ * CLDR data assign this code?" and its answer can therefore move with an ICU
+ * upgrade. See the module docstring: the pinned tables in `community.test.ts`
+ * are the tripwire for that.
  */
 export function isRegionCode(value: string): boolean {
   if (!REGION_CODE_PATTERN.test(value)) return false;
@@ -211,8 +229,22 @@ const languageDisplayNames = new Intl.DisplayNames(["en"], {
  * — a Costa Rican group whose vocabulary is the vocabulary this site's
  * glossary standardises on.
  *
- * Extensions and private-use subtags are refused by the shape gate: this is a
- * tag for a human language, not a locale for formatting numbers.
+ * The same three gates as `isRegionCode`, and again a value rejected early
+ * never reaches `Intl`. `LANGUAGE_TAG_PATTERN` is doing more work here than
+ * the region pattern does, and it is worth being precise about which failures
+ * are its:
+ * 1. shape — `LANGUAGE_TAG_PATTERN` rejects wrong case (`EN`), an underscore
+ *    (`es_CR`), a non-canonical region subtag (`es-cr` — the pattern requires
+ *    `-[A-Z]{2}`), a language *name* (`spanish`), and anything carrying
+ *    extension or private-use subtags (`en-US-u-ca-gregory`). None of these
+ *    reach `Intl` at all. This is a tag for a human language, not a locale
+ *    for formatting numbers;
+ * 2. canonicality — `Intl.getCanonicalLocales` catches what survives the
+ *    pattern but is still not the form CLDR would write;
+ * 3. assignment — `Intl.DisplayNames` echoes unassigned tags (`zz`) back.
+ *
+ * As with regions, gate 3 is the ICU/CLDR-dependent one and the pinned tables
+ * in `community.test.ts` are its tripwire.
  */
 export function isLanguageTag(value: string): boolean {
   if (!LANGUAGE_TAG_PATTERN.test(value)) return false;
@@ -273,6 +305,38 @@ export const communityLinkSchema = z
   .strict();
 
 export type CommunityLink = z.infer<typeof communityLinkSchema>;
+
+/**
+ * The `links` list, with URL uniqueness enforced *within* the array.
+ *
+ * There are two ways the same destination can appear twice on a card, and
+ * both are errors: a link repeating the entry's canonical `url` (checked at
+ * entry level, where `url` is in scope) and two links repeating each other
+ * (checked here). Comparison is on the URL alone — the realistic way this
+ * happens is the same address filed under two `kind`s.
+ */
+export const communityLinksSchema = z
+  .array(communityLinkSchema)
+  .min(1)
+  .superRefine((links, ctx) => {
+    const seen = new Map<string, number>();
+    links.forEach((link, index) => {
+      const { url } = link;
+      const first = seen.get(url);
+      if (first === undefined) {
+        seen.set(url, index);
+        return;
+      }
+      ctx.addIssue({
+        code: "custom",
+        path: [index, "url"],
+        message:
+          `duplicate link url \`${url}\` (already listed at index ${first}): ` +
+          `\`links\` holds one entry per destination, so this would render ` +
+          `twice (refs specs/001-foundation, COM-01)`,
+      });
+    });
+  });
 
 /* -------------------------------------------------------------------------
  * Tag lists
@@ -344,7 +408,7 @@ export const communityShared = {
   url: httpUrlSchema(),
 
   /** Additional presences for the same community. Optional; never a duplicate. */
-  links: z.array(communityLinkSchema).min(1).optional(),
+  links: communityLinksSchema.optional(),
 };
 
 /**
@@ -379,11 +443,14 @@ export const communityProse = {
 /**
  * The registered `community` schema.
  *
- * The final `superRefine` is the one rule that cannot live on a single field:
- * a `links` entry repeating `url` renders the same destination twice on the
- * same card. Same-URL-different-kind is the realistic way it happens (a
- * Facebook group whose `url` *is* its Facebook page), so the check compares
- * URLs and ignores `kind`.
+ * The final `superRefine` is the half of link de-duplication that cannot live
+ * on a single field: a `links` entry repeating the canonical `url` renders the
+ * same destination twice on the same card, and only here is `url` in scope.
+ * Its sibling — two `links` repeating each other — is enforced inside
+ * `communityLinksSchema`, so the pair covers both ways a duplicate arrives.
+ * Same-URL-different-kind is the realistic way it happens (a Facebook group
+ * whose `url` *is* its Facebook page), so both checks compare URLs and ignore
+ * `kind`.
  */
 export const communitySchema = defineEntrySchema(
   communityShared,

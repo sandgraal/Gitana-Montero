@@ -181,15 +181,18 @@ describe("regions (COM-01)", () => {
     }
   );
 
+  // As with languages, the parenthetical names the gate that does the work.
+  // Only the two "assignment gate" rows depend on the running Node's CLDR
+  // data; the rest are decided before `Intl` is consulted.
   it.each([
-    ["UK", "a non-canonical alias of GB — one place, one code"],
-    ["ZZ", "CLDR's unknown-region placeholder"],
-    ["XX", "unassigned"],
-    ["999", "unassigned"],
-    ["cr", "wrong case"],
-    ["CRI", "alpha-3, not alpha-2"],
-    ["costa-rica", "a slug, not a code"],
-    ["", "blank"],
+    ["cr", "shape gate — wrong case"],
+    ["CRI", "shape gate — alpha-3, not alpha-2"],
+    ["costa-rica", "shape gate — a slug, not a code"],
+    ["", "shape gate — blank"],
+    ["ZZ", "excluded by name — CLDR's unknown-region placeholder"],
+    ["UK", "canonicality gate — a non-canonical alias of GB"],
+    ["XX", "assignment gate — unassigned"],
+    ["999", "assignment gate — unassigned"],
   ])("rejects `%s` (%s)", (code) => {
     expect(isRegionCode(code)).toBe(false);
     expect(paths(makeCommunity({ regions: [code] }))).toContain("regions.0");
@@ -215,17 +218,34 @@ describe("languages (COM-01) — data about the community, not the site Locale",
     }
   );
 
+  // The parenthetical names the gate that actually rejects each value, in the
+  // order `isLanguageTag` applies them. Only `zz` gets as far as the
+  // ICU/CLDR-backed assignment gate; everything else dies at the shape gate,
+  // before any `Intl` call. That distinction is the point of the pinning: an
+  // ICU upgrade can only move the `zz` row.
   it.each([
-    ["EN", "wrong case"],
-    ["zz", "unassigned"],
-    ["spanish", "a language name, not a tag"],
-    ["es_CR", "underscore, not a hyphen"],
-    ["es-cr", "non-canonical region casing"],
-    ["en-US-u-ca-gregory", "a formatting locale, not a language"],
-    ["", "blank"],
+    ["EN", "shape gate — wrong case"],
+    ["spanish", "shape gate — a language name, not a tag"],
+    ["es_CR", "shape gate — underscore, not a hyphen"],
+    ["es-cr", "shape gate — the pattern requires an uppercase region subtag"],
+    ["en-US-u-ca-gregory", "shape gate — extension subtags are not a language"],
+    ["", "shape gate — blank"],
+    ["zz", "assignment gate — CLDR assigns no such language"],
   ])("rejects `%s` (%s)", (tag) => {
     expect(isLanguageTag(tag)).toBe(false);
     expect(paths(makeCommunity({ languages: [tag] }))).toContain("languages.0");
+  });
+
+  it("relies on the shape gate, not Intl, for the near-miss tags", () => {
+    // `Intl` on its own would wave both of these through: `es-cr` canonicalises
+    // to a real tag and `en-US-u-ca-gregory` names a real locale. They are
+    // rejected because `LANGUAGE_TAG_PATTERN` runs first, which is what keeps
+    // an ICU upgrade from being able to change the answer for either.
+    for (const tag of ["es-cr", "en-US-u-ca-gregory"]) {
+      expect(() => Intl.getCanonicalLocales(tag), tag).not.toThrow();
+      expect(isLanguageTag(tag), tag).toBe(false);
+    }
+    expect(Intl.getCanonicalLocales("es-cr")[0]).toBe("es-CR");
   });
 
   it("requires at least one", () => {
@@ -311,6 +331,38 @@ describe("links (COM-01)", () => {
     expect(
       paths(makeCommunity({ url, links: [{ kind: "forum", url }] }))
     ).toContain("links.0.url");
+  });
+
+  it("rejects two links sharing a url, naming the later index", () => {
+    // The other half of de-duplication: neither link is the canonical `url`,
+    // so only the in-array check can catch this. Same destination filed under
+    // two kinds is the realistic way it arrives.
+    const url = "https://chat.example.invalid/cr";
+    const paths_ = paths(
+      makeCommunity({
+        links: [
+          { kind: "discord", url },
+          { kind: "whatsapp", url },
+        ],
+      })
+    );
+    expect(paths_).toContain("links.1.url");
+    expect(paths_).not.toContain("links.0.url");
+  });
+
+  it("names every later duplicate, not just the first", () => {
+    const url = "https://video.example.invalid/channel";
+    const found = paths(
+      makeCommunity({
+        links: [
+          { kind: "youtube", url },
+          { kind: "website", url },
+          { kind: "facebook", url },
+        ],
+      })
+    );
+    expect(found).toContain("links.1.url");
+    expect(found).toContain("links.2.url");
   });
 
   it("allows a different url of the same kind", () => {
