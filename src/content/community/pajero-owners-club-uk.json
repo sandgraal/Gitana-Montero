@@ -7,10 +7,16 @@
   "communityType": "forum",
   "regions": ["GB"],
   "languages": ["en"],
-  "activity": "very-active",
-  "activityAssessed": "2026-08-28",
+  "activity": "active",
+  "activityAssessed": "2025-07-29",
   "url": "https://www.pocuk.com/forums/",
-  "confidence": "first-hand",
+  "links": [
+    {
+      "kind": "facebook",
+      "url": "https://www.facebook.com/PajeroOwnersClubUK/"
+    }
+  ],
+  "confidence": "anecdotal",
   "sources": [
     {
       "title": "The Mitsubishi Pajero Owners Club (POCUK) — forum index",
@@ -23,22 +29,22 @@
   "prose": {
     "en": {
       "title": "Pajero Owners Club UK (POCUK)",
-      "summary": "The UK's long-running free-to-join club for Pajero, Shogun, Montero and Challenger owners, built around a large phpBB forum. Its \"Main technical forum\" alone carried over 50,000 topics and 330,000 posts the last time it was checked, with a new post the same month — this is one of the biggest English-language technical archives for the platform anywhere.",
+      "summary": "The UK's long-running free-to-join club for Pajero, Shogun, Montero and Challenger owners, built around a large phpBB forum. Its \"Main technical forum\" alone carried tens of thousands of topics and hundreds of thousands of posts on the archived snapshot this entry cites, with its newest post about a month before that snapshot — but most of the other subforums shown on the same page had gone quieter, with their newest posts dated back to 2024. The live site itself returns HTTP 403 to automated checks and no fresher Wayback capture exists, so this entry's dates and tier reflect that July 2025 read, not a reconfirmed one today.",
       "goodFor": [
-        "UK-specific concerns: MOT/servicing, insurance, SVA/import paperwork",
+        "UK-specific concerns: MOT and servicing, insurance, SVA/import paperwork",
         "A dedicated 4M41 (3.2 DiD) subforum and a Gen 4 (2006-on) subforum",
         "A DIY workshop section and a technical FAQ built up over two decades",
-        "Sheer volume — most fault symptoms already have a thread"
+        "A companion Facebook page for the same club"
       ]
     },
     "es": {
       "title": "Pajero Owners Club UK (POCUK)",
-      "summary": "El club británico de ingreso gratuito para dueños de Pajero, Shogun, Montero y Challenger de mayor trayectoria en su categoría, construido sobre un foro phpBB muy grande. Solo su \"Main technical forum\" superaba los 50.000 temas y los 330.000 mensajes en la última revisión, con una publicación ese mismo mes — es uno de los archivos técnicos en inglés de mayor tamaño que existen para esta plataforma.",
+      "summary": "El club británico de más larga trayectoria, de ingreso gratuito, para dueños de Pajero, Shogun, Montero y Challenger, construido sobre un foro phpBB muy grande. Solo su \"Main technical forum\" tenía decenas de miles de temas y cientos de miles de mensajes en la captura archivada que cita esta ficha, con su publicación más nueva cerca de un mes antes de esa captura — pero la mayoría de los demás subforos de esa misma página se veían más callados, con sus publicaciones más recientes fechadas hasta 2024. El sitio en vivo devuelve HTTP 403 ante revisiones automatizadas y no existe una copia más reciente en Wayback, así que las fechas y el nivel de esta ficha reflejan esa lectura de julio de 2025, no una reconfirmada hoy.",
       "goodFor": [
-        "Temas propios del Reino Unido: ITV (MOT), seguros, trámites de importación (SVA)",
+        "Temas propios del Reino Unido: la revisión técnica MOT y el mantenimiento, seguros, trámites de importación (SVA)",
         "Un subforo dedicado al motor 4M41 (3.2 DiD) y otro para la Gen 4 (desde 2006)",
         "Una sección de taller DIY y un FAQ técnico acumulado a lo largo de dos décadas",
-        "El volumen: la mayoría de los síntomas de falla ya tienen un hilo abierto"
+        "Una página de Facebook hermana del mismo club"
       ]
     }
   }

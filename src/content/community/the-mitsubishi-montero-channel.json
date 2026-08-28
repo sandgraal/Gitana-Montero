@@ -2,11 +2,11 @@
   "id": "the-mitsubishi-montero-channel",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["us"]
+    "markets": ["us", "uk", "global"]
   },
   "communityType": "youtube-channel",
   "regions": ["001"],
-  "languages": ["en"],
+  "languages": ["en", "es"],
   "activity": "active",
   "activityAssessed": "2026-08-28",
   "url": "https://www.youtube.com/@The_Mitsubishi_Montero_Channel",
@@ -18,24 +18,33 @@
       "archiveUrl": "https://web.archive.org/web/20260828153037/https://www.youtube.com/@The_Mitsubishi_Montero_Channel/about",
       "accessed": "2026-08-28",
       "kind": "video"
+    },
+    {
+      "title": "The Mitsubishi Montero Channel — Videos",
+      "url": "https://www.youtube.com/@The_Mitsubishi_Montero_Channel/videos",
+      "archiveUrl": "https://web.archive.org/web/20260828191235/https://www.youtube.com/@The_Mitsubishi_Montero_Channel/videos",
+      "accessed": "2026-08-28",
+      "kind": "video"
     }
   ],
   "prose": {
     "en": {
       "title": "The Mitsubishi Montero Channel",
-      "summary": "A dedicated English-language YouTube channel built around repair, maintenance and how-to videos anchored on a 2004 Montero (Gen 3), running for over a decade with a video uploaded only days before the last check. Fitment is recorded here as Gen 3 / US market because that is what was directly verified — other generations may appear in the catalogue but were not confirmed.",
+      "summary": "A YouTube channel built around repair, maintenance and how-to videos anchored on a 2004 Montero (Gen 3), active for over a decade with a video uploaded only days before the last check. Most titles are in English, but several are explicitly marked \"(Spanish Video)\" — languages are recorded as both. Some titles also name the truck as \"Pajero, Shogun\" rather than only \"Montero,\" so market is recorded broader than US-only. Fitment stays Gen 3 only: that is the generation directly verified across the titles checked.",
       "goodFor": [
-        "Step-by-step visual repair and maintenance walkthroughs on a US-market Gen 3 Montero",
+        "Step-by-step visual repair and maintenance walkthroughs on a Gen 3 truck",
         "A large enough back catalogue that many common symptoms already have a video",
+        "A handful of videos in Spanish, alongside the mostly-English catalogue",
         "Recent, ongoing uploads rather than an abandoned archive"
       ]
     },
     "es": {
       "title": "The Mitsubishi Montero Channel",
-      "summary": "Un canal de YouTube en inglés dedicado a videos de reparación, mantenimiento y \"cómo hacerlo\", centrado en una Montero 2004 (Gen 3), activo desde 2015 y con un video publicado apenas días antes de la última revisión. Aquí se registra el ajuste (fitment) como Gen 3 / mercado de EE. UU. porque eso fue lo que se verificó directamente; puede que el catálogo incluya otras generaciones, pero no se confirmaron.",
+      "summary": "Un canal de YouTube dedicado a videos de reparación, mantenimiento y \"cómo hacerlo\", centrado en una Montero 2004 (Gen 3), activo desde hace más de una década y con un video publicado apenas días antes de la última revisión. La mayoría de los títulos están en inglés, pero varios llevan la etiqueta explícita \"(Spanish Video)\", así que los idiomas se registran como ambos. Algunos títulos también nombran el carro como \"Pajero, Shogun\" y no solo \"Montero\", así que el mercado se registra más amplio que solo EE. UU. La compatibilidad (fitment) se mantiene únicamente en Gen 3: esa es la generación verificada directamente en los títulos revisados.",
       "goodFor": [
-        "Videos paso a paso de reparación y mantenimiento de una Montero Gen 3 de mercado estadounidense",
+        "Videos paso a paso de reparación y mantenimiento de un carro Gen 3",
         "Un catálogo lo bastante amplio como para que muchos síntomas comunes ya tengan un video",
+        "Algunos videos en español, dentro de un catálogo mayormente en inglés",
         "Publicaciones recientes y continuas, no un archivo abandonado"
       ]
     }

@@ -1,16 +1,16 @@
 {
   "id": "grupo-automotriz-zuniga-montero",
   "fitment": {
-    "gens": ["gen2", "gen2-5", "gen3"],
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
     "markets": ["cr"]
   },
   "communityType": "shop",
   "regions": ["CR"],
   "languages": ["es-CR"],
   "activity": "active",
-  "activityAssessed": "2026-08-28",
+  "activityAssessed": "2024-02-20",
   "url": "https://grupoautomotrizzuniga.com/producto/repuestos-mitsubishi-montero/",
-  "confidence": "first-hand",
+  "confidence": "anecdotal",
   "sources": [
     {
       "title": "Repuestos Mitsubishi Montero — Grupo Automotriz Zúñiga",
@@ -23,19 +23,19 @@
   "prose": {
     "en": {
       "title": "Grupo Automotriz Zúñiga — Montero repuestos",
-      "summary": "A Costa Rican repuestos shop in San Joaquín de Flores, Heredia, listing new and used body, engine and drivetrain parts specifically for the Montero (bumpers, lights, doors, llantas and aros, plus engine and drivetrain components) with a WhatsApp contact line for quotes. The archived listing that backs this entry is from early 2024; the live site itself responded when checked again today, but rate-limited automated access before a fresh page could be re-read in full, so treat the specific inventory details as slightly dated rather than reconfirmed today.",
+      "summary": "A Costa Rican repuestos shop in San Joaquín de Flores, Heredia, listing body, engine and drivetrain parts specifically for the Montero (bumpers, lights, doors, llantas and aros, plus engine and drivetrain components) with a WhatsApp contact line for quotes. The page does not specify new vs. used stock, so that distinction is not claimed here. The citation is an archived snapshot from February 2024 — today's live site only returned a rate-limit response (HTTP 429) to repeated automated checks, so the tier and dates below reflect a 2024 read, not a reconfirmed one.",
       "goodFor": [
-        "Used and new Montero body panels and glass in the Heredia/San Joaquín de Flores area",
-        "Drivetrain parts: differentials, transmission cases, driveshafts, steering racks",
+        "Montero body panels and glass in the Heredia/San Joaquín de Flores area",
+        "Drivetrain parts: differentials, transmissions, driveshafts, steering racks",
         "A WhatsApp quote line alongside a landline number"
       ]
     },
     "es": {
       "title": "Grupo Automotriz Zúñiga — repuestos para Montero",
-      "summary": "Un taller de repuestos costarricense en San Joaquín de Flores, Heredia, con piezas de carrocería, motor y tren motriz nuevas y usadas específicamente para la Montero (bumpers, faroles, puertas, llantas y aros, además de piezas de motor y tren motriz), con línea de WhatsApp para cotizaciones. La ficha archivada que respalda esta entrada es de inicios de 2024; el sitio en vivo sí respondió al revisarlo de nuevo hoy, pero limitó el acceso automatizado antes de poder releer la página completa, así que conviene tratar los detalles puntuales del inventario como algo desactualizados y no reconfirmados hoy.",
+      "summary": "Una repuestera costarricense en San Joaquín de Flores, Heredia, con repuestos de carrocería, motor y tren motriz específicamente para la Montero (bumpers, faroles, puertas, llantas y aros, además de repuestos de motor y tren motriz), con línea de WhatsApp para cotizaciones. La página no indica si el repuesto es nuevo o usado, así que esa distinción no se afirma aquí. La cita es una captura archivada de febrero de 2024 — el sitio en vivo de hoy solo devolvió una respuesta de límite de tráfico (HTTP 429) ante revisiones automatizadas repetidas, así que el nivel y las fechas de abajo reflejan una lectura de 2024, no una reconfirmada.",
       "goodFor": [
-        "Piezas de carrocería y vidrios de Montero, nuevas y usadas, en la zona de Heredia/San Joaquín de Flores",
-        "Piezas de tren motriz: diferenciales, cajas de transmisión, ejes de transmisión, cremalleras de dirección",
+        "Repuestos de carrocería y vidrios de Montero en la zona de Heredia/San Joaquín de Flores",
+        "Repuestos de tren motriz: diferenciales, cajas de transmisión, ejes de transmisión, cremalleras de dirección",
         "Línea de WhatsApp para cotizar, además de un número fijo"
       ]
     }

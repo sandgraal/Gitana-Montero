@@ -23,22 +23,22 @@
   "prose": {
     "en": {
       "title": "Club Mitsubishi Montero (Mofler)",
-      "summary": "A small Spanish-language club forum hosted on Mofler, a Spain-based car-enthusiast social platform. It is genuinely low-traffic (its busiest subforum has under 100 posts total) but the most recent thread was started only weeks before the last check, so it is a real, if quiet, place — not an abandoned page.",
+      "summary": "A small Spanish-language club forum hosted on Mofler, a Spain-based car-enthusiast social platform. It is genuinely low-traffic — its most active subforum's total post count is modest — but the most recent thread was started only weeks before the last check, so it is a real, if quiet, place — not an abandoned page.",
       "goodFor": [
         "European Spanish (Spain) terminology and context for Montero ownership",
         "A small, readable \"Mecánica y consumos\" (mechanics and fuel consumption) subforum",
-        "Photo galleries of members' own trucks",
-        "A pre/post-sale service subforum for quotes and delivery times"
+        "A \"General\" subforum, the second-busiest section on the board",
+        "A \"Manuales y esquemas\" (manuals and diagrams) subforum"
       ]
     },
     "es": {
       "title": "Club Mitsubishi Montero (Mofler)",
-      "summary": "Un foro de club pequeño en español, alojado en Mofler, una red social española para aficionados al motor. El tráfico es realmente bajo (su subforo con mayor actividad no llega a 100 mensajes en total), pero el último tema se abrió apenas semanas antes de la última revisión, así que es un espacio real, aunque tranquilo, y no una página abandonada.",
+      "summary": "Un foro de club pequeño en español, alojado en Mofler, una red social española para aficionados al motor. El tráfico es realmente bajo — su subforo más activo tiene un total de mensajes modesto — pero el último tema se abrió apenas semanas antes de la última revisión, así que es un espacio real, aunque tranquilo, y no una página abandonada.",
       "goodFor": [
-        "Terminología y contexto de español de España para dueños de Montero",
+        "Terminología y contexto de español de España para dueños de la Montero",
         "Un subforo pequeño pero legible de \"Mecánica y consumos\"",
-        "Galerías de fotos de los carros de los propios miembros",
-        "Un subforo de servicio pre/post venta para presupuestos y tiempos de entrega"
+        "Un subforo \"General\", la segunda sección más movida del foro",
+        "Un subforo de \"Manuales y esquemas\""
       ]
     }
   }

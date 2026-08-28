@@ -23,22 +23,22 @@
   "prose": {
     "en": {
       "title": "Pajero 4WD Club of Victoria — public forum",
-      "summary": "An Australian club forum (vBulletin) open to the public, organised by vehicle generation, with active new-member introduction threads and posts within hours of the last check — a genuinely live community, not an archive.",
+      "summary": "An Australian club forum (vBulletin) open to the public, organised by vehicle generation, with posts within hours of the last check in its general/technical sections — a genuinely live community, not an archive. Its own \"Introductions\" board was slower by comparison (newest post about four weeks old at last check), so that specific board is not the evidence for how active the forum is; the rest of it is. The same forum also carries sections for the Triton, Challenger, Delica and ASX/Outlander/Eclipse Cross — all outside this site's scope, but worth knowing about before assuming every subforum here is Pajero-specific.",
       "goodFor": [
         "AU-market Pajero specifics and generation-specific subforums",
         "Local meet-ups and club membership for Victoria-based owners",
-        "Fast turnaround on questions — new posts show up within hours",
-        "A separate \"new to the forum\" section for first-time posters"
+        "Fast turnaround on questions in the general/technical sections — new posts show up within hours",
+        "An \"Introductions\" board for first-time posters"
       ]
     },
     "es": {
       "title": "Pajero 4WD Club of Victoria — foro público",
-      "summary": "Un foro de club australiano (vBulletin) abierto al público, organizado por generación del vehículo, con hilos de presentación de nuevos miembros activos y publicaciones de apenas horas antes de la última revisión — una comunidad realmente viva, no un archivo muerto.",
+      "summary": "Un foro de club australiano (vBulletin) abierto al público, organizado por generación del vehículo, con publicaciones de apenas horas antes de la última revisión en sus secciones generales/técnicas — una comunidad realmente viva. Su propio panel de \"Introductions\" (presentaciones) estaba más lento en comparación (la publicación más reciente tenía unas cuatro semanas en la última revisión), así que ese panel puntual no es la evidencia de qué tan activo está el foro; el resto sí lo es. El mismo foro también tiene secciones para el Triton, el Challenger, el Delica y el ASX/Outlander/Eclipse Cross — todos fuera del alcance de este sitio, pero vale la pena saberlo antes de asumir que cada subforo aquí es específico del Pajero.",
       "goodFor": [
         "Particularidades del Pajero de mercado australiano y subforos por generación",
         "Encuentros locales y membresía de club para dueños en Victoria",
-        "Respuesta rápida a las consultas — las publicaciones nuevas aparecen en cuestión de horas",
-        "Una sección aparte para quien recién se une al foro"
+        "Respuesta rápida a las consultas en las secciones generales/técnicas — las publicaciones nuevas aparecen en cuestión de horas",
+        "Un panel de \"Introductions\" (presentaciones) para quien recién se une al foro"
       ]
     }
   }
