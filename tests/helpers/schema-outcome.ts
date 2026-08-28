@@ -17,11 +17,22 @@
 import type { SchemaIssue } from "../../src/schemas/entry.ts";
 
 export function issuesOf(outcome: unknown): readonly SchemaIssue[] {
-  if (typeof outcome !== "object" || outcome === null) return [];
-  const { error } = outcome as {
+  if (typeof outcome !== "object" || outcome === null) {
+    throw new Error("expected a Zod safeParse outcome object");
+  }
+
+  const { success, error } = outcome as {
+    success?: boolean;
     error?: { issues?: readonly SchemaIssue[] };
   };
-  return error?.issues ?? [];
+
+  if (success === true) return [];
+  if (success === false) {
+    if (!error?.issues) throw new Error("expected safeParse error.issues");
+    return error.issues;
+  }
+
+  throw new Error("expected safeParse outcome with boolean success");
 }
 
 /** Dotted field paths of every issue, e.g. `["prose.es"]`. */
