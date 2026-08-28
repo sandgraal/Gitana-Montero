@@ -24,6 +24,7 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import { defineEntrySchema } from "./schemas/entry";
 import { communitySchema } from "./schemas/community";
+import { vehiclesEntrySchema } from "./schemas/vehicles";
 
 /**
  * Files whose name starts with `_` are drafts/notes and are never loaded, per
@@ -66,7 +67,7 @@ function entryCollection(
 
 export const collections = {
   /** VEH-01…03 — generations, markets, engines, transmissions, trims. */
-  vehicles: entryCollection("vehicles"),
+  vehicles: entryCollection("vehicles", vehiclesEntrySchema(baseProse)),
   /** GLO-01…04 — canonical EN/ES terms and regional aliases. */
   glossary: entryCollection("glossary"),
   /** REF-01, REF-02 — FSM index, fluids, torque master table, capacities. */
