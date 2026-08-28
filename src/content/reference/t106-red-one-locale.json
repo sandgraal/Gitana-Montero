@@ -1,0 +1,12 @@
+{
+  "id": "t106-red-one-locale",
+  "fitment": { "gens": ["gen3"] },
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "Deliberate one-locale entry (T106 gate proof)",
+      "summary": "This entry ships English only. CI must refuse to merge it. Scratch branch only — never merged."
+    }
+  }
+}
