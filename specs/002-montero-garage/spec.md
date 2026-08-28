@@ -76,7 +76,7 @@ the user's own record and is not fact-checked by the site.
 - **SHR-03** Costs and receipts SHALL stay private even on a public work-log
   unless opened per record.
 - **SHR-04** Public pages SHALL carry the reference site's chrome and design
-  (HANDOFF-DESIGN) and hreflang per 001 I18N-04.
+  (HANDOFF-DESIGN.md) and hreflang per 001 I18N-04.
 
 ## 6. Platform & migration (MIG)
 
