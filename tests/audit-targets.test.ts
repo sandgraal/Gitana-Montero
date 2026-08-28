@@ -10,11 +10,14 @@
  *
  * refs specs/001-foundation (SCF-03, SCF-06)
  */
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
   auditTargets,
+  builtServedPaths,
   collectionSampleTargets,
   normalizeBase,
   resolveChromePath,
@@ -74,6 +77,138 @@ describe("auditTargets", () => {
     const { lighthouse } = auditTargets({ base: "/", locales: LOCALES });
     expect(lighthouse).toEqual(["/en/", "/es/"]);
   });
+
+  // SCF-06's "one representative content page per collection". The audits
+  // pass `builtPaths` from `dist/`; if that plumbing is ever cut, the two
+  // assertions below are what notice — a reviewer reading the docstring
+  // cannot tell a wired-up helper from an exported-but-unused one.
+  it("adds a representative content page per collection when one is built", () => {
+    const builtPaths = [
+      "/Gitana-Montero/",
+      "/Gitana-Montero/404.html",
+      "/Gitana-Montero/en/",
+      "/Gitana-Montero/en/problems/transfer-case-wont-engage/",
+      "/Gitana-Montero/en/problems/rear-diff-whine/",
+      "/Gitana-Montero/es/",
+      "/Gitana-Montero/es/problemas/transferencia-no-engrana/",
+    ];
+
+    const { a11y, lighthouse } = auditTargets({
+      base: "/Gitana-Montero",
+      locales: LOCALES,
+      builtPaths,
+    });
+
+    for (const targets of [a11y, lighthouse]) {
+      // One per locale+collection, not one per page.
+      expect(targets).toContain("/Gitana-Montero/en/problems/rear-diff-whine/");
+      expect(targets).not.toContain(
+        "/Gitana-Montero/en/problems/transfer-case-wont-engage/"
+      );
+      expect(targets).toContain(
+        "/Gitana-Montero/es/problemas/transferencia-no-engrana/"
+      );
+      // The homes never drop out when samples appear.
+      expect(targets).toContain("/Gitana-Montero/en/");
+      expect(targets).toContain("/Gitana-Montero/es/");
+    }
+  });
+
+  it("audits only the homes (+404) when nothing else was built", () => {
+    const { a11y, lighthouse } = auditTargets({
+      base: "/Gitana-Montero",
+      locales: LOCALES,
+      builtPaths: [
+        "/Gitana-Montero/",
+        "/Gitana-Montero/404.html",
+        "/Gitana-Montero/en/",
+        "/Gitana-Montero/es/",
+      ],
+    });
+
+    expect(lighthouse).toEqual(["/Gitana-Montero/en/", "/Gitana-Montero/es/"]);
+    expect(a11y).toEqual([
+      "/Gitana-Montero/en/",
+      "/Gitana-Montero/es/",
+      "/Gitana-Montero/404.html",
+    ]);
+  });
+});
+
+describe("builtServedPaths", () => {
+  let distDir: string;
+
+  beforeAll(async () => {
+    distDir = await mkdtemp(path.join(os.tmpdir(), "gitana-dist-"));
+    const pages = [
+      "index.html",
+      "404.html",
+      "en/index.html",
+      "es/index.html",
+      "en/problems/transfer-case-wont-engage/index.html",
+      "es/problemas/transferencia-no-engrana/index.html",
+    ];
+    for (const page of pages) {
+      const file = path.join(distDir, page);
+      await mkdir(path.dirname(file), { recursive: true });
+      await writeFile(file, '<!doctype html><html lang="en"></html>');
+    }
+    // Assets must not be mistaken for pages.
+    await mkdir(path.join(distDir, "_astro"), { recursive: true });
+    await writeFile(path.join(distDir, "_astro", "site.css"), "body{}");
+  });
+
+  afterAll(async () => {
+    await rm(distDir, { recursive: true, force: true });
+  });
+
+  it("maps built files to the paths they are served at, under base", async () => {
+    const served = await builtServedPaths({
+      distDir,
+      base: "/Gitana-Montero",
+    });
+
+    expect(served).toEqual([
+      "/Gitana-Montero/",
+      "/Gitana-Montero/404.html",
+      "/Gitana-Montero/en/",
+      "/Gitana-Montero/en/problems/transfer-case-wont-engage/",
+      "/Gitana-Montero/es/",
+      "/Gitana-Montero/es/problemas/transferencia-no-engrana/",
+    ]);
+  });
+
+  it("feeds a real dist into the audit target set, end to end", async () => {
+    const builtPaths = await builtServedPaths({
+      distDir,
+      base: "/Gitana-Montero",
+    });
+    const { a11y, lighthouse } = auditTargets({
+      base: "/Gitana-Montero",
+      locales: LOCALES,
+      builtPaths,
+    });
+
+    expect(lighthouse).toEqual([
+      "/Gitana-Montero/en/",
+      "/Gitana-Montero/es/",
+      "/Gitana-Montero/en/problems/transfer-case-wont-engage/",
+      "/Gitana-Montero/es/problemas/transferencia-no-engrana/",
+    ]);
+    expect(a11y).toContain("/Gitana-Montero/404.html");
+    expect(a11y).toContain(
+      "/Gitana-Montero/es/problemas/transferencia-no-engrana/"
+    );
+  });
+
+  it("returns nothing rather than throwing when dist is absent", async () => {
+    expect(
+      await builtServedPaths({
+        distDir: path.join(distDir, "no-such-dir"),
+        base: "/Gitana-Montero",
+      })
+    ).toEqual([]);
+  });
 });
 
 describe("collectionSampleTargets", () => {
@@ -89,6 +224,10 @@ describe("collectionSampleTargets", () => {
   });
 
   it("samples one page per collection per locale (SCF-06)", () => {
+    // Deliberately unsorted, and `rear-diff-whine` sorts before
+    // `transfer-case-wont-engage`: the sample is the first page in *path*
+    // order, not in whatever order the directory walk returned, or a budget
+    // regression on a stable site would look like a flake.
     const built = [
       "/Gitana-Montero/en/",
       "/Gitana-Montero/en/problems/transfer-case-wont-engage/",
@@ -99,7 +238,7 @@ describe("collectionSampleTargets", () => {
 
     expect(collectionSampleTargets(built, config)).toEqual([
       "/Gitana-Montero/en/parts/front-brake-pads/",
-      "/Gitana-Montero/en/problems/transfer-case-wont-engage/",
+      "/Gitana-Montero/en/problems/rear-diff-whine/",
       "/Gitana-Montero/es/problemas/transferencia-no-engrana/",
     ]);
   });

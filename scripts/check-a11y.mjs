@@ -34,6 +34,7 @@ import pa11y from "pa11y";
 import {
   REPO_ROOT,
   auditTargets,
+  builtServedPaths,
   resolveChromePath,
   readSiteConfig,
 } from "./lib/audit-targets.mjs";
@@ -94,7 +95,8 @@ async function main() {
 
   const { base, locales } = await readSiteConfig();
   const chromePath = resolveChromePath();
-  const { a11y: paths } = auditTargets({ base, locales });
+  const builtPaths = await builtServedPaths({ distDir, base });
+  const { a11y: paths } = auditTargets({ base, locales, builtPaths });
 
   const server = await startServer({ distDir, base });
   let failures = 0;

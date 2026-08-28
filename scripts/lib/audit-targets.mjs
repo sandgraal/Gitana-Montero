@@ -12,11 +12,12 @@
  * ## Which pages are audited, and why only these
  *
  * SCF-06: "the home page and one representative content page per collection".
- * Every content collection is empty today (T104 registered the schemas; the
- * phase-2+ content tasks fill them), so the only pages that exist are the two
- * locale homes, the root redirect shim and the 404. The per-collection
- * representatives are added by `collectionSampleTargets` as soon as a
- * collection has a page to sample — see that function.
+ * Both audits call `builtServedPaths()` on `dist/` and feed the result to
+ * `auditTargets()`, so the per-collection representatives appear in the target
+ * set the moment a collection has a page — no edit to either script, and
+ * never a URL that was not actually built. Every content collection is empty
+ * today (T104 registered the schemas; the phase-2+ content tasks fill them),
+ * so today that set is exactly the two locale homes plus the 404.
  *
  * - **`/<locale>/` (both locales, a11y + Lighthouse).** The home page SCF-06
  *   names, once per locale: `/es/` is not a translation of an audited page,
@@ -31,10 +32,13 @@
  *   `data-locale-choice` attributes) is graded by
  *   `tests/locale-switcher.test.ts` instead, which is where a redirect page's
  *   behaviour can actually be asserted.
+ * - **One content page per collection per locale (a11y + Lighthouse)**, chosen
+ *   by `collectionSampleTargets` from what `dist/` actually contains.
  *
  * refs specs/001-foundation (SCF-03, SCF-06)
  */
 import { existsSync } from "node:fs";
+import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -56,30 +60,74 @@ export function normalizeBase(base) {
 }
 
 /**
+ * Every page `astro build` wrote, as the path it is *served* at.
+ *
+ * The audits derive their per-collection samples from this rather than from
+ * the content collections, for the same reason `check:hreflang` walks `dist/`:
+ * a page that failed to build is a page that cannot be audited, and inventing
+ * its URL would fail the audit for the wrong reason.
+ *
+ * @returns {Promise<string[]>} sorted served paths, e.g. `/Gitana-Montero/en/`
+ */
+export async function builtServedPaths({ distDir, base }) {
+  const prefix = normalizeBase(base);
+
+  async function walk(dir) {
+    const found = [];
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) found.push(...(await walk(full)));
+      else if (entry.isFile() && entry.name.endsWith(".html")) found.push(full);
+    }
+    return found;
+  }
+
+  if (!existsSync(distDir)) return [];
+
+  const files = await walk(distDir);
+  return files
+    .map((file) => {
+      const relative = path.relative(distDir, file).split(path.sep).join("/");
+      // `en/index.html` is served at `/en/`; `404.html` stays `404.html`.
+      return `${prefix}/${relative.replace(/(^|\/)index\.html$/, "$1")}`;
+    })
+    .sort();
+}
+
+/**
  * Served paths audited by Pa11y and by the Lighthouse budgets.
  *
- * @param {{ base: string, locales: readonly string[] }} config
+ * `builtPaths` is what `builtServedPaths()` found in `dist/`; passing it is
+ * what turns SCF-06's "one representative content page per collection" on.
+ * It defaults to `[]` so the locale homes are still audited if a caller has
+ * no build listing — never the other way round, because an empty target set
+ * is an audit that passes by auditing nothing.
+ *
+ * @param {{ base: string, locales: readonly string[], builtPaths?: readonly string[] }} config
  * @returns {{ a11y: string[], lighthouse: string[] }}
  */
-export function auditTargets({ base, locales }) {
+export function auditTargets({ base, locales, builtPaths = [] }) {
   const prefix = normalizeBase(base);
   const homes = locales.map((locale) => `${prefix}/${locale}/`);
+  const samples = collectionSampleTargets(builtPaths, { base, locales });
   return {
-    a11y: [...homes, `${prefix}/404.html`],
-    lighthouse: [...homes],
+    a11y: [...homes, `${prefix}/404.html`, ...samples],
+    lighthouse: [...homes, ...samples],
   };
 }
 
 /**
- * The per-collection representative pages SCF-06 asks for, once collections
- * have pages to sample.
+ * The per-collection representative pages SCF-06 asks for: the first built
+ * page of each `<locale>/<collection>` pair, in path order.
  *
- * Deliberately a stub returning `[]` with the reason attached rather than a
- * silent omission: when a phase-2+ task adds the first `/en/<collection>/…`
- * route, it extends this one function and both audits pick the page up
- * without either script changing. `entryPaths` is the built page list a
- * caller already has (from `dist/`), so this never guesses a URL that was
- * not built.
+ * Returns `[]` while every collection is empty, which is the state today —
+ * but it is wired into `auditTargets()`, so when a phase-2+ task builds the
+ * first `/en/problems/<slug>/` page both audits pick it up with no edit to
+ * either script. `entryPaths` is the built page list from `dist/`
+ * (`builtServedPaths`), so this never guesses a URL that was not built.
+ *
+ * "First in path order" is a deliberate, boring rule: the sample has to be
+ * stable across runs or a budget regression looks like a flake.
  *
  * @param {readonly string[]} entryPaths served paths that exist in `dist/`
  * @param {{ base: string, locales: readonly string[] }} config
@@ -90,7 +138,9 @@ export function collectionSampleTargets(entryPaths, { base, locales }) {
   const localeHomes = new Set(locales.map((locale) => `${prefix}/${locale}/`));
   const byCollection = new Map();
 
-  for (const served of entryPaths) {
+  // Sorted here, not assumed sorted: "first per collection" is only stable if
+  // the input order is.
+  for (const served of [...entryPaths].sort()) {
     if (localeHomes.has(served)) continue;
     // `/<base>/<locale>/<collection>/<slug>/` — anything shallower is a
     // section index, not a content page.

@@ -8,7 +8,18 @@ import gitana from "./scripts/eslint/index.mjs";
 
 export default defineConfig(
   {
-    ignores: ["dist/**", ".astro/**", "node_modules/**", "coverage/**"],
+    ignores: [
+      "dist/**",
+      ".astro/**",
+      "node_modules/**",
+      "coverage/**",
+      // Agent worktrees live in `.claude/worktrees/` and are independent
+      // checkouts that lint themselves. Without this, one agent's
+      // work-in-progress edit fails `npm run verify` in the main checkout and
+      // in every other worktree — a build break nobody in those checkouts can
+      // see the cause of. (`.prettierignore` already skips `.claude/`.)
+      ".claude/**",
+    ],
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,

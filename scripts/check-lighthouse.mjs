@@ -35,6 +35,7 @@ import lighthouse from "lighthouse";
 import {
   REPO_ROOT,
   auditTargets,
+  builtServedPaths,
   resolveChromePath,
   readSiteConfig,
 } from "./lib/audit-targets.mjs";
@@ -111,7 +112,8 @@ async function main() {
 
   const { base, locales } = await readSiteConfig();
   const chromePath = resolveChromePath();
-  const { lighthouse: paths } = auditTargets({ base, locales });
+  const builtPaths = await builtServedPaths({ distDir, base });
+  const { lighthouse: paths } = auditTargets({ base, locales, builtPaths });
 
   const server = await startServer({ distDir, base });
   const missed = [];
