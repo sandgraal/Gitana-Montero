@@ -120,7 +120,7 @@ PRs. Accounts, comments, and submissions are explicitly out of scope (§9).
 
 - **MOD-01** THE `mods` collection SHALL hold, per entry: what it requires (by entry ID), what it breaks or affects, cost band, difficulty, fitment, honest tradeoffs prose in both locales, sources.
 - **MOD-02** WHEN a mod requires another mod or part, THE requirement SHALL be a typed reference that the build resolves.
-- **COM-01** THE `community` collection SHALL hold forums, subreddits, groups, Discords, clubs, channels, vendors, and shops — tagged by region, language, generation focus, activity level, and "what it's good for" in both locales.
+- **COM-01** THE `community` collection SHALL hold forums, subreddits, groups (Facebook, WhatsApp, Telegram — WhatsApp/Telegram added as first-class types by owner ruling 2026-08-28; in Central America a WhatsApp group is often the primary venue), Discords, clubs, channels, vendors, and shops — tagged by region, language, generation focus, activity level, and "what it's good for" in both locales.
 - **COM-02** Spanish-language and Central American communities SHALL be first-class entries, not an appendix.
 - **SRCH-01** THE site SHALL provide client-side search per locale over titles, symptoms, glossary terms and aliases, and part numbers.
 - **SRCH-02** WHEN a visitor searches a regional alias (e.g. `balatas`), THE results SHALL include the canonical entry (GLO-03).
