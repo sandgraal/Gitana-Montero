@@ -234,6 +234,16 @@ export const INFORMAL_VERB_LEXICON = new Set([
  * `anís` and `parchís` — both have no verb reading either, but neither is a
  * word this site's automotive/build-log/community domain has any plausible
  * use for; adding unused entries is dead weight, not safety margin.
+ *
+ * Also audited and explicitly rejected: `tomás`. It collides with the
+ * proper name Tomás, so it might look like the same kind of safe addition —
+ * it is not. `tomás` is a genuine vos present-indicative form of `tomar`
+ * ("Vos tomás café"), so denylisting it would create real false negatives
+ * and violate this list's own admission rule above (no standard tú/vos verb
+ * reading at all — not "rare", none). The proper-noun collision is inherent
+ * to a word-level heuristic; if name collisions ever bite in practice, the
+ * fix is capitalized-token handling or a per-entry allowlist, never another
+ * denylist row.
  */
 export const ACCENTED_SUFFIX_DENYLIST = new Set([
   "además",
