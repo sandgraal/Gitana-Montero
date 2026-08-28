@@ -1,0 +1,17 @@
+{
+  "id": "t106-red-uncited-numeric",
+  "fitment": { "gens": ["gen3"] },
+  "torqueNm": 88,
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "Deliberate uncited numeric spec (T106 gate proof)",
+      "summary": "A torque figure with no source. CI must refuse to merge it. Scratch branch only — never merged."
+    },
+    "es": {
+      "title": "Especificación numérica sin fuente (prueba del gate T106)",
+      "summary": "Una cifra de torque sin fuente. CI debe rechazarla. Solo rama de prueba — nunca se integra."
+    }
+  }
+}
