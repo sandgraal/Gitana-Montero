@@ -1,17 +1,37 @@
 ---
 /** Site chrome: brand, primary nav, locale switcher. All text via `t()` (I18N-08). */
 import LocaleSwitcher from "./LocaleSwitcher.astro";
-import { localeHref, type Locale } from "../i18n/routing";
+import {
+  localeHref,
+  type Locale,
+  type LocalizedRoutePaths,
+} from "../i18n/routing";
+import { collectionRoutePath } from "../i18n/routes";
 import { t } from "../i18n/ui";
 import { SITE_NAME } from "../site";
 
 interface Props {
   locale: Locale;
   routePath: string;
+  /** This page's route in every locale, when its segment is translated. */
+  routePathByLocale?: LocalizedRoutePaths;
 }
 
-const { locale, routePath } = Astro.props;
+const { locale, routePath, routePathByLocale } = Astro.props;
 const strings = t(locale);
+
+/**
+ * Nav destinations, resolved in *this* locale. A collection whose segment is
+ * translated is linked through `collectionRoutePath`, never by writing the
+ * path twice — the registry is the only place a segment exists (I18N-05).
+ */
+const navItems = [
+  { href: "/", label: strings.navHome },
+  {
+    href: collectionRoutePath("glossary", locale),
+    label: strings.navGlossary,
+  },
+];
 ---
 
 <header>
@@ -21,16 +41,25 @@ const strings = t(locale);
   </a>
   <nav aria-label={strings.navLabel}>
     <ul>
-      <li>
-        <a
-          href={localeHref(locale, "/")}
-          aria-current={routePath === "/" ? "page" : undefined}
-          >{strings.navHome}</a
-        >
-      </li>
+      {
+        navItems.map((item) => (
+          <li>
+            <a
+              href={localeHref(locale, item.href)}
+              aria-current={routePath === item.href ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
     </ul>
   </nav>
-  <LocaleSwitcher locale={locale} routePath={routePath} />
+  <LocaleSwitcher
+    locale={locale}
+    routePath={routePath}
+    routePathByLocale={routePathByLocale}
+  />
 </header>
 
 <style>

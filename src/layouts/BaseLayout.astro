@@ -13,10 +13,12 @@ import SiteFooter from "../components/SiteFooter.astro";
 import {
   LOCALE_BCP47,
   absoluteUrl,
-  alternateLinks,
+  localizedAlternateLinks,
   localeHref,
+  sameRouteInEveryLocale,
   splitLocalePath,
   type Locale,
+  type LocalizedRoutePaths,
 } from "../i18n/routing";
 import { t } from "../i18n/ui";
 import { warnIfSiteUnset } from "../i18n/site-url";
@@ -28,16 +30,30 @@ interface Props {
   /** Meta description, already localized. */
   description?: string;
   /**
-   * Locale-independent route (`/`, `/problems/`). Defaults to the current URL
-   * with the base path and locale prefix removed.
+   * Route (`/`, `/problems/`) for pages served at the same path in every
+   * locale. Defaults to the current URL with the base path and locale prefix
+   * removed.
    */
   routePath?: string;
+  /**
+   * Route per locale, for pages whose segment is translated (`/glossary/` ↔
+   * `/glosario/`, see `src/i18n/routes.ts`). Wins over `routePath`: hreflang,
+   * canonical and the locale switcher all have to name the URL that was
+   * actually built for each locale, or `check:hreflang` fails the build.
+   */
+  routePathByLocale?: LocalizedRoutePaths;
 }
 
-const { locale, title, description, routePath } = Astro.props;
+const { locale, title, description, routePath, routePathByLocale } =
+  Astro.props;
 
-const route = routePath ?? splitLocalePath(Astro.url.pathname).routePath;
-const alternates = alternateLinks(route);
+const routes =
+  routePathByLocale ??
+  sameRouteInEveryLocale(
+    routePath ?? splitLocalePath(Astro.url.pathname).routePath
+  );
+const route = routes[locale];
+const alternates = localizedAlternateLinks(routes);
 const canonicalHref = localeHref(locale, route);
 
 warnIfSiteUnset(Astro.site, Astro.url.pathname);
@@ -66,7 +82,7 @@ const strings = t(locale);
   </head>
   <body>
     <a class="skip-link" href="#main">{strings.skipToContent}</a>
-    <SiteHeader locale={locale} routePath={route} />
+    <SiteHeader locale={locale} routePath={route} routePathByLocale={routes} />
     <main id="main">
       <slot />
     </main>

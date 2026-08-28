@@ -16,16 +16,28 @@ import {
   LOCALE_NATIVE_NAME,
   localeHref,
   type Locale,
+  type LocalizedRoutePaths,
 } from "../i18n/routing";
 import { t } from "../i18n/ui";
 
 interface Props {
   locale: Locale;
   routePath: string;
+  /**
+   * The page's route in each locale, for pages whose segment is translated
+   * (`/glossary/` ↔ `/glosario/`). Without it the switcher would send a
+   * reader from `/en/glossary/` to `/es/glossary/`, which is a 404 — the
+   * "reader loses their place" bug `tests/locale-switcher.test.ts` exists to
+   * prevent, one level subtler.
+   */
+  routePathByLocale?: LocalizedRoutePaths;
 }
 
-const { locale, routePath } = Astro.props;
+const { locale, routePath, routePathByLocale } = Astro.props;
 const strings = t(locale);
+
+const routeIn = (option: Locale): string =>
+  routePathByLocale?.[option] ?? routePath;
 ---
 
 <nav class="locale-switcher" aria-label={strings.languageSwitcherLabel}>
@@ -37,7 +49,7 @@ const strings = t(locale);
       LOCALES.map((option) => (
         <li>
           <a
-            href={localeHref(option, routePath)}
+            href={localeHref(option, routeIn(option))}
             hreflang={LOCALE_HREFLANG[option]}
             lang={LOCALE_BCP47[option]}
             data-locale-choice={option}

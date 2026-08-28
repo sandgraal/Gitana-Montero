@@ -248,6 +248,46 @@ describe("collectionSampleTargets", () => {
       collectionSampleTargets(["/Gitana-Montero/fr/problems/whatever/"], config)
     ).toEqual([]);
   });
+
+  // T205: the glossary is the first collection whose only page is its index
+  // (GLO-04 asks for one page, not one per term). Without the fallback below
+  // it would be audited by nothing, which is a silent hole in SCF-06.
+  it("falls back to a collection's index page when it has no entry pages", () => {
+    const built = [
+      "/Gitana-Montero/en/",
+      "/Gitana-Montero/en/glossary/",
+      "/Gitana-Montero/es/",
+      "/Gitana-Montero/es/glosario/",
+    ];
+
+    expect(collectionSampleTargets(built, config)).toEqual([
+      "/Gitana-Montero/en/glossary/",
+      "/Gitana-Montero/es/glosario/",
+    ]);
+  });
+
+  it("prefers an entry page over the index, and never audits both", () => {
+    const built = [
+      "/Gitana-Montero/en/",
+      "/Gitana-Montero/en/problems/",
+      "/Gitana-Montero/en/problems/rear-diff-whine/",
+      "/Gitana-Montero/en/glossary/",
+    ];
+
+    expect(collectionSampleTargets(built, config)).toEqual([
+      "/Gitana-Montero/en/glossary/",
+      "/Gitana-Montero/en/problems/rear-diff-whine/",
+    ]);
+  });
+
+  it("still ignores the 404 and the root shim", () => {
+    expect(
+      collectionSampleTargets(
+        ["/Gitana-Montero/", "/Gitana-Montero/404.html"],
+        config
+      )
+    ).toEqual([]);
+  });
 });
 
 describe("resolveChromePath", () => {
