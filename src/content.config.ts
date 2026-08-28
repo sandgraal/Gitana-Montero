@@ -44,10 +44,10 @@ const baseProse = {
 };
 
 /** One collection, base entry shape, loaded from `src/content/<name>/`. */
-function entryCollection(name: string) {
+function entryCollection(name: string, shared: z.ZodRawShape = {}) {
   return defineCollection({
     loader: glob({ pattern: ENTRY_PATTERN, base: `./src/content/${name}` }),
-    schema: defineEntrySchema({}, baseProse),
+    schema: defineEntrySchema(shared, baseProse),
   });
 }
 
@@ -57,7 +57,7 @@ export const collections = {
   /** GLO-01…04 — canonical EN/ES terms and regional aliases. */
   glossary: entryCollection("glossary"),
   /** REF-01, REF-02 — FSM index, fluids, torque master table, capacities. */
-  reference: entryCollection("reference"),
+  reference: entryCollection("reference", { torqueNm: z.number().optional() }),
   /** GAR-01…05 — the build log for the truck. */
   garage: entryCollection("garage"),
   /** PRB-01…06 — the symptom-driven problem finder. */
