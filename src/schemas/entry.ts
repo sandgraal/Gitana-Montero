@@ -146,12 +146,54 @@ export const isoDateSchema = () =>
  * Sources — plan.md "Content conventions", AGENTS.md "Cite what you read"
  * ---------------------------------------------------------------------- */
 
+/**
+ * What kind of document a citation points at, per plan.md "Content
+ * conventions" (list amended 2026-08-28 to add `manufacturer` and
+ * `reference`).
+ *
+ * The array order is descriptive, not semantic. Unlike `CONFIDENCE_TIERS` —
+ * whose index order is an explicit contract — nothing compares positions here;
+ * the kinds merely read strongest-to-weakest as a reading aid.
+ *
+ * A source kind is an **evidence class**, not a confidence tier. The two stay
+ * separate fields and this schema deliberately does not map one onto the
+ * other, but the kinds exist so a reader can judge whether the tier an entry
+ * claims is plausible for the documents it actually cites:
+ *
+ * - `fsm` — the Factory Service Manual. Supports `fsm-confirmed`.
+ * - `tsb` — a Technical Service Bulletin. Supports `tsb`.
+ * - `manufacturer` — factory literature that is not the FSM: spec sheets,
+ *   brochures, catalogues, official Mitsubishi pages. Added with the owner's
+ *   "factory-documented" ruling (AGENTS.md, 2026-08-28), which widened the top
+ *   tier from *the FSM alone* to *manufacturer primary literature* — so this
+ *   kind can support `fsm-confirmed`. Before it existed, a factory brochure
+ *   had to file as `vendor`, which reads as "a shop that sells the part" and
+ *   lost the fact that the manufacturer itself published the figure.
+ * - `forum` — an enthusiast thread or club post. Supports
+ *   `community-consensus` at best, and only in aggregate.
+ * - `video` — a build or repair video. Same standing as `forum`.
+ * - `vendor` — a parts seller's catalogue or fitment guide. Good for part
+ *   numbers and supersession, not for factory figures.
+ * - `reference` — tertiary or institutional reference: dictionaries (DLE,
+ *   Diccionario de americanismos), encyclopedias, and government or official
+ *   pages (gov.uk MOT, COSEVI RTV). Added alongside `manufacturer`. It is the
+ *   honest kind for the terminology and jurisdiction claims the glossary and
+ *   market entries make, and supports those at `community-consensus` level: a
+ *   dictionary settles what a word means and a ministry page settles what a
+ *   rule is, but neither is factory evidence about a truck. **Wikipedia
+ *   belongs here**, not under `forum`, where it was previously filed for lack
+ *   of anywhere better — an encyclopedia is not an enthusiast thread, and the
+ *   mis-filing understated otherwise-citable entries.
+ * - `first-hand` — the owner's own truck. Supports `first-hand`, never more.
+ */
 export const SOURCE_KINDS = [
   "fsm",
   "tsb",
+  "manufacturer",
   "forum",
   "video",
   "vendor",
+  "reference",
   "first-hand",
 ] as const;
 

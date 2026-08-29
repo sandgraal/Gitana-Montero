@@ -11,9 +11,11 @@
  *   `fsm-confirmed > tsb > community-consensus > first-hand > anecdotal`.
  *   See the ordering block for what that resolved.
  * - Sources: plan.md — `{ title, url, archiveUrl, accessed, kind }`,
- *   `kind ∈ fsm | tsb | forum | video | vendor | first-hand`; AGENTS.md
- *   requires archiving the URL at citation time, so `archiveUrl` is not
- *   optional.
+ *   `kind ∈ fsm | tsb | manufacturer | forum | video | vendor | reference |
+ *   first-hand` (plan.md amended 2026-08-28: `manufacturer` = factory
+ *   literature per the factory-documented tier ruling, `reference` =
+ *   tertiary/institutional); AGENTS.md requires archiving the URL at citation
+ *   time, so `archiveUrl` is not optional.
  * - Fitment: AGENTS.md — "Every entity carries an explicit fitment. A fact
  *   with no fitment is a build error." The *values* inside a fitment are not
  *   graded here: resolving gen/market/engine ids against the taxonomy is
@@ -211,9 +213,18 @@ describe("sources (plan.md conventions, AGENTS.md archive-at-citation)", () => {
     }
   );
 
-  it("SOURCE_KINDS holds exactly the six kinds plan.md names", () => {
+  it("SOURCE_KINDS holds exactly the eight kinds plan.md names", () => {
     expect([...SOURCE_KINDS].sort()).toEqual(
-      ["first-hand", "forum", "fsm", "tsb", "vendor", "video"].sort()
+      [
+        "first-hand",
+        "forum",
+        "fsm",
+        "manufacturer",
+        "reference",
+        "tsb",
+        "vendor",
+        "video",
+      ].sort()
     );
   });
 
