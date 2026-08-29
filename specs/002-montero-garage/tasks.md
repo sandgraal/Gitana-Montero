@@ -11,18 +11,29 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
 
 ## Phase P0 — Rename & replatform
 
-- [ ] **T2-101 [PLATFORM]** Coordinated rename gitana-montero → monterogarage:
+- [x] **T2-101 [PLATFORM]** Coordinated rename gitana-montero → monterogarage:
   repo rename (redirects verified), `site` → https://monterogarage.com,
   `base` → "/", src/site.ts (SITE_NAME → "Montero Garage", REPO_URL,
   keep TRUCK_YEAR with Gitana Blanca naming), ui.ts mission strings both
   locales, README, CI base-assertion updated for the no-base world,
   check:hreflang against the new absolute URLs, bilingual not-affiliated
   footer notice (MIG-05). *(MIG-01, MIG-05)*
+  <br>**Landed in two halves on purpose.** GitHub Pages is the live deploy
+  until T2-102, and a Pages *project site* is only reachable when `base` ===
+  `/<RepoName>`. So T2-101 renamed the repository and set `base` to
+  `/monterogarage`, leaving `site` at `https://sandgraal.github.io`; setting
+  `site` to the custom domain before the DNS cutover (an owner action inside
+  T2-102) would have published canonical/hreflang URLs at a host that does
+  not answer. **T2-102 owns the remaining two lines of MIG-01:** `site` →
+  `https://monterogarage.com`, `base` → `/`, and deleting the CI
+  base-assertion step in the same commit.
 - [ ] **T2-102 [PLATFORM]** Vercel migration: project setup, production on
   main + preview deployments on PRs, CI gates unchanged and still
   merge-blocking, Pages deploy retired with a tombstone redirect, DNS records
   handed to the owner for Namecheap (owner action), Lighthouse/Pa11y budgets
-  re-proved on the Vercel URL. Depends: T2-101. *(MIG-02; amends 001 SCF-05)*
+  re-proved on the Vercel URL. **Also finishes MIG-01:** `site` →
+  `https://monterogarage.com`, `base` → `/`, CI base-assertion step deleted
+  (see T2-101). Depends: T2-101. *(MIG-02; amends 001 SCF-05)*
 
 ## Phase P1 — Auth & user model
 

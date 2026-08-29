@@ -82,7 +82,7 @@ export function withBase(path: string, base?: string): string {
   return `${prefix}${suffix}`;
 }
 
-/** The site root as served (`/` or `/Gitana-Montero/`). */
+/** The site root as served (`/` or `/monterogarage/`). */
 export function baseHref(base?: string): string {
   return withBase("/", base);
 }

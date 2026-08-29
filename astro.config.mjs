@@ -4,15 +4,32 @@ import { defineConfig } from "astro/config";
 /**
  * Single source of truth for where this site is deployed.
  *
- * Today: GitHub Pages project pages — https://sandgraal.github.io/Gitana-Montero/
- * (owner decision, 2026-08-27). If it later moves to a custom domain, change
- * `site` and set `base` to "/" here and nowhere else: every internal link,
- * canonical URL and hreflang href is derived from these two values through
+ * Today (T2-101, the rename half of MIG-01): still GitHub Pages project pages,
+ * now at https://sandgraal.github.io/monterogarage/ — the repository was
+ * renamed `Gitana-Montero` → `monterogarage`, and a Pages *project site* is
+ * served at `/<RepoName>/`, so `base` must track the repository name
+ * byte-for-byte (CI asserts exactly that). GitHub redirects the old repo and
+ * Pages URLs for as long as it keeps them, but the redirect is not a place to
+ * build on.
+ *
+ * Next (T2-102, the replatform half of MIG-01/MIG-02): hosting moves to Vercel
+ * behind monterogarage.com, at which point — and only then, because the DNS
+ * cutover is an owner action — this becomes:
+ *
+ *     site: "https://monterogarage.com",
+ *     base: "/",
+ *
+ * and the CI "base matches the repository name" assertion retires with it.
+ * Setting `site` to the custom domain before DNS resolves would publish
+ * canonical and hreflang URLs pointing at a host that does not answer.
+ *
+ * Both values are changed here and nowhere else: every internal link,
+ * canonical URL and hreflang href is derived from them through
  * `src/i18n/routing.ts` (`import.meta.env.BASE_URL`) and `Astro.site`.
  */
 export default defineConfig({
   site: "https://sandgraal.github.io",
-  base: "/Gitana-Montero",
+  base: "/monterogarage",
 
   // Static output (SCF-01).
   output: "static",
