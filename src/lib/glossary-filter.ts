@@ -33,7 +33,11 @@ import { normalizeForSearch } from "./text";
 export interface GlossaryFilterCard {
   /** The card's system id, `data-system`. */
   readonly system: string;
-  /** Pre-normalized searchable text, `data-haystack`. */
+  /**
+   * Pre-normalized searchable text. Built client-side by `buildHaystack`
+   * from the card's own rendered text — there is no server-rendered
+   * `data-haystack` attribute (SCF-06 follow-up; see the module docs).
+   */
   readonly haystack: string;
 }
 
@@ -64,6 +68,15 @@ export interface GlossaryHaystackSource {
  * Normalize a card's rendered parts into the same haystack shape the page
  * used to serialize into `data-haystack`, without shipping the duplicate
  * bytes. See the module docs for why this is safe for SRCH-02 recall.
+ *
+ * Country tags render joined (`alias.countries`, e.g. `"CR/DO"`), which is
+ * one token to `normalizeForSearch` — a `/` is not whitespace. The pre-T206
+ * server-rendered haystack joined each country as its own array element
+ * (`" "`-separated), so `"CR DO"` matched. Splitting `alias.countries` back
+ * into its own tokens alongside the raw joined string keeps both shapes
+ * findable — a single country code, the slash-joined chip text as shown, or
+ * a space-separated pair — without reintroducing the duplicate bytes this
+ * function exists to remove.
  */
 export function buildHaystack(source: GlossaryHaystackSource): string {
   return normalizeForSearch(
@@ -71,7 +84,11 @@ export function buildHaystack(source: GlossaryHaystackSource): string {
       ...source.terms,
       ...source.definitions,
       source.system,
-      ...source.aliases.flatMap((alias) => [alias.term, alias.countries]),
+      ...source.aliases.flatMap((alias) => [
+        alias.term,
+        alias.countries,
+        ...alias.countries.split("/"),
+      ]),
     ].join(" ")
   );
 }

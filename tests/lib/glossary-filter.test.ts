@@ -121,6 +121,20 @@ describe("buildHaystack", () => {
     expect(haystack).toContain(normalizeForSearch("DO"));
   });
 
+  it("finds a multi-country chip both as rendered and as separate tokens", () => {
+    // The chip renders "CR/DO" (joined with "/", which normalizeForSearch
+    // does not treat as whitespace). A query typed as the rendered text
+    // and a query typed as space-separated codes must both find it.
+    const haystack = buildHaystack(source);
+    expect(haystack).toContain(normalizeForSearch("CR/DO"));
+    expect(
+      matchesFilter(
+        { system: "brakes", haystack },
+        { system: "", query: "CR DO" }
+      )
+    ).toBe(true);
+  });
+
   it("finds both locales' term and definition text", () => {
     const haystack = buildHaystack(source);
     expect(haystack).toContain(normalizeForSearch("brake pad"));
