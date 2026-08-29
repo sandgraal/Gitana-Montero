@@ -55,11 +55,15 @@ internal link, canonical URL and hreflang href derives from them.
 - **CI is the merge gate; Vercel is only the deployer.** The three required
   checks in `.github/workflows/ci.yml` are what branch protection enforces.
   Vercel's build status is not a required check and should not become one.
-- **GitHub Pages is retired.** The old project site at
-  `https://sandgraal.github.io/monterogarage/` is served by a bilingual
-  tombstone that forwards each path to the same path on the new domain,
-  published by `.github/workflows/pages-tombstone.yml` (`workflow_dispatch`,
-  run once, by hand, after DNS went live).
+- **GitHub Pages is being retired.** Nothing here deploys to it any more, but
+  removing the deploy job froze the last deployment rather than removing it,
+  so `https://sandgraal.github.io/monterogarage/` still serves a stale copy of
+  the site until the tombstone is published. The tombstone — a bilingual
+  redirect that forwards each path to the same path on the new domain — is
+  `.github/workflows/pages-tombstone.yml`: `workflow_dispatch` only, run once
+  by hand, and it refuses to publish until `monterogarage.com` answers. Until
+  someone runs it, the old URL is stale-but-working, which is the intended
+  state during the DNS cutover.
 
 Creating the Vercel project and the Namecheap DNS records are owner actions,
 written out step by step in

@@ -67,6 +67,11 @@ jobs:
     name: Publish the tombstone to GitHub Pages
     runs-on: ubuntu-latest
     permissions:
+      # A job-level `permissions` block REPLACES the workflow-level one, it
+      # does not merge with it. Without `contents: read` spelled out here the
+      # workflow-level grant is gone and `actions/checkout` runs with no read
+      # access at all.
+      contents: read
       pages: write
       id-token: write
     environment:
@@ -90,6 +95,14 @@ jobs:
       # with a redirect to a host that does not answer. Both locale homes are
       # probed, because a half-configured domain (apex working, one locale
       # 404ing) is exactly the state a rushed DNS cutover leaves behind.
+      #
+      # Deliberately NOT `curl -L`. These are apex URLs, and the apex is the
+      # host every canonical and hreflang link in the built site names
+      # (`astro.config.mjs` → `site`). If the apex answers with a redirect —
+      # the state you get by making `www` the primary domain in Vercel — then
+      # every canonical URL the site publishes is a hop, and following the
+      # redirect here would hide exactly that. A 3xx fails this gate on
+      # purpose.
       - name: Preflight — the new domain must be serving both locales
         run: |
           failed=0
@@ -98,7 +111,7 @@ jobs:
             "https://monterogarage.com/en/" \
             "https://monterogarage.com/es/"
           do
-            code="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 20 "$url" || echo 000)"
+            code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "$url" || echo 000)"
             echo "${code}  ${url}"
             case "$code" in
               2*) ;;
@@ -106,7 +119,9 @@ jobs:
             esac
           done
           if [ "$failed" -ne 0 ]; then
-            echo "monterogarage.com is not serving the site yet." >&2
+            echo "monterogarage.com is not serving the site yet (a 3xx counts:" >&2
+            echo "the apex must answer directly, because it is the host every" >&2
+            echo "canonical and hreflang URL in the built site names)." >&2
             echo "Finish the Vercel project + DNS steps in" >&2
             echo "specs/002-montero-garage/HANDOFF-T2-102-DEPLOY.md, then re-run." >&2
             exit 1

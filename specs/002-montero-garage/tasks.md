@@ -36,7 +36,11 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   (see T2-101). Depends: T2-101. *(MIG-02; amends 001 SCF-05)*
   <br>**Two parts are owner actions and are written out, not done:**
   `specs/002-montero-garage/HANDOFF-T2-102-DEPLOY.md` has the Vercel project
-  import (do it *before* merging, so the cutover gap is zero) and the exact
+  import (do it *before* merging, so production is one automatic build away
+  when `main` moves — but note the pre-merge deployment renders broken by
+  construction, because `main` still sets `base: "/monterogarage"` while the
+  output tree has no such directory; the merge is what fixes it, so nothing
+  about the merge is gated on that deployment rendering) and the exact
   Namecheap records, read off Vercel's live docs on 2026-08-28. The Pages
   tombstone is **staged, not fired**: `.github/workflows/pages-tombstone.yml`
   is `workflow_dispatch`-only and refuses to publish until
