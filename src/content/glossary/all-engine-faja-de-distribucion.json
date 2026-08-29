@@ -6,16 +6,6 @@
   "system": "engine",
   "aliases": [
     {
-      "term": "faja de tiempo",
-      "locale": "es",
-      "countries": ["CR"]
-    },
-    {
-      "term": "fajas de tiempo",
-      "locale": "es",
-      "countries": ["CR"]
-    },
-    {
       "term": "banda de tiempo",
       "locale": "es",
       "countries": ["MX"]
@@ -54,13 +44,6 @@
   "relatedTerms": ["all-engine-faja", "all-engine-arbol-de-levas"],
   "confidence": "community-consensus",
   "sources": [
-    {
-      "title": "Faja de distribución 4PK815 — Rojas Motor Costa Rica",
-      "url": "https://rojasmotorcr.com/product/faja-de-distribucion-4pk815/",
-      "archiveUrl": "https://web.archive.org/web/20260829010243/https://rojasmotorcr.com/product/faja-de-distribucion-4pk815/",
-      "accessed": "2026-08-29",
-      "kind": "vendor"
-    },
     {
       "title": "Fajas / Bandas / Correa de distribución — Truck Depot Costa Rica",
       "url": "https://truckdepot.cr/componentes-de-motor/motor/fajas-bandas-correa-de-distribucion.html",

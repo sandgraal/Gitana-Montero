@@ -6,24 +6,14 @@
   "system": "tools",
   "aliases": [
     {
-      "term": "burra",
-      "locale": "es",
-      "countries": ["CR"]
-    },
-    {
-      "term": "burras",
-      "locale": "es",
-      "countries": ["CR"]
-    },
-    {
       "term": "torre de seguridad",
       "locale": "es",
-      "countries": ["CR", "MX"]
+      "countries": ["MX"]
     },
     {
       "term": "torres de seguridad",
       "locale": "es",
-      "countries": ["CR", "MX"]
+      "countries": ["MX"]
     },
     {
       "term": "borriqueta",
@@ -72,7 +62,7 @@
   "prose": {
     "en": {
       "title": "jack stands",
-      "summary": "The stands the vehicle rests on once it is lifted, on firm level ground, with the wheels chocked. Costa Rican catalogues sell them as soportes para vehículos and, on the shop floor, as burras or burros. This is the single most important safety habit in home mechanics."
+      "summary": "The stands the vehicle rests on once it is lifted, on firm level ground, with the wheels chocked. Costa Rican catalogs sell them as soportes para vehículos and, on the shop floor, as burras or burros. This is the single most important safety habit in home mechanics."
     },
     "es": {
       "title": "soportes de seguridad",

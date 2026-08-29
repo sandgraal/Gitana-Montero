@@ -10,7 +10,7 @@
     "all-fuel-inyector",
     "all-fuel-bomba-de-combustible"
   ],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [
     {
       "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
@@ -23,11 +23,11 @@
   "prose": {
     "en": {
       "title": "fuel system",
-      "summary": "Tank, pump, lines, filter and injectors or carburetor. Safety-critical: gasoline vapor and a hot exhaust are in the same engine bay, and fuel work belongs to a qualified mechanic if there is any doubt about the state of a line."
+      "summary": "Tank, pump, lines, filter and injectors or carburetor. The cited Costa Rican catalog names the components — bombas eléctricas para combustible, línea de combustible — rather than this heading, which is the site's own category term. Safety-critical: gasoline vapor and a hot exhaust are in the same engine bay, and fuel work belongs to a qualified mechanic if there is any doubt about the state of a line."
     },
     "es": {
       "title": "sistema de combustible",
-      "summary": "Tanque, bomba, cañerías, filtro e inyectores o carburador. Es crítico para la seguridad: el vapor de gasolina y un escape caliente conviven bajo el mismo capó, y si hay dudas del estado de una cañería el trabajo es para un mecánico calificado."
+      "summary": "Tanque, bomba, cañerías, filtro e inyectores o carburador. El catálogo tico que se cita nombra las piezas — bombas eléctricas para combustible, línea de combustible — y no este encabezado, que es el término de categoría del propio sitio. Es crítico para la seguridad: el vapor de gasolina y un escape caliente conviven bajo el mismo capó, y si hay dudas del estado de una cañería el trabajo es para un mecánico calificado."
     }
   }
 }

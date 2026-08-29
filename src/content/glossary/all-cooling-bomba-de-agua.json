@@ -5,7 +5,10 @@
   },
   "system": "cooling",
   "aliases": [],
-  "relatedTerms": ["all-cooling-refrigeracion"],
+  "relatedTerms": [
+    "all-cooling-refrigeracion",
+    "all-engine-faja-de-distribucion"
+  ],
   "confidence": "community-consensus",
   "sources": [
     {

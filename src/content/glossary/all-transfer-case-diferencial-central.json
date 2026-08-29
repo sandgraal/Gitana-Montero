@@ -1,7 +1,7 @@
 {
   "id": "all-transfer-case-diferencial-central",
   "fitment": {
-    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+    "gens": ["gen2", "gen2-5", "gen3", "gen4"]
   },
   "system": "transfer-case",
   "aliases": [
@@ -42,7 +42,7 @@
     },
     "es": {
       "title": "diferencial central",
-      "summary": "El diferencial que va dentro de una caja de transferencia Super Select y que permite que el eje delantero y el trasero giren a distinta velocidad. Abierto, el vehículo puede andar con tracción total en asfalto; bloqueado, adelante y atrás quedan amarrados para agarrar."
+      "summary": "El diferencial que va dentro de una caja de transferencia Super Select y que permite que el eje delantero y el trasero giren a distinta velocidad. Abierto, el vehículo puede andar con doble tracción en asfalto; bloqueado, adelante y atrás quedan amarrados para agarrar."
     }
   }
 }

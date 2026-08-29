@@ -4,7 +4,18 @@
     "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
   },
   "system": "general",
-  "aliases": [],
+  "aliases": [
+    {
+      "term": "avería",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "averías",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
   "relatedTerms": ["all-general-taller", "all-interior-luz-de-advertencia"],
   "confidence": "first-hand",
   "sources": [],

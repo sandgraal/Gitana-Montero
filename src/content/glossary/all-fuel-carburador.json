@@ -6,9 +6,14 @@
   "system": "fuel",
   "aliases": [
     {
-      "term": "carburetor",
+      "term": "carburettor",
       "locale": "en",
-      "countries": ["US"]
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "carburettors",
+      "locale": "en",
+      "countries": ["GB", "AU"]
     },
     {
       "term": "carburetors",
@@ -21,8 +26,8 @@
   "sources": [],
   "prose": {
     "en": {
-      "title": "carburettor",
-      "summary": "The mechanical mixer used on the earliest petrol versions, before fuel injection. A carburetted engine and an injected one share almost nothing in the fuel system, so fitment matters more than usual here."
+      "title": "carburetor",
+      "summary": "The mechanical mixer used on the earliest gasoline versions, before fuel injection — carburettor in British and Australian usage. A carbureted engine and an injected one share almost nothing in the fuel system, so fitment matters more than usual here."
     },
     "es": {
       "title": "carburador",

@@ -6,6 +6,16 @@
   "system": "transmission",
   "aliases": [
     {
+      "term": "manual gearbox",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "manual gearboxes",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
       "term": "stick shift",
       "locale": "en",
       "countries": ["US"]
@@ -16,8 +26,8 @@
   "sources": [],
   "prose": {
     "en": {
-      "title": "manual gearbox",
-      "summary": "The manual transmission. Whining that changes with road speed but not with engine speed usually lives here or further back, not in the engine."
+      "title": "manual transmission",
+      "summary": "The gearbox you shift yourself — manual gearbox in British and Australian usage. Whining that changes with road speed but not with engine speed usually lives here or further back, not in the engine."
     },
     "es": {
       "title": "caja de cambios",

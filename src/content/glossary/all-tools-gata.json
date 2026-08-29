@@ -8,22 +8,22 @@
     {
       "term": "gato",
       "locale": "es",
-      "countries": ["CR", "MX", "ES"]
+      "countries": ["MX", "ES"]
     },
     {
       "term": "gatos",
       "locale": "es",
-      "countries": ["CR", "MX", "ES"]
+      "countries": ["MX", "ES"]
     },
     {
       "term": "gato hidráulico",
       "locale": "es",
-      "countries": ["CR", "MX", "ES"]
+      "countries": ["MX", "ES"]
     },
     {
       "term": "gatos hidráulicos",
       "locale": "es",
-      "countries": ["CR", "MX", "ES"]
+      "countries": ["MX", "ES"]
     },
     {
       "term": "jacks",
@@ -72,7 +72,7 @@
   "prose": {
     "en": {
       "title": "jack",
-      "summary": "What lifts the vehicle. Costa Rican tool catalogues list them in the feminine, as gatas — gata hidráulica, gata de botella, gata de tijereta — though gato is also read locally. A jack lifts, it does not hold: nobody goes under a vehicle held up by one, and the lifting points are the ones the manufacturer specifies, not whatever looks solid."
+      "summary": "What lifts the vehicle. Costa Rican tool catalogs list them in the feminine, as gatas — gata hidráulica, gata de botella, gata de tijereta — though gato is also read locally. A jack lifts, it does not hold: nobody goes under a vehicle held up by one, and the lifting points are the ones the manufacturer specifies, not whatever looks solid."
     },
     "es": {
       "title": "gata",

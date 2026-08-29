@@ -16,45 +16,15 @@
       "countries": ["ES"]
     },
     {
-      "term": "palier",
-      "locale": "es",
-      "countries": ["ES", "AR"]
-    },
-    {
-      "term": "palieres",
-      "locale": "es",
-      "countries": ["ES", "AR"]
-    },
-    {
-      "term": "semieje",
-      "locale": "es",
-      "countries": ["MX", "ES"]
-    },
-    {
-      "term": "semiejes",
-      "locale": "es",
-      "countries": ["MX", "ES"]
-    },
-    {
       "term": "CV joints",
       "locale": "en",
       "countries": ["US", "GB", "AU"]
-    },
-    {
-      "term": "halfshaft",
-      "locale": "en",
-      "countries": ["US", "GB"]
-    },
-    {
-      "term": "halfshafts",
-      "locale": "en",
-      "countries": ["US", "GB"]
     }
   ],
   "relatedTerms": [
-    "all-drivetrain-tren-motriz",
+    "all-drivetrain-palier",
     "all-wheels-tires-maza",
-    "all-drivetrain-diferencial"
+    "all-drivetrain-tren-motriz"
   ],
   "confidence": "community-consensus",
   "sources": [
@@ -69,11 +39,11 @@
   "prose": {
     "en": {
       "title": "CV joint",
-      "summary": "The constant-velocity joint at the end of a front axle shaft — the part that keeps transmitting drive while the wheel is steered. Costa Rican catalogues sell the whole item as the punta de eje, inner and outer, and that is the word to use at the counter. A clicking noise on full lock is the outer one; a torn boot is what kills them."
+      "summary": "The constant-velocity joint at the end of an axle shaft — the joint that keeps transmitting drive while the wheel is steered. It is not the shaft itself. Costa Rican counters sell the assembled unit as the punta de eje, inner and outer, so a shaft and its joints are often quoted as one part; ask which you are getting. A clicking noise on full lock is the outer joint, and a torn boot is what kills them."
     },
     "es": {
       "title": "punta de eje",
-      "summary": "La unión articulada en el extremo del eje delantero, la que sigue transmitiendo el giro aunque la rueda vaya doblada. Los catálogos ticos las venden así, puntas de eje internas y externas, y ese es el nombre con que se piden en la repuestera. El clic al doblar a tope es la externa, y lo que las mata es el guardapolvo roto."
+      "summary": "La unión articulada en el extremo del palier: la que sigue transmitiendo el giro aunque la rueda vaya doblada. No es el eje en sí. En las repuesteras ticas se vende el conjunto armado como punta de eje, interna y externa, así que muchas veces el eje y sus juntas se cotizan como una sola pieza: conviene preguntar cuál le están dando. El clic al doblar a tope es la externa, y lo que las mata es el guardapolvo roto."
     }
   }
 }

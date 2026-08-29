@@ -19,16 +19,6 @@
       "term": "universal joints",
       "locale": "en",
       "countries": ["GB", "AU"]
-    },
-    {
-      "term": "cruz de cardán",
-      "locale": "es",
-      "countries": ["CR"]
-    },
-    {
-      "term": "cruces de cardán",
-      "locale": "es",
-      "countries": ["CR"]
     }
   ],
   "relatedTerms": ["all-drivetrain-cardan", "all-fluids-grasa"],
@@ -49,7 +39,7 @@
     },
     "es": {
       "title": "cruceta",
-      "summary": "La junta en cruz en cada extremo del cardán. Seca o trabada suena al arrancar la marcha y, si se deja, puede soltar el eje: por eso se revisa cada vez que el vehículo está en soportes."
+      "summary": "La junta en cruz en cada extremo del cardán; los catálogos ticos las listan también como cruces de cardán. Seca o trabada suena al arrancar la marcha y, si se deja, puede soltar el eje: por eso se revisa cada vez que el vehículo está en soportes."
     }
   }
 }

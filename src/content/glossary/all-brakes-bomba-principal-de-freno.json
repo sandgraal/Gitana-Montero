@@ -24,16 +24,6 @@
       "term": "cilindros maestros",
       "locale": "es",
       "countries": ["MX"]
-    },
-    {
-      "term": "bomba principal para freno",
-      "locale": "es",
-      "countries": ["CR"]
-    },
-    {
-      "term": "bombas principales para frenos",
-      "locale": "es",
-      "countries": ["CR"]
     }
   ],
   "relatedTerms": [
@@ -53,7 +43,7 @@
   "prose": {
     "en": {
       "title": "brake master cylinder",
-      "summary": "The cylinder the pedal acts on, which sends pressure to all four wheels. Costa Rican catalogues list it as the bomba principal de freno and the wheel cylinders as bombas auxiliares."
+      "summary": "The cylinder the pedal acts on, which sends pressure to all four wheels. Costa Rican catalogs list it as the bomba principal de freno and the wheel cylinders as bombas auxiliares."
     },
     "es": {
       "title": "bomba principal de freno",

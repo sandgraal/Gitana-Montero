@@ -8,22 +8,12 @@
     {
       "term": "alineación",
       "locale": "es",
-      "countries": ["CR", "MX", "ES"]
+      "countries": ["MX", "ES"]
     },
     {
       "term": "alineaciones",
       "locale": "es",
-      "countries": ["CR", "MX", "ES"]
-    },
-    {
-      "term": "tramado",
-      "locale": "es",
-      "countries": ["CR"]
-    },
-    {
-      "term": "tramados",
-      "locale": "es",
-      "countries": ["CR"]
+      "countries": ["MX", "ES"]
     },
     {
       "term": "tracking",

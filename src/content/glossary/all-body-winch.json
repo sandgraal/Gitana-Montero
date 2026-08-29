@@ -6,9 +6,14 @@
   "system": "body",
   "aliases": [
     {
+      "term": "winche",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
       "term": "winches",
-      "locale": "en",
-      "countries": ["US", "GB", "AU"]
+      "locale": "es",
+      "countries": ["CR"]
     },
     {
       "term": "cabrestante",

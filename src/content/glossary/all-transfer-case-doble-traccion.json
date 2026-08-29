@@ -19,11 +19,6 @@
       "term": "4x4",
       "locale": "en",
       "countries": ["US", "GB", "AU"]
-    },
-    {
-      "term": "all-wheel drive",
-      "locale": "en",
-      "countries": ["US"]
     }
   ],
   "relatedTerms": [
@@ -31,8 +26,15 @@
     "all-transfer-case-super-select-4wd-ii",
     "all-transfer-case-easy-select"
   ],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-29",
+      "kind": "manufacturer"
+    },
     {
       "title": "Super Select II When and Where — Mitsubishi Motors Australia",
       "url": "https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
@@ -44,11 +46,11 @@
   "prose": {
     "en": {
       "title": "four-wheel drive",
-      "summary": "Drive delivered to both axles instead of one. The Spanish canonical on this site is doble tracción; tracción en las cuatro ruedas is the long form and 4x4 the short one, and both are fine in prose. A part-time system — tracción conectable, engaged by hand — must not be used in four-wheel drive on dry pavement; a system with a center differential may be."
+      "summary": "Drive delivered to both axles instead of one. The manufacturer's own specification sheet for this truck describes it as 4WD with a two-speed transfer case; the Spanish headword here, doble tracción, is this site's designation rather than a term any cited catalog prints — tracción en las cuatro ruedas is the long form and 4x4 the short one, and both are fine in prose. A part-time system — tracción conectable, engaged by hand — must not be used in four-wheel drive on dry pavement; a system with a center differential may be. It is not all-wheel drive, which stays engaged and has no low range."
     },
     "es": {
       "title": "doble tracción",
-      "summary": "La tracción que llega a los dos ejes y no a uno solo. En este sitio el término de cabecera es doble tracción; tracción en las cuatro ruedas es la forma larga y 4x4 la corta, y las dos se pueden usar en el texto. Un sistema de tracción conectable — de conexión manual — no debe andar con doble tracción en asfalto seco; uno con diferencial central sí."
+      "summary": "La tracción que llega a los dos ejes y no a uno solo. La hoja de especificaciones de fábrica de esta camioneta la describe como 4WD con caja de transferencia de dos rangos; el término de cabecera en español, doble tracción, es la designación de este sitio y no una que imprima alguno de los catálogos citados. Tracción en las cuatro ruedas es la forma larga y 4x4 la corta, y las dos se pueden usar en el texto. Un sistema de tracción conectable — de conexión manual — no debe andar con doble tracción en asfalto seco; uno con diferencial central sí. No es lo mismo que la tracción integral permanente, que va siempre conectada y no tiene rango bajo."
     }
   }
 }

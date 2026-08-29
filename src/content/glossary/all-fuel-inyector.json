@@ -11,7 +11,7 @@
       "countries": ["US", "GB", "AU"]
     }
   ],
-  "relatedTerms": ["all-fuel-sistema-de-combustible"],
+  "relatedTerms": ["all-fuel-sistema-de-combustible", "all-fuel-gdi"],
   "confidence": "first-hand",
   "sources": [],
   "prose": {

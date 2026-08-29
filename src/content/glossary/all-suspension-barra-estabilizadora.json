@@ -6,19 +6,24 @@
   "system": "suspension",
   "aliases": [
     {
-      "term": "sway bar",
-      "locale": "en",
-      "countries": ["US", "AU"]
-    },
-    {
       "term": "sway bars",
       "locale": "en",
       "countries": ["US", "AU"]
     },
     {
+      "term": "anti-roll bar",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
       "term": "anti-roll bars",
       "locale": "en",
       "countries": ["GB"]
+    },
+    {
+      "term": "stabilizer bar",
+      "locale": "en",
+      "countries": ["US"]
     }
   ],
   "relatedTerms": ["all-suspension-buje"],
@@ -34,8 +39,8 @@
   ],
   "prose": {
     "en": {
-      "title": "anti-roll bar",
-      "summary": "The transverse bar that ties the two sides of an axle together and limits body roll in a corner. Its rubber mounts — sold in Costa Rica as hules de estabilizadora — knock when they go."
+      "title": "sway bar",
+      "summary": "The transverse bar that ties the two sides of an axle together and limits body roll in a corner — anti-roll bar in British usage. Its rubber mounts, sold in Costa Rica as hules de estabilizadora, knock when they go."
     },
     "es": {
       "title": "barra estabilizadora",

@@ -1,0 +1,61 @@
+{
+  "id": "all-drivetrain-palier",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "drivetrain",
+  "aliases": [
+    {
+      "term": "semieje",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "semiejes",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "flecha",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "flechas",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "halfshaft",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
+      "term": "halfshafts",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
+      "term": "driveshaft",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-drivetrain-punta-de-eje",
+    "all-drivetrain-diferencial",
+    "all-wheels-tires-maza"
+  ],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "axle shaft",
+      "summary": "The shaft that carries drive from the differential out to the hub, with a joint at each end. Costa Rican counters usually quote it together with its joints, as a punta de eje, and no Costa Rican catalog this site has opened names the bare shaft on its own — so the Spanish headword here is recorded at the lowest confidence tier rather than invented."
+    },
+    "es": {
+      "title": "palier",
+      "summary": "El eje que lleva la tracción desde el diferencial hasta la maza, con una junta en cada extremo. En Costa Rica el mostrador casi siempre lo cotiza junto con sus juntas, como punta de eje, y ningún catálogo tico de los que este sitio ha consultado nombra el eje pelado por aparte: por eso este término se registra en el nivel de confianza más bajo, en vez de inventar uno."
+    }
+  }
+}
