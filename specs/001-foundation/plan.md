@@ -74,7 +74,12 @@ Haiku prohibitions are enforced by `scripts/validate-routing.mjs` in CI.
 - Branches: `feat/001-t###-short-slug`. Commits:
   `type(scope): …, refs specs/001-foundation`.
 - Sources: every source gets `{ title, url, archiveUrl, accessed, kind }`;
-  `kind` ∈ fsm | tsb | forum | video | vendor | first-hand. Archive at citation
+  `kind` ∈ fsm | tsb | manufacturer | forum | video | vendor | reference |
+  first-hand *(2026-08-28: `manufacturer` = factory literature — spec sheets,
+  brochures, catalogues, official manufacturer pages, per the
+  factory-documented tier ruling; `reference` = tertiary/institutional —
+  dictionaries, encyclopedias incl. Wikipedia, government/official pages;
+  added because T201/T206 evidence had no honest kind)*. Archive at citation
   time (AGENTS.md).
 - Confidence tiers ratchet upward only with new evidence; `anecdotal` entries
   older than 90 days surface in the gaps report (GAP-01) as promotion tasks.
