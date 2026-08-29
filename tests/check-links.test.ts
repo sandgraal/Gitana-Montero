@@ -427,6 +427,64 @@ describe("findUnreachableLinks — archive.org throttling", () => {
     expect(delayCalls).toEqual([1_000]);
   });
 
+  it("clamps an absurd Retry-After value to the largest backoff schedule entry instead of waiting it out", async () => {
+    let calls = 0;
+    const fetchImpl = async () => {
+      calls += 1;
+      if (calls === 1) {
+        return {
+          ok: false,
+          status: 429,
+          headers: {
+            // A year, in seconds — a hostile or misconfigured host.
+            get: (name: string) => (name === "retry-after" ? "31536000" : null),
+          },
+        };
+      }
+      return { ok: true, status: 200 };
+    };
+    const delayCalls: number[] = [];
+    const delayImpl = async (ms: number) => {
+      delayCalls.push(ms);
+    };
+
+    const { issues, warnings } = await findUnreachableLinks(
+      [archiveOnlyEntry()],
+      { fetchImpl, delayImpl }
+    );
+
+    expect(issues).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(calls).toBe(2);
+    // Clamped to the largest ARCHIVE_BACKOFF_SCHEDULE_MS entry, not the
+    // year-long value the header actually requested.
+    expect(delayCalls).toEqual([Math.max(...ARCHIVE_BACKOFF_SCHEDULE_MS)]);
+  });
+
+  it("reports a source unreachable when archive.org keeps returning 429 through every backoff attempt", async () => {
+    let headCalls = 0;
+    let getCalls = 0;
+    const fetchImpl = async (_url: string, init: { method: string }) => {
+      if (init.method === "HEAD") headCalls += 1;
+      else getCalls += 1;
+      return { ok: false, status: 429 };
+    };
+    const { issues, warnings } = await findUnreachableLinks(
+      [archiveOnlyEntry()],
+      { fetchImpl, delayImpl: instantDelay }
+    );
+
+    expect(warnings).toEqual([]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.message).toMatch(/unreachable on both sides/);
+    expect(issues[0]?.message).toMatch(/HTTP 429/);
+    // A 429 status (not a thrown error) fails immediately without an
+    // additional GET fallback (only 405/501 trigger that) — but every
+    // ARCHIVE_MAX_ATTEMPTS backoff attempt was exhausted first, not just one.
+    expect(headCalls).toBe(ARCHIVE_MAX_ATTEMPTS);
+    expect(getCalls).toBe(0);
+  });
+
   it("reports a source unreachable when archive.org connection failures persist through every backoff attempt (GAP-01 rule unchanged)", async () => {
     let headCalls = 0;
     let getCalls = 0;

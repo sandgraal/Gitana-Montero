@@ -227,18 +227,34 @@ async function defaultDelay(ms) {
 }
 
 /**
+ * The longest we will ever honor a `Retry-After` header for — the largest
+ * entry in `ARCHIVE_BACKOFF_SCHEDULE_MS`. `Retry-After` is server-supplied
+ * and unbounded (a misbehaving or hostile host could send `Retry-After:
+ * 999999999`); rather than lean on Node's incidental 32-bit `setTimeout`
+ * clamp (~24.8 days) to save us, this ceiling is explicit and small enough
+ * that a single check can never stall a run for more than the same worst
+ * case a connection-failure retry already accepts.
+ */
+const RETRY_AFTER_CEILING_MS = Math.max(...ARCHIVE_BACKOFF_SCHEDULE_MS);
+
+/**
  * How long to wait before the next attempt when a `429` response carries a
  * `Retry-After` header — seconds (`Retry-After: 5`) or an HTTP-date are both
  * valid per RFC 9110. Returns `null` when absent, unparseable, or the
- * duck-typed test double has no `headers`.
+ * duck-typed test double has no `headers`; otherwise clamps to
+ * `RETRY_AFTER_CEILING_MS` (see its docstring).
  */
 function retryAfterMs(response) {
   const header = response?.headers?.get?.("retry-after");
   if (typeof header !== "string" || header === "") return null;
   const seconds = Number(header);
-  if (Number.isFinite(seconds)) return Math.max(0, seconds * 1_000);
+  if (Number.isFinite(seconds)) {
+    return Math.min(RETRY_AFTER_CEILING_MS, Math.max(0, seconds * 1_000));
+  }
   const when = Date.parse(header);
-  if (!Number.isNaN(when)) return Math.max(0, when - Date.now());
+  if (!Number.isNaN(when)) {
+    return Math.min(RETRY_AFTER_CEILING_MS, Math.max(0, when - Date.now()));
+  }
   return null;
 }
 
