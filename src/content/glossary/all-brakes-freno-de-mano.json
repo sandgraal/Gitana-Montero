@@ -6,7 +6,17 @@
   "system": "brakes",
   "aliases": [
     {
-      "term": "parking brake",
+      "term": "handbrake",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "handbrakes",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "emergency brake",
       "locale": "en",
       "countries": ["US"]
     },
@@ -14,14 +24,19 @@
       "term": "freno de estacionamiento",
       "locale": "es",
       "countries": ["MX", "ES"]
+    },
+    {
+      "term": "frenos de estacionamiento",
+      "locale": "es",
+      "countries": ["MX", "ES"]
     }
   ],
   "relatedTerms": ["all-brakes-zapatas-de-freno"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
-      "title": "handbrake",
+      "title": "parking brake",
       "summary": "The mechanical brake worked by the lever or the foot pedal, independent of the hydraulics. On a Montero it is often a drum inside the rear disc, and it is what holds the vehicle on a slope while a jack is under it."
     },
     "es": {

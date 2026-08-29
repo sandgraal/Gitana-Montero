@@ -4,9 +4,15 @@
     "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
   },
   "system": "steering",
-  "aliases": [],
+  "aliases": [
+    {
+      "term": "pitman arms",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
   "relatedTerms": ["all-steering-caja-de-direccion", "all-steering-brazo-loco"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {

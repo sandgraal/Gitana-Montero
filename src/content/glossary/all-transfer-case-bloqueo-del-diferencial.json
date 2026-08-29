@@ -11,12 +11,27 @@
       "countries": ["US", "GB", "AU"]
     },
     {
+      "term": "diff locks",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
       "term": "locker",
       "locale": "en",
       "countries": ["US", "AU"]
     },
     {
+      "term": "lockers",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
       "term": "bloqueo de diferencial",
+      "locale": "es",
+      "countries": ["ES", "MX"]
+    },
+    {
+      "term": "bloqueos de diferencial",
       "locale": "es",
       "countries": ["ES", "MX"]
     }
@@ -25,7 +40,7 @@
     "all-drivetrain-diferencial",
     "all-transfer-case-diferencial-central"
   ],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
@@ -34,7 +49,7 @@
     },
     "es": {
       "title": "bloqueo del diferencial",
-      "summary": "El mecanismo que amarra los dos palieres de un diferencial para que la rueda sin agarre no se lleve toda la tracción. Es para trabajo lento y de poco agarre, y se desconecta antes de volver a superficie dura."
+      "summary": "El mecanismo que amarra los dos ejes de salida de un diferencial para que la rueda sin agarre no se lleve toda la tracción. Es para trabajo lento y de poco agarre, y se desconecta antes de volver a superficie dura."
     }
   }
 }

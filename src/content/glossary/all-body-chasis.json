@@ -11,13 +11,23 @@
       "countries": ["US"]
     },
     {
+      "term": "frames",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
       "term": "bastidor",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "bastidores",
       "locale": "es",
       "countries": ["ES"]
     }
   ],
   "relatedTerms": ["all-body-protector-de-carter"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {

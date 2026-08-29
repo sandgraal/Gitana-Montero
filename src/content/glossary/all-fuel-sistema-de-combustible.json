@@ -1,0 +1,33 @@
+{
+  "id": "all-fuel-sistema-de-combustible",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fuel",
+  "aliases": [],
+  "relatedTerms": [
+    "all-fuel-gasolina",
+    "all-fuel-inyector",
+    "all-fuel-bomba-de-combustible"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "fuel system",
+      "summary": "Tank, pump, lines, filter and injectors or carburetor. Safety-critical: gasoline vapor and a hot exhaust are in the same engine bay, and fuel work belongs to a qualified mechanic if there is any doubt about the state of a line."
+    },
+    "es": {
+      "title": "sistema de combustible",
+      "summary": "Tanque, bomba, cañerías, filtro e inyectores o carburador. Es crítico para la seguridad: el vapor de gasolina y un escape caliente conviven bajo el mismo capó, y si hay dudas del estado de una cañería el trabajo es para un mecánico calificado."
+    }
+  }
+}

@@ -57,11 +57,11 @@
   "prose": {
     "en": {
       "title": "headlamp",
-      "summary": "The front lamp assembly. Costa Rican parts listings say farol — farol principal — and catalogues also file the same assemblies under silvines. Aim is an inspection item, and it changes when the suspension height changes."
+      "summary": "The front lamp assembly. Costa Rican parts listings say farol — farol principal — and catalogues also file the same assemblies under silvines. Headlamp aim is checked at Costa Rica's RTV and at the UK MOT alike, and it changes when the suspension height changes."
     },
     "es": {
       "title": "farol",
-      "summary": "El conjunto de la luz delantera. En las listas de repuestos de este país se pide como farol — farol principal — y en los catálogos los mismos conjuntos aparecen bajo «silvines». La mira es punto de revisión y cambia cuando cambia la altura de la suspensión."
+      "summary": "El conjunto de la luz delantera. En las listas de repuestos de este país se pide como farol — farol principal — y en los catálogos los mismos conjuntos aparecen bajo «silvines». El enfoque de los faroles se revisa tanto en la RTV costarricense como en el MOT británico, y cambia cuando cambia la altura de la suspensión."
     }
   }
 }

@@ -9,20 +9,35 @@
       "term": "reductora",
       "locale": "es",
       "countries": ["ES"]
+    },
+    {
+      "term": "reductoras",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "low-range",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "low ratio",
+      "locale": "en",
+      "countries": ["GB", "AU"]
     }
   ],
   "relatedTerms": [
     "all-transfer-case-caja-de-transferencia",
     "all-transfer-case-super-select-4wd-ii"
   ],
-  "confidence": "community-consensus",
+  "confidence": "fsm-confirmed",
   "sources": [
     {
       "title": "Super Select II When and Where — Mitsubishi Motors Australia",
       "url": "https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
       "archiveUrl": "https://web.archive.org/web/20260828191907/https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
       "accessed": "2026-08-28",
-      "kind": "vendor"
+      "kind": "manufacturer"
     }
   ],
   "prose": {
@@ -32,7 +47,7 @@
     },
     "es": {
       "title": "rango bajo",
-      "summary": "La desmultiplicación de la caja de transferencia, para trabajo lento, empinado o con carga. Se engancha detenido o casi detenido, y lo que hace es multiplicar el par, no dar más potencia."
+      "summary": "La desmultiplicación de la caja de transferencia, para trabajo lento, empinado o con carga. En el habla del taller es «la reducida». Se engancha detenido o casi detenido, y lo que hace es multiplicar el par, no dar más potencia."
     }
   }
 }

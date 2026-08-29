@@ -5,7 +5,7 @@
   },
   "system": "cooling",
   "aliases": [],
-  "relatedTerms": ["all-cooling-refrigeracion", "all-engine-faja-de-tiempo"],
+  "relatedTerms": ["all-cooling-refrigeracion"],
   "confidence": "community-consensus",
   "sources": [
     {
@@ -23,7 +23,7 @@
     },
     "es": {
       "title": "bomba de agua",
-      "summary": "La bomba que hace circular el refrigerante. En los motores donde la mueve la faja de tiempo, se cambia junto con la faja: la mano de obra ya está pagada."
+      "summary": "La bomba que hace circular el refrigerante. En los motores donde la mueve la faja de distribución, se cambia junto con la faja: la mano de obra ya está pagada."
     }
   }
 }

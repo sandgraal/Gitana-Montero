@@ -14,9 +14,14 @@
       "term": "desarmadores",
       "locale": "es",
       "countries": ["MX"]
+    },
+    {
+      "term": "screwdrivers",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
     }
   ],
-  "relatedTerms": [],
+  "relatedTerms": ["all-tools-llave"],
   "confidence": "community-consensus",
   "sources": [
     {
@@ -30,11 +35,11 @@
   "prose": {
     "en": {
       "title": "screwdriver",
-      "summary": "Flat, cross-head or Torx. Using one as a pry bar is how trim clips and knuckles get broken."
+      "summary": "The tool that turns a screw by its slot or recess — flat, cross-head or Torx. Using one as a pry bar is how trim clips and knuckles get broken."
     },
     "es": {
       "title": "destornillador",
-      "summary": "Plano, de cruz o Torx. Usarlo como palanca es la forma habitual de quebrar los clips de los acabados y de lastimarse los dedos."
+      "summary": "La herramienta que gira un tornillo por su ranura o su huella: plano, de cruz o Torx. Usarlo como palanca es la forma habitual de quebrar los clips de los acabados y de lastimarse los dedos."
     }
   }
 }

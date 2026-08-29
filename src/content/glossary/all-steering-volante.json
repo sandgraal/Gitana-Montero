@@ -8,16 +8,21 @@
     {
       "term": "timón",
       "locale": "es",
-      "countries": ["CO", "PE", "VE", "PA"]
+      "countries": ["CR", "CO", "PE", "VE", "PA"]
     },
     {
       "term": "timones",
       "locale": "es",
-      "countries": ["CO", "PE", "VE", "PA"]
+      "countries": ["CR", "CO", "PE", "VE", "PA"]
+    },
+    {
+      "term": "steering wheels",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
     }
   ],
   "relatedTerms": ["all-interior-bolsa-de-aire"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {

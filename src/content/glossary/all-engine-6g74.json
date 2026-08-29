@@ -1,0 +1,51 @@
+{
+  "id": "all-engine-6g74",
+  "fitment": {
+    "gens": ["gen2", "gen2-5", "gen3"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "6G74 SOHC",
+      "locale": "en",
+      "countries": ["US", "CR", "AU"]
+    },
+    {
+      "term": "6G74 DOHC",
+      "locale": "en",
+      "countries": ["JP"]
+    }
+  ],
+  "relatedTerms": [
+    "all-engine-motor",
+    "all-fuel-gdi",
+    "all-general-compatibilidad"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-29",
+      "kind": "manufacturer"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades and drivetrains)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260829054038/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-29",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "6G74",
+      "summary": "The V6 petrol engine family Mitsubishi used across the second and third generations, in DOHC, SOHC and GDI direct-injection variants depending on market and year — the SOHC is the engine in this site's own truck. The variant matters: they do not share fuel systems or all their parts, so the family code alone is not a fitment."
+    },
+    "es": {
+      "title": "6G74",
+      "summary": "La familia de motores V6 de gasolina que Mitsubishi usó en la segunda y la tercera generación, en variantes DOHC, SOHC y GDI de inyección directa según el mercado y el año; la SOHC es la de la camioneta de este sitio. La variante importa: no comparten sistema de combustible ni todas sus piezas, así que el código de familia por sí solo no es una compatibilidad."
+    }
+  }
+}

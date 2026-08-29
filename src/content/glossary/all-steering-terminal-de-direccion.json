@@ -24,16 +24,21 @@
       "term": "rótula de dirección",
       "locale": "es",
       "countries": ["ES"]
+    },
+    {
+      "term": "rótulas de dirección",
+      "locale": "es",
+      "countries": ["ES"]
     }
   ],
   "relatedTerms": ["all-suspension-rotula", "all-suspension-alineamiento"],
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "Automas — Repuestos Automotrices en Costa Rica",
-      "url": "https://automas.cr/",
-      "archiveUrl": "http://web.archive.org/web/20260828190644/https://automas.cr/",
-      "accessed": "2026-08-28",
+      "title": "Cabezales / Rótulas / Punta de dirección / Terminales de dirección — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/componentes-de-direccion/cabezales-rotulas-punta-de-direccion-terminales-de-direccion.html",
+      "archiveUrl": "https://web.archive.org/web/20260829005607/https://truckdepot.cr/componentes-de-direccion/cabezales-rotulas-punta-de-direccion-terminales-de-direccion.html",
+      "accessed": "2026-08-29",
       "kind": "vendor"
     }
   ],

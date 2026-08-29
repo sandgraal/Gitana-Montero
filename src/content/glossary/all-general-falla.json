@@ -1,0 +1,21 @@
+{
+  "id": "all-general-falla",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-taller", "all-interior-luz-de-advertencia"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "fault",
+      "summary": "Something that has failed or is failing on the vehicle. The Costa Rican word is falla, in the shop and on the invoice alike; avería is understood but reads formal, and a vehicle stopped by one se varó."
+    },
+    "es": {
+      "title": "falla",
+      "summary": "Algo que falló o va fallando en el vehículo. Es la palabra de todos los días en el taller y en la factura; avería se entiende, pero suena formal, y cuando el carro queda tirado se dice que se varó."
+    }
+  }
+}

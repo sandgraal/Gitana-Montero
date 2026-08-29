@@ -6,14 +6,35 @@
   "system": "drivetrain",
   "aliases": [
     {
+      "term": "differentials",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
       "term": "diff",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "diffs",
       "locale": "en",
       "countries": ["US", "GB", "AU"]
     }
   ],
-  "relatedTerms": ["all-transfer-case-bloqueo-del-diferencial"],
+  "relatedTerms": [
+    "all-transfer-case-bloqueo-del-diferencial",
+    "all-fluids-aceite-de-engranajes"
+  ],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "Diferenciales / Diferenciales para ejes — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/componentes-de-frenos-fitineria-y-rueda/ejes/diferenciales-diferenciales-para-ejes.html",
+      "archiveUrl": "https://web.archive.org/web/20260829053348/https://truckdepot.cr/componentes-de-frenos-fitineria-y-rueda/ejes/diferenciales-diferenciales-para-ejes.html",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "differential",

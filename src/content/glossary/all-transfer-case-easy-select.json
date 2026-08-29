@@ -1,7 +1,7 @@
 {
   "id": "all-transfer-case-easy-select",
   "fitment": {
-    "gens": ["gen2", "gen2-5", "gen3", "gen4"]
+    "gens": ["gen1", "gen2", "gen3"]
   },
   "system": "transfer-case",
   "aliases": [
@@ -13,18 +13,18 @@
   ],
   "relatedTerms": [
     "all-transfer-case-super-select-4wd-ii",
-    "all-transfer-case-caja-de-transferencia"
+    "all-transfer-case-doble-traccion"
   ],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
       "title": "Easy Select",
-      "summary": "The simpler part-time system: rear-wheel drive, four-wheel drive high and four-wheel drive low, with no centre differential. Four-wheel drive on it is for loose surfaces only — using it on dry pavement winds up the drivetrain and breaks things."
+      "summary": "The simpler part-time system: rear-wheel drive, four-wheel drive high and four-wheel drive low, with no center differential. Four-wheel drive on it is for loose surfaces only — using it on dry pavement winds up the drivetrain and breaks things."
     },
     "es": {
       "title": "Easy Select",
-      "summary": "El sistema más sencillo, de tracción conectable: trasera, cuatro ruedas en rango alto y cuatro ruedas en rango bajo, sin diferencial central. En este sistema la tracción total es solo para superficie suelta: usarla en asfalto seco tensiona el tren motriz y quiebra piezas."
+      "summary": "El sistema más sencillo, de tracción conectable — es decir, de conexión manual: trasera, cuatro ruedas en rango alto y cuatro ruedas en rango bajo, sin diferencial central. Aquí la doble tracción es solo para superficie suelta: usarla en asfalto seco tensiona el tren motriz y quiebra piezas."
     }
   }
 }

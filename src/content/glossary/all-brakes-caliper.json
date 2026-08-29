@@ -26,14 +26,9 @@
       "countries": ["ES"]
     },
     {
-      "term": "caliper",
-      "locale": "en",
-      "countries": ["US"]
-    },
-    {
       "term": "calipers",
-      "locale": "en",
-      "countries": ["US"]
+      "locale": "es",
+      "countries": ["CR"]
     }
   ],
   "relatedTerms": [
@@ -53,11 +48,11 @@
   "prose": {
     "en": {
       "title": "brake caliper",
-      "summary": "The hydraulic clamp that holds the pads over the disc. A seized piston or a stuck slide pin drags one wheel, cooks that pad and pulls the vehicle to one side under braking."
+      "summary": "The hydraulic assembly that clamps the pads against the disc. A seized piston or a stuck slide pin drags one wheel, cooks that pad and pulls the vehicle to one side under braking."
     },
     "es": {
       "title": "cáliper",
-      "summary": "La mordaza hidráulica que sostiene las pastillas sobre el disco. En los catálogos ticos aparece escrito «caliper». Si se pega el pistón o se traba un perno guía, esa rueda queda frenando, quema las pastillas de ese lado y el vehículo se jala para un lado al frenar."
+      "summary": "El conjunto hidráulico que aprieta las pastillas contra el disco. Los catálogos ticos lo escriben sin tilde, «caliper»; aquí se usa la forma acentuada. Si se pega el pistón o se traba un perno guía, esa rueda queda frenando, quema las pastillas de ese lado y el vehículo se jala para un lado al frenar."
     }
   }
 }

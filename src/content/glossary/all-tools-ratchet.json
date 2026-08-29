@@ -11,9 +11,24 @@
       "countries": ["ES"]
     },
     {
+      "term": "carracas",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
       "term": "matraca",
       "locale": "es",
       "countries": ["MX"]
+    },
+    {
+      "term": "matracas",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "ratchets",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
     }
   ],
   "relatedTerms": ["all-tools-cubo"],

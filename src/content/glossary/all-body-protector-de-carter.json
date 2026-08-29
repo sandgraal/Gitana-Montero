@@ -6,12 +6,32 @@
   "system": "body",
   "aliases": [
     {
+      "term": "skid plates",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
       "term": "sump guard",
       "locale": "en",
       "countries": ["GB"]
     },
     {
+      "term": "sump guards",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
       "term": "cubrecárter",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "cubrecárteres",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "protección de bajos",
       "locale": "es",
       "countries": ["ES"]
     }
@@ -20,10 +40,10 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "PRTOFFROAD — Preparación de vehículos 4x4 y offroad",
-      "url": "https://www.prtoffroad.com/",
-      "archiveUrl": "https://web.archive.org/web/20260828191951/https://www.prtoffroad.com/",
-      "accessed": "2026-08-28",
+      "title": "Protector de cárter — Akurat Costa Rica",
+      "url": "https://akuratcr.com/products/category/7990/",
+      "archiveUrl": "https://web.archive.org/web/20260829010119/https://akuratcr.com/products/category/7990/",
+      "accessed": "2026-08-29",
       "kind": "vendor"
     }
   ],

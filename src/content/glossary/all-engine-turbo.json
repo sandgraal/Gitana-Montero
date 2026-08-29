@@ -1,27 +1,32 @@
 {
   "id": "all-engine-turbo",
   "fitment": {
-    "gens": ["gen2", "gen2-5", "gen3", "gen4"]
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
   },
   "system": "engine",
   "aliases": [
     {
-      "term": "turbo",
+      "term": "turbos",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "turbochargers",
       "locale": "en",
       "countries": ["US", "GB", "AU"]
     }
   ],
   "relatedTerms": ["all-fuel-diesel"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
       "title": "turbocharger",
-      "summary": "The exhaust-driven compressor fitted to the turbodiesel engines in the range. Oil supply and cool-down matter: shutting a hot turbo engine off immediately after a hard climb is how bearings get cooked."
+      "summary": "The exhaust-driven compressor fitted to the turbodiesel engines in the range, from the first-generation 4D56T onward. Oil supply and cool-down matter: shutting a hot turbo engine off immediately after a hard climb is how bearings get cooked."
     },
     "es": {
       "title": "turbo",
-      "summary": "El compresor movido por los gases de escape que llevan los motores turbodiésel de la gama. La alimentación de aceite y el enfriamiento importan: apagar un turbo caliente apenas termina una cuesta es la forma más común de quemarle el cojinete."
+      "summary": "El compresor movido por los gases de escape que llevan los motores turbodiésel de la gama, desde el 4D56T de la primera generación en adelante. La alimentación de aceite y el enfriamiento importan: apagar un turbo caliente apenas termina una cuesta es la forma más común de quemarle el rodamiento."
     }
   }
 }

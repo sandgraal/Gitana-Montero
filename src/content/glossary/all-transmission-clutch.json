@@ -9,6 +9,16 @@
       "term": "croche",
       "locale": "es",
       "countries": ["DO", "PR"]
+    },
+    {
+      "term": "croches",
+      "locale": "es",
+      "countries": ["DO", "PR"]
+    },
+    {
+      "term": "clutches",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
     }
   ],
   "relatedTerms": [
@@ -29,6 +39,13 @@
       "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
       "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
       "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Repuestos para carros en Costa Rica — Repuestos Gigante",
+      "url": "https://repuestosgigante.com/repuestos/",
+      "archiveUrl": "https://web.archive.org/web/20260828192347/https://repuestosgigante.com/repuestos/",
       "accessed": "2026-08-28",
       "kind": "vendor"
     }

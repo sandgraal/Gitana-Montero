@@ -11,13 +11,23 @@
       "countries": ["ES"]
     },
     {
+      "term": "salpicaderos",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "dashboards",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
       "term": "dash",
       "locale": "en",
       "countries": ["US"]
     }
   ],
   "relatedTerms": ["all-interior-luz-de-advertencia"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {

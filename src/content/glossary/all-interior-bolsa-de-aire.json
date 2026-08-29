@@ -20,7 +20,7 @@
     "all-steering-volante",
     "all-interior-cinturon-de-seguridad"
   ],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
@@ -29,7 +29,7 @@
     },
     "es": {
       "title": "bolsa de aire",
-      "summary": "El sistema de retención suplementaria que se dispara en un impacto fuerte. Es un dispositivo pirotécnico: nunca se le miden circuitos a la ligera, nunca se trabaja cerca con la batería conectada y una luz de SRS encendida nunca es cosa cosmética. Esto es trabajo para un mecánico calificado."
+      "summary": "El sistema de retención suplementaria que se dispara en un impacto fuerte. Es un dispositivo pirotécnico: nunca se le miden los circuitos, nunca se trabaja cerca con la batería conectada y una luz de SRS encendida nunca es cosa cosmética. Esto es trabajo para un mecánico calificado."
     }
   }
 }

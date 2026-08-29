@@ -14,6 +14,13 @@
   "confidence": "community-consensus",
   "sources": [
     {
+      "title": "Empresa alemana Dekra asumirá la revisión técnica vehicular a partir del viernes 28 de octubre — Delfino.cr",
+      "url": "https://delfino.cr/2022/10/empresa-alemana-dekra-asumira-la-revision-tecnica-vehicular-a-partir-del-viernes-28-de-octubre",
+      "archiveUrl": "https://web.archive.org/web/20260829053853/https://delfino.cr/2022/10/empresa-alemana-dekra-asumira-la-revision-tecnica-vehicular-a-partir-del-viernes-28-de-octubre",
+      "accessed": "2026-08-29",
+      "kind": "reference"
+    },
+    {
       "title": "Inspección Vehicular — DEKRA Costa Rica",
       "url": "https://www.dekra.cr/es/inspeccion-vehicular/",
       "archiveUrl": "https://web.archive.org/web/20260828191803/https://www.dekra.cr/es/inspeccion-vehicular/",
@@ -24,11 +31,11 @@
   "prose": {
     "en": {
       "title": "RTV",
-      "summary": "Costa Rica's periodic vehicle inspection — revisión técnica vehicular. It applies only in Costa Rica and is run there under a state concession, held by DEKRA since the Riteve concession ended; DEKRA's own Costa Rican site also brands the service inspección técnica vehicular, ITV. RTV is not the British MOT and not the Spanish ITV; the requirements are set by Costa Rican regulation and nothing on this site should be read as a statement of what will pass."
+      "summary": "Costa Rica's periodic vehicle inspection — revisión técnica vehicular. It applies only in Costa Rica. When the Riteve contract ended the service passed to DEKRA under a temporary uso precario arrangement granted by the MOPT rather than under a new concession; DEKRA's own Costa Rican site brands the service inspección técnica vehicular, ITV. RTV is not the British MOT and not the Spanish ITV; the requirements are set by Costa Rican regulation and nothing on this site should be read as a statement of what will pass."
     },
     "es": {
       "title": "RTV",
-      "summary": "La revisión técnica vehicular de Costa Rica. Rige solo en Costa Rica y la opera un concesionario del Estado — desde el final de la concesión de Riteve la realiza DEKRA, que en su propio sitio tico también le dice inspección técnica vehicular, ITV. La RTV no es el MOT británico ni la ITV española; los requisitos los fija la normativa costarricense y nada de este sitio debe leerse como una promesa de que algo pasa la revisión."
+      "summary": "La revisión técnica vehicular de Costa Rica. Rige solo en Costa Rica. Al terminar el contrato de Riteve el servicio pasó a DEKRA bajo un permiso temporal de uso precario otorgado por el MOPT, no bajo una concesión nueva; DEKRA, en su propio sitio tico, le dice inspección técnica vehicular, ITV. La RTV no es el MOT británico ni la ITV española; los requisitos los fija la normativa costarricense y nada de este sitio debe leerse como una promesa de que algo pasa la revisión."
     }
   }
 }

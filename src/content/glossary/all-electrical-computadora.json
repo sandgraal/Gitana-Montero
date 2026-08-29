@@ -11,7 +11,17 @@
       "countries": ["ES"]
     },
     {
+      "term": "centralitas",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
       "term": "ECU",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "ECUs",
       "locale": "en",
       "countries": ["US", "GB", "AU"]
     },
@@ -22,7 +32,7 @@
     }
   ],
   "relatedTerms": ["all-tools-escaner"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {

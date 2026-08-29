@@ -41,8 +41,8 @@
       "countries": ["US", "GB", "AU"]
     }
   ],
-  "relatedTerms": ["all-fluids-grasa"],
-  "confidence": "community-consensus",
+  "relatedTerms": ["all-wheels-tires-maza", "all-fluids-grasa"],
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {

@@ -1,0 +1,54 @@
+{
+  "id": "all-transfer-case-doble-traccion",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "transfer-case",
+  "aliases": [
+    {
+      "term": "tracción integral",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "4WD",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
+      "term": "4x4",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "all-wheel drive",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": [
+    "all-transfer-case-caja-de-transferencia",
+    "all-transfer-case-super-select-4wd-ii",
+    "all-transfer-case-easy-select"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Super Select II When and Where — Mitsubishi Motors Australia",
+      "url": "https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
+      "archiveUrl": "https://web.archive.org/web/20260828191907/https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
+      "accessed": "2026-08-28",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "four-wheel drive",
+      "summary": "Drive delivered to both axles instead of one. The Spanish canonical on this site is doble tracción; tracción en las cuatro ruedas is the long form and 4x4 the short one, and both are fine in prose. A part-time system — tracción conectable, engaged by hand — must not be used in four-wheel drive on dry pavement; a system with a center differential may be."
+    },
+    "es": {
+      "title": "doble tracción",
+      "summary": "La tracción que llega a los dos ejes y no a uno solo. En este sitio el término de cabecera es doble tracción; tracción en las cuatro ruedas es la forma larga y 4x4 la corta, y las dos se pueden usar en el texto. Un sistema de tracción conectable — de conexión manual — no debe andar con doble tracción en asfalto seco; uno con diferencial central sí."
+    }
+  }
+}

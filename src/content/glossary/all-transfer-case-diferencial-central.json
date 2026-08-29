@@ -6,7 +6,17 @@
   "system": "transfer-case",
   "aliases": [
     {
-      "term": "center differential",
+      "term": "centre differential",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "centre differentials",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "center diff",
       "locale": "en",
       "countries": ["US"]
     }
@@ -15,20 +25,20 @@
     "all-transfer-case-super-select-4wd-ii",
     "all-drivetrain-diferencial"
   ],
-  "confidence": "community-consensus",
+  "confidence": "fsm-confirmed",
   "sources": [
     {
       "title": "Super Select II When and Where — Mitsubishi Motors Australia",
       "url": "https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
       "archiveUrl": "https://web.archive.org/web/20260828191907/https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
       "accessed": "2026-08-28",
-      "kind": "vendor"
+      "kind": "manufacturer"
     }
   ],
   "prose": {
     "en": {
-      "title": "centre differential",
-      "summary": "The differential inside a Super Select transfer case that lets front and rear axles turn at different speeds. Open, the vehicle can use four-wheel drive on tarmac; locked, front and rear are tied together for grip."
+      "title": "center differential",
+      "summary": "The differential inside a Super Select transfer case that lets front and rear axles turn at different speeds. Open, the vehicle can use four-wheel drive on pavement; locked, front and rear are tied together for grip."
     },
     "es": {
       "title": "diferencial central",

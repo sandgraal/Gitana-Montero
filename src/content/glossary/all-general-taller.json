@@ -6,6 +6,26 @@
   "system": "general",
   "aliases": [
     {
+      "term": "garaje",
+      "locale": "es",
+      "countries": ["ES", "MX"]
+    },
+    {
+      "term": "garajes",
+      "locale": "es",
+      "countries": ["ES", "MX"]
+    },
+    {
+      "term": "cochera",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "cocheras",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
       "term": "garage",
       "locale": "en",
       "countries": ["US", "GB"]
@@ -32,19 +52,19 @@
     {
       "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
       "url": "https://guiaautomotrizcr.com/",
-      "archiveUrl": "http://web.archive.org/web/20260606201328/https://guiaautomotrizcr.com/",
-      "accessed": "2026-08-28",
+      "archiveUrl": "https://web.archive.org/web/20260829004857/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-29",
       "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
       "title": "repair shop",
-      "summary": "The shop where the vehicle is actually worked on. Costa Rican directories list them as talleres, often specialised — taller mecánico, taller de enderezado y pintura, taller eléctrico."
+      "summary": "The shop where the vehicle is actually worked on. Costa Rican directories list them as talleres, usually specialized — taller mecánico, taller de enderezado y pintura, taller eléctrico. A garaje or cochera in Costa Rica is where you park, not where the work gets done."
     },
     "es": {
       "title": "taller",
-      "summary": "El local donde se le hace el trabajo al vehículo. Los directorios ticos los listan como talleres y casi siempre especializados: taller mecánico, taller de enderezado y pintura, taller eléctrico."
+      "summary": "El local donde se le hace el trabajo al vehículo. Los directorios ticos los listan como talleres y casi siempre especializados: taller mecánico, taller de enderezado y pintura, taller eléctrico. En Costa Rica un garaje o una cochera es donde se parquea, no donde se repara."
     }
   }
 }

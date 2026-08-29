@@ -6,13 +6,23 @@
   "system": "steering",
   "aliases": [
     {
+      "term": "idler arms",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
       "term": "brazo auxiliar",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "brazos auxiliares",
       "locale": "es",
       "countries": ["ES"]
     }
   ],
   "relatedTerms": ["all-steering-brazo-pitman"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {

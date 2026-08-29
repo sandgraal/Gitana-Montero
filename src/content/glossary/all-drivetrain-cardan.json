@@ -11,19 +11,47 @@
       "countries": ["ES"]
     },
     {
+      "term": "árboles de transmisión",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
       "term": "flecha cardán",
       "locale": "es",
       "countries": ["MX"]
     },
     {
+      "term": "flechas cardán",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "driveshafts",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
       "term": "propshaft",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "propshafts",
       "locale": "en",
       "countries": ["GB"]
     }
   ],
   "relatedTerms": ["all-drivetrain-cruceta", "all-drivetrain-tren-motriz"],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "Cruces de cardán / Crucetas de cardán — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/componentes-de-transmision/transmision/cruces-de-cardan-cruces-de-barra-crucetas-de-cardan-o-cruces-de-transmision.html",
+      "archiveUrl": "https://web.archive.org/web/20260829053304/https://truckdepot.cr/componentes-de-transmision/transmision/cruces-de-cardan-cruces-de-barra-crucetas-de-cardan-o-cruces-de-transmision.html",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "driveshaft",

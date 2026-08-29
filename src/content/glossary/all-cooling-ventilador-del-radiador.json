@@ -6,14 +6,32 @@
   "system": "cooling",
   "aliases": [
     {
+      "term": "radiator fans",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
       "term": "cooling fan",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "cooling fans",
       "locale": "en",
       "countries": ["US"]
     }
   ],
   "relatedTerms": ["all-cooling-radiador", "all-cooling-refrigeracion"],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "ABANICOS VARIEDAD — Repuestos USA Motors, Costa Rica",
+      "url": "https://repuestosusamotorscr.com/producto/abanicos-variedad/",
+      "archiveUrl": "https://web.archive.org/web/20260829005857/https://repuestosusamotorscr.com/producto/abanicos-variedad/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "radiator fan",
@@ -21,7 +39,7 @@
     },
     "es": {
       "title": "ventilador del radiador",
-      "summary": "El ventilador que jala aire por el radiador cuando el vehículo no anda lo bastante rápido para lograrlo solo; en casi toda esta gama va movido por faja con un acople viscoso. En el taller tico también se le dice abanico."
+      "summary": "El ventilador que jala aire por el radiador cuando el vehículo no anda lo bastante rápido para lograrlo solo; en casi toda esta gama va movido por faja con un acople viscoso. En el taller y en las repuesteras ticas se le dice abanico — abanico del agua, para distinguirlo del abanico del aire acondicionado."
     }
   }
 }

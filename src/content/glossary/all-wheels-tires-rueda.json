@@ -19,11 +19,11 @@
   "prose": {
     "en": {
       "title": "wheel",
-      "summary": "Rim and tire together, as one assembly — what comes off the vehicle when the five nuts are undone."
+      "summary": "Rim and tire together, as one assembly — what comes off the vehicle when its wheel nuts are undone."
     },
     "es": {
       "title": "rueda",
-      "summary": "El aro y la llanta juntos, como un solo conjunto: lo que sale del vehículo cuando se aflojan las cinco tuercas."
+      "summary": "El aro y la llanta juntos, como un solo conjunto: lo que sale del vehículo cuando se aflojan las tuercas de rueda."
     }
   }
 }

@@ -7,7 +7,8 @@
   "aliases": [],
   "relatedTerms": [
     "all-general-overland",
-    "all-transfer-case-caja-de-transferencia"
+    "all-transfer-case-caja-de-transferencia",
+    "all-transfer-case-doble-traccion"
   ],
   "confidence": "community-consensus",
   "sources": [
@@ -29,11 +30,11 @@
   "prose": {
     "en": {
       "title": "off-road vehicle",
-      "summary": "A vehicle built to leave paved roads: body-on-frame or reinforced structure, high ground clearance and low-range gearing. The Montero is one."
+      "summary": "A vehicle built to leave paved roads: body-on-frame or reinforced structure, high ground clearance and low range. The Montero is one."
     },
     "es": {
       "title": "todoterreno",
-      "summary": "Vehículo hecho para salirse del asfalto: estructura reforzada, buena altura libre y marcha reducida. La Montero es uno."
+      "summary": "Vehículo hecho para salirse del asfalto: carrocería sobre chasis o estructura reforzada, buena altura libre y rango bajo. La Montero es un todoterreno."
     }
   }
 }

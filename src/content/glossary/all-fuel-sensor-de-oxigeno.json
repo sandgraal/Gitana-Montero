@@ -6,7 +6,17 @@
   "system": "fuel",
   "aliases": [
     {
+      "term": "oxygen sensors",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
       "term": "lambda sensor",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "lambda sensors",
       "locale": "en",
       "countries": ["GB", "AU"]
     },
@@ -14,10 +24,15 @@
       "term": "sonda lambda",
       "locale": "es",
       "countries": ["ES"]
+    },
+    {
+      "term": "sondas lambda",
+      "locale": "es",
+      "countries": ["ES"]
     }
   ],
   "relatedTerms": ["all-exhaust-catalizador"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {

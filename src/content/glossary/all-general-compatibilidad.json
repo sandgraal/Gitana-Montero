@@ -5,7 +5,11 @@
   },
   "system": "general",
   "aliases": [],
-  "relatedTerms": ["all-general-numero-de-parte", "all-general-repuestos"],
+  "relatedTerms": [
+    "all-general-numero-de-parte",
+    "all-general-repuestos",
+    "all-general-factura"
+  ],
   "confidence": "community-consensus",
   "sources": [
     {

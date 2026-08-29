@@ -5,11 +5,7 @@
   },
   "system": "engine",
   "aliases": [],
-  "relatedTerms": [
-    "all-engine-cabezote",
-    "all-engine-aceite-de-motor",
-    "all-engine-faja-de-tiempo"
-  ],
+  "relatedTerms": ["all-engine-cabezote", "all-engine-aceite-de-motor"],
   "confidence": "community-consensus",
   "sources": [
     {

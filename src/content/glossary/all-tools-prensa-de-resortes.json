@@ -6,7 +6,7 @@
   "system": "tools",
   "aliases": [],
   "relatedTerms": ["all-suspension-resorte", "all-suspension-amortiguador"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
@@ -15,7 +15,7 @@
     },
     "es": {
       "title": "prensa de resortes",
-      "summary": "La prensa que mantiene comprimido el resorte mientras se desarma la suspensión. Un resorte comprimido es energía guardada: este es uno de esos trabajos donde la herramienta correcta, o el mecánico calificado, no son opcionales."
+      "summary": "La prensa que mantiene comprimido el resorte mientras se desarma la suspensión. Un resorte comprimido es una lesión guardada: este es uno de esos trabajos donde la herramienta correcta, o el mecánico calificado, no son opcionales."
     }
   }
 }

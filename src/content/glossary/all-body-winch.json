@@ -6,7 +6,17 @@
   "system": "body",
   "aliases": [
     {
+      "term": "winches",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
       "term": "cabrestante",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "cabrestantes",
       "locale": "es",
       "countries": ["ES"]
     }
@@ -15,10 +25,10 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "PRTOFFROAD — Preparación de vehículos 4x4 y offroad",
-      "url": "https://www.prtoffroad.com/",
-      "archiveUrl": "https://web.archive.org/web/20260828191951/https://www.prtoffroad.com/",
-      "accessed": "2026-08-28",
+      "title": "Resultados de búsqueda para «winche» — CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalogsearch/result/?q=winche",
+      "archiveUrl": "https://web.archive.org/web/20260829005737/https://www.capris.cr/es/catalogsearch/result/?q=winche",
+      "accessed": "2026-08-29",
       "kind": "vendor"
     }
   ],

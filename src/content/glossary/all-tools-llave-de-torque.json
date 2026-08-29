@@ -11,9 +11,24 @@
       "countries": ["MX"]
     },
     {
+      "term": "torquímetros",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
       "term": "llave dinamométrica",
       "locale": "es",
       "countries": ["ES"]
+    },
+    {
+      "term": "llaves dinamométricas",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "torque wrenches",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
     }
   ],
   "relatedTerms": ["all-tools-llave", "all-wheels-tires-tuerca-de-rueda"],

@@ -11,9 +11,29 @@
       "countries": ["US", "GB", "AU"]
     },
     {
+      "term": "master cylinders",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
       "term": "cilindro maestro",
       "locale": "es",
       "countries": ["MX"]
+    },
+    {
+      "term": "cilindros maestros",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "bomba principal para freno",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "bombas principales para frenos",
+      "locale": "es",
+      "countries": ["CR"]
     }
   ],
   "relatedTerms": [

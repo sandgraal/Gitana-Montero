@@ -6,12 +6,27 @@
   "system": "brakes",
   "aliases": [
     {
+      "term": "brake boosters",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
       "term": "servo",
       "locale": "en",
       "countries": ["GB"]
     },
     {
+      "term": "servos",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
       "term": "servofreno",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "servofrenos",
       "locale": "es",
       "countries": ["ES"]
     }

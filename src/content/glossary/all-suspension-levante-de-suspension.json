@@ -11,7 +11,17 @@
       "countries": ["US", "AU"]
     },
     {
+      "term": "lift kits",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
       "term": "kit de elevación",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "kits de elevación",
       "locale": "es",
       "countries": ["ES"]
     }
@@ -23,21 +33,21 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "PRTOFFROAD — Preparación de vehículos 4x4 y offroad",
-      "url": "https://www.prtoffroad.com/",
-      "archiveUrl": "https://web.archive.org/web/20260828191951/https://www.prtoffroad.com/",
-      "accessed": "2026-08-28",
+      "title": "Suspensión, off-road — The Underground Costa Rica",
+      "url": "https://theundergroundcr.com/categoria-producto/off-road/suspension/",
+      "archiveUrl": "https://web.archive.org/web/20260829010032/https://theundergroundcr.com/categoria-producto/off-road/suspension/",
+      "accessed": "2026-08-29",
       "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
       "title": "suspension lift",
-      "summary": "A kit of springs, dampers and spacers that raises the body relative to the axles for clearance and bigger tires. It changes geometry, driveshaft angles and headlamp aim, and in most jurisdictions it changes what an inspection will accept — check the rules for your own country before fitting one."
+      "summary": "A kit of springs, dampers and spacers that raises the body relative to the axles for clearance and bigger tires — sold in Costa Rica as a kit de levante. It changes geometry, driveshaft angles and headlamp aim, and in many jurisdictions it changes what an inspection will accept: in Costa Rica that is the RTV, and the rules are set there, not here."
     },
     "es": {
       "title": "levante de suspensión",
-      "summary": "El conjunto de resortes, amortiguadores y separadores que sube la carrocería respecto a los ejes para ganar espacio y montar llantas más grandes. Cambia la geometría, los ángulos del cardán y la mira de los faroles, y en casi cualquier jurisdicción cambia lo que acepta la revisión: consulte las reglas de su país antes de montar uno."
+      "summary": "El conjunto de resortes, amortiguadores y separadores que sube la carrocería respecto a los ejes para ganar espacio y montar llantas más grandes; en Costa Rica se vende como kit de levante. Cambia la geometría, los ángulos del cardán y el enfoque de los faroles, y en muchas jurisdicciones cambia lo que acepta la revisión: en Costa Rica eso es la RTV, y las reglas las fija ella, no este sitio."
     }
   }
 }

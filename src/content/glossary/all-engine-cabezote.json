@@ -16,6 +16,16 @@
       "countries": ["ES"]
     },
     {
+      "term": "tapa de cilindros",
+      "locale": "es",
+      "countries": ["AR"]
+    },
+    {
+      "term": "tapas de cilindros",
+      "locale": "es",
+      "countries": ["AR"]
+    },
+    {
       "term": "cylinder heads",
       "locale": "en",
       "countries": ["US", "GB", "AU"]

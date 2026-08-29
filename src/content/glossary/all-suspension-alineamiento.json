@@ -4,26 +4,55 @@
     "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
   },
   "system": "suspension",
-  "aliases": [],
-  "relatedTerms": [],
+  "aliases": [
+    {
+      "term": "alineación",
+      "locale": "es",
+      "countries": ["CR", "MX", "ES"]
+    },
+    {
+      "term": "alineaciones",
+      "locale": "es",
+      "countries": ["CR", "MX", "ES"]
+    },
+    {
+      "term": "tramado",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "tramados",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "tracking",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-steering-terminal-de-direccion",
+    "all-wheels-tires-llanta"
+  ],
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
-      "url": "https://guiaautomotrizcr.com/",
-      "archiveUrl": "http://web.archive.org/web/20260606201328/https://guiaautomotrizcr.com/",
-      "accessed": "2026-08-28",
+      "title": "ALINEAMIENTO, BALANCEO Y TRAMADO — Guía Automotriz de Costa Rica",
+      "url": "https://guiaautomotrizcr.com/categoria/alineamiento-balanceo-y-tramado/",
+      "archiveUrl": "https://web.archive.org/web/20260829004936/https://guiaautomotrizcr.com/categoria/alineamiento-balanceo-y-tramado/",
+      "accessed": "2026-08-29",
       "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
       "title": "wheel alignment",
-      "summary": "Setting the angles the wheels sit at — toe, camber, caster. A vehicle that wanders, eats the inner or outer edge of a tire, or pulls to one side is asking for alignment, and on a four-wheel-drive vehicle it has to be measured, not eyeballed."
+      "summary": "Setting the angles the wheels sit at — toe, camber, caster. A vehicle that wanders, eats the inner or outer edge of a tire, or pulls to one side is asking for alignment, and on a four-wheel-drive vehicle it has to be measured, not eyeballed. Costa Rican shops advertise the job as alineamiento, balanceo y tramado, and also as alineado y balanceado."
     },
     "es": {
       "title": "alineamiento",
-      "summary": "Ajustar los ángulos en que quedan paradas las ruedas: convergencia, caída y avance. Un vehículo que se va de lado, que se come el borde interno o externo de la llanta, o que jala para un lado, está pidiendo alineamiento; en un 4x4 eso se mide con equipo, no a ojo."
+      "summary": "Ajustar los ángulos en que quedan paradas las ruedas: convergencia, caída y avance. Un vehículo que se va de lado, que se come el borde interno o externo de la llanta, o que jala para un lado, está pidiendo alineamiento; en un 4x4 eso se mide con equipo, no a ojo. Los talleres ticos anuncian el servicio como «alineamiento, balanceo y tramado», y también como alineado y balanceado."
     }
   }
 }

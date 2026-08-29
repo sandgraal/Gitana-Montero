@@ -1,7 +1,7 @@
 {
   "id": "all-transfer-case-super-select-4wd-ii",
   "fitment": {
-    "gens": ["gen2-5", "gen3", "gen4"]
+    "gens": ["gen3", "gen4"]
   },
   "system": "transfer-case",
   "aliases": [
@@ -14,6 +14,11 @@
       "term": "Super Select II",
       "locale": "en",
       "countries": ["AU", "GB"]
+    },
+    {
+      "term": "Super Select 4WD",
+      "locale": "en",
+      "countries": ["AU", "GB"]
     }
   ],
   "relatedTerms": [
@@ -21,24 +26,31 @@
     "all-transfer-case-diferencial-central",
     "all-transfer-case-rango-bajo"
   ],
-  "confidence": "community-consensus",
+  "confidence": "fsm-confirmed",
   "sources": [
     {
       "title": "Super Select II When and Where — Mitsubishi Motors Australia",
       "url": "https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
       "archiveUrl": "https://web.archive.org/web/20260828191907/https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
       "accessed": "2026-08-28",
-      "kind": "vendor"
+      "kind": "manufacturer"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades and drivetrains)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260829054038/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-29",
+      "kind": "reference"
     }
   ],
   "prose": {
     "en": {
       "title": "Super Select 4WD II",
-      "summary": "Mitsubishi's four-wheel-drive system with four settings: rear-wheel drive in high range, four-wheel drive in high range with the centre differential open, the same with the centre differential locked, and four-wheel drive in low range with it locked. The open-centre setting is what lets it be driven on pavement in four-wheel drive, which an Easy Select vehicle cannot do."
+      "summary": "Mitsubishi's four-wheel-drive system with four settings: rear-wheel drive in high range, four-wheel drive in high range with the center differential open, the same with the center differential locked, and four-wheel drive in low range with it locked. The open-center setting is what lets it be driven on pavement in four-wheel drive, which an Easy Select vehicle cannot do. It is the third-generation development of Super Select; the earlier generations carry the original system."
     },
     "es": {
       "title": "Super Select 4WD II",
-      "summary": "El sistema de tracción de Mitsubishi con cuatro posiciones: tracción trasera en rango alto, tracción en las cuatro ruedas en rango alto con el diferencial central abierto, esa misma con el central bloqueado, y tracción total en rango bajo con el central bloqueado. La posición de central abierto es la que permite andar en asfalto con tracción total, cosa que un vehículo Easy Select no puede hacer."
+      "summary": "El sistema de doble tracción de Mitsubishi con cuatro posiciones: tracción trasera en rango alto, tracción en las cuatro ruedas en rango alto con el diferencial central abierto, esa misma con el central bloqueado, y tracción en las cuatro ruedas en rango bajo con el central bloqueado. La posición de central abierto es la que permite andar en asfalto con doble tracción, cosa que un vehículo Easy Select no puede hacer. Es la evolución del Super Select original que llega con la tercera generación; las generaciones anteriores llevan el sistema original."
     }
   }
 }

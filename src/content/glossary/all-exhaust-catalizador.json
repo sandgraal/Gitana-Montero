@@ -11,13 +11,28 @@
       "countries": ["MX", "ES"]
     },
     {
+      "term": "convertidores catalíticos",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "catalytic converters",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
       "term": "cat",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
+      "term": "cats",
       "locale": "en",
       "countries": ["US", "GB"]
     }
   ],
   "relatedTerms": ["all-fuel-sensor-de-oxigeno"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {

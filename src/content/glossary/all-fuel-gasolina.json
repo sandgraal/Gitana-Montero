@@ -16,18 +16,22 @@
       "countries": ["CL"]
     },
     {
-      "term": "gas",
+      "term": "petrol",
       "locale": "en",
-      "countries": ["US"]
+      "countries": ["GB", "AU"]
     }
   ],
-  "relatedTerms": ["all-fuel-diesel", "all-engine-bujia"],
-  "confidence": "community-consensus",
+  "relatedTerms": [
+    "all-fuel-diesel",
+    "all-engine-bujia",
+    "all-fuel-sistema-de-combustible"
+  ],
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
-      "title": "petrol",
-      "summary": "Spark-ignition fuel. Costa Rica sells it by octane grade at state-regulated prices; the grade a Montero needs comes from its own documentation, not from what the pump attendant suggests."
+      "title": "gasoline",
+      "summary": "Spark-ignition fuel — petrol in British and Australian usage. Costa Rica sells it by octane grade at state-regulated prices; the grade a Montero needs comes from its own documentation, not from what the pump attendant suggests."
     },
     "es": {
       "title": "gasolina",

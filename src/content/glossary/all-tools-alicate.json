@@ -16,7 +16,7 @@
       "countries": ["MX"]
     }
   ],
-  "relatedTerms": [],
+  "relatedTerms": ["all-tools-destornillador"],
   "confidence": "community-consensus",
   "sources": [
     {
@@ -30,11 +30,11 @@
   "prose": {
     "en": {
       "title": "pliers",
-      "summary": "Combination, long-nose or locking. Costa Rican catalogues list them as alicates and tenazas."
+      "summary": "The hinged gripping tool — combination, long-nose or locking. Costa Rican catalogues list them as alicates and tenazas."
     },
     "es": {
       "title": "alicate",
-      "summary": "De combinación, de punta larga o de presión. Los catálogos ticos los listan como alicates y tenazas."
+      "summary": "La herramienta de agarre con bisagra: de combinación, de punta larga o de presión. Los catálogos ticos los listan como alicates y tenazas."
     }
   }
 }

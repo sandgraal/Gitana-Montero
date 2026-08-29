@@ -8,15 +8,35 @@
     {
       "term": "gato",
       "locale": "es",
-      "countries": ["MX", "ES"]
+      "countries": ["CR", "MX", "ES"]
+    },
+    {
+      "term": "gatos",
+      "locale": "es",
+      "countries": ["CR", "MX", "ES"]
     },
     {
       "term": "gato hidráulico",
       "locale": "es",
-      "countries": ["MX", "ES"]
+      "countries": ["CR", "MX", "ES"]
+    },
+    {
+      "term": "gatos hidráulicos",
+      "locale": "es",
+      "countries": ["CR", "MX", "ES"]
+    },
+    {
+      "term": "jacks",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
     },
     {
       "term": "trolley jack",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "trolley jacks",
       "locale": "en",
       "countries": ["GB"]
     }
@@ -26,15 +46,37 @@
     "all-wheels-tires-llanta-de-repuesto"
   ],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "Repuestos La Guaca — Herramientas, Gatas",
+      "url": "https://laguacaenlinea.cr/herramientas/gatas/",
+      "archiveUrl": "https://web.archive.org/web/20260829005018/https://laguacaenlinea.cr/herramientas/gatas/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    },
+    {
+      "title": "Burras o soportes para vehículos — Compra Total Costa Rica",
+      "url": "https://compratotal.com/collections/burras-o-soportes-para-vehiculos",
+      "archiveUrl": "https://web.archive.org/web/20260829005120/https://www.compratotal.com/collections/burras-o-soportes-para-vehiculos",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    },
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "http://web.archive.org/web/20251212133603/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "jack",
-      "summary": "What lifts the vehicle. A jack lifts, it does not hold: nobody goes under a vehicle held up by one, and the lifting points are the ones the manufacturer specifies, not whatever looks solid."
+      "summary": "What lifts the vehicle. Costa Rican tool catalogues list them in the feminine, as gatas — gata hidráulica, gata de botella, gata de tijereta — though gato is also read locally. A jack lifts, it does not hold: nobody goes under a vehicle held up by one, and the lifting points are the ones the manufacturer specifies, not whatever looks solid."
     },
     "es": {
       "title": "gata",
-      "summary": "Lo que levanta el vehículo. La gata levanta, no sostiene: nadie se mete debajo de un vehículo que solo está en la gata, y los puntos de levante son los que indica la fábrica, no los que se vean firmes."
+      "summary": "Lo que levanta el vehículo. Las ferreterías y repuesteras ticas las venden en femenino: gata hidráulica, gata de botella, gata de tijereta. La gata levanta, no sostiene: nadie se mete debajo de un vehículo que solo está en la gata, y los puntos de levante son los que indica la fábrica, no los que se vean firmes."
     }
   }
 }

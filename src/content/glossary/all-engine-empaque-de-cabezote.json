@@ -19,6 +19,16 @@
       "term": "empaquetadura de culata",
       "locale": "es",
       "countries": ["CL"]
+    },
+    {
+      "term": "empaquetaduras de culata",
+      "locale": "es",
+      "countries": ["CL"]
+    },
+    {
+      "term": "head gaskets",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
     }
   ],
   "relatedTerms": ["all-engine-cabezote", "all-cooling-refrigerante"],

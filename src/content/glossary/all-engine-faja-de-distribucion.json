@@ -1,0 +1,82 @@
+{
+  "id": "all-engine-faja-de-distribucion",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "faja de tiempo",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "fajas de tiempo",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "banda de tiempo",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "bandas de tiempo",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "correa de distribución",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "correas de distribución",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "timing belts",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
+      "term": "cam belt",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "cam belts",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": ["all-engine-faja", "all-engine-arbol-de-levas"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Faja de distribución 4PK815 — Rojas Motor Costa Rica",
+      "url": "https://rojasmotorcr.com/product/faja-de-distribucion-4pk815/",
+      "archiveUrl": "https://web.archive.org/web/20260829010243/https://rojasmotorcr.com/product/faja-de-distribucion-4pk815/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    },
+    {
+      "title": "Fajas / Bandas / Correa de distribución — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/componentes-de-motor/motor/fajas-bandas-correa-de-distribucion.html",
+      "archiveUrl": "https://web.archive.org/web/20260829005150/https://truckdepot.cr/componentes-de-motor/motor/fajas-bandas-correa-de-distribucion.html",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "timing belt",
+      "summary": "The toothed belt that keeps the camshafts in step with the crankshaft. Costa Rican parts shops sell it as the faja de distribución, and the shop floor also says faja de tiempo. On an interference engine a broken belt bends valves, so it is replaced by time and distance, not by how it looks."
+    },
+    "es": {
+      "title": "faja de distribución",
+      "summary": "La faja dentada que mantiene los árboles de levas en sincronía con el cigüeñal. Así se pide en las repuesteras ticas; de boca también se oye faja de tiempo. En un motor de interferencia, si se revienta dobla válvulas: por eso se cambia por tiempo y kilometraje, no por cómo se vea."
+    }
+  }
+}

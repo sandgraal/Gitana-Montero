@@ -10,7 +10,7 @@
     "all-drivetrain-cardan",
     "all-drivetrain-diferencial"
   ],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
@@ -19,7 +19,7 @@
     },
     "es": {
       "title": "tren motriz",
-      "summary": "Todo lo que lleva la fuerza desde la caja hasta las ruedas: caja de transferencia, cardanes, diferenciales y palieres. Es el nombre con que este sitio agrupa el sistema en español."
+      "summary": "Todo lo que lleva la fuerza desde la caja hasta las ruedas: caja de transferencia, cardanes, diferenciales y ejes de rueda con sus puntas de eje. Es el nombre con que este sitio agrupa el sistema en español."
     }
   }
 }

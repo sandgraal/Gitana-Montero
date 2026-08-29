@@ -17,7 +17,7 @@
     }
   ],
   "relatedTerms": ["all-wheels-tires-tuerca-de-rueda", "all-tools-gata"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
@@ -26,7 +26,7 @@
     },
     "es": {
       "title": "llave de cruz",
-      "summary": "La llave en cruz para las tuercas de rueda que anda junto con la gata. Sirve para aflojar y para dejar apretado a mano; el apriete final es trabajo de la llave de torque."
+      "summary": "La llave de cruz para las tuercas de rueda, la que anda junto con la gata. Sirve para aflojar y para dejar apretado a mano; el apriete final es trabajo de la llave de torque."
     }
   }
 }

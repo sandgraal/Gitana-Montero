@@ -16,12 +16,46 @@
       "countries": ["ES"]
     },
     {
+      "term": "palier",
+      "locale": "es",
+      "countries": ["ES", "AR"]
+    },
+    {
+      "term": "palieres",
+      "locale": "es",
+      "countries": ["ES", "AR"]
+    },
+    {
+      "term": "semieje",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "semiejes",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
       "term": "CV joints",
       "locale": "en",
       "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "halfshaft",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
+      "term": "halfshafts",
+      "locale": "en",
+      "countries": ["US", "GB"]
     }
   ],
-  "relatedTerms": ["all-drivetrain-palier", "all-drivetrain-tren-motriz"],
+  "relatedTerms": [
+    "all-drivetrain-tren-motriz",
+    "all-wheels-tires-maza",
+    "all-drivetrain-diferencial"
+  ],
   "confidence": "community-consensus",
   "sources": [
     {
@@ -35,11 +69,11 @@
   "prose": {
     "en": {
       "title": "CV joint",
-      "summary": "The constant-velocity joint at the end of a front axle shaft. Costa Rican catalogues list them as puntas de eje, inner and outer. A clicking noise on full lock is the outer one; a torn boot is what kills them."
+      "summary": "The constant-velocity joint at the end of a front axle shaft — the part that keeps transmitting drive while the wheel is steered. Costa Rican catalogues sell the whole item as the punta de eje, inner and outer, and that is the word to use at the counter. A clicking noise on full lock is the outer one; a torn boot is what kills them."
     },
     "es": {
       "title": "punta de eje",
-      "summary": "La junta homocinética en el extremo del palier delantero. Los catálogos ticos las listan así, puntas de eje internas y externas. El clic al doblar a tope es la externa, y lo que las mata es el guardapolvo roto."
+      "summary": "La unión articulada en el extremo del eje delantero, la que sigue transmitiendo el giro aunque la rueda vaya doblada. Los catálogos ticos las venden así, puntas de eje internas y externas, y ese es el nombre con que se piden en la repuestera. El clic al doblar a tope es la externa, y lo que las mata es el guardapolvo roto."
     }
   }
 }

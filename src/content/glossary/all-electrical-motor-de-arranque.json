@@ -11,13 +11,33 @@
       "countries": ["MX", "AR"]
     },
     {
+      "term": "burros de arranque",
+      "locale": "es",
+      "countries": ["MX", "AR"]
+    },
+    {
+      "term": "marcha de arranque",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "starter motors",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
       "term": "starter",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "starters",
       "locale": "en",
       "countries": ["US"]
     }
   ],
   "relatedTerms": ["all-electrical-bateria", "all-engine-volante-del-motor"],
-  "confidence": "community-consensus",
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
@@ -26,7 +46,7 @@
     },
     "es": {
       "title": "motor de arranque",
-      "summary": "El motor que hace girar el motor para encenderlo. Un solo clic fuerte con las luces sin bajar de intensidad suele ser el solenoide o un cable, no la batería descargada."
+      "summary": "El motor eléctrico que hace girar el cigüeñal para encender el vehículo. Un solo clic fuerte con las luces sin bajar de intensidad suele ser el solenoide o un cable, no la batería descargada."
     }
   }
 }

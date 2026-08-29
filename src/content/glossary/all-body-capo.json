@@ -11,23 +11,38 @@
       "countries": ["MX"]
     },
     {
+      "term": "cofres",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
       "term": "capot",
       "locale": "es",
       "countries": ["AR"]
     },
     {
-      "term": "hood",
+      "term": "capots",
+      "locale": "es",
+      "countries": ["AR"]
+    },
+    {
+      "term": "bonnet",
       "locale": "en",
-      "countries": ["US"]
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "bonnets",
+      "locale": "en",
+      "countries": ["GB", "AU"]
     }
   ],
-  "relatedTerms": ["all-engine-motor"],
-  "confidence": "community-consensus",
+  "relatedTerms": ["all-body-bumper", "all-engine-motor"],
+  "confidence": "first-hand",
   "sources": [],
   "prose": {
     "en": {
-      "title": "bonnet",
-      "summary": "The engine cover. Its release cable and its support strut are both things that fail quietly and are noticed at the worst moment."
+      "title": "hood",
+      "summary": "The engine cover — the bonnet in British and Australian usage. Its release cable and its support strut are both things that fail quietly and are noticed at the worst moment."
     },
     "es": {
       "title": "capó",

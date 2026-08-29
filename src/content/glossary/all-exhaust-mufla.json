@@ -37,8 +37,8 @@
     {
       "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
       "url": "https://guiaautomotrizcr.com/",
-      "archiveUrl": "http://web.archive.org/web/20260606201328/https://guiaautomotrizcr.com/",
-      "accessed": "2026-08-28",
+      "archiveUrl": "https://web.archive.org/web/20260829004857/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-29",
       "kind": "vendor"
     },
     {
@@ -52,7 +52,7 @@
   "prose": {
     "en": {
       "title": "muffler",
-      "summary": "The silencer box in the exhaust. Costa Rican directories list whole shops under muflas, and a mufla shop will usually fabricate a section rather than sell you a whole system."
+      "summary": "The muffler box in the exhaust, which damps the noise of the gas leaving the engine. Costa Rican directories list whole shops under muflas, and a mufla shop will usually fabricate a section rather than sell you a whole system."
     },
     "es": {
       "title": "mufla",

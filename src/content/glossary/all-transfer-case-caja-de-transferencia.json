@@ -6,12 +6,17 @@
   "system": "transfer-case",
   "aliases": [
     {
-      "term": "caja transfer",
-      "locale": "es",
-      "countries": ["ES"]
+      "term": "transfer cases",
+      "locale": "en",
+      "countries": ["US", "AU"]
     },
     {
       "term": "transfer box",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "transfer boxes",
       "locale": "en",
       "countries": ["GB"]
     }
@@ -21,24 +26,24 @@
     "all-transfer-case-rango-bajo",
     "all-drivetrain-tren-motriz"
   ],
-  "confidence": "community-consensus",
+  "confidence": "fsm-confirmed",
   "sources": [
     {
       "title": "Super Select II When and Where — Mitsubishi Motors Australia",
       "url": "https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
       "archiveUrl": "https://web.archive.org/web/20260828191907/https://www.mitsubishi-motors.com.au/blog/super-select-ll-when-and-where.html",
       "accessed": "2026-08-28",
-      "kind": "vendor"
+      "kind": "manufacturer"
     }
   ],
   "prose": {
     "en": {
       "title": "transfer case",
-      "summary": "The second gearbox that splits drive between front and rear axles and provides low range. It is the heart of what makes a Montero a Montero, and its type — Easy Select or Super Select — decides which of the drive modes the vehicle has."
+      "summary": "The second gearbox that splits drive between front and rear axles and provides low range. It is the heart of what makes a Montero a Montero, and its type — Easy Select or Super Select — decides which drive modes the vehicle has."
     },
     "es": {
       "title": "caja de transferencia",
-      "summary": "La segunda caja que reparte la tracción entre el eje delantero y el trasero y que da la marcha reducida. Es el corazón de lo que hace que una Montero sea Montero, y su tipo — Easy Select o Super Select — define cuáles modos de tracción tiene el vehículo."
+      "summary": "La segunda caja que reparte la tracción entre el eje delantero y el trasero y que da el rango bajo. En el taller también se le dice la transfer. Es el corazón de lo que hace que una Montero sea Montero, y su tipo — Easy Select o Super Select — define cuáles modos de tracción tiene el vehículo."
     }
   }
 }

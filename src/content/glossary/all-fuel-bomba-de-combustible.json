@@ -5,7 +5,10 @@
   },
   "system": "fuel",
   "aliases": [],
-  "relatedTerms": ["all-fuel-filtro-de-combustible"],
+  "relatedTerms": [
+    "all-fuel-sistema-de-combustible",
+    "all-fuel-filtro-de-combustible"
+  ],
   "confidence": "community-consensus",
   "sources": [
     {

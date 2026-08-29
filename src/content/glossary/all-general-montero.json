@@ -28,6 +28,13 @@
   "confidence": "community-consensus",
   "sources": [
     {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-29",
+      "kind": "manufacturer"
+    },
+    {
       "title": "MITSUPARTES — Repuestos Mitsubishi, Tibás, Costa Rica",
       "url": "https://www.mitsupartescr.com/",
       "archiveUrl": "http://web.archive.org/web/20250712163140/http://mitsupartescr.com/",
@@ -42,7 +49,7 @@
     },
     "es": {
       "title": "Montero",
-      "summary": "El nombre que lleva en Costa Rica, España y América la camioneta 4x4 grande de Mitsubishi; el mismo vehículo es Pajero en casi todos los demás mercados y Shogun en el Reino Unido. En este sitio la Montero es femenina — se escribe la Montero, nunca el Montero. Montero Sport es otro modelo, más pequeño, y no es sinónimo."
+      "summary": "El nombre que lleva en Costa Rica, España y América la camioneta grande de doble tracción de Mitsubishi; el mismo vehículo es Pajero en casi todos los demás mercados y Shogun en el Reino Unido. Regla de género de este sitio: se escribe la Montero, en femenino, pero el Pajero y el Shogun en masculino — el género va con el emblema, no con el vehículo. Montero Sport es otro modelo, más pequeño, y no es sinónimo."
     }
   }
 }

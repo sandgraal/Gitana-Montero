@@ -6,30 +6,40 @@
   "system": "body",
   "aliases": [
     {
-      "term": "windshield",
+      "term": "windscreen",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "windscreens",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "windshields",
       "locale": "en",
       "countries": ["US"]
     }
   ],
-  "relatedTerms": ["all-general-rtv"],
+  "relatedTerms": ["all-general-rtv", "all-interior-bolsa-de-aire"],
   "confidence": "community-consensus",
   "sources": [
     {
       "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
       "url": "https://guiaautomotrizcr.com/",
-      "archiveUrl": "http://web.archive.org/web/20260606201328/https://guiaautomotrizcr.com/",
-      "accessed": "2026-08-28",
+      "archiveUrl": "https://web.archive.org/web/20260829004857/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-29",
       "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
-      "title": "windscreen",
-      "summary": "The front glass, which is a structural part on a modern body and part of how the passenger airbag works. Chips spread fast on Costa Rican gravel roads, and cracks in the driver's field of view are an inspection item."
+      "title": "windshield",
+      "summary": "The front glass — windscreen in British and Australian usage — which is a structural part on a modern body and part of how the passenger airbag works. Chips spread fast on Costa Rican gravel roads, and a crack in the driver's field of view is a fail item at Costa Rica's RTV and at the UK MOT alike."
     },
     "es": {
       "title": "parabrisas",
-      "summary": "El vidrio delantero, que en una carrocería moderna es pieza estructural y forma parte de cómo trabaja la bolsa de aire del pasajero. En calle de lastre las estrelladuras corren rápido, y una rajadura en el campo de visión del conductor es punto de revisión."
+      "summary": "El vidrio delantero, que en una carrocería moderna es pieza estructural y forma parte de cómo trabaja la bolsa de aire del pasajero. En calle de lastre las estrelladuras corren rápido, y una rajadura en el campo de visión del conductor es motivo de rechazo tanto en la RTV costarricense como en el MOT británico."
     }
   }
 }
