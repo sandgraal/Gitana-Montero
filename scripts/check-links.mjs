@@ -212,7 +212,12 @@ async function mapWithConcurrency(items, limit, fn) {
 }
 
 /** One fetch attempt. Never throws — network failures come back as `{ ok: false, error }`. */
-async function attemptOnce(url, method, fetchImpl, timeoutMs = FETCH_TIMEOUT_MS) {
+async function attemptOnce(
+  url,
+  method,
+  fetchImpl,
+  timeoutMs = FETCH_TIMEOUT_MS
+) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
