@@ -6,6 +6,10 @@ coverage/
 playwright-report/
 test-results/
 
+# Vercel CLI scratch: `.vercel/project.json` carries the org and project IDs
+# this checkout is linked to, plus pulled environment values. Never committed.
+.vercel/
+
 # env & secrets
 .env
 .env.*

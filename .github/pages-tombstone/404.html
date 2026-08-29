@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Montero Garage has moved to monterogarage.com</title>
+    <link rel="canonical" href="https://monterogarage.com/" />
+    <script>
+      // GitHub Pages serves this file for every path under /monterogarage/
+      // that no longer exists — which, once the tombstone is published, is
+      // every deep link anyone ever shared into the old site. Rather than
+      // dumping all of them at the new root, carry the path across:
+      //
+      //   /monterogarage/en/glossary/  ->  https://monterogarage.com/en/glossary/
+      //
+      // There is deliberately no <meta http-equiv="refresh"> on this page: a
+      // refresh and this script would race, and the refresh could only ever
+      // name the root. Visitors with JavaScript off get the links below,
+      // which is why they are real links and not decoration.
+      (function () {
+        var TARGET_ORIGIN = "https://monterogarage.com";
+        var OLD_BASE = "/monterogarage";
+        var path = window.location.pathname;
+        if (path === OLD_BASE) path = "/";
+        else if (path.indexOf(OLD_BASE + "/") === 0)
+          path = path.slice(OLD_BASE.length);
+        if (path.charAt(0) !== "/") path = "/" + path;
+        // Always prefixed with the fixed origin above, so a hostile pathname
+        // cannot turn this into an off-site redirect.
+        window.location.replace(
+          TARGET_ORIGIN + path + window.location.search + window.location.hash
+        );
+      })();
+    </script>
+  </head>
+  <body>
+    <main>
+      <section lang="en">
+        <h1>Montero Garage has moved</h1>
+        <p>
+          This site now lives at
+          <a href="https://monterogarage.com/">monterogarage.com</a>. The page
+          you asked for is probably at the same path there.
+        </p>
+        <p><a href="https://monterogarage.com/en/">Go to the home page</a></p>
+      </section>
+      <section lang="es">
+        <h1>Montero Garage se mudó</h1>
+        <p>
+          Este sitio ahora está en
+          <a href="https://monterogarage.com/">monterogarage.com</a>. La página
+          que buscaba probablemente está en la misma ruta allá.
+        </p>
+        <p>
+          <a href="https://monterogarage.com/es/">Ir a la página de inicio</a>
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

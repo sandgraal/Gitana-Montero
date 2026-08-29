@@ -1,0 +1,152 @@
+name: Retire GitHub Pages (tombstone)
+
+# ──────────────────────────────────────────────────────────────────────────
+# 002 MIG-02 / T2-102 — the last thing this repository ever publishes to
+# GitHub Pages.
+#
+# ## What it does
+#
+# Publishes `.github/pages-tombstone/` (four static files, both locales) over
+# the old Pages project site, so `https://sandgraal.github.io/monterogarage/`
+# and every deep link under it send visitors to the same path on
+# `https://monterogarage.com`.
+#
+# ## Why it is STAGED, not run, by the pull request that adds it
+#
+# T2-102 removes the deploy job from `ci.yml`. That stops new publishes; it
+# does not unpublish the last one. So on merge, the Pages site keeps serving
+# the deployment made from T2-101 — built with `base: "/monterogarage"`, and
+# therefore still correct, merely frozen — while the owner creates the Vercel
+# project and points DNS. Publishing the tombstone before `monterogarage.com`
+# resolves would replace a working site with a redirect to a host that does
+# not answer: strictly worse than stale.
+#
+# Hence `workflow_dispatch` and nothing else. The owner runs it by hand, once,
+# after the new domain is serving. The `confirm` input and the preflight below
+# exist so that "once, after" is enforced and not merely intended.
+#
+# ## After it has run
+#
+# Nothing else in this repository targets GitHub Pages. The repository's Pages
+# site can be deleted outright in Settings → Pages whenever the owner judges
+# the inbound links to have drained; deleting it turns those URLs into
+# GitHub's own 404 instead of a redirect, which is why it is not the default.
+#
+# `.nojekyll` is not needed and is deliberately absent, for the same reason it
+# was absent from the old deploy job: `upload-pages-artifact` + `deploy-pages`
+# publish a tarball that Jekyll never sees. These files have no leading-
+# underscore paths either way.
+#
+# Actions on the publish path are pinned to immutable commit SHAs, not tags —
+# this job holds `pages: write` + `id-token: write`, the highest privilege
+# anything in this repository has, and a tag is a pointer its owner can move.
+# Resolve a new one deliberately:
+#   gh api repos/<owner>/<repo>/git/ref/tags/<tag> --jq .object.sha
+# ──────────────────────────────────────────────────────────────────────────
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: >-
+          Type the new domain to confirm you are retiring the GitHub Pages
+          site. This is irreversible in practice: the old Pages URLs become
+          redirects and the frozen copy of the site is gone.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  tombstone:
+    name: Publish the tombstone to GitHub Pages
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Confirm intent
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          if [ "$CONFIRM" != "monterogarage.com" ]; then
+            echo "The confirm input was '${CONFIRM}', not 'monterogarage.com'." >&2
+            echo "Re-run and type the domain exactly to proceed." >&2
+            exit 1
+          fi
+          echo "Confirmed."
+
+      # The one check that actually matters: do not replace a working site
+      # with a redirect to a host that does not answer. Both locale homes are
+      # probed, because a half-configured domain (apex working, one locale
+      # 404ing) is exactly the state a rushed DNS cutover leaves behind.
+      - name: Preflight — the new domain must be serving both locales
+        run: |
+          failed=0
+          for url in \
+            "https://monterogarage.com/" \
+            "https://monterogarage.com/en/" \
+            "https://monterogarage.com/es/"
+          do
+            code="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 20 "$url" || echo 000)"
+            echo "${code}  ${url}"
+            case "$code" in
+              2*) ;;
+              *) failed=1 ;;
+            esac
+          done
+          if [ "$failed" -ne 0 ]; then
+            echo "monterogarage.com is not serving the site yet." >&2
+            echo "Finish the Vercel project + DNS steps in" >&2
+            echo "specs/002-montero-garage/HANDOFF-T2-102-DEPLOY.md, then re-run." >&2
+            exit 1
+          fi
+          echo "monterogarage.com is live; publishing the tombstone."
+
+      # `deploy-pages` fails with a bare "Not Found"/"Get Pages site failed"
+      # when the repository's Pages source is not "GitHub Actions". This step
+      # names the setting instead. (Owner action: publishing source is
+      # repository infrastructure, not something an agent can change.)
+      - name: Preflight — Pages must publish from GitHub Actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          build_type="$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type' 2>/dev/null || echo "unconfigured")"
+          if [ "$build_type" != "workflow" ]; then
+            echo "GitHub Pages build_type is '${build_type}', not 'workflow'." >&2
+            echo "Set Settings → Pages → Build and deployment → Source = 'GitHub Actions'." >&2
+            exit 1
+          fi
+          echo "Pages publishes from GitHub Actions."
+
+      # Enumerated rather than uploading the directory, so the published set
+      # is exactly these four files and reviewing this step is reviewing the
+      # whole deployment. (It also keeps the directory's README — which
+      # explains why these files exist — off the public host.)
+      - name: Stage the tombstone
+        run: |
+          mkdir -p tombstone-site/en tombstone-site/es
+          cp .github/pages-tombstone/index.html    tombstone-site/index.html
+          cp .github/pages-tombstone/404.html      tombstone-site/404.html
+          cp .github/pages-tombstone/en/index.html tombstone-site/en/index.html
+          cp .github/pages-tombstone/es/index.html tombstone-site/es/index.html
+          find tombstone-site -type f | sort
+
+      - name: Package the tombstone
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: tombstone-site/
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
