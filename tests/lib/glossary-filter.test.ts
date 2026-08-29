@@ -12,6 +12,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildHaystack,
   countMatches,
   formatCount,
   matchesFilter,
@@ -81,6 +82,84 @@ describe("matchesFilter", () => {
     expect(countMatches(cards, { system: "", query: "   " })).toBe(
       cards.length
     );
+  });
+});
+
+describe("buildHaystack", () => {
+  // T205 follow-up (SCF-06): the page no longer ships a server-rendered
+  // `data-haystack` attribute — the client derives it from the rendered
+  // card's own text via this function. These graders are the recall
+  // guarantee that removal must not break: every alias, in every locale,
+  // with every country tag, still matches.
+  const source = {
+    terms: ["Brake pad", "Pastilla de freno"],
+    definitions: [
+      "The friction material that presses on the rotor.",
+      "El material de fricción que presiona el disco.",
+    ],
+    system: "Brakes",
+    aliases: [
+      { term: "balatas", countries: "MX" },
+      { term: "pastillas", countries: "CR/DO" },
+    ],
+  };
+
+  it("finds a country-tagged alias regardless of locale", () => {
+    expect(buildHaystack(source)).toContain(normalizeForSearch("balatas"));
+    expect(
+      matchesFilter(
+        { system: "brakes", haystack: buildHaystack(source) },
+        { system: "", query: "balatas" }
+      )
+    ).toBe(true);
+  });
+
+  it("finds every alias's country tags, including a multi-country chip", () => {
+    const haystack = buildHaystack(source);
+    expect(haystack).toContain(normalizeForSearch("MX"));
+    expect(haystack).toContain(normalizeForSearch("CR"));
+    expect(haystack).toContain(normalizeForSearch("DO"));
+  });
+
+  it("finds a multi-country chip both as rendered and as separate tokens", () => {
+    // The chip renders "CR/DO" (joined with "/", which normalizeForSearch
+    // does not treat as whitespace). A query typed as the rendered text
+    // and a query typed as space-separated codes must both find it.
+    const haystack = buildHaystack(source);
+    expect(haystack).toContain(normalizeForSearch("CR/DO"));
+    expect(
+      matchesFilter(
+        { system: "brakes", haystack },
+        { system: "", query: "CR DO" }
+      )
+    ).toBe(true);
+  });
+
+  it("finds both locales' term and definition text", () => {
+    const haystack = buildHaystack(source);
+    expect(haystack).toContain(normalizeForSearch("brake pad"));
+    expect(haystack).toContain(normalizeForSearch("pastilla de freno"));
+    expect(haystack).toContain(normalizeForSearch("rotor"));
+    expect(haystack).toContain(normalizeForSearch("disco"));
+  });
+
+  it("finds the rendered system label", () => {
+    expect(buildHaystack(source)).toContain(normalizeForSearch("Brakes"));
+  });
+
+  it("ignores case, same as the rest of the filter", () => {
+    expect(buildHaystack(source)).toBe(
+      buildHaystack({
+        ...source,
+        terms: source.terms.map((term) => term.toUpperCase()),
+      })
+    );
+  });
+
+  it("produces nothing for a term with no aliases", () => {
+    const haystack = buildHaystack({ ...source, aliases: [] });
+    expect(haystack).not.toContain("balatas");
+    expect(haystack).toContain(normalizeForSearch("brake pad"));
   });
 });
 
