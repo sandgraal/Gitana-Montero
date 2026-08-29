@@ -55,7 +55,7 @@
   "prose": {
     "en": {
       "title": "driveshaft",
-      "summary": "The shaft between transfer case and differential. Vibration that comes in at a particular road speed and worsens with load often starts at its joints or its balance."
+      "summary": "The shaft between transfer case and differential. Vibration that comes in at a particular road speed and worsens with load often starts at its joints or its balance. British usage calls this the propshaft and reserves driveshaft for the axle shaft, so a parts list written in one dialect and read in the other is a real source of wrong orders."
     },
     "es": {
       "title": "cardán",

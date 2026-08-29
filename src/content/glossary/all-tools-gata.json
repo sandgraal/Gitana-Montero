@@ -16,16 +16,6 @@
       "countries": ["MX", "ES"]
     },
     {
-      "term": "gato hidráulico",
-      "locale": "es",
-      "countries": ["MX", "ES"]
-    },
-    {
-      "term": "gatos hidráulicos",
-      "locale": "es",
-      "countries": ["MX", "ES"]
-    },
-    {
       "term": "jacks",
       "locale": "en",
       "countries": ["US", "GB", "AU"]
@@ -72,11 +62,11 @@
   "prose": {
     "en": {
       "title": "jack",
-      "summary": "What lifts the vehicle. Costa Rican tool catalogs list them in the feminine, as gatas — gata hidráulica, gata de botella, gata de tijereta — though gato is also read locally. A jack lifts, it does not hold: nobody goes under a vehicle held up by one, and the lifting points are the ones the manufacturer specifies, not whatever looks solid."
+      "summary": "What lifts the vehicle. Costa Rican tool catalogs list them in the feminine, as gatas — gata hidráulica, gata de botella, gata de tijereta — though gato is also read locally, and gato hidráulico is what the box itself often says. A jack lifts, it does not hold: nobody goes under a vehicle held up by one, and the lifting points are the ones the manufacturer specifies, not whatever looks solid."
     },
     "es": {
       "title": "gata",
-      "summary": "Lo que levanta el vehículo. Las ferreterías y repuesteras ticas las venden en femenino: gata hidráulica, gata de botella, gata de tijereta. La gata levanta, no sostiene: nadie se mete debajo de un vehículo que solo está en la gata, y los puntos de levante son los que indica la fábrica, no los que se vean firmes."
+      "summary": "Lo que levanta el vehículo. Las ferreterías y repuesteras ticas las venden en femenino: gata hidráulica, gata de botella, gata de tijereta, aunque en el estante también se lee gato hidráulico. La gata levanta, no sostiene: nadie se mete debajo de un vehículo que solo está en la gata, y los puntos de levante son los que indica la fábrica, no los que se vean firmes."
     }
   }
 }

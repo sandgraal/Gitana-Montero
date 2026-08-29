@@ -6,6 +6,16 @@
   "system": "engine",
   "aliases": [
     {
+      "term": "faja de tiempo",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "fajas de tiempo",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
       "term": "banda de tiempo",
       "locale": "es",
       "countries": ["MX"]
