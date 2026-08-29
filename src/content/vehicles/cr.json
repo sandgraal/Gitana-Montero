@@ -18,11 +18,11 @@
   "prose": {
     "en": {
       "title": "Costa Rica and Latin America",
-      "summary": "The home market of this project, covering Costa Rica and Spanish-speaking Latin America. The truck carries the Montero name across the whole region, the same name used in North America and Spain, and every generation is recorded under that name here. What is not recorded is any powertrain combination for this market: which engines, gearboxes and transfer cases were actually offered, and which vehicles arrived instead as used imports, has no source yet. Until a combination entry exists, treat a Costa Rican fitment as unverified rather than as impossible."
+      "summary": "The home market of this project, covering Costa Rica and Spanish-speaking Latin America. The truck carries the Montero name across the whole region, the same name used in North America and Spain, and every generation is recorded under that name here. No powertrain combination for this market is recorded: there is no source yet for which engines, gearboxes and transfer cases were actually offered, or which vehicles arrived instead as used imports. Until a combination entry exists, treat a Costa Rican fitment as unverified rather than as impossible."
     },
     "es": {
       "title": "Costa Rica y Latinoamérica",
-      "summary": "El mercado de origen de este proyecto, que abarca Costa Rica y Latinoamérica hispanohablante. El vehículo lleva el nombre Montero en toda la región, el mismo que se usa en Norteamérica y en España, y aquí se registran todas las generaciones bajo ese nombre. Lo que no está registrado es ninguna combinación de tren motriz para este mercado: cuáles motores, cajas y cajas de transferencia se ofrecieron de verdad, y cuáles vehículos entraron como usados importados, todavía no tiene fuente. Mientras no exista una entrada de combinaciones, conviene tratar una aplicación costarricense como no verificada y no como imposible."
+      "summary": "El mercado de origen de este proyecto, que abarca Costa Rica y Latinoamérica hispanohablante. El vehículo lleva el nombre Montero en toda la región, el mismo que se usa en Norteamérica y en España, y aquí se registran todas las generaciones bajo ese nombre. Ninguna combinación de tren motriz de este mercado está registrada: todavía no hay fuente para saber qué motores, cajas de cambios y cajas de transferencia se ofrecieron de verdad, ni cuáles vehículos entraron como usados importados. Mientras no exista una entrada de combinaciones, conviene tratar una aplicación costarricense como no verificada y no como imposible."
     }
   }
 }
