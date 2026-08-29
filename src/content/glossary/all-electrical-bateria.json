@@ -1,0 +1,48 @@
+{
+  "id": "all-electrical-bateria",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "acumulador",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "acumuladores",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "batteries",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-electrical-alternador",
+    "all-electrical-motor-de-arranque"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
+      "url": "https://guiaautomotrizcr.com/",
+      "archiveUrl": "https://web.archive.org/web/20260829004857/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "battery",
+      "summary": "The starter battery. It is also the first thing to disconnect before electrical work, and the last thing to blame before the grounds have been checked."
+    },
+    "es": {
+      "title": "batería",
+      "summary": "La batería de arranque. Es lo primero que se desconecta antes de trabajar en eléctrico y lo último a lo que hay que culpar antes de revisar las tierras."
+    }
+  }
+}

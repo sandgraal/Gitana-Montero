@@ -1,0 +1,60 @@
+{
+  "id": "all-body-protector-de-carter",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "body",
+  "aliases": [
+    {
+      "term": "skid plates",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
+      "term": "sump guard",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "sump guards",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "cubrecárter",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "cubrecárteres",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "protección de bajos",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-engine-carter", "all-general-todoterreno"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Protector de cárter — Akurat Costa Rica",
+      "url": "https://akuratcr.com/products/category/7990/",
+      "archiveUrl": "https://web.archive.org/web/20260829010119/https://akuratcr.com/products/category/7990/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "skid plate",
+      "summary": "The steel or aluminum plate under the engine, transmission or fuel tank that takes the hit from rocks. Fitting one adds weight and can trap heat, so it is chosen for the terrain the vehicle actually sees."
+    },
+    "es": {
+      "title": "protector de cárter",
+      "summary": "La plancha de acero o aluminio bajo el motor, la caja o el tanque que se lleva el golpe de las piedras. Montar uno suma peso y puede retener calor, así que se escoge según el terreno en que de verdad anda el vehículo."
+    }
+  }
+}

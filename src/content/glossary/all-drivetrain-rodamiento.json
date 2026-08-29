@@ -1,0 +1,57 @@
+{
+  "id": "all-drivetrain-rodamiento",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "drivetrain",
+  "aliases": [
+    {
+      "term": "balero",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "baleros",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "rulemán",
+      "locale": "es",
+      "countries": ["AR", "UY"]
+    },
+    {
+      "term": "rulemanes",
+      "locale": "es",
+      "countries": ["AR", "UY"]
+    },
+    {
+      "term": "balinera",
+      "locale": "es",
+      "countries": ["CO"]
+    },
+    {
+      "term": "balineras",
+      "locale": "es",
+      "countries": ["CO"]
+    },
+    {
+      "term": "bearings",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-wheels-tires-maza", "all-fluids-grasa"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "bearing",
+      "summary": "Any of the rolling bearings in hubs, transmission, transfer case and differentials. A wheel bearing that growls and changes tone as the vehicle is steered is a safety item, not a noise to live with."
+    },
+    "es": {
+      "title": "rodamiento",
+      "summary": "Cualquiera de los rodamientos de las mazas, la caja, la transferencia y los diferenciales. Un rodamiento de rueda que ronronea y cambia de tono al doblar es asunto de seguridad, no un ruido con el que se convive."
+    }
+  }
+}

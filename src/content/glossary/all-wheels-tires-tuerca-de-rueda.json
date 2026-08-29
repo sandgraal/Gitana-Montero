@@ -1,0 +1,47 @@
+{
+  "id": "all-wheels-tires-tuerca-de-rueda",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "wheels-tires",
+  "aliases": [
+    {
+      "term": "birlo",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "birlos",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "lug nuts",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "wheel nut",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "wheel nuts",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-wheels-tires-rueda", "all-tools-llave-de-cruz"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "lug nut",
+      "summary": "The nut that holds the wheel to the hub. Torque matters in both directions — loose loses the wheel, over-tightened warps the brake disc and stretches the stud — so it is torque-wrench work, not impact-gun work."
+    },
+    "es": {
+      "title": "tuerca de rueda",
+      "summary": "La tuerca que sujeta la rueda a la maza. El apriete importa en los dos sentidos: floja se pierde la rueda, y sobreapretada tuerce el disco de freno y estira el espárrago. Por eso se aprieta con llave de torque y no con pistola de impacto."
+    }
+  }
+}

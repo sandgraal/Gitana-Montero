@@ -1,0 +1,48 @@
+{
+  "id": "all-engine-faja",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "drive belts",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "fan belt",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "fan belts",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-engine-faja-de-distribucion",
+    "all-electrical-alternador"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Fajas / Bandas / Correa de distribución — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/componentes-de-motor/motor/fajas-bandas-correa-de-distribucion.html",
+      "archiveUrl": "https://web.archive.org/web/20260829005150/https://truckdepot.cr/componentes-de-motor/motor/fajas-bandas-correa-de-distribucion.html",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "drive belt",
+      "summary": "The external belt that drives alternator, water pump, power steering and air conditioning. Costa Rican usage is faja — a CR truck-parts catalog files them as Fajas / Bandas / Correa De Distribución. A glazed or cracked belt squeals cold and can leave you without charging or steering assistance."
+    },
+    "es": {
+      "title": "faja",
+      "summary": "La faja externa que mueve el alternador, la bomba de agua, la dirección hidráulica y el aire acondicionado. En Costa Rica se le dice faja, y los catálogos ticos las agrupan bajo «fajas y bandas». Vidriosa o rajada chilla en frío y puede dejarlo sin carga o sin asistencia de dirección."
+    }
+  }
+}

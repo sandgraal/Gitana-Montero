@@ -1,0 +1,41 @@
+{
+  "id": "all-fuel-diesel",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fuel",
+  "aliases": [
+    {
+      "term": "gasoil",
+      "locale": "es",
+      "countries": ["ES", "AR"]
+    },
+    {
+      "term": "gasóleo",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "petróleo",
+      "locale": "es",
+      "countries": ["CL"]
+    }
+  ],
+  "relatedTerms": [
+    "all-fuel-gasolina",
+    "all-engine-bujia-de-precalentamiento",
+    "all-engine-turbo"
+  ],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "diesel",
+      "summary": "Compression-ignition fuel, and by extension the engines that run on it — the 4D56, 4M40 and 4M41 families in this range."
+    },
+    "es": {
+      "title": "diésel",
+      "summary": "El combustible de encendido por compresión y, por extensión, los motores que lo usan: las familias 4D56, 4M40 y 4M41 de esta gama."
+    }
+  }
+}

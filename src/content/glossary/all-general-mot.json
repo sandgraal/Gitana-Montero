@@ -1,0 +1,37 @@
+{
+  "id": "all-general-mot",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["uk"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-rtv", "all-general-itv"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Getting an MOT — GOV.UK",
+      "url": "https://www.gov.uk/getting-an-mot",
+      "archiveUrl": "https://web.archive.org/web/20260829053643/https://www.gov.uk/getting-an-mot",
+      "accessed": "2026-08-29",
+      "kind": "reference"
+    },
+    {
+      "title": "Book your MOT / vehicle test online — nidirect",
+      "url": "https://www.nidirect.gov.uk/services/book-your-mot-vehicle-test-online",
+      "archiveUrl": "https://web.archive.org/web/20260829053818/https://www.nidirect.gov.uk/services/book-your-mot-vehicle-test-online",
+      "accessed": "2026-08-29",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "MOT",
+      "summary": "The periodic test that checks a vehicle against road-safety and environmental standards in the United Kingdom. Great Britain and Northern Ireland run it under different rules — in Northern Ireland the test is booked through the DVA — so even inside the UK the detail depends on where you are. Jurisdiction-bound: an MOT says nothing about what Costa Rica's RTV or Spain's ITV will accept, and the three terms are never interchangeable."
+    },
+    "es": {
+      "title": "MOT",
+      "summary": "La prueba periódica que revisa el vehículo contra los estándares de seguridad vial y ambientales del Reino Unido. Gran Bretaña e Irlanda del Norte la aplican con reglas distintas — en Irlanda del Norte la cita se saca por medio de la DVA —, así que hasta dentro del propio Reino Unido el detalle depende de dónde esté. Es un término atado a esa jurisdicción: el MOT no dice nada sobre lo que aceptan la RTV costarricense o la ITV española, y los tres nombres nunca se sustituyen entre sí."
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "id": "all-wheels-tires-llanta",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "wheels-tires",
+  "aliases": [
+    {
+      "term": "neumático",
+      "locale": "es",
+      "countries": ["ES", "AR", "CL", "PE", "UY"]
+    },
+    {
+      "term": "neumáticos",
+      "locale": "es",
+      "countries": ["ES", "AR", "CL", "PE", "UY"]
+    },
+    {
+      "term": "goma",
+      "locale": "es",
+      "countries": ["AR", "UY", "PR", "DO"],
+      "falseFriend": true
+    },
+    {
+      "term": "gomas",
+      "locale": "es",
+      "countries": ["AR", "UY", "PR", "DO"],
+      "falseFriend": true
+    },
+    {
+      "term": "caucho",
+      "locale": "es",
+      "countries": ["VE"]
+    },
+    {
+      "term": "cauchos",
+      "locale": "es",
+      "countries": ["VE"]
+    },
+    {
+      "term": "tyre",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "tyres",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-wheels-tires-aro",
+    "all-wheels-tires-medida-de-llanta",
+    "all-wheels-tires-presion-de-llantas"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Venta de Llantas en Costa Rica — Aros y Llantas Mundiales",
+      "url": "https://www.arosyllantasmundiales.com/llantas",
+      "archiveUrl": "http://web.archive.org/web/20260516080024/http://arosyllantasmundiales.com/llantas",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Llantas Bridgestone México — Encuentra tu llanta ideal",
+      "url": "https://www.bridgestone.com.mx/",
+      "archiveUrl": "http://web.archive.org/web/20251211025915/https://www.bridgestone.com.mx/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Neumáticos Bridgestone Argentina",
+      "url": "https://www.bridgestone.com.ar/",
+      "archiveUrl": "http://web.archive.org/web/20251211093255/https://www.bridgestone.com.ar/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "tire",
+      "summary": "The rubber that touches the road. In Costa Rica it is the llanta and the shops sell aros y llantas as two different things; in Spain and much of South America the same object is the neumático. Load and speed ratings, age and condition are safety-critical — have a tire fitter or a qualified mechanic judge a tire you are unsure of."
+    },
+    "es": {
+      "title": "llanta",
+      "summary": "El hule que toca la calle. En Costa Rica es la llanta, y las llanteras venden «aros y llantas» como dos cosas distintas; en España y en buena parte de Suramérica a lo mismo le dicen neumático, en Argentina y el Caribe goma, y en Venezuela caucho. Cuidado con goma: en Costa Rica esa palabra significa resaca. Los índices de carga y velocidad, la edad y el estado son asunto de seguridad: si tiene dudas de una llanta, que la valore un llantero o un mecánico calificado."
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "all-cooling-toma-de-agua",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "cooling",
+  "aliases": [
+    {
+      "term": "water outlet",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-cooling-radiador"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Automas — Repuestos Automotrices en Costa Rica",
+      "url": "https://automas.cr/",
+      "archiveUrl": "http://web.archive.org/web/20260828190644/https://automas.cr/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "water outlet housing",
+      "summary": "The housing on the head or block where the top hose and the thermostat live. Costa Rican catalogs list it as the toma de agua; its gasket weeps long before it bursts."
+    },
+    "es": {
+      "title": "toma de agua",
+      "summary": "La pieza sobre el cabezote o el bloque donde van la manguera superior y el termostato. Los catálogos ticos la listan así; su empaque llora mucho antes de reventarse."
+    }
+  }
+}

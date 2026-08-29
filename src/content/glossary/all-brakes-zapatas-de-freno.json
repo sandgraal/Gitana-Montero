@@ -1,0 +1,35 @@
+{
+  "id": "all-brakes-zapatas-de-freno",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [
+    {
+      "term": "brake shoe",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    }
+  ],
+  "relatedTerms": ["all-brakes-tambor-de-freno", "all-brakes-freno-de-mano"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Automas — Repuestos Automotrices en Costa Rica",
+      "url": "https://automas.cr/",
+      "archiveUrl": "http://web.archive.org/web/20260828190644/https://automas.cr/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "brake shoes",
+      "summary": "The curved friction shoes that press outward inside a drum. On a Montero this is the rear brake on many versions, and the parking brake on others."
+    },
+    "es": {
+      "title": "zapatas de freno",
+      "summary": "Las zapatas curvas de fricción que empujan hacia afuera dentro del tambor. En una Montero son el freno trasero en varias versiones y el freno de mano en otras."
+    }
+  }
+}

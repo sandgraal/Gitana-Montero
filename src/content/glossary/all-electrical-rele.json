@@ -1,0 +1,37 @@
+{
+  "id": "all-electrical-rele",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "relevador",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "relevadores",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "relays",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-electrical-fusible"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "relay",
+      "summary": "The switch that lets a small current control a large one. Swapping an identical relay from another circuit is the cheapest diagnostic in the fuse box."
+    },
+    "es": {
+      "title": "relé",
+      "summary": "El interruptor que deja que una corriente pequeña controle una grande. Cambiar un relé por otro idéntico de otro circuito es el diagnóstico más barato que hay en la caja de fusibles."
+    }
+  }
+}

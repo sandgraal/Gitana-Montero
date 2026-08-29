@@ -1,0 +1,55 @@
+{
+  "id": "all-steering-terminal-de-direccion",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "steering",
+  "aliases": [
+    {
+      "term": "tie rod ends",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "track rod end",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "track rod ends",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "rótula de dirección",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "rótulas de dirección",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-suspension-rotula", "all-suspension-alineamiento"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Cabezales / Rótulas / Punta de dirección / Terminales de dirección — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/componentes-de-direccion/cabezales-rotulas-punta-de-direccion-terminales-de-direccion.html",
+      "archiveUrl": "https://web.archive.org/web/20260829005607/https://truckdepot.cr/componentes-de-direccion/cabezales-rotulas-punta-de-direccion-terminales-de-direccion.html",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "tie rod end",
+      "summary": "The joint at each end of the steering linkage. Play here is felt as slop at the wheel and shows as uneven tire wear; replacing one always means an alignment afterwards."
+    },
+    "es": {
+      "title": "terminal de dirección",
+      "summary": "La rótula en cada extremo del varillaje de dirección. Su juego se siente como flojedad en el volante y se ve como desgaste disparejo de la llanta; cambiar una obliga a alinear después."
+    }
+  }
+}

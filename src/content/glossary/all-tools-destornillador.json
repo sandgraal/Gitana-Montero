@@ -1,0 +1,37 @@
+{
+  "id": "all-tools-destornillador",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "desarmador",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "desarmadores",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "screwdrivers",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-tools-llave"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "screwdriver",
+      "summary": "The tool that turns a screw by its slot or recess — flat, cross-head or Torx. Using one as a pry bar is how trim clips and knuckles get broken."
+    },
+    "es": {
+      "title": "destornillador",
+      "summary": "La herramienta que gira un tornillo por su ranura o su huella: plano, de cruz o Torx. Usarlo como palanca es la forma habitual de quebrar los clips de los acabados y de lastimarse los dedos."
+    }
+  }
+}

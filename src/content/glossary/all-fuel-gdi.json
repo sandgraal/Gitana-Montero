@@ -1,0 +1,40 @@
+{
+  "id": "all-fuel-gdi",
+  "fitment": {
+    "gens": ["gen2-5", "gen3"],
+    "markets": ["jdm"]
+  },
+  "system": "fuel",
+  "aliases": [
+    {
+      "term": "gasoline direct injection",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": [
+    "all-engine-6g74",
+    "all-fuel-inyector",
+    "all-general-compatibilidad"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades and drivetrains)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260829054038/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-29",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "GDI",
+      "summary": "Mitsubishi's gasoline direct-injection system — inyección directa de gasolina — fitted to the 6G74 from the Gen 2.5 facelift through Gen 3 as a Japanese-market engine; the Japanese catalog lists the Pajero's 3.5 V6 as 直噴GDI, while export cars of the same generations kept port injection. A GDI engine has its own fuel system, its own sensors and its own reputation for carbon build-up, so parts and procedures for it are never assumed to fit a non-GDI engine, and one outside Japan is an imported vehicle rather than a local one."
+    },
+    "es": {
+      "title": "GDI",
+      "summary": "El sistema de inyección directa de gasolina de Mitsubishi, montado en el 6G74 desde el rediseño de la generación 2.5 hasta la tercera como motor del mercado japonés: el catálogo japonés lista el V6 de 3.5 del Pajero como 直噴GDI, mientras que los carros de exportación de esas mismas generaciones conservaron la inyección en el múltiple. Un motor GDI tiene su propio sistema de combustible, sus propios sensores y su propia fama de carbonizarse, así que sus repuestos y procedimientos nunca se dan por buenos en un motor que no sea GDI, y uno fuera de Japón es un carro importado y no uno de venta local."
+    }
+  }
+}

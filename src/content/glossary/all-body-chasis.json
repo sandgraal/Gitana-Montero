@@ -1,0 +1,42 @@
+{
+  "id": "all-body-chasis",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "body",
+  "aliases": [
+    {
+      "term": "frame",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "frames",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "bastidor",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "bastidores",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-body-protector-de-carter"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "chassis",
+      "summary": "The structure the running gear bolts to. Rust in the rails, the crossmembers and the suspension mounting points is a structural and safety question, not a cosmetic one — have it assessed properly before spending money on anything else."
+    },
+    "es": {
+      "title": "chasis",
+      "summary": "La estructura a la que se atornilla todo el tren rodante. El óxido en los largueros, los travesaños y los apoyos de suspensión es asunto estructural y de seguridad, no cosmético: hágalo valorar bien antes de gastar en cualquier otra cosa."
+    }
+  }
+}

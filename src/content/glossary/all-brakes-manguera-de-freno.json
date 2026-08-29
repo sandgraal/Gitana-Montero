@@ -1,0 +1,29 @@
+{
+  "id": "all-brakes-manguera-de-freno",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [],
+  "relatedTerms": ["all-brakes-liquido-de-frenos", "all-brakes-caliper"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mangueras para frenos / Conductos para frenos — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/componentes-de-frenos-fitineria-y-rueda/frenos/mangueras-para-frenos-conductos-para-frenos.html",
+      "archiveUrl": "https://web.archive.org/web/20260829005448/https://truckdepot.cr/componentes-de-frenos-fitineria-y-rueda/frenos/mangueras-para-frenos-conductos-para-frenos.html",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "brake hose",
+      "summary": "The flexible line between the hard line and the caliper. It ages from the inside: a hose that has swollen shut acts like a stuck caliper and can hold a brake on after the pedal is released."
+    },
+    "es": {
+      "title": "manguera de freno",
+      "summary": "La manguera flexible entre la cañería rígida y el cáliper. Se daña por dentro: una manguera hinchada se comporta como un cáliper pegado y puede dejar la rueda frenando después de soltar el pedal."
+    }
+  }
+}

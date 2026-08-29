@@ -1,0 +1,47 @@
+{
+  "id": "all-electrical-computadora",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "centralita",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "centralitas",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "ECU",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "ECUs",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "engine control unit",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-tools-escaner"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "engine computer",
+      "summary": "The control unit that runs fuelling and ignition, and stores fault codes. A stored code names a circuit, not a part to buy."
+    },
+    "es": {
+      "title": "computadora",
+      "summary": "La unidad de control que maneja la inyección y el encendido y que guarda los códigos de falla. Un código guardado nombra un circuito, no la pieza que hay que comprar."
+    }
+  }
+}

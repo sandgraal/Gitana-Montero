@@ -1,0 +1,47 @@
+{
+  "id": "all-brakes-freno-de-mano",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [
+    {
+      "term": "handbrake",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "handbrakes",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "emergency brake",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "freno de estacionamiento",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "frenos de estacionamiento",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    }
+  ],
+  "relatedTerms": ["all-brakes-zapatas-de-freno"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "parking brake",
+      "summary": "The mechanical brake worked by the lever or the foot pedal, independent of the hydraulics. On a Montero it is often a drum inside the rear disc, and it is what holds the vehicle on a slope while a jack is under it."
+    },
+    "es": {
+      "title": "freno de mano",
+      "summary": "El freno mecánico que se acciona con la palanca o el pedal de pie, independiente del sistema hidráulico. En una Montero suele ser un tambor dentro del disco trasero, y es lo que sostiene el vehículo en una cuesta cuando hay una gata debajo."
+    }
+  }
+}

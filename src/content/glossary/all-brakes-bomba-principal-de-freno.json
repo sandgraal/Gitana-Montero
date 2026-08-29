@@ -1,0 +1,45 @@
+{
+  "id": "all-brakes-bomba-principal-de-freno",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [
+    {
+      "term": "master cylinder",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "master cylinders",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "cilindro maestro",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "cilindros maestros",
+      "locale": "es",
+      "countries": ["MX"]
+    }
+  ],
+  "relatedTerms": [
+    "all-brakes-liquido-de-frenos",
+    "all-brakes-booster-de-freno"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "brake master cylinder",
+      "summary": "The cylinder the pedal acts on, which sends pressure to all four wheels. Costa Rican catalogs list it as the bomba principal de freno and the wheel cylinders as bombas auxiliares."
+    },
+    "es": {
+      "title": "bomba principal de freno",
+      "summary": "El cilindro sobre el que actúa el pedal y que manda presión a las cuatro ruedas. Los catálogos ticos la listan así, y a los cilindros de rueda les dicen bombas auxiliares."
+    }
+  }
+}

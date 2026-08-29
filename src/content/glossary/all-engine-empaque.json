@@ -1,0 +1,45 @@
+{
+  "id": "all-engine-empaque",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "empaquetadura",
+      "locale": "es",
+      "countries": ["CL"]
+    },
+    {
+      "term": "empaquetaduras",
+      "locale": "es",
+      "countries": ["CL"]
+    },
+    {
+      "term": "gaskets",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-engine-empaque-de-cabezote", "all-engine-retenedor"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
+      "url": "https://guiaautomotrizcr.com/",
+      "archiveUrl": "https://web.archive.org/web/20260829004857/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "gasket",
+      "summary": "The static seal between two bolted faces. Costa Rican directories list whole shops under empaques, because on an engine of this age there is always another one to replace."
+    },
+    "es": {
+      "title": "empaque",
+      "summary": "El sello estático entre dos caras atornilladas. Los directorios ticos listan negocios enteros bajo «empaques», porque en un motor de estos años siempre hay otro por cambiar."
+    }
+  }
+}

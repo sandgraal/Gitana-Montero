@@ -1,0 +1,27 @@
+{
+  "id": "all-brakes-abs",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [
+    {
+      "term": "anti-lock brakes",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    }
+  ],
+  "relatedTerms": [],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "ABS",
+      "summary": "The anti-lock braking system, which releases and reapplies a wheel that is about to lock. A lit ABS light means the system has switched itself off and the vehicle brakes as if it had none — it is not a light to keep driving on for months."
+    },
+    "es": {
+      "title": "ABS",
+      "summary": "El sistema antibloqueo de frenos, que suelta y vuelve a aplicar la rueda que está por trabarse. Una luz de ABS encendida quiere decir que el sistema se apagó solo y que el vehículo frena como si no lo tuviera: no es una luz para andar meses con ella."
+    }
+  }
+}

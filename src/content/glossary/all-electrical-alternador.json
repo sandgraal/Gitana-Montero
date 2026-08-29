@@ -1,0 +1,21 @@
+{
+  "id": "all-electrical-alternador",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [],
+  "relatedTerms": ["all-electrical-bateria", "all-engine-faja"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "alternator",
+      "summary": "The generator that charges the battery and runs the vehicle once it is going. A charge light that comes on at idle and goes out with revs is usually the belt or the brushes."
+    },
+    "es": {
+      "title": "alternador",
+      "summary": "El generador que carga la batería y alimenta el vehículo una vez en marcha. Una luz de carga que enciende en ralentí y se apaga al acelerar suele ser la faja o los carbones."
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "all-engine-bujia",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "spark plugs",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
+      "term": "sparking plug",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": ["all-engine-bujia-de-precalentamiento"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "spark plug",
+      "summary": "The plug that lights the mixture in a gasoline engine. Reading a used set tells you a lot about how each cylinder is running."
+    },
+    "es": {
+      "title": "bujía",
+      "summary": "La pieza que enciende la mezcla en un motor de gasolina. Leer un juego usado dice bastante sobre cómo viene trabajando cada cilindro."
+    }
+  }
+}

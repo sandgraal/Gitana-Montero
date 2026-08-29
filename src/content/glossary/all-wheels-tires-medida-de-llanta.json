@@ -1,0 +1,36 @@
+{
+  "id": "all-wheels-tires-medida-de-llanta",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "wheels-tires",
+  "aliases": [],
+  "relatedTerms": ["all-wheels-tires-llanta", "all-wheels-tires-aro"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Llantas Bridgestone México — Encuentra tu llanta ideal",
+      "url": "https://www.bridgestone.com.mx/",
+      "archiveUrl": "http://web.archive.org/web/20251211025915/https://www.bridgestone.com.mx/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Venta de Llantas en Costa Rica — Aros y Llantas Mundiales",
+      "url": "https://www.arosyllantasmundiales.com/llantas",
+      "archiveUrl": "http://web.archive.org/web/20260516080024/http://arosyllantasmundiales.com/llantas",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "tire size",
+      "summary": "The code molded on the sidewall — section width, aspect ratio, construction, rim diameter, then the load and speed ratings. Changing it changes speedometer reading, gearing and clearance, so it is never a free swap on a four-wheel-drive vehicle."
+    },
+    "es": {
+      "title": "medida de llanta",
+      "summary": "El código grabado en el flanco: ancho de sección, perfil, construcción y diámetro de aro, seguido de los índices de carga y velocidad. Cambiar la medida cambia la lectura del velocímetro, la desmultiplicación y el espacio libre, así que en un 4x4 nunca es un cambio gratis."
+    }
+  }
+}

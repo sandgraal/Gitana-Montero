@@ -1,0 +1,30 @@
+{
+  "id": "all-transfer-case-cubos-de-rueda-libre",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5"]
+  },
+  "system": "transfer-case",
+  "aliases": [
+    {
+      "term": "freewheel hubs",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-transfer-case-caja-de-transferencia",
+    "all-wheels-tires-maza"
+  ],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "free-wheeling hubs",
+      "summary": "The lockable front hubs on earlier part-time versions, which disconnect the front axle shafts when four-wheel drive is not in use. Manual ones are turned by hand at the wheel; leaving them locked wears the front drivetrain for nothing."
+    },
+    "es": {
+      "title": "cubos de rueda libre",
+      "summary": "Los cubos delanteros bloqueables de las versiones antiguas de tracción conectable, que desconectan los palieres delanteros cuando no se anda con doble tracción. Los manuales se giran a mano en la rueda; dejarlos bloqueados desgasta el tren delantero sin necesidad."
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "all-engine-arbol-de-levas",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "camshafts",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-engine-faja-de-distribucion"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "camshaft",
+      "summary": "The shaft whose lobes open the valves. Whether it sits in the head or in the block is what SOHC and OHV mean, and the Montero range has both layouts."
+    },
+    "es": {
+      "title": "árbol de levas",
+      "summary": "El eje cuyas levas abren las válvulas. Que vaya en el cabezote o en el bloque es justamente lo que distinguen las siglas SOHC y OHV, y en la gama Montero hay de los dos."
+    }
+  }
+}

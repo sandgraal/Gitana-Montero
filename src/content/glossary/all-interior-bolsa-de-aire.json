@@ -1,0 +1,35 @@
+{
+  "id": "all-interior-bolsa-de-aire",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "interior",
+  "aliases": [
+    {
+      "term": "airbags",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "SRS",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-steering-volante",
+    "all-interior-cinturon-de-seguridad"
+  ],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "airbag",
+      "summary": "The supplementary restraint that fires in a serious impact. It is a pyrotechnic device: never probe its circuits, never work near it with the battery connected, and never treat a lit SRS light as cosmetic. This is qualified-mechanic work."
+    },
+    "es": {
+      "title": "bolsa de aire",
+      "summary": "El sistema de retención suplementaria que se dispara en un impacto fuerte. Es un dispositivo pirotécnico: nunca se le miden los circuitos, nunca se trabaja cerca con la batería conectada y una luz de SRS encendida nunca es cosa cosmética. Esto es trabajo para un mecánico calificado."
+    }
+  }
+}

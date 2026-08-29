@@ -1,0 +1,29 @@
+{
+  "id": "all-general-repuesto-no-original",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-repuesto-original"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Repuestos para carros en Costa Rica — Repuestos Gigante",
+      "url": "https://repuestosgigante.com/repuestos/",
+      "archiveUrl": "https://web.archive.org/web/20260828192347/https://repuestosgigante.com/repuestos/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "aftermarket part",
+      "summary": "A part made by someone other than the vehicle manufacturer. Costa Rican parts shops advertise these as repuestos no originales; quality ranges from equal to the original down to unusable, so the brand matters more than the price."
+    },
+    "es": {
+      "title": "repuesto no original",
+      "summary": "Pieza que no fabrica la marca del vehículo. Las repuesteras ticas los anuncian así, como repuestos no originales; la calidad va desde igual al original hasta inservible, de modo que la marca pesa más que el precio."
+    }
+  }
+}

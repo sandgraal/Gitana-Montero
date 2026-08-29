@@ -1,0 +1,32 @@
+{
+  "id": "all-interior-cinturon-de-seguridad",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "interior",
+  "aliases": [
+    {
+      "term": "seatbelt",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "safety belt",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-interior-bolsa-de-aire"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "seat belt",
+      "summary": "The restraint itself, plus its retractor, its pretensioner where fitted and its anchor points. A belt that does not lock when tugged, or webbing that is cut or frayed, is replaced — it is not adjusted."
+    },
+    "es": {
+      "title": "cinturón de seguridad",
+      "summary": "El cinturón, con su retractor, su pretensor cuando lo lleva y sus puntos de anclaje. Un cinturón que no traba al jalarlo, o una cinta cortada o deshilachada, se cambia: no se ajusta."
+    }
+  }
+}
