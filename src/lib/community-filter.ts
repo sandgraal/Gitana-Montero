@@ -51,15 +51,39 @@ export const EMPTY_COMMUNITY_FILTER: CommunityFilterState = {
   activity: "",
 };
 
+/**
+ * RFC 4647 §3.3.1 basic filtering, directional: a selected range (`"es"`)
+ * matches a tag that is either identical or one step more specific
+ * (`"es-CR"`), never the reverse. This is the fix for a COM-02-inverting bug
+ * (code review F2): exact-string matching made the "español" pill match only
+ * the one entry whose `languages` is the bare `["es"]`, dropping all four
+ * `es-CR` Costa Rican entries the moment a reader filtered by their own
+ * language. `"en"` still never matches an `"es"` tag — there is no shared
+ * prefix — so the directionality does not leak across languages.
+ */
+function languageMatches(tag: string, selected: string): boolean {
+  return tag === selected || tag.startsWith(`${selected}-`);
+}
+
 /** Whether `card` survives every active facet in `state`. */
 export function matchesCommunityFilter(
   card: CommunityFilterCard,
   state: CommunityFilterState
 ): boolean {
+  // Region is exact-match, not prefix: `001` (worldwide, M49 "world") is its
+  // own pill precisely because a worldwide community is not a Costa Rican
+  // one wearing a broader label, and a reader who selects `CR` wants
+  // Costa-Rica-specific communities, not "everywhere, including Costa Rica"
+  // (code review F2, ruled — deliberately different from the language
+  // facet's RFC 4647 prefix matching just below, which *is* a
+  // generic/specific relationship within one language).
   if (state.region !== "" && !card.regions.includes(state.region)) {
     return false;
   }
-  if (state.language !== "" && !card.languages.includes(state.language)) {
+  if (
+    state.language !== "" &&
+    !card.languages.some((tag) => languageMatches(tag, state.language))
+  ) {
     return false;
   }
   if (state.gen !== "" && !card.gens.includes(state.gen)) {

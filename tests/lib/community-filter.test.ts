@@ -64,6 +64,28 @@ describe("matchesCommunityFilter", () => {
     ).toBe(2);
   });
 
+  // Code review F2 (ruled): RFC 4647 basic filtering, directional. Exact-string
+  // matching here previously made selecting "español" (`es`) drop every
+  // `es-CR` entry — inverting COM-02 for the exact readers it exists for.
+  it("matches a language selection to a more specific regional tag (RFC 4647)", () => {
+    expect(
+      countCommunityMatches(cards, {
+        ...EMPTY_COMMUNITY_FILTER,
+        language: "es",
+      })
+    ).toBe(1); // the es-CR card, not zero
+  });
+
+  it("never lets one language's selection match a different language's tag", () => {
+    const enOnly = cards.filter((c) => c.languages.includes("en"));
+    expect(
+      countCommunityMatches(enOnly, {
+        ...EMPTY_COMMUNITY_FILTER,
+        language: "es",
+      })
+    ).toBe(0); // "en" tags never match the "es" selection
+  });
+
   it("filters by generation, matching any gen the community lists", () => {
     // cards[0] and cards[2] carry the default "all gens" fixture; cards[1]
     // is scoped to gen3 alone.

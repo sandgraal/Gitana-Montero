@@ -26,8 +26,11 @@ import type {
 import type { ConfidenceTier } from "../schemas/entry";
 import type { GenerationId } from "../schemas/vehicles";
 import {
+  COMMUNITY_TYPE_BRAND_NAMES,
   LINK_KIND_BRAND_NAMES,
+  TRANSLATABLE_COMMUNITY_TYPES,
   TRANSLATABLE_LINK_KINDS,
+  type TranslatableCommunityType,
   type TranslatableLinkKind,
 } from "./community-brand-names";
 
@@ -46,12 +49,17 @@ export type GlossarySystemStrings = {
 };
 
 /**
- * One flat key per community type (T703a's type chip), same rationale as
- * {@link GlossarySystemStrings}: derived from `COMMUNITY_TYPES` so a new type
- * with no translation is a type error, not a chip that silently shows nothing.
+ * One flat key per *translatable* community type (T703a's type chip), same
+ * rationale as {@link GlossarySystemStrings}: derived from
+ * `TRANSLATABLE_COMMUNITY_TYPES` so a new translatable type with no
+ * translation is a type error, not a chip that silently shows nothing.
+ * `subreddit` is excluded — see `COMMUNITY_TYPE_BRAND_NAMES` in
+ * `src/i18n/community-brand-names.ts` (bilingual review B4).
  */
 export type CommunityTypeStrings = {
-  readonly [Type in CommunityType as `communityType.${Type}`]: string;
+  readonly [
+    Type in TranslatableCommunityType as `communityType.${Type}`
+  ]: string;
 };
 
 /** One flat key per `ACTIVITY_LEVELS` value (T703a's activity badge). */
@@ -143,6 +151,16 @@ export interface UiStrings
   readonly communityIntro: string;
   readonly communityFilterRegionLabel: string;
   readonly communityFilterRegionAll: string;
+  /**
+   * The `WORLDWIDE_REGION` (`001`) pill's label. Typed here rather than read
+   * from `Intl.DisplayNames` like every other region: EN's CLDR data gives
+   * `"world"` (lowercase) for `001` while ES gives `"Mundo"` (capitalized),
+   * so the EN pill would sit uncapitalized next to sibling pills like
+   * "Costa Rica" (code review F2). ES already agrees with `Intl` here, so
+   * this simply pins the one code where EN and the rest of this page's title
+   * casing would otherwise disagree.
+   */
+  readonly communityRegionWorldwide: string;
   readonly communityFilterLanguageLabel: string;
   readonly communityFilterLanguageAll: string;
   readonly communityFilterGenerationLabel: string;
@@ -228,6 +246,7 @@ const en: UiStrings = {
     "Forums, groups, shops and channels for Montero, Pajero and Shogun owners. Costa Rican and Spanish-language communities are listed as first-class entries, not an appendix.",
   communityFilterRegionLabel: "Filter by region",
   communityFilterRegionAll: "All regions",
+  communityRegionWorldwide: "World",
   communityFilterLanguageLabel: "Filter by language",
   communityFilterLanguageAll: "All languages",
   communityFilterGenerationLabel: "Filter by generation",
@@ -244,15 +263,14 @@ const en: UiStrings = {
   communityConfidenceCaveatTemplate:
     "Confidence: {tier}. This entry has not been checked against a factory manual or technical bulletin — treat it as a starting point, not a verified fact.",
   "communityType.forum": "Forum",
-  "communityType.subreddit": "Subreddit",
   "communityType.facebook-group": "Facebook group",
   "communityType.whatsapp-group": "WhatsApp group",
   "communityType.telegram-group": "Telegram group",
   "communityType.discord": "Discord server",
-  "communityType.club": "Club",
+  "communityType.club": "Owners' club",
   "communityType.youtube-channel": "YouTube channel",
   "communityType.vendor": "Vendor",
-  "communityType.shop": "Shop",
+  "communityType.shop": "Parts shop",
   "communityActivity.very-active": "Very active",
   "communityActivity.active": "Active",
   "communityActivity.quiet": "Quiet",
@@ -266,10 +284,11 @@ const en: UiStrings = {
   "communityGeneration.gen2-5": "Gen 2.5",
   "communityGeneration.gen3": "Gen 3",
   "communityGeneration.gen4": "Gen 4",
-  "confidenceTier.fsm-confirmed": "Confirmed in the Factory Service Manual",
-  "confidenceTier.tsb": "Technical service bulletin",
+  "confidenceTier.fsm-confirmed":
+    "Confirmed in the Factory Service Manual (FSM)",
+  "confidenceTier.tsb": "Technical service bulletin (TSB)",
   "confidenceTier.community-consensus": "Community consensus",
-  "confidenceTier.first-hand": "First-hand read",
+  "confidenceTier.first-hand": "First-hand experience",
   "confidenceTier.anecdotal": "Anecdotal",
 };
 
@@ -333,9 +352,10 @@ const es: UiStrings = {
   navCommunity: "Comunidad",
   communityHeading: "Directorio de comunidades",
   communityIntro:
-    "Foros, grupos, tiendas y canales para dueños de Montero, Pajero y Shogun. Las comunidades costarricenses y de habla hispana aparecen como fichas de primera clase, no como un apéndice.",
+    "Foros, grupos, tiendas y canales para dueños de Montero, Pajero y Shogun. Las comunidades costarricenses y de habla hispana aparecen en igualdad de condiciones, no en un apéndice.",
   communityFilterRegionLabel: "Filtre por región",
   communityFilterRegionAll: "Todas las regiones",
+  communityRegionWorldwide: "Mundo",
   communityFilterLanguageLabel: "Filtre por idioma",
   communityFilterLanguageAll: "Todos los idiomas",
   communityFilterGenerationLabel: "Filtre por generación",
@@ -350,9 +370,8 @@ const es: UiStrings = {
   communityCountTemplate: "{shown} de {total} comunidades",
   communityActivityAssessedTemplate: "Revisado el {date}",
   communityConfidenceCaveatTemplate:
-    "Nivel de confianza: {tier}. Esta ficha no se comparó con un manual de fábrica ni un boletín técnico — tómela como punto de partida, no como un dato verificado.",
+    "Nivel de confianza: {tier}. Esta ficha no se ha contrastado con un manual de fábrica ni con un boletín técnico — tómela como punto de partida, no como un dato verificado.",
   "communityType.forum": "Foro",
-  "communityType.subreddit": "Comunidad en Reddit",
   "communityType.facebook-group": "Grupo de Facebook",
   "communityType.whatsapp-group": "Grupo de WhatsApp",
   "communityType.telegram-group": "Grupo de Telegram",
@@ -360,12 +379,20 @@ const es: UiStrings = {
   "communityType.club": "Club de dueños",
   "communityType.youtube-channel": "Canal de YouTube",
   "communityType.vendor": "Proveedor",
-  "communityType.shop": "Tienda",
-  "communityActivity.very-active": "Muy activo",
-  "communityActivity.active": "Activo",
-  "communityActivity.quiet": "Poca actividad",
-  "communityActivity.dormant": "Inactivo",
-  "communityActivity.archived": "Archivado",
+  "communityType.shop": "Tienda de repuestos",
+  /*
+   * B3 (bilingual review, ruled) — feminine forms, agreeing with "comunidad"
+   * (the noun this badge is describing), which is also what four other
+   * strings on this page already name explicitly (`communityHeading`,
+   * `communityEmpty`, `communityCountTemplate`, `communityNoResults`).
+   * "Foro · Archivada" is expected and accepted: the badge agrees with the
+   * community, not with the type chip next to it.
+   */
+  "communityActivity.very-active": "Muy activa",
+  "communityActivity.active": "Activa",
+  "communityActivity.quiet": "Poco activa",
+  "communityActivity.dormant": "Inactiva",
+  "communityActivity.archived": "Archivada",
   "communityLinkKind.website": "Sitio web",
   "communityLinkKind.forum": "Foro",
   "communityLinkKind.map": "Mapa",
@@ -377,7 +404,7 @@ const es: UiStrings = {
   "confidenceTier.fsm-confirmed": "Confirmado en el manual de fábrica (FSM)",
   "confidenceTier.tsb": "Boletín técnico de servicio (TSB)",
   "confidenceTier.community-consensus": "Consenso de la comunidad",
-  "confidenceTier.first-hand": "Lectura de primera mano",
+  "confidenceTier.first-hand": "Experiencia de primera mano",
   "confidenceTier.anecdotal": "Anecdótico",
 };
 
@@ -400,11 +427,21 @@ export function glossarySystemLabel(
 }
 
 /** The label for a community type id — the only supported way to read one. */
+function isTranslatableCommunityType(
+  type: CommunityType
+): type is TranslatableCommunityType {
+  return (TRANSLATABLE_COMMUNITY_TYPES as readonly CommunityType[]).includes(
+    type
+  );
+}
+
 export function communityTypeLabel(
   strings: UiStrings,
   type: CommunityType
 ): string {
-  return strings[`communityType.${type}`];
+  return isTranslatableCommunityType(type)
+    ? strings[`communityType.${type}`]
+    : COMMUNITY_TYPE_BRAND_NAMES[type];
 }
 
 /** The label for an activity level id. */

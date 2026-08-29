@@ -18,16 +18,17 @@
  *
  * refs specs/001-foundation (COM-01, COM-02, I18N-08)
  */
-import type { LinkKind } from "../schemas/community";
+import type { CommunityType, LinkKind } from "../schemas/community";
 
 /**
  * `LINK_KINDS` values whose display name is a bare platform name with no
  * surrounding translated word — every kind except {@link TRANSLATABLE_LINK_KINDS}.
  *
- * `COMMUNITY_TYPES` needs no equivalent table: every one of its values
- * pairs a platform name with a translated word (`facebook-group` → "Grupo de
- * Facebook", `discord` → "Servidor de Discord"), so the whole label already
- * differs by locale and lives in `ui.ts` as ordinary translated prose.
+ * Most of `COMMUNITY_TYPES` needs no equivalent table: `facebook-group` →
+ * "Grupo de Facebook", `discord` → "Servidor de Discord" pair a platform name
+ * with a translated word, so the whole label already differs by locale and
+ * lives in `ui.ts` as ordinary translated prose. `subreddit` is the one
+ * exception — see {@link COMMUNITY_TYPE_BRAND_NAMES}.
  */
 export const LINK_KIND_BRAND_NAMES: Readonly<Record<BrandLinkKind, string>> = {
   facebook: "Facebook",
@@ -51,3 +52,45 @@ export type TranslatableLinkKind = (typeof TRANSLATABLE_LINK_KINDS)[number];
 
 /** The complement of {@link TRANSLATABLE_LINK_KINDS} within `LINK_KINDS`. */
 export type BrandLinkKind = Exclude<LinkKind, TranslatableLinkKind>;
+
+/**
+ * `COMMUNITY_TYPES` values whose display name is a bare platform name —
+ * bilingual review B4 (ruled): a `subreddit`-type entry's type chip reads
+ * "Subreddit" on both `/en/community/` and `/es/comunidad/`, the same
+ * platform term either way, not "Comunidad en Reddit" (a translation that
+ * reads as a *different*, friendlier kind of thing than what "Subreddit"
+ * names on the link-kind chips elsewhere on the same card). Routed through
+ * this seam — mirroring {@link LINK_KIND_BRAND_NAMES} exactly — rather than
+ * `ui.ts`, for the same reason: `ui.test.ts`'s no-identical-pairs rule is
+ * correct for prose and wrong for a proper noun.
+ */
+export const COMMUNITY_TYPE_BRAND_NAMES: Readonly<
+  Record<BrandCommunityType, string>
+> = {
+  subreddit: "Subreddit",
+};
+
+/**
+ * `COMMUNITY_TYPES` values that pair with an ordinary translated word —
+ * `ui.ts` carries `communityType.<type>` for exactly these nine.
+ */
+export const TRANSLATABLE_COMMUNITY_TYPES = [
+  "forum",
+  "facebook-group",
+  "whatsapp-group",
+  "telegram-group",
+  "discord",
+  "club",
+  "youtube-channel",
+  "vendor",
+  "shop",
+] as const;
+
+export type TranslatableCommunityType =
+  (typeof TRANSLATABLE_COMMUNITY_TYPES)[number];
+
+/** The complement of {@link TRANSLATABLE_COMMUNITY_TYPES} within `COMMUNITY_TYPES`. */
+export type BrandCommunityType = Exclude<
+  CommunityType,
+  TranslatableCommunityType
+>;

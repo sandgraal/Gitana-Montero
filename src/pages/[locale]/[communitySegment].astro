@@ -90,6 +90,7 @@ import { formatCount } from "../../lib/glossary-filter";
 import { needsConfidenceCaveat } from "../../lib/confidence";
 import {
   ACTIVITY_LEVELS,
+  WORLDWIDE_REGION,
   type ActivityLevel,
   type CommunityLink,
 } from "../../schemas/community";
@@ -129,6 +130,17 @@ function isKnownGeneration(id: string): id is GenerationId {
   return (GENERATION_IDS as readonly string[]).includes(id);
 }
 
+/**
+ * A region code's display name. `WORLDWIDE_REGION` (`001`) is special-cased
+ * to `strings.communityRegionWorldwide` rather than `Intl.DisplayNames`,
+ * which gives EN a lowercase `"world"` next to title-cased siblings like
+ * "Costa Rica" (code review F2).
+ */
+function regionLabelFor(code: string): string {
+  if (code === WORLDWIDE_REGION) return strings.communityRegionWorldwide;
+  return regionNames.of(code) ?? code;
+}
+
 /** The bilingual confidence-caveat sentence, in `each` locale's own words. */
 function caveatSentence(each: Locale, tier: ConfidenceTier): string {
   const localized = t(each);
@@ -163,7 +175,7 @@ const communities = entries
       domId: `community-${entry.id.replace(/\//g, "--")}`,
       typeLabel: communityTypeLabel(strings, communityType),
       regions,
-      regionLabels: regions.map((code) => regionNames.of(code) ?? code),
+      regionLabels: regions.map(regionLabelFor),
       languages,
       languageLabels: languages.map((tag) => languageNames.of(tag) ?? tag),
       gens,
@@ -422,6 +434,16 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
                     {community.activityLabel}
                   </span>
                   <span class="entry__activity-date">
+                    {/*
+                     * F5 (code review, ruled) — rendered as the raw
+                     * `YYYY-MM-DD` from the schema, not through
+                     * `Intl.DateTimeFormat`: a field-manual reference reads
+                     * unambiguously in both locales this way, where a
+                     * localized short date (`28/08` en vs `08/24` es-style
+                     * day/month order) would not. Revisiting this with a
+                     * proper `Intl.DateTimeFormat` render is T204's, not
+                     * this task's.
+                     */}
                     {strings.communityActivityAssessedTemplate.replace(
                       "{date}",
                       community.activityAssessed
@@ -459,7 +481,11 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
                 )}
 
                 <div class="entry__links">
-                  <a class="entry__visit" href={community.url}>
+                  <a
+                    class="entry__visit"
+                    href={community.url}
+                    aria-label={`${strings.communityVisitLabel} ${community.title}`}
+                  >
                     {strings.communityVisitLabel}
                     <svg
                       width="14"
@@ -801,7 +827,15 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
   .activity-badge[data-activity="dormant"],
   .activity-badge[data-activity="archived"] {
     background: var(--panel-soft);
-    color: var(--faint);
+    /*
+     * F1 (code review) — `--faint` text on `--panel-soft` measured 2.56:1,
+     * under WCAG AA's 4.5:1 for this small, bold, uppercase text. `--muted`
+     * (5.3:1, the same swap the glossary page made for its own secondary
+     * text) keeps the de-emphasized feel; the dashed `--faint` border, which
+     * is a large-enough graphical element for the looser non-text contrast
+     * rule, stays.
+     */
+    color: var(--muted);
     border: 1px dashed var(--faint);
   }
 

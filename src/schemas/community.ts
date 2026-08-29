@@ -114,6 +114,14 @@ import {
  * appendix by mislabelling. They remain distinct from the `whatsapp` and
  * `telegram` *link* kinds below, which describe a secondary presence of a
  * community that is primarily something else.
+ *
+ * `shop` names a **parts retailer** — a business that sells Montero/Pajero/
+ * Shogun repuestos, new or used, online or from a physical counter (T703a
+ * bilingual review B5). The glossary's canonical `taller` (AGENTS.md) names a
+ * *repair* shop instead, a different kind of place a `shop` entry may or may
+ * not also be; the community directory page's ES type-chip label is
+ * "Tienda de repuestos", deliberately not "Taller", for exactly this reason.
+ * Comment only — this does not change `COMMUNITY_TYPES`' shape or values.
  */
 export const COMMUNITY_TYPES = [
   "forum",
