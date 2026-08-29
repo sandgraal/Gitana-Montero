@@ -11,7 +11,21 @@
  * counter says the same thing before and after the first keystroke and the
  * `{shown}` / `{total}` placeholder contract exists in one place.
  *
- * refs specs/001-foundation (GLO-04, I18N-08)
+ * ## `buildHaystack` — no server-rendered `data-haystack` (SCF-06 follow-up)
+ *
+ * At 153 glossary terms the page used to carry the searchable text *twice*:
+ * once as the visible card (canonical term, gloss, both definitions, system
+ * label, alias chips) and again as a normalized `data-haystack` attribute on
+ * every `<li>` — roughly 73 kB of the page's ~383 kB, for text a reader
+ * never sees and a crawler already has in the chip markup. `buildHaystack`
+ * takes the same *parts* the card already renders (read from the live DOM by
+ * the `.astro` script's thin wiring, once per card, not per keystroke) and
+ * normalizes them the same way `normalizeForSearch` always has, so the
+ * matched set is unchanged — only the duplicate encoding is gone. The one
+ * intentional narrowing: the *other* locale's system label (e.g. the Spanish
+ * word for "brakes" while reading `/en/glossary/`) is no longer indexed,
+ * because it was never rendered either — GLO-03/SRCH-02 promise alias
+ * recall, not a translated category name nobody sees.
  */
 import { normalizeForSearch } from "./text";
 
@@ -21,6 +35,45 @@ export interface GlossaryFilterCard {
   readonly system: string;
   /** Pre-normalized searchable text, `data-haystack`. */
   readonly haystack: string;
+}
+
+/** One alias chip's searchable parts, as rendered (country tags joined, e.g. `"CR/MX"`). */
+export interface GlossaryHaystackAlias {
+  readonly term: string;
+  readonly countries: string;
+}
+
+/**
+ * The parts of a rendered card that are searchable, read once from the DOM
+ * by the page's `<script>` and passed here rather than re-derived from
+ * content data — so the haystack can never say something the card does not
+ * actually show.
+ */
+export interface GlossaryHaystackSource {
+  /** Both locales' term text (canonical + gloss). */
+  readonly terms: readonly string[];
+  /** Both locales' definition text. */
+  readonly definitions: readonly string[];
+  /** The rendered system label, page locale only (see module docs). */
+  readonly system: string;
+  /** Every alias chip, regardless of locale or country. */
+  readonly aliases: readonly GlossaryHaystackAlias[];
+}
+
+/**
+ * Normalize a card's rendered parts into the same haystack shape the page
+ * used to serialize into `data-haystack`, without shipping the duplicate
+ * bytes. See the module docs for why this is safe for SRCH-02 recall.
+ */
+export function buildHaystack(source: GlossaryHaystackSource): string {
+  return normalizeForSearch(
+    [
+      ...source.terms,
+      ...source.definitions,
+      source.system,
+      ...source.aliases.flatMap((alias) => [alias.term, alias.countries]),
+    ].join(" ")
+  );
 }
 
 /** The active filter state. */
