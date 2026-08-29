@@ -14,7 +14,12 @@
  */
 import { describe, expect, it } from "vitest";
 import { z } from "astro/zod";
-import { CITATION_REQUIRED_TIERS, defineEntrySchema } from "./entry";
+import {
+  CITATION_REQUIRED_TIERS,
+  SOURCE_KINDS,
+  defineEntrySchema,
+  sourceSchema,
+} from "./entry";
 
 const shared = { torqueNm: z.number() };
 const prose = { title: z.string(), summary: z.string() };
@@ -227,4 +232,93 @@ describe("citation-required confidence tiers", () => {
       expect(schema().safeParse(entry(tier, [])).success).toBe(true);
     }
   );
+});
+
+/**
+ * The `manufacturer` / `reference` source kinds (plan.md amended 2026-08-28).
+ *
+ * Exact `SOURCE_KINDS` membership is the graders' contract
+ * (`tests/schemas/entry-primitives.test.ts`). What is tested here is the
+ * implementation-side consequence of adding them: that the new kinds are
+ * actually reachable through `sourceSchema` and satisfy the
+ * citation-required-tier refinement, which is the whole reason they exist —
+ * `manufacturer` was added so factory literature could support
+ * `fsm-confirmed` without filing a brochure as `vendor`.
+ */
+describe("manufacturer and reference source kinds", () => {
+  const sourceOfKind = (kind: string) => ({
+    title: "TEST fixture source — not a real document",
+    url: "https://example.invalid/test-schema/source",
+    archiveUrl:
+      "https://web.archive.org/web/20260101000000/" +
+      "https://example.invalid/test-schema/source",
+    accessed: "2026-08-27",
+    kind,
+  });
+
+  it.each(["manufacturer", "reference"])(
+    "sourceSchema accepts the kind `%s`",
+    (kind) => {
+      expect(sourceSchema.safeParse(sourceOfKind(kind)).success).toBe(true);
+    }
+  );
+
+  /**
+   * Guards against enum/schema drift: `sourceSchema.kind` is built from
+   * `SOURCE_KINDS`, so a kind that is listed but unparseable would mean the
+   * two had come apart.
+   */
+  it.each([...SOURCE_KINDS])(
+    "sourceSchema accepts every listed kind %j",
+    (kind) => {
+      expect(sourceSchema.safeParse(sourceOfKind(kind)).success).toBe(true);
+    }
+  );
+
+  const entryCitedBy = (confidence: string, kind: string) => ({
+    id: "test-schema-alpha",
+    fitment: { gens: ["gen3"] },
+    torqueNm: 88,
+    confidence,
+    sources: [sourceOfKind(kind)],
+    prose: {
+      en: { title: "T", summary: "S" },
+      es: { title: "T", summary: "S" },
+    },
+  });
+
+  /**
+   * The round-trip proof: a whole entry at the strongest tier, cited only by
+   * factory literature, parses. Before `manufacturer` existed this shape was
+   * unexpressible — the citation had to claim a kind it was not.
+   */
+  it("accepts an `fsm-confirmed` entry cited only by a `manufacturer` source", () => {
+    const outcome = defineEntrySchema(shared, prose).safeParse(
+      entryCitedBy("fsm-confirmed", "manufacturer")
+    );
+
+    expect(outcome.success).toBe(true);
+  });
+
+  it("accepts a `community-consensus` entry cited only by a `reference` source", () => {
+    const outcome = defineEntrySchema(shared, prose).safeParse(
+      entryCitedBy("community-consensus", "reference")
+    );
+
+    expect(outcome.success).toBe(true);
+  });
+
+  /**
+   * Kind and tier stay independent fields: nothing in the schema stops a
+   * `reference` source from backing `fsm-confirmed`. Pinned so the day a
+   * kind→tier rule is added (recorded on T207), this test fails and forces the
+   * decision to be deliberate rather than discovered.
+   */
+  it("does not yet constrain which kind may support which tier", () => {
+    const outcome = defineEntrySchema(shared, prose).safeParse(
+      entryCitedBy("fsm-confirmed", "reference")
+    );
+
+    expect(outcome.success).toBe(true);
+  });
 });

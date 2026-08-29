@@ -37,6 +37,23 @@
  * `check:links` run in an offline sandbox is not mistaken for real link rot
  * (see `findUnreachableLinks`'s `offlineNotice`).
  *
+ * **web.archive.org gets special handling.** At content scale (T201: ~140
+ * source pairs, most citing an archive snapshot) the pooled concurrency below
+ * self-inflicts a Wayback Machine rate-limit: every `archiveUrl` fetch came
+ * back a connection-level error in CI while a same-size run against other
+ * hosts passed clean. So `ARCHIVE_HOST` requests are pulled out of the shared
+ * pool and run serially (concurrency 1) with a fixed inter-request delay
+ * (`ARCHIVE_REQUEST_SPACING_MS`), and get their own backoff-retry policy —
+ * up to `ARCHIVE_MAX_ATTEMPTS` attempts with exponential backoff
+ * (`ARCHIVE_BACKOFF_SCHEDULE_MS`), honoring a `Retry-After` header when the
+ * host sends one, and retrying HTTP 429 in addition to thrown connection
+ * errors. Every other host keeps the original pooled `CONCURRENCY` and the
+ * original single-immediate-retry policy — this is pure politeness toward
+ * one host, not a change to the failure rule: a 429 or connection failure
+ * that survives every backoff attempt still counts as unreachable, and a
+ * source still only fails when **both** its `url` and `archiveUrl` are
+ * unreachable (GAP-01, unchanged).
+ *
  * Scope note: "internal references resolve" (AGENTS.md) is not implemented
  * here yet. Nothing in the T104 base schema creates an internal cross-entry
  * reference to validate — `fitment.{gens,engines,…}` are opaque id lists
@@ -55,6 +72,23 @@ import { CONTENT_ROOT, loadContentEntries } from "./lib/content-entries.mjs";
 const ARCHIVE_HOST = "web.archive.org";
 const FETCH_TIMEOUT_MS = 10_000;
 const CONCURRENCY = 6;
+
+/** Fixed spacing between consecutive `ARCHIVE_HOST` requests (politeness, not a retry). */
+export const ARCHIVE_REQUEST_SPACING_MS = 1_800;
+/** 1 initial attempt + up to 3 backoff retries, per method, for `ARCHIVE_HOST` only. */
+export const ARCHIVE_MAX_ATTEMPTS = 4;
+/** Wait before retry attempts 2, 3, 4 respectively (exponential, ~2s/8s/20s). */
+export const ARCHIVE_BACKOFF_SCHEDULE_MS = [2_000, 8_000, 20_000];
+/** How often `runArchiveChecks` prints a liveness line, so CI logs are never silent for minutes. */
+const ARCHIVE_PROGRESS_INTERVAL = 20;
+
+/** The generic (non-archive) retry policy — unchanged from before: 1 immediate retry, no 429 handling. */
+const GENERIC_POLICY = {
+  maxAttempts: 2,
+  backoffMs: [0],
+  delayImpl: async () => {},
+  retryOn429: false,
+};
 
 /** `sources[]` entries are `{ title, url, archiveUrl, accessed, kind }`. */
 function sourcesOf(data) {
@@ -187,24 +221,84 @@ async function attemptOnce(url, method, fetchImpl) {
   }
 }
 
-/** One retry on a thrown network error before this method's attempt gives up. */
-async function attemptWithRetry(url, method, fetchImpl) {
-  const first = await attemptOnce(url, method, fetchImpl);
-  if (first.ok) return first;
-  return attemptOnce(url, method, fetchImpl);
+/** Real (production) delay — a plain `setTimeout` wrapped in a promise. */
+async function defaultDelay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * The longest we will ever honor a `Retry-After` header for — the largest
+ * entry in `ARCHIVE_BACKOFF_SCHEDULE_MS`. `Retry-After` is server-supplied
+ * and unbounded (a misbehaving or hostile host could send `Retry-After:
+ * 999999999`); rather than lean on Node's incidental 32-bit `setTimeout`
+ * clamp (~24.8 days) to save us, this ceiling is explicit and small enough
+ * that a single check can never stall a run for more than the same worst
+ * case a connection-failure retry already accepts.
+ */
+const RETRY_AFTER_CEILING_MS = Math.max(...ARCHIVE_BACKOFF_SCHEDULE_MS);
+
+/**
+ * How long to wait before the next attempt when a `429` response carries a
+ * `Retry-After` header — seconds (`Retry-After: 5`) or an HTTP-date are both
+ * valid per RFC 9110. Returns `null` when absent, unparseable, or the
+ * duck-typed test double has no `headers`; otherwise clamps to
+ * `RETRY_AFTER_CEILING_MS` (see its docstring).
+ */
+function retryAfterMs(response) {
+  const header = response?.headers?.get?.("retry-after");
+  if (typeof header !== "string" || header === "") return null;
+  const seconds = Number(header);
+  if (Number.isFinite(seconds)) {
+    return Math.min(RETRY_AFTER_CEILING_MS, Math.max(0, seconds * 1_000));
+  }
+  const when = Date.parse(header);
+  if (!Number.isNaN(when)) {
+    return Math.min(RETRY_AFTER_CEILING_MS, Math.max(0, when - Date.now()));
+  }
+  return null;
+}
+
+/**
+ * Attempt `method url` up to `policy.maxAttempts` times. A thrown network
+ * error is always retryable (until attempts run out); an HTTP `429` is
+ * retryable only when `policy.retryOn429` is set (archive host only — see
+ * module docstring). Every retry waits `policy.delayImpl(ms)` first, `ms`
+ * coming from the response's `Retry-After` header when present, else
+ * `policy.backoffMs[attemptIndex]` (clamped to the schedule's last entry).
+ */
+async function attemptWithPolicy(url, method, fetchImpl, policy) {
+  const { maxAttempts, backoffMs, delayImpl, retryOn429 } = policy;
+  let last;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    last = await attemptOnce(url, method, fetchImpl);
+    const isFinalAttempt = attempt === maxAttempts;
+    if (last.ok) {
+      const retryable = retryOn429 && last.response.status === 429;
+      if (!retryable || isFinalAttempt) return last;
+      const wait =
+        retryAfterMs(last.response) ??
+        backoffMs[attempt - 1] ??
+        backoffMs[backoffMs.length - 1];
+      await delayImpl(wait);
+      continue;
+    }
+    if (isFinalAttempt) return last;
+    const wait = backoffMs[attempt - 1] ?? backoffMs[backoffMs.length - 1];
+    await delayImpl(wait);
+  }
+  return last;
 }
 
 /**
  * Fetch `url`, HEAD first (cheaper), falling back to GET when the host
  * rejects HEAD (`405`/`501`, common on forums and vendor sites) or every
- * attempt at a method throws. Each method gets one retry on a thrown network
- * error (see {@link attemptWithRetry}) before this function moves on.
+ * attempt at a method exhausts `policy` (see {@link attemptWithPolicy}).
  * Returns `{ ok, status?, error? }`.
  */
-async function checkReachable(url, fetchImpl) {
+async function checkReachable(url, fetchImpl, policy) {
   let lastError;
   for (const method of ["HEAD", "GET"]) {
-    const attempt = await attemptWithRetry(url, method, fetchImpl);
+    const attempt = await attemptWithPolicy(url, method, fetchImpl, policy);
     if (attempt.ok) {
       const { response } = attempt;
       if (response.ok || (response.status >= 200 && response.status < 400)) {
@@ -219,9 +313,39 @@ async function checkReachable(url, fetchImpl) {
       return { ok: false, status: response.status };
     }
     lastError = attempt.error;
-    // Still failing after the retry — try GET before giving up entirely.
+    // Still failing after every retry this policy allows — try GET before
+    // giving up entirely.
   }
   return { ok: false, error: lastError ?? "unreachable" };
+}
+
+/**
+ * `ARCHIVE_HOST` checks, serialized (concurrency 1) with a fixed inter-
+ * request delay and their own backoff-retry policy — see module docstring.
+ * Prints a liveness line every `ARCHIVE_PROGRESS_INTERVAL` checks (and at the
+ * end) so a CI log stays visibly alive through a multi-minute run.
+ */
+async function runArchiveChecks(checks, fetchImpl, delayImpl) {
+  const policy = {
+    maxAttempts: ARCHIVE_MAX_ATTEMPTS,
+    backoffMs: ARCHIVE_BACKOFF_SCHEDULE_MS,
+    delayImpl,
+    retryOn429: true,
+  };
+  const results = [];
+  for (let index = 0; index < checks.length; index++) {
+    if (index > 0) await delayImpl(ARCHIVE_REQUEST_SPACING_MS);
+    const check = checks[index];
+    const result = await checkReachable(check.target, fetchImpl, policy);
+    results.push({ ...check, result });
+    const done = index + 1;
+    if (done % ARCHIVE_PROGRESS_INTERVAL === 0 || done === checks.length) {
+      console.log(
+        `check:links — ${ARCHIVE_HOST} reachability: ${done}/${checks.length} checked`
+      );
+    }
+  }
+  return results;
 }
 
 /**
@@ -323,11 +447,12 @@ function detectOfflineNotice(results) {
  * default is the global `fetch` (Node 24, no dependency needed).
  *
  * @param {{ file: string, data: unknown }[]} entries
- * @param {{ fetchImpl?: FetchLike }} [options]
+ * @param {{ fetchImpl?: FetchLike, delayImpl?: (ms: number) => Promise<void> }} [options]
  * @returns {Promise<{ issues: LinkIssue[], warnings: LinkWarning[], offlineNotice: string | null }>}
  */
 export async function findUnreachableLinks(entries, options = {}) {
   const fetchImpl = options.fetchImpl ?? fetch;
+  const delayImpl = options.delayImpl ?? defaultDelay;
   const pairs = collectSourcePairs(entries);
 
   const checks = pairs.flatMap((pair) => [
@@ -338,14 +463,21 @@ export async function findUnreachableLinks(entries, options = {}) {
   ]);
   const performed = checks.filter((c) => c !== null);
 
-  const results = await mapWithConcurrency(
-    performed,
-    CONCURRENCY,
-    async (check) => ({
+  // ARCHIVE_HOST checks are pulled out of the shared pool and run serially,
+  // spaced, with their own backoff policy (see module docstring); every
+  // other host keeps the original pooled concurrency and immediate-retry
+  // policy, unchanged from before this run split.
+  const archiveChecks = performed.filter((check) => isArchiveUrl(check.target));
+  const otherChecks = performed.filter((check) => !isArchiveUrl(check.target));
+
+  const [archiveResults, otherResults] = await Promise.all([
+    runArchiveChecks(archiveChecks, fetchImpl, delayImpl),
+    mapWithConcurrency(otherChecks, CONCURRENCY, async (check) => ({
       ...check,
-      result: await checkReachable(check.target, fetchImpl),
-    })
-  );
+      result: await checkReachable(check.target, fetchImpl, GENERIC_POLICY),
+    })),
+  ]);
+  const results = [...archiveResults, ...otherResults];
 
   const bySide = new Map();
   for (const { pair, side, result } of results) {
@@ -375,7 +507,7 @@ export async function findUnreachableLinks(entries, options = {}) {
 
 /**
  * @param {{ file: string, data: unknown }[]} entries
- * @param {{ fetchImpl?: FetchLike }} [options]
+ * @param {{ fetchImpl?: FetchLike, delayImpl?: (ms: number) => Promise<void> }} [options]
  * @returns {Promise<{ issues: LinkIssue[], warnings: LinkWarning[], offlineNotice: string | null }>}
  */
 export async function auditLinks(entries, options = {}) {
