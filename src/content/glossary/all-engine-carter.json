@@ -1,0 +1,30 @@
+{
+  "id": "all-engine-carter",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "sump",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-engine-aceite-de-motor",
+    "all-body-protector-de-carter"
+  ],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "oil pan",
+      "summary": "The pan under the engine that holds the oil. On a vehicle taken off pavement it is also the part that meets rocks, which is what a skid plate is for."
+    },
+    "es": {
+      "title": "cárter",
+      "summary": "La bandeja bajo el motor donde se deposita el aceite. En un vehículo que sale del asfalto es también la pieza que se encuentra con las piedras: para eso está el protector."
+    }
+  }
+}

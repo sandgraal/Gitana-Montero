@@ -1,0 +1,52 @@
+{
+  "id": "all-body-capo",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "body",
+  "aliases": [
+    {
+      "term": "cofre",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "cofres",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "capot",
+      "locale": "es",
+      "countries": ["AR"]
+    },
+    {
+      "term": "capots",
+      "locale": "es",
+      "countries": ["AR"]
+    },
+    {
+      "term": "bonnet",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "bonnets",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-body-bumper", "all-engine-motor"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "hood",
+      "summary": "The engine cover — the bonnet in British and Australian usage. Its release cable and its support strut are both things that fail quietly and are noticed at the worst moment."
+    },
+    "es": {
+      "title": "capó",
+      "summary": "La tapa del motor. Su cable de apertura y su amortiguador de sostén son de esas piezas que fallan calladas y se notan en el peor momento."
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "all-fuel-sensor-de-oxigeno",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fuel",
+  "aliases": [
+    {
+      "term": "oxygen sensors",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "lambda sensor",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "lambda sensors",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "sonda lambda",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "sondas lambda",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-exhaust-catalizador"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "oxygen sensor",
+      "summary": "The sensor in the exhaust that tells the engine computer how rich or lean the mixture is. A lazy one costs fuel long before it lights a warning lamp."
+    },
+    "es": {
+      "title": "sensor de oxígeno",
+      "summary": "El sensor en el escape que le dice a la computadora qué tan rica o pobre viene la mezcla. Uno perezoso cuesta combustible mucho antes de encender una luz de advertencia."
+    }
+  }
+}

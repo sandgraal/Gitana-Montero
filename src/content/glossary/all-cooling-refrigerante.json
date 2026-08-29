@@ -1,0 +1,36 @@
+{
+  "id": "all-cooling-refrigerante",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "cooling",
+  "aliases": [
+    {
+      "term": "anticongelante",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "antifreeze",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-cooling-refrigeracion",
+    "all-cooling-radiador",
+    "all-fluids-liquidos"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "coolant",
+      "summary": "The water-and-additive mix that carries heat out of the engine. Costa Rican counters sell it as refrigerante and also as líquido para radiador. Type matters — mixing incompatible coolants turns them to jelly — and it is never opened hot."
+    },
+    "es": {
+      "title": "refrigerante",
+      "summary": "La mezcla de agua y aditivos que saca el calor del motor. En las repuesteras ticas se vende como refrigerante y también como líquido para radiador. El tipo importa — mezclar refrigerantes incompatibles los vuelve una gelatina — y nunca se destapa en caliente."
+    }
+  }
+}

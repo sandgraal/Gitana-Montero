@@ -1,0 +1,21 @@
+{
+  "id": "all-tools-prensa-de-resortes",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [],
+  "relatedTerms": ["all-suspension-resorte", "all-suspension-amortiguador"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "spring compressor",
+      "summary": "The clamp that holds a coil spring compressed while the suspension is apart. A stored spring is a stored injury: this is one of the jobs where the right tool, or a qualified mechanic, is not optional."
+    },
+    "es": {
+      "title": "prensa de resortes",
+      "summary": "La prensa que mantiene comprimido el resorte mientras se desarma la suspensión. Un resorte comprimido guarda energía de sobra para lastimar a alguien: este es uno de esos trabajos donde la herramienta correcta, o el mecánico calificado, no son opcionales."
+    }
+  }
+}

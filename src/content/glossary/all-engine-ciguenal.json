@@ -1,0 +1,21 @@
+{
+  "id": "all-engine-ciguenal",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [],
+  "relatedTerms": ["all-engine-faja-de-distribucion"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "crankshaft",
+      "summary": "The shaft that turns the pistons' up-and-down into rotation. Its pulley, its seals and its bearings are all common sources of leaks and noises on high-mileage engines."
+    },
+    "es": {
+      "title": "cigüeñal",
+      "summary": "El eje que convierte el sube y baja de los pistones en giro. Su polea, sus retenedores y sus cojinetes son fuentes comunes de fugas y ruidos en motores con mucho recorrido."
+    }
+  }
+}

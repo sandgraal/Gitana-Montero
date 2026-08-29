@@ -1,0 +1,55 @@
+{
+  "id": "all-engine-empaque-de-cabezote",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "junta de culata",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "juntas de culata",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "empaquetadura de culata",
+      "locale": "es",
+      "countries": ["CL"]
+    },
+    {
+      "term": "empaquetaduras de culata",
+      "locale": "es",
+      "countries": ["CL"]
+    },
+    {
+      "term": "head gaskets",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-engine-cabezote", "all-cooling-refrigerante"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Automas — Repuestos Automotrices en Costa Rica",
+      "url": "https://automas.cr/",
+      "archiveUrl": "http://web.archive.org/web/20260828190644/https://automas.cr/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "head gasket",
+      "summary": "The gasket sealing the head to the block, holding combustion pressure in and keeping coolant and oil apart. A failed one shows up as white smoke, coolant loss with no puddle, or oil that looks like coffee with milk."
+    },
+    "es": {
+      "title": "empaque de cabezote",
+      "summary": "El empaque que sella el cabezote contra el bloque: aguanta la presión de combustión y mantiene separados el refrigerante y el aceite. Cuando se quema aparece humo blanco, pérdida de refrigerante sin charco debajo, o aceite con aspecto de café con leche."
+    }
+  }
+}

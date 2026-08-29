@@ -1,0 +1,74 @@
+{
+  "id": "all-electrical-farol",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "faro",
+      "locale": "es",
+      "countries": ["ES", "MX", "AR"]
+    },
+    {
+      "term": "faros",
+      "locale": "es",
+      "countries": ["ES", "MX", "AR"]
+    },
+    {
+      "term": "silvín",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "silvines",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "headlight",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "headlights",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-electrical-bombillo", "all-electrical-pide-vias"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "FAROLES, SILVINES — Guía Automotriz de Costa Rica",
+      "url": "https://guiaautomotrizcr.com/categoria/faroles-silvines/",
+      "archiveUrl": "http://web.archive.org/web/20241202105001/https://guiaautomotrizcr.com/categoria/faroles-silvines/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Silvines / Faros Delanteros — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/sistema-electrico-iluminacion-baterias-fitineria/iluminacion/silvines-faros-delanteros-headlights.html",
+      "archiveUrl": "https://web.archive.org/web/20260828191644/https://truckdepot.cr/sistema-electrico-iluminacion-baterias-fitineria/iluminacion/silvines-faros-delanteros-headlights.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "MOT inspection manual: cars and passenger vehicles — 4. Lamps, reflectors and electrical equipment (headlamp aim)",
+      "url": "https://www.gov.uk/guidance/mot-inspection-manual-for-private-passenger-and-light-commercial-vehicles/4-lamps-reflectors-and-electrical-equipment",
+      "archiveUrl": "https://web.archive.org/web/20260829064748/https://www.gov.uk/guidance/mot-inspection-manual-for-private-passenger-and-light-commercial-vehicles/4-lamps-reflectors-and-electrical-equipment",
+      "accessed": "2026-08-29",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "headlamp",
+      "summary": "The front lamp assembly. Costa Rican parts listings say farol — farol principal — and catalogs also file the same assemblies under silvines. Headlamp aim is checked at Costa Rica's RTV and at the UK MOT alike, and it changes when the suspension height changes."
+    },
+    "es": {
+      "title": "farol",
+      "summary": "El conjunto de la luz delantera. En las listas de repuestos de este país se pide como farol — farol principal — y en los catálogos los mismos conjuntos aparecen bajo «silvines». El enfoque de los faroles se revisa tanto en la RTV costarricense como en el MOT británico, y cambia cuando cambia la altura de la suspensión."
+    }
+  }
+}

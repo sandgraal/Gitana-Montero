@@ -1,0 +1,27 @@
+{
+  "id": "all-suspension-barra-de-torsion",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3"]
+  },
+  "system": "suspension",
+  "aliases": [
+    {
+      "term": "torsion bars",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-suspension-resorte"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "torsion bar",
+      "summary": "A steel bar that twists instead of a coil compressing, used for the front springing of several Montero generations. Its adjuster sets front ride height. Winding that adjuster up to gain height is not a lift: it preloads the bar, changes the alignment and runs the suspension at the end of its travel, which is the work a lift kit is designed to do properly."
+    },
+    "es": {
+      "title": "barra de torsión",
+      "summary": "Barra de acero que trabaja torciéndose en lugar de comprimirse como un resorte; varias generaciones de Montero la llevan adelante. Su regulador fija la altura delantera. Subir ese regulador para ganar altura no es un levante: precarga la barra, cambia el alineamiento y deja la suspensión trabajando al final de su recorrido, que es justo lo que un kit de levante sí resuelve bien."
+    }
+  }
+}

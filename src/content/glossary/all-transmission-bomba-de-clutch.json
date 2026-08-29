@@ -1,0 +1,32 @@
+{
+  "id": "all-transmission-bomba-de-clutch",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "transmission",
+  "aliases": [],
+  "relatedTerms": [
+    "all-transmission-clutch",
+    "all-brakes-bomba-principal-de-freno"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Automas — Repuestos Automotrices en Costa Rica",
+      "url": "https://automas.cr/",
+      "archiveUrl": "http://web.archive.org/web/20260828190644/https://automas.cr/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "clutch master cylinder",
+      "summary": "The hydraulic cylinder the clutch pedal acts on; the one at the transmission end is the slave. Costa Rican catalogs list them as bomba principal and bomba auxiliar de clutch."
+    },
+    "es": {
+      "title": "bomba de clutch",
+      "summary": "El cilindro hidráulico sobre el que actúa el pedal del clutch; el del lado de la caja es el auxiliar. Los catálogos ticos las listan como bomba principal y bomba auxiliar de clutch."
+    }
+  }
+}

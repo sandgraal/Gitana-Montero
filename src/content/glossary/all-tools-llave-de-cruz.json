@@ -1,0 +1,32 @@
+{
+  "id": "all-tools-llave-de-cruz",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "lug wrenches",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "wheel brace",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-wheels-tires-tuerca-de-rueda", "all-tools-gata"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "lug wrench",
+      "summary": "The cross-shaped wrench for wheel nuts that lives with the jack. It loosens and it snugs; final tightening is a torque wrench's job."
+    },
+    "es": {
+      "title": "llave de cruz",
+      "summary": "La llave de cruz para las tuercas de rueda, la que anda junto con la gata. Sirve para aflojar y para dejar apretado a mano; el apriete final es trabajo de la llave de torque."
+    }
+  }
+}

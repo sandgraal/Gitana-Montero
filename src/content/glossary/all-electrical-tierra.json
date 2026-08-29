@@ -1,0 +1,27 @@
+{
+  "id": "all-electrical-tierra",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "earth",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-electrical-bateria"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "ground",
+      "summary": "The return path to the battery through the body and the engine. Corroded ground straps cause faults that look like everything else — dim lights, odd gauge readings, a starter that clicks."
+    },
+    "es": {
+      "title": "tierra",
+      "summary": "El camino de retorno a la batería por la carrocería y el motor. Las trenzas de tierra corroídas provocan fallas que parecen cualquier otra cosa: luces opacas, agujas que marcan raro, un arranque que solo hace clic."
+    }
+  }
+}

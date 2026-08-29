@@ -1,0 +1,21 @@
+{
+  "id": "all-fuel-filtro-de-combustible",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fuel",
+  "aliases": [],
+  "relatedTerms": ["all-fuel-bomba-de-combustible", "all-fuel-diesel"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "fuel filter",
+      "summary": "The filter between tank and engine. On diesels it is also the water trap, and draining it is part of ordinary maintenance in a wet climate."
+    },
+    "es": {
+      "title": "filtro de combustible",
+      "summary": "El filtro entre el tanque y el motor. En los diésel hace además de trampa de agua, y drenarlo es parte del mantenimiento normal en un clima húmedo."
+    }
+  }
+}

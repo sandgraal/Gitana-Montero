@@ -1,0 +1,29 @@
+{
+  "id": "all-general-mecanico",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-taller"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
+      "url": "https://guiaautomotrizcr.com/",
+      "archiveUrl": "https://web.archive.org/web/20260829004857/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "mechanic",
+      "summary": "The person who does the work. Nothing on this site replaces a qualified mechanic on safety-critical systems — brakes, steering, suspension, fuel, airbags, tires, towing and lifting."
+    },
+    "es": {
+      "title": "mecánico",
+      "summary": "La persona que hace el trabajo. Nada de este sitio sustituye a un mecánico calificado en los sistemas críticos para la seguridad: frenos, dirección, suspensión, combustible, bolsas de aire, llantas, remolque y levante del vehículo."
+    }
+  }
+}

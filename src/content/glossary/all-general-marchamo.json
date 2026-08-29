@@ -1,0 +1,22 @@
+{
+  "id": "all-general-marchamo",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["cr"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-rtv"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "marchamo",
+      "summary": "In Costa Rica, the annual payment that keeps a vehicle legally on the road — circulation rights plus the compulsory insurance, collected by the state insurer and evidenced by a sticker on the windscreen. A Costa Rica-only term; the amounts and the rules are set each year by Costa Rican authorities and are outside the scope of this site."
+    },
+    "es": {
+      "title": "marchamo",
+      "summary": "En Costa Rica, el pago anual que mantiene al vehículo legalmente en circulación: los derechos de circulación más el seguro obligatorio, que cobra el instituto asegurador del Estado y que se comprueba con la calcomanía del parabrisas. Es un término exclusivo de Costa Rica; los montos y las reglas los fijan cada año las autoridades costarricenses y quedan fuera del alcance de este sitio."
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "all-tools-cubo",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "llave de vaso",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "llaves de vaso",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "sockets",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-tools-ratchet",
+    "all-tools-llave",
+    "all-transfer-case-cubos-de-rueda-libre"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "socket",
+      "summary": "The cup that fits over a nut or bolt head and drives from a ratchet. Costa Rican catalogs sell them as cubos, in sets and singly — not to be confused with the cubos de rueda libre on the front axle, which are hubs."
+    },
+    "es": {
+      "title": "cubo",
+      "summary": "La copa que entra sobre la tuerca o la cabeza del perno y se acciona con ratchet. Los catálogos ticos los venden como cubos, en juegos y por unidad. Ojo con el otro sentido de la palabra: los cubos de rueda libre del eje delantero son otra cosa."
+    }
+  }
+}

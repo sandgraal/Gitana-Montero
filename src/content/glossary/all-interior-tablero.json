@@ -1,0 +1,42 @@
+{
+  "id": "all-interior-tablero",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "interior",
+  "aliases": [
+    {
+      "term": "salpicadero",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "salpicaderos",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "dashboards",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "dash",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-interior-luz-de-advertencia"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "dashboard",
+      "summary": "The panel with the instruments and the vents. On this range the top cracks in tropical sun, and the wiring behind it is where a lot of intermittent faults hide."
+    },
+    "es": {
+      "title": "tablero",
+      "summary": "El panel de los instrumentos y las salidas de aire. En esta gama la parte de arriba se raja con el sol del trópico, y el cableado que va detrás es donde se esconden muchas fallas intermitentes."
+    }
+  }
+}

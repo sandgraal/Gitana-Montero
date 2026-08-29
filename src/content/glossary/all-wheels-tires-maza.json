@@ -1,0 +1,25 @@
+{
+  "id": "all-wheels-tires-maza",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "wheels-tires",
+  "aliases": [],
+  "relatedTerms": [
+    "all-wheels-tires-llanta",
+    "all-drivetrain-rodamiento",
+    "all-transfer-case-cubos-de-rueda-libre"
+  ],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "hub",
+      "summary": "The part the wheel bolts to and turns on. Its bearing is a wear item and a safety item: play or a growl that changes when the vehicle is steered is a reason to stop and have it looked at."
+    },
+    "es": {
+      "title": "maza",
+      "summary": "La pieza a la que se atornilla la rueda y sobre la que gira. Su rodamiento es pieza de desgaste y de seguridad: juego o un ronroneo que cambia al doblar es motivo para revisarla de una vez."
+    }
+  }
+}

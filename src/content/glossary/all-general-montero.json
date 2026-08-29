@@ -1,0 +1,62 @@
+{
+  "id": "all-general-montero",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [
+    {
+      "term": "Pajero",
+      "locale": "en",
+      "countries": ["AU", "JP", "GB"]
+    },
+    {
+      "term": "Shogun",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "Montero Sport",
+      "locale": "en",
+      "countries": ["US", "CR"]
+    }
+  ],
+  "relatedTerms": [
+    "all-general-carro",
+    "all-transfer-case-super-select-4wd-ii"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Shogun accessories — Mitsubishi Motors in the UK",
+      "url": "https://mitsubishi-motors.co.uk/aftersales/parts-and-accessories/accessories/shogun-accessories/",
+      "archiveUrl": "https://web.archive.org/web/20260829064547/https://mitsubishi-motors.co.uk/aftersales/parts-and-accessories/accessories/shogun-accessories/",
+      "accessed": "2026-08-29",
+      "kind": "manufacturer"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades and drivetrains)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260829054038/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-29",
+      "kind": "reference"
+    },
+    {
+      "title": "MITSUPARTES — Repuestos Mitsubishi, Tibás, Costa Rica",
+      "url": "https://www.mitsupartescr.com/",
+      "archiveUrl": "http://web.archive.org/web/20250712163140/http://mitsupartescr.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Montero",
+      "summary": "The name Mitsubishi's full-size four-wheel-drive wagon carries in Costa Rica and the Americas — Costa Rican parts sellers list it as the Montero, while Mitsubishi's own Japanese catalog prints Pajero and its UK site Shogun. Montero Sport is a different, smaller model and is never a synonym for it."
+    },
+    "es": {
+      "title": "Montero",
+      "summary": "El nombre que lleva en Costa Rica y América la camioneta grande de doble tracción de Mitsubishi: las repuesteras ticas la listan como Montero, mientras que la propia Mitsubishi imprime Pajero en su catálogo japonés y Shogun en su sitio británico. Regla de género de este sitio: se escribe la Montero, en femenino, pero el Pajero y el Shogun en masculino — el género va con el emblema, no con el vehículo. Montero Sport es otro modelo, más pequeño, y no es sinónimo."
+    }
+  }
+}

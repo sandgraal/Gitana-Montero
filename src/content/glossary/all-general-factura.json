@@ -1,0 +1,25 @@
+{
+  "id": "all-general-factura",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": [
+    "all-general-repuestos",
+    "all-general-taller",
+    "all-general-numero-de-parte"
+  ],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "invoice",
+      "summary": "The paper the parts counter or the shop gives you. It is worth keeping: it records what was fitted and when, it is what a warranty claim rests on, and for this site's build log it is where a cost comes from."
+    },
+    "es": {
+      "title": "factura",
+      "summary": "El papel que le entrega la repuestera o el taller. Conviene guardarla: deja constancia de qué se instaló y cuándo, es lo que sostiene un reclamo de garantía y, para la bitácora de este sitio, es de donde sale un costo."
+    }
+  }
+}

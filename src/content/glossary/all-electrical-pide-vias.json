@@ -1,0 +1,55 @@
+{
+  "id": "all-electrical-pide-vias",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "pidevías",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "pide-vías",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "indicator",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "indicators",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "turn signals",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-electrical-farol", "all-electrical-bombillo"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Silvines / Faros Delanteros — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/sistema-electrico-iluminacion-baterias-fitineria/iluminacion/silvines-faros-delanteros-headlights.html",
+      "archiveUrl": "https://web.archive.org/web/20260828191644/https://truckdepot.cr/sistema-electrico-iluminacion-baterias-fitineria/iluminacion/silvines-faros-delanteros-headlights.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "turn signal",
+      "summary": "The indicator lamps. Costa Rican truck-parts catalogs list them as pide vías, also written pidevías; Spain says luces intermitentes, which in Costa Rica means the hazard lights instead. A signal that suddenly flashes fast is usually a burnt bulb on that side."
+    },
+    "es": {
+      "title": "pide vías",
+      "summary": "Las luces direccionales. Los catálogos ticos las listan así, como pide vías, y también aparece escrito pidevías. Ojo: en España se les dice luces intermitentes, pero aquí las intermitentes son las de emergencia. Una luz que de pronto parpadea rápido casi siempre es un bombillo quemado de ese lado."
+    }
+  }
+}

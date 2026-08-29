@@ -1,0 +1,32 @@
+{
+  "id": "all-interior-luz-de-advertencia",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "interior",
+  "aliases": [
+    {
+      "term": "testigo",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "testigos",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-interior-tablero", "all-electrical-computadora"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "warning light",
+      "summary": "A lamp in the instrument cluster reporting a system. Two rules: a light that comes on while driving is read before the next trip, and a light nobody can explain is not fixed by removing the bulb."
+    },
+    "es": {
+      "title": "luz de advertencia",
+      "summary": "Una luz del tablero que reporta el estado de un sistema. Dos reglas: una luz que enciende andando se atiende antes del siguiente viaje, y una luz que nadie explica no se arregla quitándole el bombillo."
+    }
+  }
+}

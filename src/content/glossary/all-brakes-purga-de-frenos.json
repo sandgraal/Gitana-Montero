@@ -1,0 +1,21 @@
+{
+  "id": "all-brakes-purga-de-frenos",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "brakes",
+  "aliases": [],
+  "relatedTerms": ["all-brakes-liquido-de-frenos"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "brake bleeding",
+      "summary": "Pushing fluid through each wheel in turn to get the air out. Air in the lines is what makes a pedal go soft or long, and a system that will not hold a firm pedal after bleeding has another fault — take it to a qualified mechanic before driving."
+    },
+    "es": {
+      "title": "purga de frenos",
+      "summary": "Sacar el aire haciendo pasar líquido por cada rueda en su orden. El aire en las cañerías es lo que pone el pedal esponjoso o largo; si después de purgar el pedal no queda firme, hay otra falla y el vehículo debe ir donde un mecánico calificado antes de rodar."
+    }
+  }
+}

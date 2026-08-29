@@ -1,0 +1,21 @@
+{
+  "id": "all-wheels-tires-presion-de-llantas",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "wheels-tires",
+  "aliases": [],
+  "relatedTerms": ["all-wheels-tires-llanta"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "tire pressure",
+      "summary": "The cold inflation pressure the vehicle's own placard calls for, not the maximum written on the tire. It changes with load and with tire size, and it is checked cold."
+    },
+    "es": {
+      "title": "presión de llantas",
+      "summary": "La presión en frío que pide la placa del propio vehículo, no el máximo que trae escrito la llanta. Cambia con la carga y con la medida, y se mide en frío."
+    }
+  }
+}

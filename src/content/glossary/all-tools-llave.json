@@ -1,0 +1,32 @@
+{
+  "id": "all-tools-llave",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "spanner",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    },
+    {
+      "term": "spanners",
+      "locale": "en",
+      "countries": ["GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-tools-cubo", "all-tools-llave-de-torque"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "wrench",
+      "summary": "The hand tool that grips a nut or bolt head by its flats — open-ended, box-end or combination. Costa Rican catalogs list llaves combinadas, llaves corofijas and llaves allen."
+    },
+    "es": {
+      "title": "llave",
+      "summary": "La herramienta que agarra la tuerca o la cabeza del perno por sus caras planas: fija, de corona o combinada. Los catálogos ticos las listan como llaves combinadas, llaves corofijas y llaves allen."
+    }
+  }
+}

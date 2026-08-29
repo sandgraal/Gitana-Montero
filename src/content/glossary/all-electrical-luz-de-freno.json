@@ -1,0 +1,40 @@
+{
+  "id": "all-electrical-luz-de-freno",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "electrical",
+  "aliases": [
+    {
+      "term": "stop lamp",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "stop lamps",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-electrical-bombillo"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Silvines / Faros Delanteros — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/sistema-electrico-iluminacion-baterias-fitineria/iluminacion/silvines-faros-delanteros-headlights.html",
+      "archiveUrl": "https://web.archive.org/web/20260828191644/https://truckdepot.cr/sistema-electrico-iluminacion-baterias-fitineria/iluminacion/silvines-faros-delanteros-headlights.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "brake light",
+      "summary": "The rear lamp that comes on with the pedal. In Costa Rican speech both the lamp and its switch are simply the stop, and a failed switch can also upset cruise control and gear selection on some vehicles."
+    },
+    "es": {
+      "title": "luz de freno",
+      "summary": "La luz trasera que enciende con el pedal. En el habla tica se le dice stop, tanto a la luz como a su interruptor, y cuando ese interruptor falla puede afectar además el control de velocidad y el cambio de marchas en algunos vehículos."
+    }
+  }
+}

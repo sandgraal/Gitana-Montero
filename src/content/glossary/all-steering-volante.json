@@ -1,0 +1,37 @@
+{
+  "id": "all-steering-volante",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "steering",
+  "aliases": [
+    {
+      "term": "timón",
+      "locale": "es",
+      "countries": ["CO", "PE", "VE", "PA"]
+    },
+    {
+      "term": "timones",
+      "locale": "es",
+      "countries": ["CO", "PE", "VE", "PA"]
+    },
+    {
+      "term": "steering wheels",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-interior-bolsa-de-aire"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "steering wheel",
+      "summary": "The wheel itself. On vehicles fitted with a driver's airbag the wheel is also an airbag housing — never work on it as if it were only a wheel."
+    },
+    "es": {
+      "title": "volante",
+      "summary": "El volante propiamente dicho. En los vehículos con bolsa de aire del conductor, el volante es además la caja de esa bolsa: nunca se le mete mano como si fuera solo un volante."
+    }
+  }
+}

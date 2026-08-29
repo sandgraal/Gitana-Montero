@@ -1,0 +1,27 @@
+{
+  "id": "all-engine-bujia-de-precalentamiento",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "glow plugs",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-engine-bujia", "all-fuel-diesel"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "glow plug",
+      "summary": "The heater plug that warms a diesel's combustion chamber for starting. Costa Rican catalogs list them as bujías de precalentamiento; a diesel that starts hard cold and clatters for the first minute is often asking for a set."
+    },
+    "es": {
+      "title": "bujía de precalentamiento",
+      "summary": "La bujía que calienta la cámara de un motor diésel para que arranque. Así aparecen en los catálogos ticos. Un diésel que cuesta arrancar en frío y suena golpeado el primer minuto suele estar pidiendo un juego."
+    }
+  }
+}

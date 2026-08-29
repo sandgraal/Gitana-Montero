@@ -1,0 +1,47 @@
+{
+  "id": "all-general-repuestera",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [
+    {
+      "term": "refaccionaria",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "refaccionarias",
+      "locale": "es",
+      "countries": ["MX"]
+    }
+  ],
+  "relatedTerms": ["all-general-repuestos", "all-general-taller"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "FAROLES, SILVINES — Guía Automotriz de Costa Rica",
+      "url": "https://guiaautomotrizcr.com/categoria/faroles-silvines/",
+      "archiveUrl": "http://web.archive.org/web/20241202105001/https://guiaautomotrizcr.com/categoria/faroles-silvines/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Guía Automotriz de Costa Rica — directorio de talleres y repuestos",
+      "url": "https://guiaautomotrizcr.com/",
+      "archiveUrl": "https://web.archive.org/web/20260829004857/https://guiaautomotrizcr.com/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "parts shop",
+      "summary": "A business that sells vehicle parts, new or used. It is not the same thing as a taller: a repuestera sells you the part and normally does not fit it, while the taller is where the work is done. The person behind the counter is the repuestero."
+    },
+    "es": {
+      "title": "repuestera",
+      "summary": "Negocio que vende piezas de vehículo, nuevas o usadas. No es lo mismo que un taller: la repuestera vende el repuesto y por lo general no lo instala, mientras que en el taller es donde se hace el trabajo. A quien atiende se le dice repuestero."
+    }
+  }
+}

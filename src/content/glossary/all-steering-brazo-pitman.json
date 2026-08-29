@@ -1,0 +1,27 @@
+{
+  "id": "all-steering-brazo-pitman",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "steering",
+  "aliases": [
+    {
+      "term": "pitman arms",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-steering-caja-de-direccion", "all-steering-brazo-loco"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "pitman arm",
+      "summary": "The arm bolted to the output of the steering box that pushes the linkage. Its taper joint wears like any other steering joint."
+    },
+    "es": {
+      "title": "brazo pitman",
+      "summary": "El brazo atornillado a la salida de la caja de dirección que empuja el varillaje. Su unión cónica se gasta igual que cualquier otra unión de dirección."
+    }
+  }
+}

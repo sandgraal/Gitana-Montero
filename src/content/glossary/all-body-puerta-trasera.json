@@ -1,0 +1,27 @@
+{
+  "id": "all-body-puerta-trasera",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "body",
+  "aliases": [
+    {
+      "term": "rear door",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": ["all-wheels-tires-llanta-de-repuesto"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "tailgate",
+      "summary": "The rear door. On most Monteros it is side-hinged and carries the spare wheel, so its hinges, its strut and its lock all work harder than a normal door's."
+    },
+    "es": {
+      "title": "puerta trasera",
+      "summary": "La puerta de atrás. En casi todas las Montero abre de lado y carga la llanta de repuesto, así que sus bisagras, su amortiguador y su chapa trabajan más que las de una puerta común."
+    }
+  }
+}

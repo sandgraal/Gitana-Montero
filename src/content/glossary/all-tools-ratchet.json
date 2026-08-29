@@ -1,0 +1,47 @@
+{
+  "id": "all-tools-ratchet",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "carraca",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "carracas",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "matraca",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "matracas",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "ratchets",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-tools-cubo"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "ratchet",
+      "summary": "The handle that drives a socket one way and freewheels the other. Costa Rican tool catalogs list it in English, as the ratchet."
+    },
+    "es": {
+      "title": "ratchet",
+      "summary": "El mango que mueve el cubo en un sentido y gira libre en el otro. Los catálogos de herramienta ticos lo listan así, en inglés."
+    }
+  }
+}

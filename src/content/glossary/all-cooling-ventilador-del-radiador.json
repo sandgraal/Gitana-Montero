@@ -1,0 +1,52 @@
+{
+  "id": "all-cooling-ventilador-del-radiador",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "cooling",
+  "aliases": [
+    {
+      "term": "radiator fans",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "cooling fan",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "cooling fans",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-cooling-radiador", "all-cooling-refrigeracion"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "ABANICOS VARIEDAD — Repuestos USA Motors, Costa Rica",
+      "url": "https://repuestosusamotorscr.com/producto/abanicos-variedad/",
+      "archiveUrl": "https://web.archive.org/web/20260829005857/https://repuestosusamotorscr.com/producto/abanicos-variedad/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    },
+    {
+      "title": "Ventiladores / Ventiladores de radiador — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/componentes-de-motor/refrigeracion-motor/ventiladores-ventiladora-ventiladores-de-radiador.html",
+      "archiveUrl": "http://web.archive.org/web/20260311004516/https://truckdepot.cr/componentes-de-motor/refrigeracion-motor/ventiladores-ventiladora-ventiladores-de-radiador.html",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "radiator fan",
+      "summary": "The fan that pulls air through the radiator when the vehicle is not moving fast enough to do it by itself — belt-driven through a viscous clutch on most of this range. Costa Rican mechanics also call it the abanico."
+    },
+    "es": {
+      "title": "ventilador del radiador",
+      "summary": "El ventilador que jala aire por el radiador cuando el vehículo no anda lo bastante rápido para lograrlo solo; en casi toda esta gama va movido por faja con un acople viscoso. En el taller y en las repuesteras ticas se le dice abanico — abanico del agua, para distinguirlo del abanico del aire acondicionado."
+    }
+  }
+}

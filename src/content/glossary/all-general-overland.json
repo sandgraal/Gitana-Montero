@@ -1,0 +1,36 @@
+{
+  "id": "all-general-overland",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-preparacion", "all-general-todoterreno"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Overland 4x4, Vehículos para la Aventura — CODIGO 4X4",
+      "url": "https://codigo4x4.com/overland-4x4/",
+      "archiveUrl": "https://web.archive.org/web/20260828192031/https://codigo4x4.com/overland-4x4/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "PRTOFFROAD — Preparación de vehículos 4x4 y offroad",
+      "url": "https://www.prtoffroad.com/",
+      "archiveUrl": "https://web.archive.org/web/20260828191951/https://www.prtoffroad.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "overland",
+      "summary": "Long-distance travel by vehicle where the journey and self-sufficiency are the point — camping gear, water, fuel and spares carried on board. The word stays in English in Spanish prose on this site, because that is how Spanish-language 4x4 shops and magazines write it; there is no settled Spanish equivalent."
+    },
+    "es": {
+      "title": "overland",
+      "summary": "Viajar largo en vehículo, donde lo que cuenta es el trayecto y la autonomía: equipo de campamento, agua, combustible y repuestos a bordo. En este sitio la palabra se deja en inglés también en español, porque así la escriben los talleres y las revistas 4x4 en español; no hay un equivalente asentado."
+    }
+  }
+}

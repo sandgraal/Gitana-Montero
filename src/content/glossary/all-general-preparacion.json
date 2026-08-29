@@ -1,0 +1,29 @@
+{
+  "id": "all-general-preparacion",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "general",
+  "aliases": [],
+  "relatedTerms": ["all-general-overland", "all-general-todoterreno"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "PRTOFFROAD — Preparación de vehículos 4x4 y offroad",
+      "url": "https://www.prtoffroad.com/",
+      "archiveUrl": "https://web.archive.org/web/20260828191951/https://www.prtoffroad.com/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "build",
+      "summary": "A vehicle worked over as a project — suspension, tires, protection, load carrying — rather than a single repair. Spanish says preparación, and a shop that does this work advertises preparación de vehículos 4x4."
+    },
+    "es": {
+      "title": "preparación",
+      "summary": "El trabajo de fondo que se le hace a un vehículo como proyecto — suspensión, llantas, protecciones, capacidad de carga — y no una reparación suelta. Es la palabra del oficio: los talleres del ramo anuncian preparación de vehículos 4x4. Nunca se le dice «construcción», que en español es levantar obra."
+    }
+  }
+}

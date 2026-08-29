@@ -1,0 +1,65 @@
+{
+  "id": "all-tools-gata",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "gato",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "gatos",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "jacks",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "trolley jack",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "trolley jacks",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-tools-soportes-de-seguridad",
+    "all-wheels-tires-llanta-de-repuesto"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Repuestos La Guaca — Herramientas, Gatas",
+      "url": "https://laguacaenlinea.cr/herramientas/gatas/",
+      "archiveUrl": "https://web.archive.org/web/20260829005018/https://laguacaenlinea.cr/herramientas/gatas/",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    },
+    {
+      "title": "Burras o soportes para vehículos — Compra Total Costa Rica",
+      "url": "https://compratotal.com/collections/burras-o-soportes-para-vehiculos",
+      "archiveUrl": "https://web.archive.org/web/20260829005120/https://www.compratotal.com/collections/burras-o-soportes-para-vehiculos",
+      "accessed": "2026-08-29",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "jack",
+      "summary": "What lifts the vehicle. Costa Rican tool catalogs list them in the feminine, as gatas — gata hidráulica, gata de botella, gata de tijereta — though gato is also read locally, and gato hidráulico is what the box itself often says. A jack lifts, it does not hold: nobody goes under a vehicle held up by one, and the lifting points are the ones the manufacturer specifies, not whatever looks solid."
+    },
+    "es": {
+      "title": "gata",
+      "summary": "Lo que levanta el vehículo. Las ferreterías y repuesteras ticas las venden en femenino: gata hidráulica, gata de botella, gata de tijereta, aunque en el estante también se lee gato hidráulico. La gata levanta, no sostiene: nadie se mete debajo de un vehículo que solo está en la gata, y los puntos de levante son los que indica la fábrica, no los que se vean firmes."
+    }
+  }
+}

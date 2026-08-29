@@ -1,0 +1,21 @@
+{
+  "id": "all-fluids-grasa",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fluids",
+  "aliases": [],
+  "relatedTerms": ["all-drivetrain-cruceta", "all-suspension-rotula"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "grease",
+      "summary": "What goes into u-joints, ball joints and wheel bearings. Type matters — a wheel-bearing grease and a chassis grease are not the same product."
+    },
+    "es": {
+      "title": "grasa",
+      "summary": "Lo que lleva por dentro una cruceta, una rótula o un rodamiento de rueda. El tipo importa: la grasa de rodamientos y la de chasis no son el mismo producto."
+    }
+  }
+}

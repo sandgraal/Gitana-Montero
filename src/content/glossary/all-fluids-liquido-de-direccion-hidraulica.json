@@ -1,0 +1,21 @@
+{
+  "id": "all-fluids-liquido-de-direccion-hidraulica",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fluids",
+  "aliases": [],
+  "relatedTerms": ["all-steering-direccion-hidraulica", "all-fluids-liquidos"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "power steering fluid",
+      "summary": "The hydraulic fluid for the steering assistance. Costa Rican catalogs sell it as líquido para dirección hidráulica; some systems take automatic transmission fluid instead, and the two are not interchangeable by guess."
+    },
+    "es": {
+      "title": "líquido de dirección hidráulica",
+      "summary": "El líquido hidráulico de la asistencia de dirección. En los catálogos ticos se vende como líquido para dirección hidráulica; algunos sistemas llevan aceite de transmisión automática en su lugar, y eso no se decide a ojo."
+    }
+  }
+}

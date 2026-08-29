@@ -1,0 +1,45 @@
+{
+  "id": "all-body-bumper",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "body",
+  "aliases": [
+    {
+      "term": "parachoques",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "paragolpes",
+      "locale": "es",
+      "countries": ["AR", "UY"]
+    },
+    {
+      "term": "bumpers",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": [],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "BUMPERS VARIEDAD — Repuestos USA Motors, Costa Rica",
+      "url": "https://repuestosusamotorscr.com/producto/bumpers-variedad/",
+      "archiveUrl": "https://web.archive.org/web/20260828191720/https://repuestosusamotorscr.com/producto/bumpers-variedad/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "bumper",
+      "summary": "The front or rear impact structure and its cover. Costa Rican parts shops sell it in English as the bumper — bumper delantero, bumper trasero — and a steel replacement fitted for off-road work changes weight, airbag behavior and approach angle all at once."
+    },
+    "es": {
+      "title": "bumper",
+      "summary": "La estructura de impacto delantera o trasera y su forro. En las repuesteras ticas se pide así, en inglés: bumper delantero, bumper trasero. Cambiarlo por uno de acero para trabajo fuera de asfalto altera de un solo golpe el peso, el comportamiento de las bolsas de aire y el ángulo de ataque."
+    }
+  }
+}

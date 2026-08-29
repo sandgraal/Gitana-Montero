@@ -1,0 +1,47 @@
+{
+  "id": "all-exhaust-catalizador",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "exhaust",
+  "aliases": [
+    {
+      "term": "convertidor catalítico",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "convertidores catalíticos",
+      "locale": "es",
+      "countries": ["MX", "ES"]
+    },
+    {
+      "term": "catalytic converters",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "cat",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
+      "term": "cats",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    }
+  ],
+  "relatedTerms": ["all-fuel-sensor-de-oxigeno"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "catalytic converter",
+      "summary": "The emissions device in the exhaust. Whether one is required, and what happens if it is missing, depends entirely on the jurisdiction — Costa Rica's RTV, a British MOT and a US state test are three different rulebooks."
+    },
+    "es": {
+      "title": "catalizador",
+      "summary": "El dispositivo de emisiones que va en el escape. Si es obligatorio, y qué pasa si falta, depende por completo de la jurisdicción: la RTV costarricense, el MOT británico y una prueba estatal en Estados Unidos son tres reglamentos distintos."
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "all-fuel-bomba-de-combustible",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fuel",
+  "aliases": [],
+  "relatedTerms": [
+    "all-fuel-sistema-de-combustible",
+    "all-fuel-filtro-de-combustible"
+  ],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "fuel pump",
+      "summary": "The pump that feeds the engine, electric and inside the tank on injected versions. Running the tank very low on a hot day is hard on it, because the fuel is what cools it."
+    },
+    "es": {
+      "title": "bomba de combustible",
+      "summary": "La bomba que alimenta el motor; en las versiones inyectadas es eléctrica y va dentro del tanque. Andar siempre con el tanque casi vacío la castiga, porque es el mismo combustible el que la enfría."
+    }
+  }
+}

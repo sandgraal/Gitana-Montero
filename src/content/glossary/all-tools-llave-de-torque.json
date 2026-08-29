@@ -1,0 +1,47 @@
+{
+  "id": "all-tools-llave-de-torque",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "torquímetro",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "torquímetros",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "llave dinamométrica",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "llaves dinamométricas",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "torque wrenches",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-tools-llave", "all-wheels-tires-tuerca-de-rueda"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "torque wrench",
+      "summary": "The wrench that measures how hard a fastener is being tightened. Every torque figure on this site comes from a cited source, and the wrench is what makes such a figure mean anything."
+    },
+    "es": {
+      "title": "llave de torque",
+      "summary": "La llave que mide con cuánta fuerza se aprieta un tornillo. Toda cifra de torque de este sitio sale de una fuente citada, y esta llave es lo que hace que esa cifra sirva de algo."
+    }
+  }
+}

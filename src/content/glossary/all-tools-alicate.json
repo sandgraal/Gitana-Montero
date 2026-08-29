@@ -1,0 +1,32 @@
+{
+  "id": "all-tools-alicate",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "tools",
+  "aliases": [
+    {
+      "term": "pinza",
+      "locale": "es",
+      "countries": ["MX"]
+    },
+    {
+      "term": "pinzas",
+      "locale": "es",
+      "countries": ["MX"]
+    }
+  ],
+  "relatedTerms": ["all-tools-destornillador"],
+  "confidence": "community-consensus",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "pliers",
+      "summary": "The hinged gripping tool — combination, long-nose or locking. Costa Rican catalogs list them as alicates and tenazas."
+    },
+    "es": {
+      "title": "alicate",
+      "summary": "La herramienta de agarre con bisagra: de combinación, de punta larga o de presión. Los catálogos ticos los listan como alicates y tenazas."
+    }
+  }
+}

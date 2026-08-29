@@ -1,0 +1,50 @@
+{
+  "id": "all-suspension-barra-estabilizadora",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "suspension",
+  "aliases": [
+    {
+      "term": "sway bars",
+      "locale": "en",
+      "countries": ["US", "AU"]
+    },
+    {
+      "term": "anti-roll bar",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "anti-roll bars",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "stabilizer bar",
+      "locale": "en",
+      "countries": ["US"]
+    }
+  ],
+  "relatedTerms": ["all-suspension-buje"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Automas — Repuestos Automotrices en Costa Rica",
+      "url": "https://automas.cr/",
+      "archiveUrl": "http://web.archive.org/web/20260828190644/https://automas.cr/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "sway bar",
+      "summary": "The transverse bar that ties the two sides of an axle together and limits body roll in a corner — anti-roll bar in British usage. Its rubber mounts, sold in Costa Rica as hules de estabilizadora, knock when they go."
+    },
+    "es": {
+      "title": "barra estabilizadora",
+      "summary": "La barra transversal que amarra los dos lados de un eje y limita el balanceo de la carrocería en las curvas. Sus hules de montaje se venden así en Costa Rica, como hules de estabilizadora, y suenan cuando se acaban."
+    }
+  }
+}

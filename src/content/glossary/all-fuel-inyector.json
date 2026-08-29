@@ -1,0 +1,27 @@
+{
+  "id": "all-fuel-inyector",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "fuel",
+  "aliases": [
+    {
+      "term": "injectors",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": ["all-fuel-sistema-de-combustible", "all-fuel-gdi"],
+  "confidence": "first-hand",
+  "sources": [],
+  "prose": {
+    "en": {
+      "title": "injector",
+      "summary": "The valve that sprays fuel into the intake or the cylinder. Dirty or leaking injectors show up as rough idle, poor economy and a smell of fuel after shutdown."
+    },
+    "es": {
+      "title": "inyector",
+      "summary": "La válvula que pulveriza el combustible en la admisión o en el cilindro. Sucios o goteando dan ralentí irregular, mal rendimiento y olor a combustible después de apagar."
+    }
+  }
+}
