@@ -71,6 +71,16 @@ import { CONTENT_ROOT, loadContentEntries } from "./lib/content-entries.mjs";
 
 const ARCHIVE_HOST = "web.archive.org";
 const FETCH_TIMEOUT_MS = 10_000;
+/**
+ * Per-attempt fetch timeout for `ARCHIVE_HOST` requests — higher than the
+ * generic timeout because old Wayback Machine snapshots (especially PDFs and
+ * pre-2010 pages stored in the `:80` URL format) can take significantly longer
+ * to decompress and serve from cold storage. 30 s gives three times the
+ * headroom before an AbortController fires, reducing intermittent "This
+ * operation was aborted" false-positives that flip a warning into a build
+ * failure when archive.org happens to be slow on a particular CI run.
+ */
+export const ARCHIVE_FETCH_TIMEOUT_MS = 30_000;
 const CONCURRENCY = 6;
 
 /** Fixed spacing between consecutive `ARCHIVE_HOST` requests (politeness, not a retry). */
@@ -88,6 +98,7 @@ const GENERIC_POLICY = {
   backoffMs: [0],
   delayImpl: async () => {},
   retryOn429: false,
+  timeoutMs: FETCH_TIMEOUT_MS,
 };
 
 /** `sources[]` entries are `{ title, url, archiveUrl, accessed, kind }`. */
@@ -201,9 +212,9 @@ async function mapWithConcurrency(items, limit, fn) {
 }
 
 /** One fetch attempt. Never throws — network failures come back as `{ ok: false, error }`. */
-async function attemptOnce(url, method, fetchImpl) {
+async function attemptOnce(url, method, fetchImpl, timeoutMs = FETCH_TIMEOUT_MS) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await fetchImpl(url, {
       method,
@@ -267,10 +278,10 @@ function retryAfterMs(response) {
  * `policy.backoffMs[attemptIndex]` (clamped to the schedule's last entry).
  */
 async function attemptWithPolicy(url, method, fetchImpl, policy) {
-  const { maxAttempts, backoffMs, delayImpl, retryOn429 } = policy;
+  const { maxAttempts, backoffMs, delayImpl, retryOn429, timeoutMs } = policy;
   let last;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    last = await attemptOnce(url, method, fetchImpl);
+    last = await attemptOnce(url, method, fetchImpl, timeoutMs);
     const isFinalAttempt = attempt === maxAttempts;
     if (last.ok) {
       const retryable = retryOn429 && last.response.status === 429;
@@ -331,6 +342,7 @@ async function runArchiveChecks(checks, fetchImpl, delayImpl) {
     backoffMs: ARCHIVE_BACKOFF_SCHEDULE_MS,
     delayImpl,
     retryOn429: true,
+    timeoutMs: ARCHIVE_FETCH_TIMEOUT_MS,
   };
   const results = [];
   for (let index = 0; index < checks.length; index++) {
