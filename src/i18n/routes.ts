@@ -42,6 +42,8 @@ import { validateSlugRegistry } from "../schemas/slugs";
  */
 export const COLLECTION_ROUTE_SEGMENTS = {
   glossary: { en: "glossary", es: "glosario" },
+  /** T703a — the public community directory page (COM-01, COM-02). */
+  community: { en: "community", es: "comunidad" },
 } as const satisfies Readonly<Record<string, Readonly<Record<Locale, string>>>>;
 
 export type CollectionRouteId = keyof typeof COLLECTION_ROUTE_SEGMENTS;
