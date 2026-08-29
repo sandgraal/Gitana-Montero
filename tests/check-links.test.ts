@@ -9,8 +9,11 @@
  *
  * refs specs/001-foundation (SCF-02, SCF-03, GAP-01)
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
+  ARCHIVE_BACKOFF_SCHEDULE_MS,
+  ARCHIVE_MAX_ATTEMPTS,
+  ARCHIVE_REQUEST_SPACING_MS,
   auditLinks,
   collectLinkTargets,
   collectSourcePairs,
@@ -18,6 +21,9 @@ import {
   findUnreachableLinks,
   isArchiveUrl,
 } from "../scripts/check-links.mjs";
+
+/** A no-op delay so tests exercising archive-host retry/backoff/spacing logic stay fast. */
+const instantDelay = async () => {};
 
 interface Entry {
   collection: string;
@@ -44,6 +50,35 @@ function entry(overrides: Partial<Entry> = {}): Entry {
       prose: {},
     },
     ...overrides,
+  };
+}
+
+/**
+ * Same shape as {@link entry}, but the source cites only `archiveUrl` (no
+ * `url`) — isolates archive-host reachability from the both-sides classifier
+ * (`classifyPair` scores `urlOk === null` as "ok"/"issue" purely off
+ * `archiveOk`, see `check-links.mjs`), so archive backoff/retry behavior can
+ * be asserted without a second, unrelated fetch masking the result.
+ */
+function archiveOnlyEntry(
+  file = "src/content/reference/archive-only.md"
+): Entry {
+  return {
+    collection: "reference",
+    file,
+    data: {
+      id: "archive-only",
+      sources: [
+        {
+          title: "TEST source",
+          archiveUrl:
+            "https://web.archive.org/web/20260101000000/https://example.invalid/archive-only",
+          accessed: "2026-08-27",
+          kind: "forum",
+        },
+      ],
+      prose: {},
+    },
   };
 }
 
@@ -199,7 +234,7 @@ describe("findUnreachableLinks — F2 both-sides-dead policy", () => {
     expect(calls).toContain("GET");
   });
 
-  it("retries once on a thrown network error before falling back to GET", async () => {
+  it("retries once on a thrown network error before falling back to GET (non-archive side); the archive side gets its own longer backoff policy", async () => {
     let headAttempts = 0;
     const fetchImpl = async (_url: string, init: { method: string }) => {
       if (init.method === "HEAD") {
@@ -210,19 +245,24 @@ describe("findUnreachableLinks — F2 both-sides-dead policy", () => {
     };
     const { issues, warnings } = await findUnreachableLinks([entry()], {
       fetchImpl,
+      delayImpl: instantDelay,
     });
     expect(issues).toEqual([]);
     expect(warnings).toEqual([]);
-    // One initial HEAD attempt plus exactly one retry, per side (url +
-    // archiveUrl) — 2 sides * 2 attempts = 4.
-    expect(headAttempts).toBe(4);
+    // Non-archive `url` side: one initial HEAD attempt plus exactly one
+    // retry (2). Archive `archiveUrl` side: `ARCHIVE_MAX_ATTEMPTS` HEAD
+    // attempts under its own backoff policy.
+    expect(headAttempts).toBe(2 + ARCHIVE_MAX_ATTEMPTS);
   });
 
   it("declares a side unreachable after its retry also fails", async () => {
     const fetchImpl = async () => {
       throw new Error("getaddrinfo ENOTFOUND example.invalid");
     };
-    const { issues } = await findUnreachableLinks([entry()], { fetchImpl });
+    const { issues } = await findUnreachableLinks([entry()], {
+      fetchImpl,
+      delayImpl: instantDelay,
+    });
     expect(issues).toHaveLength(1);
     expect(issues[0]?.message).toMatch(/ENOTFOUND/);
   });
@@ -274,6 +314,7 @@ describe("findUnreachableLinks — offline notice", () => {
     };
     const { offlineNotice, issues } = await findUnreachableLinks(entries, {
       fetchImpl,
+      delayImpl: instantDelay,
     });
     expect(issues.length).toBeGreaterThan(0);
     expect(offlineNotice).toMatch(/no outbound network access/);
@@ -309,8 +350,114 @@ describe("findUnreachableLinks — offline notice", () => {
     };
     const { offlineNotice } = await findUnreachableLinks(entries, {
       fetchImpl,
+      delayImpl: instantDelay,
     });
     expect(offlineNotice).toBeNull();
+  });
+});
+
+describe("findUnreachableLinks — archive.org throttling", () => {
+  it("serializes archive.org requests with a fixed spacing delay instead of the pooled concurrency", async () => {
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const fetchImpl = async () => {
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await Promise.resolve(); // yield, so a real overlap would show up
+      inFlight -= 1;
+      return { ok: true, status: 200 };
+    };
+    const delayCalls: number[] = [];
+    const delayImpl = vi.fn(async (ms: number) => {
+      delayCalls.push(ms);
+    });
+
+    const entries = [
+      archiveOnlyEntry("src/content/reference/a.md"),
+      archiveOnlyEntry("src/content/reference/b.md"),
+      archiveOnlyEntry("src/content/reference/c.md"),
+    ];
+    const { issues, warnings } = await findUnreachableLinks(entries, {
+      fetchImpl,
+      delayImpl,
+    });
+
+    expect(issues).toEqual([]);
+    expect(warnings).toEqual([]);
+    // Never more than one archive.org request in flight at once.
+    expect(maxInFlight).toBe(1);
+    // Spacing delay fires between requests (2 gaps for 3 serialized checks),
+    // every one at the fixed spacing constant — no backoff was needed since
+    // every fetch succeeded on the first attempt.
+    expect(delayCalls).toEqual([
+      ARCHIVE_REQUEST_SPACING_MS,
+      ARCHIVE_REQUEST_SPACING_MS,
+    ]);
+  });
+
+  it("retries a 429 with backoff (honoring Retry-After) and succeeds", async () => {
+    let calls = 0;
+    const fetchImpl = async () => {
+      calls += 1;
+      if (calls === 1) {
+        return {
+          ok: false,
+          status: 429,
+          headers: {
+            get: (name: string) => (name === "retry-after" ? "1" : null),
+          },
+        };
+      }
+      return { ok: true, status: 200 };
+    };
+    const delayCalls: number[] = [];
+    const delayImpl = async (ms: number) => {
+      delayCalls.push(ms);
+    };
+
+    const { issues, warnings } = await findUnreachableLinks(
+      [archiveOnlyEntry()],
+      { fetchImpl, delayImpl }
+    );
+
+    expect(issues).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(calls).toBe(2);
+    // Retry-After: 1 (second) overrides the default backoff schedule entry.
+    expect(delayCalls).toEqual([1_000]);
+  });
+
+  it("reports a source unreachable when archive.org connection failures persist through every backoff attempt (GAP-01 rule unchanged)", async () => {
+    let headCalls = 0;
+    let getCalls = 0;
+    const fetchImpl = async (_url: string, init: { method: string }) => {
+      if (init.method === "HEAD") headCalls += 1;
+      else getCalls += 1;
+      throw new Error("fetch failed");
+    };
+    const delayCalls: number[] = [];
+    const delayImpl = async (ms: number) => {
+      delayCalls.push(ms);
+    };
+    const { issues, warnings } = await findUnreachableLinks(
+      [archiveOnlyEntry()],
+      { fetchImpl, delayImpl }
+    );
+
+    expect(warnings).toEqual([]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.message).toMatch(/unreachable on both sides/);
+    expect(issues[0]?.message).toMatch(/fetch failed/);
+    // Every attempt this run's backoff policy allows was actually spent
+    // before giving up — HEAD then GET, each ARCHIVE_MAX_ATTEMPTS times.
+    expect(headCalls).toBe(ARCHIVE_MAX_ATTEMPTS);
+    expect(getCalls).toBe(ARCHIVE_MAX_ATTEMPTS);
+    // The full exponential schedule was used, once for HEAD's exhausted
+    // retries and again for GET's.
+    expect(delayCalls).toEqual([
+      ...ARCHIVE_BACKOFF_SCHEDULE_MS,
+      ...ARCHIVE_BACKOFF_SCHEDULE_MS,
+    ]);
   });
 });
 
