@@ -30,10 +30,15 @@
  * Filtering is client-side and progressive: the search box and the system
  * pills are `hidden` in the served HTML and unhidden by the script, so a
  * visitor without JavaScript sees every term and no dead controls, and the
- * first render is the complete, indexable page. Each card carries a
- * pre-normalized `data-haystack` built with the same `normalizeForSearch` the
- * script uses, so an alias search (`rin` → `aro`, SRCH-02's shape) works with
- * no index and no fetch. The real search index is T702.
+ * first render is the complete, indexable page. The script builds each
+ * card's search haystack once, from the same text the card already renders
+ * (`glossary-filter.ts`'s `buildHaystack`) rather than a second
+ * server-rendered copy — at 153 terms that duplicate `data-haystack` copy
+ * was ~73 kB of the ~383 kB page, which is what pushed SCF-06's Lighthouse
+ * performance budget under 90. An alias search (`rin` → `aro`, SRCH-02's
+ * shape) still works with no index and no fetch; it costs one JS pass over
+ * the already-downloaded DOM instead of extra HTML. The real search index is
+ * T702.
  *
  * ## The headword — owner ruling, 2026-08-28
  *
@@ -74,7 +79,6 @@ import {
 } from "../../i18n/routing";
 import { collectionRouteParams, collectionRoutePaths } from "../../i18n/routes";
 import { glossarySystemLabel, t } from "../../i18n/ui";
-import { normalizeForSearch } from "../../lib/text";
 import { formatCount } from "../../lib/glossary-filter";
 import {
   GLOSSARY_SYSTEMS,
@@ -107,8 +111,10 @@ const entries = await getCollection("glossary");
 
 /**
  * One card's worth of already-resolved values. Built here rather than in the
- * template so the sort key, the DOM id and the search haystack each exist
- * once.
+ * template so the sort key and the DOM id each exist once. There is no
+ * server-built search haystack any more — the client script derives it from
+ * the rendered card itself (`glossary-filter.ts`'s `buildHaystack`), so the
+ * searchable text exists in the HTML exactly once instead of twice.
  */
 const terms = entries
   .map((entry) => {
@@ -128,16 +134,6 @@ const terms = entries
       definitionByLocale: Object.fromEntries(
         LOCALES.map((each) => [each, prose[each].summary])
       ) as Record<Locale, string>,
-      haystack: normalizeForSearch(
-        [
-          ...LOCALES.flatMap((each) => [
-            termByLocale[each],
-            prose[each].summary,
-            glossarySystemLabel(t(each), system as GlossarySystem),
-          ]),
-          ...aliases.flatMap((alias) => [alias.term, ...alias.countries]),
-        ].join(" ")
-      ),
     };
   })
   .sort((a, b) =>
@@ -234,12 +230,7 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
 
           <ul class="glossary__list" data-glossary-list>
             {terms.map((term) => (
-              <li
-                class="term"
-                id={term.domId}
-                data-system={term.system}
-                data-haystack={term.haystack}
-              >
+              <li class="term" id={term.domId} data-system={term.system}>
                 <div class="term__head">
                   <h2 class="term__title">
                     <span class="term__canonical" lang={LOCALE_BCP47[locale]}>
@@ -322,7 +313,11 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
 </BaseLayout>
 
 <script>
-  import { formatCount, matchesFilter } from "../../lib/glossary-filter";
+  import {
+    buildHaystack,
+    formatCount,
+    matchesFilter,
+  } from "../../lib/glossary-filter";
 
   /**
    * Client-side filtering (GLO-04). Enhancement only: the toolbar ships
@@ -330,8 +325,9 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
    * whole glossary and never a control that does nothing.
    *
    * Only DOM wiring lives here — which elements to read, what to toggle. The
-   * decisions (does this card match? what does the counter say?) are pure
-   * functions in `src/lib/glossary-filter.ts`, unit-tested without a browser.
+   * decisions (does this card match? what does the counter say? what counts
+   * as its searchable text?) are pure functions in
+   * `src/lib/glossary-filter.ts`, unit-tested without a browser.
    */
   function enhance(root: HTMLElement): void {
     const toolbar = root.querySelector<HTMLElement>("[data-glossary-toolbar]");
@@ -340,8 +336,20 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     );
     const count = root.querySelector<HTMLElement>("[data-glossary-count]");
     const none = root.querySelector<HTMLElement>("[data-glossary-none]");
-    const cards = [...root.querySelectorAll<HTMLElement>(".term")];
     if (!toolbar || !search || !count || !none) return;
+
+    // The haystack is read from each card's own rendered text — never a
+    // second server-serialized copy — and built exactly once here, not on
+    // every keystroke: `apply()` runs on every `input` event, so recomputing
+    // it per keystroke would trade the removed page weight for repeated
+    // DOM walks instead.
+    const cards = [...root.querySelectorAll<HTMLElement>(".term")].map(
+      (element) => ({
+        element,
+        system: element.dataset.system ?? "",
+        haystack: buildHaystack(haystackSourceFromCard(element)),
+      })
+    );
 
     const template = count.dataset.countTemplate ?? "";
     const total = Number(count.dataset.total ?? cards.length);
@@ -355,14 +363,8 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
       let shown = 0;
 
       for (const card of cards) {
-        const visible = matchesFilter(
-          {
-            system: card.dataset.system ?? "",
-            haystack: card.dataset.haystack ?? "",
-          },
-          state
-        );
-        card.hidden = !visible;
+        const visible = matchesFilter(card, state);
+        card.element.hidden = !visible;
         if (visible) shown += 1;
       }
 
@@ -388,6 +390,33 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     apply();
   }
 
+  /**
+   * Read one card's searchable parts straight from what it already renders —
+   * the two term spans, both definitions, the system chip, and every alias
+   * chip's term and country tags. Nothing here is new text: it is the same
+   * content the reader can already see, just gathered for `buildHaystack`.
+   */
+  function haystackSourceFromCard(card: HTMLElement) {
+    const textOf = (selector: string) =>
+      [...card.querySelectorAll<HTMLElement>(selector)].map(
+        (element) => element.textContent ?? ""
+      );
+
+    return {
+      terms: textOf(".term__canonical, .term__gloss"),
+      definitions: textOf(".term__definition"),
+      system:
+        card.querySelector<HTMLElement>(".term__system")?.textContent ?? "",
+      aliases: [...card.querySelectorAll<HTMLElement>(".alias")].map(
+        (alias) => ({
+          term: alias.querySelector(".alias__term")?.textContent ?? "",
+          countries:
+            alias.querySelector(".alias__countries")?.textContent ?? "",
+        })
+      ),
+    };
+  }
+
   for (const root of document.querySelectorAll<HTMLElement>(
     "[data-glossary]"
   )) {
@@ -395,11 +424,24 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
   }
 </script>
 
-<style>
+<style is:global>
   /*
    * Palette from specs/001-foundation/design/HANDOFF-DESIGN.md, scoped to this
    * page: site-wide design tokens belong to the task that restyles the chrome,
    * not to the first collection page that needs colours.
+   *
+   * `is:global` + every selector prefixed with `.glossary` is a deliberate
+   * substitute for Astro's default *scoped* `<style>`: scoped CSS works by
+   * stamping a `data-astro-cid-…` attribute onto every element this
+   * component renders, including every element inside the `terms.map()`
+   * loop below. At 153 terms that was ~3,200 attributes — one of the
+   * largest single contributors to the page weight that put SCF-06's
+   * Lighthouse performance budget under 90 (T205 follow-up). Prefixing every
+   * rule with `.glossary` gets the same real isolation (nothing outside
+   * `<section class="glossary">` can match) without an attribute on every
+   * node — a per-term cost that only grows as the ~45 queued cognate terms
+   * land, so removing it is not just today's fix but headroom for that
+   * growth.
    */
   .glossary {
     --paper: #f7f4ee;
@@ -425,7 +467,7 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     max-width: 75rem;
   }
 
-  .visually-hidden {
+  .glossary .visually-hidden {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -437,34 +479,34 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     border: 0;
   }
 
-  .glossary__intro {
+  .glossary .glossary__intro {
     display: flex;
     flex-direction: column;
     gap: 0.375rem;
   }
 
-  .glossary__intro h1 {
+  .glossary .glossary__intro h1 {
     margin: 0;
     font-size: 1.875rem;
     font-weight: 800;
     letter-spacing: -0.3px;
   }
 
-  .glossary__intro p {
+  .glossary .glossary__intro p {
     margin: 0;
     font-size: 0.875rem;
     color: var(--muted);
     max-width: 62ch;
   }
 
-  .glossary__toolbar {
+  .glossary .glossary__toolbar {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
     align-items: center;
   }
 
-  .glossary__search {
+  .glossary .glossary__search {
     position: relative;
     display: flex;
     align-items: center;
@@ -477,7 +519,7 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     color: var(--muted);
   }
 
-  .glossary__search input {
+  .glossary .glossary__search input {
     flex: 1;
     border: 0;
     background: transparent;
@@ -487,18 +529,18 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     min-height: 1.75rem;
   }
 
-  .glossary__search input::placeholder {
+  .glossary .glossary__search input::placeholder {
     color: var(--muted);
     opacity: 1;
   }
 
-  .glossary__filters {
+  .glossary .glossary__filters {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
 
-  .glossary__filters button {
+  .glossary .glossary__filters button {
     font: inherit;
     font-size: 0.8125rem;
     border: 1px solid var(--line);
@@ -510,22 +552,22 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     cursor: pointer;
   }
 
-  .glossary__filters button[aria-pressed="true"] {
+  .glossary .glossary__filters button[aria-pressed="true"] {
     background: var(--ink);
     border-color: var(--ink);
     color: var(--paper);
     font-weight: 700;
   }
 
-  .glossary__count,
-  .glossary__none,
-  .glossary__empty {
+  .glossary .glossary__count,
+  .glossary .glossary__none,
+  .glossary .glossary__empty {
     margin: 0;
     font-size: 0.8125rem;
     color: var(--muted);
   }
 
-  .glossary__list {
+  .glossary .glossary__list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
@@ -534,7 +576,7 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     padding: 0;
   }
 
-  .term {
+  .glossary .term {
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
@@ -544,18 +586,18 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     gap: 0.75rem;
   }
 
-  .term[hidden] {
+  .glossary .term[hidden] {
     display: none;
   }
 
-  .term__head {
+  .glossary .term__head {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: 0.75rem;
   }
 
-  .term__title {
+  .glossary .term__title {
     margin: 0;
     display: flex;
     flex-wrap: wrap;
@@ -565,17 +607,17 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     font-weight: 700;
   }
 
-  .term__gloss {
+  .glossary .term__gloss {
     font-size: 0.875rem;
     font-weight: 400;
     color: var(--muted);
   }
 
-  .term__gloss::before {
+  .glossary .term__gloss::before {
     content: "— ";
   }
 
-  .term__system {
+  .glossary .term__system {
     flex: 0 0 auto;
     font-size: 0.6875rem;
     font-weight: 700;
@@ -587,15 +629,15 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     padding: 0.1875rem 0.5rem;
   }
 
-  .term__definition {
+  .glossary .term__definition {
     margin: 0;
     font-size: 0.875rem;
     line-height: 1.6;
     color: var(--muted-strong);
   }
 
-  .term__aliases,
-  .term__related {
+  .glossary .term__aliases,
+  .glossary .term__related {
     margin: 0;
     display: flex;
     flex-wrap: wrap;
@@ -603,15 +645,15 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     gap: 0.375rem;
   }
 
-  .term__label {
+  .glossary .term__label {
     font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--muted);
   }
 
-  .alias,
-  .related {
+  .glossary .alias,
+  .glossary .related {
     font-family:
       "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.75rem;
@@ -623,16 +665,16 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     gap: 0.375rem;
   }
 
-  .alias__countries {
+  .glossary .alias__countries {
     color: var(--muted);
   }
 
-  .alias--false-friend {
+  .glossary .alias--false-friend {
     background: var(--warn-tint);
     border: 1px solid var(--warn-line);
   }
 
-  .alias__warning {
+  .glossary .alias__warning {
     color: var(--warn-ink);
     font-weight: 600;
   }
@@ -644,20 +686,20 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
    * page, not estimated). `rust-deep` on `chip` is 5.6:1, so the pair moves
    * one step darker — accent colour preserved, contrast constraint met.
    */
-  .related {
+  .glossary .related {
     color: var(--rust-deep);
   }
 
-  .related:hover {
+  .glossary .related:hover {
     color: var(--ink);
   }
 
   @media (max-width: 48rem) {
-    .glossary__list {
+    .glossary .glossary__list {
       grid-template-columns: 1fr;
     }
 
-    .glossary__intro h1 {
+    .glossary .glossary__intro h1 {
       font-size: 1.5rem;
     }
   }
