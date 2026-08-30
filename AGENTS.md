@@ -57,12 +57,15 @@ Specs of record: `specs/001-foundation/spec.md` (reference platform),
 - `npm run check:citations` — every numeric spec carries a source
 - `npm run check:glossary` — translated prose uses canonical glossary terms
 - `npm run check:links` — internal references resolve; external sources reachable
-  (a CI step per SCF-03, deliberately outside `verify` per SCF-02; a source
-  fails only when both `url` and `archiveUrl` are unreachable — a dead
-  original with a live archive is a gaps-report item)
+  (owner ruling 2026-08-30: runs as a weekly scheduled CI job
+  (`link-check.yml`) plus on demand, not on the merge path — the
+  archive.org throttle made it take 30 minutes to 2.6+ hours on every PR at
+  content scale; a source fails only when both `url` and `archiveUrl` are
+  unreachable — a dead original with a live archive is a gaps-report item)
 - `npm run gaps` — the gaps report that feeds the content backlog
-- `npm run verify` — every merge-blocking check except link check and a11y
-  (SCF-02's list); CI runs `verify` plus those two (SCF-03)
+- `npm run verify` — every merge-blocking check except a11y (SCF-02's list);
+  merge-blocking CI is `verify` plus a11y (SCF-03) — link check is scheduled,
+  not merge-blocking (owner ruling 2026-08-30)
 
 `npm run verify` must pass before any commit.
 

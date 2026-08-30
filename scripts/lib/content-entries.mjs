@@ -6,9 +6,10 @@
  * directory, as plain data, with enough path information to name the offending
  * file. None of them can go through `astro:content` — that virtual module only
  * exists inside Astro's Vite pipeline, and these are plain-Node CLI scripts
- * that also run in a CI job with no build step (`links-a11y` in ci.yml runs
- * `check:links` on its own runner). So this module re-derives the same file
- * set `src/content.config.ts`'s `glob()` loader would, using the same pattern
+ * that also run in a CI job with no build step (`link-check.yml`'s weekly
+ * `link-check` job runs `check:links` on its own runner). So this module
+ * re-derives the same file set `src/content.config.ts`'s `glob()` loader
+ * would, using the same pattern
  * and the same id-generation algorithm Astro's non-legacy glob loader uses
  * (`generateIdDefault` in `astro/dist/content/loaders/glob.js`) — reimplemented
  * here from `github-slugger`, the exact package Astro calls internally, so a
@@ -41,8 +42,9 @@ export const CONTENT_ROOT = path.join(REPO_ROOT, "src", "content");
  * sibling `.ts` files by extensionless specifier, which is how TypeScript
  * project references normally work but is not something plain Node's loader
  * resolves — and these check scripts run under plain `node`, not `tsx`/Vite,
- * including in `ci.yml`'s `links-a11y` job, which has no build step. `entry.ts`
- * itself resolves fine (Node 24 strips its own erasable-syntax types), but its
+ * including in `link-check.yml`'s weekly `link-check` job, which has no
+ * build step. `entry.ts` itself resolves fine (Node 24 strips its own
+ * erasable-syntax types), but its
  * import of `../i18n/routing` (no extension) does not.
  */
 export const RESERVED_ENTRY_FIELDS = [
