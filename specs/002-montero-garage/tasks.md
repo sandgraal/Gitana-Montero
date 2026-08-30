@@ -53,11 +53,41 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
 
 ## Phase P1 — Auth & user model
 
-- [ ] **T2-201 [TEST]** Graders for the user-data contract: RLS deny-by-default
+- [x] **T2-201 [TEST]** Graders for the user-data contract: RLS deny-by-default
   proofs (anon reads nothing private; user A cannot read user B), vehicle/record
   schema shape, receipts storage policy (no public URL for private objects),
   account-deletion cascade. Expected-failure markers. Depends: T2-102.
   *(ACC-01, ACC-03, SHR-01, GAR-05′)*
+  <br>**Two tiers, because one of them cannot run in CI yet.** `tests/garage/`
+  holds 157 `it.fails` graders plus 81 unmarked positive controls.
+  *Tier A (declaration)* reads T2-202's DDL out of `supabase/migrations/` and
+  `supabase/config.toml` and runs everywhere, forever — RLS enabled **and
+  forced**, no policy granted to `anon`/`public`, every policy scoped to
+  `auth.uid()`, share flags `not null default false`, every ownership FK
+  `on delete cascade`, the receipts bucket created non-public, Google on and
+  every other provider off. *Tier B (behavioural)* proves the same guarantees
+  against a real Postgres through the real PostgREST / GoTrue / Storage
+  surfaces as three actors (anon, owner A, owner B), and needs
+  `supabase start` — i.e. Docker, which CI does not have. Tier B suites
+  `describe.skipIf` with the reason printed in the report, and
+  `GARAGE_LIVE_REQUIRED=1` turns a missing stack into a hard failure, so the
+  day CI grows a Postgres service one environment variable makes every
+  behavioural proof merge-blocking with no test-file edits. Run it locally
+  with `npm run test:garage`.
+  <br>**No dependency, no key, no cloud.** JWTs are minted with `node:crypto`
+  against the Supabase CLI's published local development secret and everything
+  else is `fetch`; `assertLocalTarget` refuses any non-loopback host and is
+  itself graded against a table that includes `*.supabase.co` and
+  monterogarage.com. No Supabase project was created and no service key exists.
+  <br>**T2-202 owns the seam:** `supabase/config.toml` + `supabase/migrations/`,
+  and deleting `tests/garage/seam-canary.test.ts` (self-enforcing — leaving it
+  turns `npm test` red). Table and column names are T2-201's design decision on
+  the spec's behalf and live only in `tests/garage/contract.ts`, so a rename is
+  a one-file change. Two things are **declaration-tier only** and named as
+  gaps rather than faked: "no policy ⇒ no access" proved behaviourally needs a
+  throwaway table, i.e. a direct SQL connection rather than PostgREST; and
+  whether GoTrue can disable the password grant outright is a T2-202 finding —
+  if it cannot, that is a stop-and-ask, not a quietly weakened grader.
 - [ ] **T2-202 [PLATFORM]** Supabase auth (magic link + Google, no passwords) +
   user/vehicle/record/receipt tables with RLS + private storage bucket.
   Activates T2-201 graders. Bilingual auth surface. Depends: T2-201 merged.
