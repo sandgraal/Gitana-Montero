@@ -1,7 +1,11 @@
 name: CI
 
 # ──────────────────────────────────────────────────────────────────────────
-# SCF-03  every `verify` step plus link check and a11y, merge-blocking.
+# SCF-03  every `verify` step plus a11y, merge-blocking. The external link
+#         check no longer runs here — owner ruling 2026-08-30 moved it to a
+#         weekly scheduled job (`link-check.yml`) because it was taking
+#         30 minutes to 2.6+ hours on every PR at current content scale. See
+#         that workflow for the schedule and the failure-tracking-issue flow.
 # SCF-05  deploy to GitHub Pages on merge to `main`; upload the built site as
 #         a downloadable artifact on pull requests (no preview deployments —
 #         owner decision 2026-08-27).
@@ -149,16 +153,18 @@ jobs:
       - name: Install
         run: npm ci
 
-      # SCF-02/SCF-03 split: the link check is deliberately outside `verify`
-      # because it reaches the network, and a source dying overnight must not
-      # break `npm run verify` on a laptop with no signal. Policy (ruled
-      # 2026-08-27, GAP-01): a source fails only when **both** its `url` and
-      # its `archiveUrl` are unreachable — a dead original with a live archive
-      # is a gaps-report item, not a merge blocker. The policy lives in
-      # `scripts/check-links.mjs`; do not re-implement it here.
-      - name: Link check
-        run: npm run check:links
-
+      # The external link check used to run here (SCF-02/SCF-03 split: outside
+      # `verify` because it reaches the network). Owner ruling 2026-08-30 took
+      # it off the merge path entirely — at current content scale (~190
+      # sources) the archive.org throttle (#41) made it take 30 minutes to
+      # 2.6+ hours on every PR and main push, mostly re-checking unchanged
+      # URLs. It now runs weekly (and on demand) in `link-check.yml`, which
+      # opens/updates a tracking issue on failure instead of blocking merges.
+      # GAP-01 policy is unchanged and still lives only in
+      # `scripts/check-links.mjs`: a source fails only when **both** its `url`
+      # and its `archiveUrl` are unreachable — a dead original with a live
+      # archive is a gaps-report item, never a blocker.
+      #
       # The a11y gate is two independent checks against the same built site:
       # Pa11y for WCAG 2.1 AA rule violations, Lighthouse for SCF-06's score
       # budgets. Both need `dist/`, so this job builds it — `astro build`
