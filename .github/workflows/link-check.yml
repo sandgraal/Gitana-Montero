@@ -1,0 +1,109 @@
+name: Link check (scheduled)
+
+# ──────────────────────────────────────────────────────────────────────────
+# Owner ruling 2026-08-30: external link checking is off the merge-blocking
+# path. `npm run check:links` reaches ~190 source URLs plus their
+# web.archive.org snapshots, and the archive.org throttle (#41) makes a full
+# run take 30 minutes to 2.6+ hours at current content scale — mostly
+# re-validating URLs that did not change since the last run. That is no
+# longer acceptable on every PR and every push to `main` (see `ci.yml`'s
+# `links-a11y` job, which used to run this step).
+#
+# This workflow runs the exact same script (`scripts/check-links.mjs`) on a
+# schedule instead, plus on demand via `workflow_dispatch`. GAP-01 semantics
+# are unchanged and still live only in that script: a source fails only when
+# **both** its `url` and its `archiveUrl` are unreachable; a dead original
+# with a live archive snapshot is a warning, not a failure. The only thing
+# that changes here is *what happens* on failure — instead of blocking a
+# merge, this workflow files (or updates) a single tracking issue so dead
+# links get triaged without holding up unrelated PRs.
+# ──────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    # Monday 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch: {}
+
+# Least privilege by default; the job below widens `issues: write` only,
+# and job-level permissions replace this block entirely for that job — so
+# every scope the job needs is spelled out there, not inherited from here.
+permissions:
+  contents: read
+
+jobs:
+  link-check:
+    name: Link check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # Same script CI used to run inline. Captured to a file (rather than
+      # just letting it print) so the tracking-issue step below can quote
+      # the exact problem list without re-running the check. `set +e` around
+      # the command only — every other line keeps the workflow's default
+      # `bash -eo pipefail` so a mistake elsewhere in this step still fails
+      # loudly instead of being swallowed.
+      - name: Link check (external sources)
+        id: link_check
+        run: |
+          set +e
+          npm run check:links > link-check-output.txt 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+          cat link-check-output.txt
+
+      # GAP-01: `check:links` itself only fails on both-url-and-archiveUrl
+      # unreachable, so a non-zero exit here means real problems, not warnings
+      # (warnings — dead original, live archive — print but exit 0). File or
+      # update one tracking issue rather than spamming a new one every week;
+      # search by exact title match first.
+      - name: Open or update the tracking issue
+        if: steps.link_check.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: "Dead source links — weekly link check"
+        run: |
+          body_file="$(mktemp)"
+          {
+            echo "Automated weekly link check found unreachable sources."
+            echo ""
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Checked: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo ""
+            echo "GAP-01 policy: a source only fails when both its \`url\` and"
+            echo "its \`archiveUrl\` are unreachable. This does not block merges —"
+            echo "see \`scripts/check-links.mjs\` and \`.github/workflows/ci.yml\`."
+            echo ""
+            echo '```'
+            cat link-check-output.txt
+            echo '```'
+          } > "$body_file"
+
+          existing="$(gh issue list --state open --search "\"${TITLE}\" in:title" --json number,title \
+            | jq -r --arg t "$TITLE" '[.[] | select(.title == $t)][0].number // empty')"
+
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --body-file "$body_file"
+            echo "Updated tracking issue #$existing"
+          else
+            gh issue create --title "$TITLE" --body-file "$body_file"
+          fi
+
+      # Surface the failure in the Actions UI/notifications after the issue
+      # is filed/updated — the issue step above must run even on failure, so
+      # this is a separate, final step rather than letting the check step
+      # itself fail the job.
+      - name: Fail the job if unreachable sources remain
+        if: steps.link_check.outputs.exit_code != '0'
+        run: exit 1
