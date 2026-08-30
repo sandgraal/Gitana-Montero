@@ -27,13 +27,29 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   not answer. **T2-102 owns the remaining two lines of MIG-01:** `site` →
   `https://monterogarage.com`, `base` → `/`, and deleting the CI
   base-assertion step in the same commit.
-- [ ] **T2-102 [PLATFORM]** Vercel migration: project setup, production on
+- [x] **T2-102 [PLATFORM]** Vercel migration: project setup, production on
   main + preview deployments on PRs, CI gates unchanged and still
   merge-blocking, Pages deploy retired with a tombstone redirect, DNS records
   handed to the owner for Namecheap (owner action), Lighthouse/Pa11y budgets
   re-proved on the Vercel URL. **Also finishes MIG-01:** `site` →
   `https://monterogarage.com`, `base` → `/`, CI base-assertion step deleted
   (see T2-101). Depends: T2-101. *(MIG-02; amends 001 SCF-05)*
+  <br>**Two parts are owner actions and are written out, not done:**
+  `specs/002-montero-garage/HANDOFF-T2-102-DEPLOY.md` has the Vercel project
+  import (do it *before* merging, so production is one automatic build away
+  when `main` moves — but note the pre-merge deployment renders broken by
+  construction, because `main` still sets `base: "/monterogarage"` while the
+  output tree has no such directory; the merge is what fixes it, so nothing
+  about the merge is gated on that deployment rendering) and the exact
+  Namecheap records, read off Vercel's live docs on 2026-08-28. The Pages
+  tombstone is **staged, not fired**: `.github/workflows/pages-tombstone.yml`
+  is `workflow_dispatch`-only and refuses to publish until
+  monterogarage.com answers, because removing the deploy job freezes the
+  Pages site rather than breaking it — stale-but-working beats a redirect to
+  a host that does not resolve. Budgets were re-proved against the
+  `base: "/"` build served locally (both audits serve `dist/` themselves;
+  they never needed the Vercel URL). Also closed a T2-101 review follow-up:
+  `src/pages/404.astro` had no footer, so MIG-05's notice missed it.
 
 ## Phase P1 — Auth & user model
 

@@ -4,32 +4,26 @@ import { defineConfig } from "astro/config";
 /**
  * Single source of truth for where this site is deployed.
  *
- * Today (T2-101, the rename half of MIG-01): still GitHub Pages project pages,
- * now at https://sandgraal.github.io/monterogarage/ — the repository was
- * renamed `Gitana-Montero` → `monterogarage`, and a Pages *project site* is
- * served at `/<RepoName>/`, so `base` must track the repository name
- * byte-for-byte (CI asserts exactly that). GitHub redirects the old repo and
- * Pages URLs for as long as it keeps them, but the redirect is not a place to
- * build on.
+ * T2-102 finished MIG-01/MIG-02: hosting is Vercel, the site is served from
+ * the apex of monterogarage.com, so there is no deploy path any more and
+ * `base` is `/`. The GitHub Pages era (`https://sandgraal.github.io` +
+ * `base: "/monterogarage"`, a Pages *project site* served under `/<RepoName>/`)
+ * ended with it, and so did CI's "base must equal /<RepoName>" assertion —
+ * that was a GitHub-Pages-project-site rule and nothing else.
  *
- * Next (T2-102, the replatform half of MIG-01/MIG-02): hosting moves to Vercel
- * behind monterogarage.com, at which point — and only then, because the DNS
- * cutover is an owner action — this becomes:
- *
- *     site: "https://monterogarage.com",
- *     base: "/",
- *
- * and the CI "base matches the repository name" assertion retires with it.
- * Setting `site` to the custom domain before DNS resolves would publish
- * canonical and hreflang URLs pointing at a host that does not answer.
+ * `site` names the production origin, not whichever origin a given build is
+ * served from. Vercel preview deployments therefore emit canonical/hreflang
+ * URLs on monterogarage.com rather than on the preview's own `*.vercel.app`
+ * host — which is what you want: a preview must never invite a crawler to
+ * index it, and previews are `noindex` on Vercel regardless.
  *
  * Both values are changed here and nowhere else: every internal link,
  * canonical URL and hreflang href is derived from them through
  * `src/i18n/routing.ts` (`import.meta.env.BASE_URL`) and `Astro.site`.
  */
 export default defineConfig({
-  site: "https://sandgraal.github.io",
-  base: "/monterogarage",
+  site: "https://monterogarage.com",
+  base: "/",
 
   // Static output (SCF-01).
   output: "static",

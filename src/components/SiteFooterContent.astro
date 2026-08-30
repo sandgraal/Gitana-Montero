@@ -1,0 +1,51 @@
+---
+/**
+ * The footer's *contents* for one locale, with no `<footer>` element of its
+ * own. All text via `t()` (I18N-08); URLs are shared data.
+ *
+ * `footerNotAffiliated` (002 MIG-05) is standing chrome, not a page-level
+ * opt-in: it renders on every page in the reader's locale, alongside the
+ * safety disclaimer. Kept as a frontmatter comment rather than an HTML
+ * comment so the rationale does not ship to every reader.
+ *
+ * ## Why this is split out from `SiteFooter.astro`
+ *
+ * Every localized page has exactly one locale and gets `SiteFooter`, which
+ * wraps this in the page's single `<footer>` (its `contentinfo` landmark).
+ * `src/pages/404.astro` is the one page that has *no* locale — it renders
+ * every locale at once, because a 404 is served for URLs that may carry no
+ * usable locale at all — so it needs both locales' footer text inside one
+ * `<footer>`. Two `<footer>` elements at body level would be two
+ * `contentinfo` landmarks, which is an a11y defect, and duplicating the
+ * markup would let MIG-05's notice drift between the two copies. Hence: one
+ * component for the content, one for the landmark.
+ */
+import { type Locale } from "../i18n/routing";
+import { t } from "../i18n/ui";
+import { ISSUES_URL, REPO_URL } from "../site";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale);
+---
+
+<p>{strings.footerDisclaimer}</p>
+<p>{strings.footerNotAffiliated}</p>
+<ul>
+  <li><a href={REPO_URL}>{strings.footerSourceLabel}</a></li>
+  <li><a href={ISSUES_URL}>{strings.footerIssuesLabel}</a></li>
+</ul>
+
+<style>
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

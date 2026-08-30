@@ -40,19 +40,34 @@ lives in git, every fact is a reviewable diff) · Vitest + Playwright ·
 Supabase for accounts, user vehicles/records and private receipt storage,
 behind row-level security · Vercel for hosting.
 
-### Where it is deployed, right now
+### Where it is deployed
 
-The rename to `monterogarage` (002 MIG-01) landed before the replatform
-(MIG-02), so the live site is still a **GitHub Pages project site** at
-`https://sandgraal.github.io/monterogarage/`, and `base` in
-`astro.config.mjs` is `/monterogarage` — a Pages project site is served under
-`/<RepoName>/`, and CI asserts the two agree. Links from the old
-`Gitana-Montero` URLs work via GitHub's repository redirect.
+**Vercel**, behind **https://monterogarage.com** (002 MIG-02, T2-102). The
+site is served from the domain root, so `site` is `https://monterogarage.com`
+and `base` is `/` — both in `astro.config.mjs` and nowhere else; every
+internal link, canonical URL and hreflang href derives from them.
 
-T2-102 moves hosting to Vercel behind **monterogarage.com**, at which point
-`site` becomes `https://monterogarage.com`, `base` becomes `/`, and the CI
-base assertion retires. Both values live in `astro.config.mjs` and nowhere
-else.
+- **Production** builds from `main`; **every pull request gets a preview
+  deployment**, through Vercel's GitHub integration. Build settings are
+  checked in as `vercel.json` (`astro` preset, `npm ci`, `npm run build`,
+  `dist`, trailing slashes enforced) rather than living only in the
+  dashboard.
+- **CI is the merge gate; Vercel is only the deployer.** The three required
+  checks in `.github/workflows/ci.yml` are what branch protection enforces.
+  Vercel's build status is not a required check and should not become one.
+- **GitHub Pages is being retired.** Nothing here deploys to it any more, but
+  removing the deploy job froze the last deployment rather than removing it,
+  so `https://sandgraal.github.io/monterogarage/` still serves a stale copy of
+  the site until the tombstone is published. The tombstone — a bilingual
+  redirect that forwards each path to the same path on the new domain — is
+  `.github/workflows/pages-tombstone.yml`: `workflow_dispatch` only, run once
+  by hand, and it refuses to publish until `monterogarage.com` answers. Until
+  someone runs it, the old URL is stale-but-working, which is the intended
+  state during the DNS cutover.
+
+Creating the Vercel project and the Namecheap DNS records are owner actions,
+written out step by step in
+[`specs/002-montero-garage/HANDOFF-T2-102-DEPLOY.md`](specs/002-montero-garage/HANDOFF-T2-102-DEPLOY.md).
 
 ## Contributing / Contribuir
 
@@ -77,7 +92,7 @@ pivot, spec of record). Start work with `/conduct next`.
 nvm use 24
 npm install
 npm run verify          # every merge-blocking check except link/a11y
-npm run dev             # http://localhost:4321/monterogarage/
+npm run dev             # http://localhost:4321/
 
 # The three gates CI adds on top of `verify`, all against the built site:
 npm run check:links     # cited sources reachable (network)
@@ -89,11 +104,11 @@ npm run test:lighthouse # accessibility ≥ 95, performance ≥ 90 (SCF-06)
 an installed Chrome. Neither downloads a browser: set `CHROME_PATH` if yours
 is somewhere unusual — the error message lists the paths that were tried.
 
-The site is served under a base path (`base` in `astro.config.mjs`), so local
-URLs include it: `/monterogarage/en/` and `/monterogarage/es/`.
-`/monterogarage/` itself is a redirect shim that picks a locale — it is not a
-page. Both locales are always built; `npm run check:hreflang` fails the build
-if any page's `en`/`es` pair or `x-default` is missing or asymmetric.
+The site is served from the root (`base` in `astro.config.mjs` is `/`), so
+local URLs are `/en/` and `/es/`. `/` itself is a redirect shim that picks a
+locale — it is not a page. Both locales are always built; `npm run
+check:hreflang` fails the build if any page's `en`/`es` pair or `x-default` is
+missing or asymmetric.
 
 ## Safety note / Nota de seguridad
 
