@@ -1,0 +1,128 @@
+{
+  "id": "combos-gen2-jdm",
+  "kind": "combination",
+  "fitment": {
+    "gens": ["gen2"],
+    "markets": ["jdm"]
+  },
+  "generation": "gen2",
+  "market": "jdm",
+  "coverage": "partial",
+  "offerings": [
+    {
+      "years": {
+        "from": 1991,
+        "to": 1996
+      },
+      "engine": "6g72-sohc",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1991,
+        "to": 1996
+      },
+      "engine": "6g72-sohc",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1991,
+        "to": 1992
+      },
+      "engine": "6g72-sohc",
+      "transmission": "manual-5-speed",
+      "transferCase": "easy-select"
+    },
+    {
+      "years": {
+        "from": 1991,
+        "to": 1996
+      },
+      "engine": "4d56",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1991,
+        "to": 1996
+      },
+      "engine": "4d56",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1993,
+        "to": 1996
+      },
+      "engine": "6g74-dohc",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1994,
+        "to": 1996
+      },
+      "engine": "6g74-dohc",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1993,
+        "to": 1997
+      },
+      "engine": "4m40",
+      "transmission": "automatic-4-speed",
+      "transferCase": "super-select"
+    },
+    {
+      "years": {
+        "from": 1993,
+        "to": 1996
+      },
+      "engine": "4m40",
+      "transmission": "manual-5-speed",
+      "transferCase": "super-select"
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "Super Select — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Super_Select",
+      "archiveUrl": "https://web.archive.org/web/20260619135909/https://en.wikipedia.org/wiki/Super_Select",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Second generation, Japanese market",
+      "summary": "Powertrain pairings recorded for the second-generation Pajero in Japan, read off dated catalogue listings that give the type designation, displacement, gearbox and drive system of each grade on sale. Every dated listing on the cited catalogue page was tabulated, and each row opens at the first listing that shows it and closes at the last. A row left open at the end is one the final listing still shows. Ranges close at the last listing before the mid-cycle facelift, which has its own entry. Almost every grade is listed with the full-time system, but the catalogue does print the part-time system against one long-wheelbase petrol manual in the opening years, and that row is recorded separately rather than folded into the others. A smaller petrol four was also offered and is not representable in this taxonomy, so it is absent rather than excluded. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
+    },
+    "es": {
+      "title": "Segunda generación, mercado japonés",
+      "summary": "Combinaciones de tren motriz registradas para el Pajero de segunda generación en Japón, leídas de listados de catálogo fechados que dan la designación de tipo, la cilindrada, la caja y el sistema de tracción de cada acabado a la venta. Se tabuló cada listado fechado de la página de catálogo citada, y cada fila abre en el primer listado que la muestra y cierra en el último. Una fila que queda abierta al final es una que el último listado todavía muestra. Los rangos cierran en el último listado anterior al rediseño de medio ciclo, que tiene su propia entrada. Casi todos los acabados aparecen con el sistema permanente, pero el catálogo sí imprime el sistema conectable frente a un manual de gasolina de distancia entre ejes larga en los primeros años, y esa fila se registra aparte en lugar de mezclarse con las otras. También se ofreció un motor de gasolina de cuatro cilindros menor que esta taxonomía no puede representar, así que está ausente y no excluido. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
+    }
+  }
+}

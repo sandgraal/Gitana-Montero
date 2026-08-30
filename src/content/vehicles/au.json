@@ -1,0 +1,35 @@
+{
+  "id": "au",
+  "kind": "market",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["au"]
+  },
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Australia and New Zealand",
+      "summary": "The Australasian market, where the truck kept the Pajero name and was sold through a series of local model codes. Local literature bundles the transfer case, the anti-lock brakes and the traction and stability systems under the Mitsubishi All Terrain Technology label."
+    },
+    "es": {
+      "title": "Australia y Nueva Zelanda",
+      "summary": "El mercado australiano y neozelandés, donde el vehículo conservó el nombre Pajero y se vendió bajo una serie de códigos de modelo locales. La documentación local agrupa la caja de transferencia, el sistema antibloqueo de frenos y los controles de tracción y estabilidad bajo la etiqueta Mitsubishi All Terrain Technology."
+    }
+  }
+}

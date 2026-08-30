@@ -1,0 +1,50 @@
+{
+  "id": "automatic-5-speed",
+  "kind": "transmission",
+  "fitment": {
+    "gens": ["gen2-5", "gen3", "gen4"]
+  },
+  "transmissionType": "automatic",
+  "gears": 5,
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — Pajero 18MY general-export specifications sheet",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "archiveUrl": "https://web.archive.org/web/20180128021206/http://www.mitsubishi-motors.com:80/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Five-speed automatic",
+      "summary": "The sequential-shift five-speed automatic, introduced on the second generation's facelift alongside the direct-injection petrol V6 and carried through to the end of production. In North America it was the gearbox that distinguished the upper trim from the lower one."
+    },
+    "es": {
+      "title": "Caja automática de cinco velocidades",
+      "summary": "La caja automática de cinco velocidades con cambio secuencial, introducida en el rediseño de la segunda generación junto con el V6 de gasolina de inyección directa y mantenida hasta el final de la producción. En Norteamérica fue precisamente la caja lo que separaba el acabado superior del inferior."
+    }
+  }
+}

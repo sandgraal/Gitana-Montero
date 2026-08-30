@@ -1,0 +1,46 @@
+{
+  "id": "4d56",
+  "kind": "engine",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3"]
+  },
+  "engineFamily": "4d56",
+  "fuel": "diesel",
+  "displacementCc": 2477,
+  "valvetrain": "sohc",
+  "fuelSystem": "indirect-injection",
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Astron engine — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Astron_engine",
+      "archiveUrl": "https://web.archive.org/web/20260815151959/https://en.wikipedia.org/wiki/Mitsubishi_Astron_engine",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "4D56 turbo-diesel four",
+      "summary": "The turbocharged Astron diesel four, offered from the first generation onward and fitted with an intercooler on the second. It uses indirect injection with a distributor-type pump, and the same engine was built under licence by Hyundai, so parts catalogues sometimes list it under a Korean code. The capacity recorded here is the one its bore and stroke give; Japanese registration listings print a slightly smaller capacity."
+    },
+    "es": {
+      "title": "Motor turbodiésel 4D56, cuatro cilindros",
+      "summary": "El cuatro cilindros diésel Astron con turbo, ofrecido desde la primera generación y equipado con intercooler en la segunda. Usa inyección indirecta con bomba de tipo distribuidor, y el mismo motor se fabricó bajo licencia por Hyundai, de manera que algunos catálogos de repuestos lo listan bajo un código coreano. La cilindrada que se registra aquí es la que dan su diámetro y su carrera; los listados de registro japoneses imprimen una cilindrada ligeramente menor."
+    }
+  }
+}

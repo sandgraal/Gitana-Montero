@@ -1,0 +1,35 @@
+{
+  "id": "eu",
+  "kind": "market",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["eu"]
+  },
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — Pajero 18MY general-export specifications sheet",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "archiveUrl": "https://web.archive.org/web/20180128021206/http://www.mitsubishi-motors.com:80/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Continental Europe",
+      "summary": "The continental European market, where the truck was sold as the Pajero. European versions are distinguished in factory literature by their emissions class, which appears inside the model code."
+    },
+    "es": {
+      "title": "Europa continental",
+      "summary": "El mercado europeo continental, donde el vehículo se vendió como Pajero. La documentación de fábrica distingue las versiones europeas por su clase de emisiones, que va incluida dentro del código de modelo."
+    }
+  }
+}

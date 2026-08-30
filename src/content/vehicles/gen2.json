@@ -1,0 +1,84 @@
+{
+  "id": "gen2",
+  "kind": "generation",
+  "fitment": {
+    "gens": ["gen2"],
+    "markets": ["us", "cr", "uk", "au", "jdm", "eu", "global"]
+  },
+  "chassisCodes": ["V20", "V30", "V40"],
+  "production": {
+    "from": 1991,
+    "to": 1999
+  },
+  "marketNames": [
+    {
+      "market": "us",
+      "name": "Montero"
+    },
+    {
+      "market": "cr",
+      "name": "Montero"
+    },
+    {
+      "market": "uk",
+      "name": "Shogun"
+    },
+    {
+      "market": "au",
+      "name": "Pajero"
+    },
+    {
+      "market": "jdm",
+      "name": "Pajero"
+    },
+    {
+      "market": "eu",
+      "name": "Pajero"
+    },
+    {
+      "market": "global",
+      "name": "Pajero"
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Super Select — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Super_Select",
+      "archiveUrl": "https://web.archive.org/web/20260619135909/https://en.wikipedia.org/wiki/Super_Select",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1995 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1995_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502215816/https://fueleconomy.gov/feg/bymodel/1995_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Second generation",
+      "summary": "The generation that introduced Super Select four-wheel drive and multi-mode ABS, and that won most of the marque's Dakar titles. Body styles ran from a canvas-top convertible through short-wheelbase three-doors to long-wheelbase five-door wagons, and the engine range widened part-way through the run with a larger petrol V6 and a larger turbo-diesel four. Latin America is where this generation lasted longest: it was manufactured in Venezuela under the Montero name, and assembled in Colombia from knocked-down kits — the cited source gives no model name for the Colombian cars — into the following decade. The production range recorded here is the Japanese one, so it closes well before those overseas runs did."
+    },
+    "es": {
+      "title": "Segunda generación",
+      "summary": "La generación que estrenó la tracción Super Select y el ABS multimodo, y la que ganó la mayoría de los títulos de la marca en el Dakar. Las carrocerías iban desde un convertible de lona hasta las de cinco puertas y distancia entre ejes larga, pasando por los tres puertas de distancia entre ejes corta; la gama de motores se amplió a mitad del ciclo con un V6 de gasolina de mayor cilindrada y un turbodiésel de cuatro cilindros también más grande. En Latinoamérica es donde esta generación duró más: se fabricó en Venezuela con el nombre Montero y se ensambló en Colombia a partir de kits desarmados — la fuente citada no da nombre de modelo para los carros colombianos — hasta la década siguiente. El rango de producción que se registra aquí es el japonés, así que cierra bastante antes que esas series de ultramar."
+    }
+  }
+}

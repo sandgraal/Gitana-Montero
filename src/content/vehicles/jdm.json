@@ -1,0 +1,35 @@
+{
+  "id": "jdm",
+  "kind": "market",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"],
+    "markets": ["jdm"]
+  },
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Japan",
+      "summary": "The Japanese domestic market, where the truck was the Pajero and where the widest grade structure was offered. Japanese registration documents identify a vehicle by a type designation such as those recorded in each generation's chassis codes, which is the most precise way to pin down an imported car."
+    },
+    "es": {
+      "title": "Japón",
+      "summary": "El mercado interno japonés, donde el vehículo fue el Pajero y donde se ofreció la estructura de acabados más amplia. Los documentos de registro japoneses identifican cada unidad con una designación de tipo como las que aparecen en los códigos de chasis de cada generación, y esa es la forma más precisa de identificar un carro importado."
+    }
+  }
+}

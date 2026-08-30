@@ -1,0 +1,36 @@
+{
+  "id": "super-exceed",
+  "kind": "trim",
+  "fitment": {
+    "gens": ["gen2", "gen2-5", "gen3"],
+    "markets": ["jdm"]
+  },
+  "markets": ["jdm"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Super Exceed",
+      "summary": "The Japanese flagship grade, above Exceed, typically restricted to the largest engine of its generation and to the five-speed automatic."
+    },
+    "es": {
+      "title": "Super Exceed",
+      "summary": "El acabado tope de gama japonés, por encima del Exceed, normalmente limitado al motor de mayor cilindrada de su generación y a la caja automática de cinco velocidades."
+    }
+  }
+}

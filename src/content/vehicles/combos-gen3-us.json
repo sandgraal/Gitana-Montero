@@ -1,0 +1,98 @@
+{
+  "id": "combos-gen3-us",
+  "kind": "combination",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"]
+  },
+  "generation": "gen3",
+  "market": "us",
+  "coverage": "partial",
+  "offerings": [
+    {
+      "years": {
+        "from": 2001,
+        "to": 2002
+      },
+      "engine": "6g74-sohc",
+      "transmission": "automatic-4-speed",
+      "transferCase": "easy-select",
+      "trims": ["xls"]
+    },
+    {
+      "years": {
+        "from": 2001,
+        "to": 2002
+      },
+      "engine": "6g74-sohc",
+      "transmission": "automatic-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["limited"]
+    },
+    {
+      "years": {
+        "from": 2004,
+        "to": 2004
+      },
+      "engine": "6g75",
+      "transmission": "automatic-5-speed",
+      "transferCase": "super-select-ii",
+      "trims": ["xls", "limited", "20th-anniversary"]
+    }
+  ],
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors North America — Montero features and specifications (mechanical), 2004 model year",
+      "url": "https://www.mitsubishicars.com/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "archiveUrl": "https://web.archive.org/web/20031220004634/http://www.mitsubishicars.com:80/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 2001 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/2001_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502214955/https://fueleconomy.gov/feg/bymodel/2001_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 2002 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/2002_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502214409/https://fueleconomy.gov/feg/bymodel/2002_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 2004 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/2004_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502213040/https://fueleconomy.gov/feg/bymodel/2004_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 2006 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/2006_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502211700/https://fueleconomy.gov/feg/bymodel/2006_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Third generation, United States market",
+      "summary": "Powertrain pairings for the third-generation Montero in North America, from the manufacturer's own model-year specification sheets cross-checked against the federal fuel-economy database. The trim split on the first two rows comes from the later of those two sheets, which maps the part-time transfer case and four-speed automatic to the lower trim and the full-time transfer case and five-speed automatic to the upper one; the earlier model year in each range is carried on the database listing, which shows the same two gearboxes but does not map them to trims. Several model years are deliberately missing: the year the larger petrol V6 arrived is listed by the database with two different automatics but no sourced transfer case, and the closing years are database-only for the same reason. No manual gearbox was offered in this market and generation. Coverage is partial: a combination that is not listed here is unrecorded, not impossible."
+    },
+    "es": {
+      "title": "Tercera generación, mercado de Estados Unidos",
+      "summary": "Combinaciones de tren motriz para la Montero de tercera generación en Norteamérica, tomadas de las hojas de especificaciones del propio fabricante por año modelo y contrastadas con la base de datos federal de consumo. El reparto por acabado de las dos primeras filas sale de la más reciente de esas hojas, que asigna la caja de transferencia conectable y la automática de cuatro velocidades al acabado inferior, y la caja de transferencia permanente con la automática de cinco velocidades al superior; el año modelo anterior de cada rango se sostiene en el listado de la base de datos, que muestra las mismas dos cajas pero no las asigna a acabados. Faltan a propósito varios años modelo: el año en que llegó el V6 de gasolina de mayor cilindrada aparece en la base con dos automáticas distintas pero sin caja de transferencia respaldada por una fuente, y los años de cierre quedan solo con la base de datos por la misma razón. En este mercado y generación no se ofreció caja manual. La cobertura es parcial: una combinación que no aparezca aquí está sin registrar, no es imposible."
+    }
+  }
+}

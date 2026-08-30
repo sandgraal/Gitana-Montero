@@ -1,0 +1,50 @@
+{
+  "id": "automatic-4-speed",
+  "kind": "transmission",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "transmissionType": "automatic",
+  "gears": 4,
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — Pajero 18MY general-export specifications sheet",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "archiveUrl": "https://web.archive.org/web/20180128021206/http://www.mitsubishi-motors.com:80/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors North America — Montero specifications, 2002 model year",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "US Department of Energy / EPA fueleconomy.gov — 1987 Mitsubishi Montero",
+      "url": "https://www.fueleconomy.gov/feg/bymodel/1987_Mitsubishi_Montero.shtml",
+      "archiveUrl": "https://web.archive.org/web/20250502212424/https://fueleconomy.gov/feg/bymodel/1987_Mitsubishi_Montero.shtml",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Four-speed automatic",
+      "summary": "The four-speed automatic, offered from the first generation onward. From the second generation the factory sold it under the adaptive-shift branding it also used on the five-speed, so brochure wording alone does not tell the two apart — the gear count does."
+    },
+    "es": {
+      "title": "Caja automática de cuatro velocidades",
+      "summary": "La caja automática de cuatro velocidades, ofrecida desde la primera generación. A partir de la segunda, la fábrica la vendió con el mismo nombre comercial de cambio adaptativo que usaba en la de cinco velocidades, así que el texto de los folletos por sí solo no permite distinguirlas: hay que fijarse en el número de marchas."
+    }
+  }
+}

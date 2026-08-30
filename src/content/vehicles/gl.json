@@ -1,0 +1,36 @@
+{
+  "id": "gl",
+  "kind": "trim",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["global"]
+  },
+  "markets": ["global"],
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — Pajero 18MY general-export specifications sheet",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "archiveUrl": "https://web.archive.org/web/20180128021206/http://www.mitsubishi-motors.com:80/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Motors — Pajero models: five-door GLS, GLX and GL grades",
+      "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/models/5door_gls.html",
+      "archiveUrl": "https://web.archive.org/web/20160315095249/http://www.mitsubishi-motors.com:80/en/showroom/pajero/models/5door_gls.html",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "GL",
+      "summary": "The base general-export grade of the fourth generation, offered with the manual gearbox and with more seats than the grades above it."
+    },
+    "es": {
+      "title": "GL",
+      "summary": "El acabado base de exportación general de la cuarta generación, ofrecido con caja manual y con más plazas que los acabados superiores."
+    }
+  }
+}

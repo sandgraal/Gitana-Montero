@@ -1,0 +1,50 @@
+{
+  "id": "exceed",
+  "kind": "trim",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3"],
+    "markets": ["au", "jdm"]
+  },
+  "markets": ["au", "jdm"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, January 1991 to September 1999 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "archiveUrl": "https://web.archive.org/web/20260828154800/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199101/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
+      "url": "https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "archiveUrl": "https://web.archive.org/web/20260828154844/https://gazoo.com/catalog/maker/MITSUBISHI/PAJERO/199909/",
+      "accessed": "2026-08-28",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "archiveUrl": "https://web.archive.org/web/20260814171326/https://en.wikipedia.org/wiki/Mitsubishi_Pajero",
+      "accessed": "2026-08-28",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Exceed",
+      "summary": "A long-running upper grade: it appeared on the first generation as the flagship badge and was still the top of the third-generation range in Australia. Japanese catalogues subdivide it further with roman numerals and with suffixed variants; those subdivisions are recorded here under this one trim."
+    },
+    "es": {
+      "title": "Exceed",
+      "summary": "Un acabado superior de larga trayectoria: apareció en la primera generación como emblema tope de gama y todavía era el más alto de la gama de tercera generación en Australia. Los catálogos japoneses lo subdividen con números romanos y con variantes con sufijo; esas subdivisiones se registran aquí bajo este único acabado."
+    }
+  }
+}
