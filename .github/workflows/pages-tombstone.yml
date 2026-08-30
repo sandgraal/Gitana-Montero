@@ -78,7 +78,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      # SHA-pinned like the other two steps in this job, and unlike the
+      # `actions/checkout@v4` in `ci.yml`. That difference is the point: in
+      # `ci.yml` checkout runs in read-only gate jobs, but here it runs in the
+      # one job that holds `pages: write` + `id-token: write`, and it is the
+      # step that decides which bytes the publish steps below see. A mutable
+      # tag on that path is a pointer someone else can move.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Confirm intent
         env:
