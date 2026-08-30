@@ -78,10 +78,12 @@ head SHA, zero unresolved threads, and the conductor told you every
 required independent pass is clean.
 
 Merge via the API, with the head SHA pinned so a race merges nothing you
-did not verify:
+did not verify. Get that SHA fresh, immediately before the call — not a
+local `HEAD`, which can be stale — from GitHub's own record of the PR:
 
+    sha=$(gh pr view <n> --json headRefOid -q .headRefOid)
     gh api -X PUT repos/<owner>/<repo>/pulls/<n>/merge \
-      -f merge_method=squash -f sha=<verified head sha> \
+      -f merge_method=squash -f sha="$sha" \
       -f commit_title='<type(scope): …, refs specs/…>' -f commit_message='<body>'
 
 Do NOT use `gh pr merge` (and never `--admin`, never bypass protection):
@@ -91,11 +93,14 @@ the main checkout it silently switches that checkout's branch, which has
 corrupted conductor state before (PR #38 incident, 2026-08-29). The API
 form has no local side effects; the repo auto-deletes merged branches.
 
-Collect the distinct `X-Agent-Role:` trailers from the branch's commits
+`git fetch origin main` first — a long-running or stale worktree can have
+`origin/main` behind the real one, which would shrink or corrupt the
+commit range below. Then collect the distinct `X-Agent-Role:` trailers
+from the branch's commits
 (`git log origin/main..HEAD --format=%B | grep '^X-Agent-Role:' | sort -u`)
 and carry them in `commit_message` so the role audit trail survives the
-squash. Then `git fetch origin main` and confirm the squash commit is on
-`main` (`git log origin/main -1 --format=%H%n%s`).
+squash. After merging, `git fetch origin main` again and confirm the
+squash commit is on `main` (`git log origin/main -1 --format=%H%n%s`).
 Remove your worktree only if the conductor asked.
 
 Two standing rules, learned the hard way (2026-08-29):
