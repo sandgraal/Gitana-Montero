@@ -11,7 +11,15 @@
     "all-brakes-purga-de-frenos"
   ],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "LÍQUIDO DE FRENOS — Aditivos y fluidos especiales, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/liquido-de-frenos/id/18837/",
+      "archiveUrl": "https://web.archive.org/web/20260830201958/https://www.capris.cr/es/catalog/category/view/s/liquido-de-frenos/id/18837/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "brake fluid",

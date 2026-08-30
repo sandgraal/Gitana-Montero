@@ -18,7 +18,15 @@
   ],
   "relatedTerms": ["all-engine-bujia-de-precalentamiento"],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "BUJÍAS — Bujías, bobinas y cables, Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/bujias/id/16866/",
+      "archiveUrl": "https://web.archive.org/web/20260830201652/https://www.capris.cr/es/catalog/category/view/s/bujias/id/16866/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "spark plug",

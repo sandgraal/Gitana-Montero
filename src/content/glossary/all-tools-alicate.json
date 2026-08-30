@@ -18,7 +18,15 @@
   ],
   "relatedTerms": ["all-tools-destornillador"],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "ALICATES - TENAZAS — Herramientas manuales, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/alicates-tenazas/id/18132/",
+      "archiveUrl": "https://web.archive.org/web/20260830200619/https://www.capris.cr/es/catalog/category/view/s/alicates-tenazas/id/18132/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "pliers",

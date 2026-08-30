@@ -7,7 +7,15 @@
   "aliases": [],
   "relatedTerms": ["all-wheels-tires-llanta"],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "MEDICIÓN DE PRESIÓN PARA LLANTAS — Diagnóstico, Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/medicion-de-presion-para-llantas/id/16791/",
+      "archiveUrl": "https://web.archive.org/web/20260830202124/https://www.capris.cr/es/catalog/category/view/s/medicion-de-presion-para-llantas/id/16791/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "tire pressure",

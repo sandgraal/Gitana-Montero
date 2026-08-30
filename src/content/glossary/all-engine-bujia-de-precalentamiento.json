@@ -13,7 +13,15 @@
   ],
   "relatedTerms": ["all-engine-bujia", "all-fuel-diesel"],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "BUJÍAS PARA PRECALENTAMIENTO — Bujías, bobinas y cables, Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/bujias-para-precalentamiento/id/16863/",
+      "archiveUrl": "https://web.archive.org/web/20260830201720/https://www.capris.cr/es/catalog/category/view/s/bujias-para-precalentamiento/id/16863/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "glow plug",
