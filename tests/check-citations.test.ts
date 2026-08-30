@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import {
   auditCitations,
   findCitationIssues,
+  findTierSourceIssues,
 } from "../scripts/check-citations.mjs";
 
 const SOURCE = {
@@ -128,6 +129,85 @@ describe("findCitationIssues", () => {
   });
 });
 
+describe("findTierSourceIssues", () => {
+  // Negative control: the case this grader exists to catch (2026-08-29
+  // erratum) — community-consensus with zero sources and no numeric shared
+  // data at all (findCitationIssues alone would never see this one).
+  it("FAILS a community-consensus entry with empty sources", () => {
+    const issues = findTierSourceIssues(
+      entry({
+        data: {
+          id: "glossary-term-x",
+          confidence: "community-consensus",
+          sources: [],
+          prose: {},
+        },
+      })
+    );
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.message).toMatch(/glossary-term-x/);
+    expect(issues[0]?.message).toMatch(/community-consensus/);
+    expect(issues[0]?.message).toMatch(/first-hand/);
+  });
+
+  // Positive control: first-hand with zero sources passes.
+  it("passes a first-hand entry with zero sources", () => {
+    const issues = findTierSourceIssues(
+      entry({
+        data: {
+          id: "x",
+          confidence: "first-hand",
+          sources: [],
+          prose: {},
+        },
+      })
+    );
+    expect(issues).toEqual([]);
+  });
+
+  // Positive control: anecdotal with zero sources passes.
+  it("passes an anecdotal entry with zero sources", () => {
+    const issues = findTierSourceIssues(
+      entry({
+        data: {
+          id: "x",
+          confidence: "anecdotal",
+          sources: [],
+          prose: {},
+        },
+      })
+    );
+    expect(issues).toEqual([]);
+  });
+
+  // Positive control: community-consensus with one source passes.
+  it("passes a community-consensus entry with one source", () => {
+    const issues = findTierSourceIssues(
+      entry({
+        data: {
+          id: "x",
+          confidence: "community-consensus",
+          sources: [SOURCE],
+          prose: {},
+        },
+      })
+    );
+    expect(issues).toEqual([]);
+  });
+
+  // fsm-confirmed / tsb still require sources (already schema-enforced, but
+  // this rule is an independent gate that must not regress it).
+  it.each(["fsm-confirmed", "tsb"])(
+    "FAILS a %s entry with empty sources",
+    (confidence) => {
+      const issues = findTierSourceIssues(
+        entry({ data: { id: "x", confidence, sources: [], prose: {} } })
+      );
+      expect(issues).toHaveLength(1);
+    }
+  );
+});
+
 describe("auditCitations", () => {
   it("aggregates issues across multiple entries", () => {
     const issues = auditCitations([
@@ -145,5 +225,23 @@ describe("auditCitations", () => {
     ]);
     expect(issues).toHaveLength(1);
     expect(issues[0]?.file).toBe("src/content/reference/g3-torque-headbolt.md");
+  });
+
+  it("catches a tier/source violation with no numeric data at all", () => {
+    // findCitationIssues alone would report [] here (no numeric leaves) —
+    // this is what auditCitations adds findTierSourceIssues for.
+    const issues = auditCitations([
+      entry({
+        file: "src/content/glossary/some-term.md",
+        data: {
+          id: "some-term",
+          confidence: "community-consensus",
+          sources: [],
+          prose: {},
+        },
+      }),
+    ]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.file).toBe("src/content/glossary/some-term.md");
   });
 });
