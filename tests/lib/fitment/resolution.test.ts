@@ -345,16 +345,21 @@ describe("determinism (FIT-04)", () => {
 });
 
 describe("fitment.drive — open ruling, not a grader (tasks.md T203)", () => {
-  it.fails("an omitted `drive` changes no answer", () => {
-    const taxonomy = realTaxonomy();
-    const withoutDrive = { gens: ["gen3"], markets: ["us"] };
+  it.fails(
+    "a fitment with no `drive` key resolves on gens and markets alone",
+    () => {
+      const taxonomy = realTaxonomy();
+      const withoutDrive = { gens: ["gen3"], markets: ["us"] };
 
-    // The one thing that follows from the spec without a ruling: today every
-    // entry omits `drive`, and resolution must be exactly what it would be if
-    // the field did not exist.
-    expect(matchesVehicle(withoutDrive, TRUCK, taxonomy)).toBe(true);
-    expect(matchesVehicle(withoutDrive, JDM_GEN2, taxonomy)).toBe(false);
-  });
+      // The one thing that follows from the spec without a ruling: today every
+      // entry omits `drive`, so resolution is decided entirely by the facets
+      // that do have a taxonomy. This is not a comparison against a `drive`-
+      // bearing fitment — no such comparison can be written until the ruling
+      // lands, which is what the skip below records.
+      expect(matchesVehicle(withoutDrive, TRUCK, taxonomy)).toBe(true);
+      expect(matchesVehicle(withoutDrive, JDM_GEN2, taxonomy)).toBe(false);
+    }
+  );
 
   /*
    * RULING NEEDED — do not activate this test; T203 must not invent the

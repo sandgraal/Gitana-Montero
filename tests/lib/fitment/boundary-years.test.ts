@@ -15,6 +15,14 @@
  * | `gen3`     | 1999–2006   | **overlaps gen2 and gen2-5 at 1999**   |
  * | `gen4`     | 2006–2021   | overlaps gen3 at 2006                  |
  *
+ * **RULING (conductor, 2026-08-30): those spans are the JDM spans, on
+ * purpose** — T201's fact-checked `gen2` prose says so — so
+ * `generationsInProduction` is JDM-scoped by contract, not a global
+ * production calendar. The `2000 → gen3 only` row rides entirely on that
+ * recorded-JDM-span contract; spec §2's "1991–2000" parenthetical is stale
+ * text pending a docs alignment. Per-market production spans are a
+ * gaps-report item (GAP-01), not a defect in this table.
+ *
  * Three separate things are graded, because they fail separately:
  *
  * 1. `generationsInProduction(year)` — which generations a year belongs to at

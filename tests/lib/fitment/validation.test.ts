@@ -232,7 +232,9 @@ describe("impossible combinations fail the build (FIT-02, VEH-03 rule 1)", () =>
   it.fails("accepts a fitment where one candidate tuple did exist", () => {
     // Same entry plus the gearbox the complete entry does list: a fitment is a
     // query over a set of vehicles, so it is only impossible when *nothing* it
-    // names could have existed.
+    // names could have existed. RATIFIED as a ruling in the T202 review
+    // (2026-08-30) and recorded on tasks.md's T203 line — the existential
+    // quantifier is the contract, not an implementation detail.
     const entry = makeFitmentEntry({
       gens: ["gen3"],
       markets: ["us"],

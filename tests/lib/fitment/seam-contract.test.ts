@@ -3,10 +3,18 @@
  *
  * Every other grader in `tests/lib/fitment/` is marked `it.fails`: it is
  * expected to throw today because `src/lib/fitment/index.ts` is a seam stub.
- * That marker is only honest if the throw is the *seam* throw. A grader that
- * failed because of a typo'd import, a moved fixture or a renamed export would
- * look identical in the Vitest report and would prove nothing — it would be a
- * green suite guarding an empty promise.
+ * That marker is only honest if the throw is the *seam* throw — a grader
+ * failing for some unrelated reason looks identical in the Vitest report and
+ * would leave a green suite guarding an empty promise.
+ *
+ * **What catches what** (corrected after the T202 review, which measured it):
+ * a typo'd import path or a renamed export is caught by `astro check`, not by
+ * this file — TypeScript reports it as ts(2724)/ts(2307) and `npm run verify`
+ * stops before Vitest ever runs. What this file catches is the class the type
+ * checker cannot see: **fixture breakage** (content moved or renamed on disk,
+ * a synthetic entry that has quietly stopped being schema-valid, the 1999
+ * overlap disappearing from T201's data) and **drift in the agreed seam
+ * message** the other graders' expectations are written against.
  *
  * So this file is the positive control for the whole task, with no marker on
  * any test. It asserts that the seam module resolves, exports every symbol the
@@ -45,6 +53,7 @@ import {
   makeSyntheticTaxonomyEntries,
   readAllContentEntries,
   readVehicleEntries,
+  shuffled,
 } from "../../fixtures/fitment-fixtures.ts";
 
 const seamError = new RegExp(SEAM_NOT_IMPLEMENTED);
@@ -118,6 +127,24 @@ describe("T202 fixture integrity (delete this file in T203)", () => {
 
     expect(entries.length).toBeGreaterThan(readVehicleEntries().length);
     expect(entries.every((entry) => entry.fitment !== undefined)).toBe(true);
+  });
+
+  it("`shuffled` really reorders, keeps every element, and is seed-stable", () => {
+    // The determinism graders are only meaningful if the "different index
+    // order" they claim to build is actually different. A `shuffled` that
+    // silently returned its input would make every one of those graders pass
+    // while proving nothing — and being a fixture helper, no type checker and
+    // no it.fails marker would ever notice.
+    const input = Array.from({ length: 20 }, (_, i) => `entry-${i}`);
+
+    const a = shuffled(input, 1);
+    const b = shuffled(input, 2);
+
+    expect([...a].sort()).toEqual([...input].sort());
+    expect(a).not.toEqual(input);
+    expect(a).not.toEqual(b);
+    expect(shuffled(input, 1)).toEqual(a);
+    expect(input[0]).toBe("entry-0");
   });
 
   it.each(
