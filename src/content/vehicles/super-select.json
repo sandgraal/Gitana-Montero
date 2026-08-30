@@ -32,11 +32,11 @@
   "prose": {
     "en": {
       "title": "Super Select 4WD",
-      "summary": "The original Super Select transfer case, launched with the second generation. It adds a centre differential to the part-time layout, which gives four selectable modes: rear-wheel drive, full-time four-wheel drive usable on dry pavement, four-wheel drive with the centre differential locked, and the same locked mode in low range. North American literature calls the system Active-Trac."
+      "summary": "The original Super Select transfer case, launched with the second generation. It adds a centre differential to the part-time layout, which gives four selectable modes: rear-wheel drive, full-time four-wheel drive usable on dry pavement, four-wheel drive with the centre differential locked, and the same locked mode in low range. North American literature calls the system Active Trac."
     },
     "es": {
       "title": "Super Select 4WD",
-      "summary": "La caja de transferencia Super Select original, lanzada con la segunda generación. Suma un diferencial central al esquema conectable, lo que da cuatro modos seleccionables: tracción trasera, tracción permanente en las cuatro ruedas apta para pavimento seco, tracción en las cuatro ruedas con el diferencial central bloqueado, y ese mismo modo bloqueado en rango bajo. La documentación norteamericana llama al sistema Active-Trac."
+      "summary": "La caja de transferencia Super Select original, lanzada con la segunda generación. Suma un diferencial central al esquema conectable, lo que da cuatro modos seleccionables: tracción trasera, tracción permanente en las cuatro ruedas apta para pavimento seco, tracción en las cuatro ruedas con el diferencial central bloqueado, y ese mismo modo bloqueado en rango bajo. La documentación norteamericana llama al sistema Active Trac."
     }
   }
 }
