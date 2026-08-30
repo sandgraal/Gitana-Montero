@@ -1,11 +1,13 @@
 /**
  * `check:links` — SCF-02/SCF-03's link check, source half.
  *
- * ci.yml's `links-a11y` job runs `npm run check:links --if-present` on its
- * own runner with no build step first, so this cannot assume `dist/` exists
- * (that is `check:hreflang`'s job, which runs post-`astro build` inside
- * `verify`). What this script can check without a build: every entry's cited
- * sources, walked straight from `src/content/`.
+ * Runs weekly (plus on demand) in `link-check.yml`'s `link-check` job, not
+ * on the merge-blocking path (owner ruling 2026-08-30 — see that workflow
+ * and `ci.yml`'s `links-a11y` job, which used to run this step). That job
+ * has no build step first, so this cannot assume `dist/` exists (that is
+ * `check:hreflang`'s job, which runs post-`astro build` inside `verify`).
+ * What this script can check without a build: every entry's cited sources,
+ * walked straight from `src/content/`.
  *
  * Two checks, both real (not a stub):
  *

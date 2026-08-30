@@ -8,9 +8,9 @@
  * the Zod gate does not:
  *
  * - A human-readable report across every collection in one run, without
- *   needing a full `astro build` first (useful in CI's `links-a11y` job,
- *   which runs `npm run check:links --if-present` on its own runner with no
- *   build step, and for local iteration).
+ *   needing a full `astro build` first (useful in `link-check.yml`'s weekly
+ *   `link-check` job, which runs `npm run check:links` on its own runner
+ *   with no build step, and for local iteration).
  * - The `data.id` === file-derived Astro entry id check (T104 review): two
  *   ids that can silently diverge because nothing in the Zod schema compares
  *   an entry's declared `id` field against the id Astro's glob loader
