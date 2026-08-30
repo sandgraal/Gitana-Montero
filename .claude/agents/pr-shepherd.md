@@ -77,13 +77,45 @@ Only when: `mergeStateStatus == CLEAN`, all required checks SUCCESS on the
 head SHA, zero unresolved threads, and the conductor told you every
 required independent pass is clean.
 
-`gh pr merge <n> --squash --delete-branch` (never `--admin`, never bypass
-protection). Collect the distinct `X-Agent-Role:` trailers from the branch's
-commits (`git log origin/main..HEAD --format=%B | grep '^X-Agent-Role:' | sort -u`)
-and pass them into the squash commit body with `--body` so the role audit
-trail survives the squash. Then `git fetch origin main` and confirm the
+Merge via the API, with the head SHA pinned so a race merges nothing you
+did not verify. Get that SHA fresh, immediately before the call — not a
+local `HEAD`, which can be stale — from GitHub's own record of the PR:
+
+    sha=$(gh pr view <n> --json headRefOid -q .headRefOid)
+    gh api -X PUT repos/<owner>/<repo>/pulls/<n>/merge \
+      -f merge_method=squash -f sha="$sha" \
+      -f commit_title='<type(scope): …, refs specs/…>' -f commit_message='<body>'
+
+Do NOT use `gh pr merge` (and never `--admin`, never bypass protection):
+`gh pr merge` checks out the base branch locally after merging — from a
+worktree it hard-fails ("'main' is already used by worktree …"), and from
+the main checkout it silently switches that checkout's branch, which has
+corrupted conductor state before (PR #38 incident, 2026-08-29). The API
+form has no local side effects; the repo auto-deletes merged branches.
+
+`git fetch origin main` first — a long-running or stale worktree can have
+`origin/main` behind the real one, which would shrink or corrupt the
+commit range below. Then collect the distinct `X-Agent-Role:` trailers
+from the branch's commits
+(`git log origin/main..HEAD --format=%B | grep '^X-Agent-Role:' | sort -u`)
+and carry them in `commit_message` so the role audit trail survives the
+squash. After merging, `git fetch origin main` again and confirm the
 squash commit is on `main` (`git log origin/main -1 --format=%H%n%s`).
 Remove your worktree only if the conductor asked.
+
+Two standing rules, learned the hard way (2026-08-29):
+
+- **You never edit content or site code — not even to satisfy a review
+  thread.** A review comment that wants a code or content change routes
+  back to the conductor for the dual-review process; your lane is branch
+  state (rebases, reverting unauthorized commits to the reviewed head,
+  PR metadata). Both incidents where a shepherd "helpfully" edited
+  fact-checked content created post-approval defects that took an audit
+  and an erratum branch to unwind.
+- **No external notification ever reaches you.** Waiting for one ends
+  your run silently. Poll with foreground `sleep` + `gh pr checks`
+  loops; under the archive.org throttle a Links + a11y run at content
+  scale legitimately takes 30 minutes to ~2.6 hours — slow is not stuck.
 
 ## Report (final message)
 
