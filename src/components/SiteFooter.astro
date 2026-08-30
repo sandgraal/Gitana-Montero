@@ -1,40 +1,24 @@
 ---
 /**
- * Site footer chrome. All text via `t()` (I18N-08); URLs are shared data.
+ * Site footer chrome for a localized page: the page's single `<footer>`, i.e.
+ * its `contentinfo` landmark, wrapped around `SiteFooterContent` for the
+ * reader's locale.
  *
- * `footerNotAffiliated` (002 MIG-05) is standing chrome, not a page-level
- * opt-in: it renders on every page in the reader's locale, alongside the
- * safety disclaimer. Kept as a frontmatter comment rather than an HTML
- * comment so the rationale does not ship to every reader.
+ * The text — including MIG-05's "not affiliated with Mitsubishi Motors"
+ * notice — lives in `SiteFooterContent.astro`, which `src/pages/404.astro`
+ * also uses (once per locale, inside one `<footer>`). Both routes to the
+ * footer therefore render the same strings from the same place.
  */
+import SiteFooterContent from "./SiteFooterContent.astro";
 import { type Locale } from "../i18n/routing";
-import { t } from "../i18n/ui";
-import { ISSUES_URL, REPO_URL } from "../site";
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
-const strings = t(locale);
 ---
 
 <footer>
-  <p>{strings.footerDisclaimer}</p>
-  <p>{strings.footerNotAffiliated}</p>
-  <ul>
-    <li><a href={REPO_URL}>{strings.footerSourceLabel}</a></li>
-    <li><a href={ISSUES_URL}>{strings.footerIssuesLabel}</a></li>
-  </ul>
+  <SiteFooterContent locale={locale} />
 </footer>
-
-<style>
-  footer ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-</style>

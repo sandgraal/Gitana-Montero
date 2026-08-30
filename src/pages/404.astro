@@ -6,7 +6,16 @@
  * page refuses to guess: it renders in every locale at once, each block marked
  * with its own `lang`. It is not a localized page and therefore carries no
  * `hreflang` set — `scripts/check-hreflang.mjs` exempts it explicitly.
+ *
+ * It does not use `BaseLayout` for exactly that reason (the layout's whole job
+ * is the canonical + hreflang set of a page that has one locale), so the
+ * footer has to be assembled here. MIG-05's "not affiliated with Mitsubishi
+ * Motors" notice is standing chrome on *every* page, and this page was the one
+ * hole in that: it shipped with no footer at all. It now carries both locales'
+ * footer text inside a single `<footer>` — one `contentinfo` landmark, two
+ * language blocks — mirroring how the body above it is built.
  */
+import SiteFooterContent from "../components/SiteFooterContent.astro";
 import {
   LOCALE_BCP47,
   LOCALE_HREFLANG,
@@ -46,6 +55,15 @@ const title = allUi.map(({ strings }) => strings.notFoundTitle).join(" · ");
         ))
       }
     </main>
+    <footer>
+      {
+        allUi.map(({ locale }) => (
+          <div lang={LOCALE_BCP47[locale]}>
+            <SiteFooterContent locale={locale} />
+          </div>
+        ))
+      }
+    </footer>
   </body>
 </html>
 
