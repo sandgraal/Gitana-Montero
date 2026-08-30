@@ -33,7 +33,15 @@
   ],
   "relatedTerms": ["all-tools-llave", "all-wheels-tires-tuerca-de-rueda"],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "LLAVES DE TORQUE — Llaves, Herramientas manuales, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/llaves-de-torque/id/18108/",
+      "archiveUrl": "https://web.archive.org/web/20260830201014/https://www.capris.cr/es/catalog/category/view/s/llaves-de-torque/id/18108/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "torque wrench",

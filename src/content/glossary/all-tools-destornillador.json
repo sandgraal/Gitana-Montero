@@ -23,7 +23,15 @@
   ],
   "relatedTerms": ["all-tools-llave"],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "DESTORNILLADORES — Herramientas manuales, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/destornilladores/id/18123/",
+      "archiveUrl": "https://web.archive.org/web/20260830200836/https://www.capris.cr/es/catalog/category/view/s/destornilladores/id/18123/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "screwdriver",

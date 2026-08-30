@@ -18,7 +18,15 @@
   ],
   "relatedTerms": ["all-tools-cubo", "all-tools-llave-de-torque"],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "LLAVES COMBINADAS — Llaves, Herramientas manuales, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/llaves-combinadas/id/18093/",
+      "archiveUrl": "https://web.archive.org/web/20260830200904/https://www.capris.cr/es/catalog/category/view/s/llaves-combinadas/id/18093/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "wrench",

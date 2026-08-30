@@ -22,7 +22,15 @@
     "all-fluids-liquidos"
   ],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "REFRIGERANTES — Aditivos y fluidos especiales, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/refrigerantes/id/18831/",
+      "archiveUrl": "https://web.archive.org/web/20260830202027/https://www.capris.cr/es/catalog/category/view/s/refrigerantes/id/18831/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "coolant",

@@ -10,7 +10,15 @@
     "all-fuel-filtro-de-combustible"
   ],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "BOMBAS ELÉCTRICAS PARA COMBUSTIBLE — Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/bombas-electricas-para-combustible/id/16923/",
+      "archiveUrl": "https://web.archive.org/web/20260830202056/https://www.capris.cr/es/catalog/category/view/s/bombas-electricas-para-combustible/id/16923/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "fuel pump",

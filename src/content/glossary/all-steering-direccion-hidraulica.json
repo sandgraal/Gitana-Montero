@@ -10,7 +10,15 @@
     "all-steering-cremallera-de-direccion"
   ],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "Mangueras hidráulicas / Conductos hidráulicos de dirección — Truck Depot Costa Rica",
+      "url": "https://truckdepot.cr/componentes-de-direccion/mangueras-hidraulicas-conductos-hidraulicos-de-direccion.html",
+      "archiveUrl": "https://web.archive.org/web/20260830202158/https://truckdepot.cr/componentes-de-direccion/mangueras-hidraulicas-conductos-hidraulicos-de-direccion.html",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "power steering",

@@ -27,7 +27,15 @@
     "all-transfer-case-cubos-de-rueda-libre"
   ],
   "confidence": "community-consensus",
-  "sources": [],
+  "sources": [
+    {
+      "title": "Pastillas de freno — Repuestos Automotriz, CAPRIS Costa Rica",
+      "url": "https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "archiveUrl": "https://web.archive.org/web/20260830202227/https://www.capris.cr/es/catalog/category/view/s/pastillas-de-freno/id/20444/",
+      "accessed": "2026-08-30",
+      "kind": "vendor"
+    }
+  ],
   "prose": {
     "en": {
       "title": "socket",
