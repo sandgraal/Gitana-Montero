@@ -156,27 +156,34 @@ export const FACTORY_DOCUMENTED_KINDS = ["fsm", "tsb", "manufacturer"];
  *
  * Paths are repo-relative POSIX, exactly as `loadContentEntries` reports
  * `file`.
+ *
+ * ## Re-kind sweep (`fix/001-source-rekind-sweep`, 2026-08-31)
+ *
+ * 18 of the original 19 entries were re-kinded: `www.mitsubishi-motors.com`
+ * and `www.mitsubishicars.com` citations to `manufacturer` (both are
+ * manufacturer primary literature — the former Mitsubishi Motors Corp's
+ * global site, the latter Mitsubishi Motors Sales of America's, confirmed by
+ * opening the archived snapshot of each and reading the page/PDF), and
+ * `en.wikipedia.org` citations to `reference` (an encyclopedia, not a forum
+ * thread). Both re-kinds land squarely in the eight ratified `SOURCE_KINDS`
+ * (`src/schemas/entry.ts`) and each now satisfies `FACTORY_DOCUMENTED_KINDS`
+ * or was never claiming to.
+ *
+ * `combos-gen3-au.json` stays listed: its only source is
+ * `xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf`, an
+ * enthusiast PDF-brochure archive ("Dezo's Garage") that reproduces a genuine
+ * Mitsubishi Motors Australia brochure (confirmed by opening the archived PDF
+ * — its metadata, cover copy, and footer publication code
+ * `PAJERONP0309` all match). The reproduction is not the manufacturer,
+ * though, so per the ratified taxonomy `xr793.com` stays `vendor` regardless
+ * of what it reproduces — `vendor` is not a `FACTORY_DOCUMENTED_KINDS` kind,
+ * and this entry has no second source to fall back on. Fixing it needs either
+ * a genuine `fsm`/`tsb`/`manufacturer` citation added (a sourcing task, out
+ * of a kind-only sweep's scope) or the tier lowered (a tier change, also out
+ * of scope here) — so one entry remains, correctly, not a stale exception.
  */
 export const KIND_TIER_LEGACY_EXCEPTIONS = [
-  "src/content/vehicles/4m40.json",
-  "src/content/vehicles/4m41.json",
-  "src/content/vehicles/6g72-sohc.json",
-  "src/content/vehicles/6g74-sohc.json",
-  "src/content/vehicles/6g75.json",
-  "src/content/vehicles/automatic-4-speed.json",
-  "src/content/vehicles/automatic-5-speed.json",
   "src/content/vehicles/combos-gen3-au.json",
-  "src/content/vehicles/combos-gen3-us.json",
-  "src/content/vehicles/combos-gen4-global.json",
-  "src/content/vehicles/gl.json",
-  "src/content/vehicles/global.json",
-  "src/content/vehicles/gls.json",
-  "src/content/vehicles/glx.json",
-  "src/content/vehicles/limited.json",
-  "src/content/vehicles/manual-5-speed.json",
-  "src/content/vehicles/me.json",
-  "src/content/vehicles/super-select-ii.json",
-  "src/content/vehicles/xls.json",
 ];
 
 /** Same extensions `ENTRY_PATTERN` in `src/content.config.ts` loads. */
