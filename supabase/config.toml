@@ -127,7 +127,20 @@ web3 = 30
 # magic link down with it.
 enable_signup = true
 double_confirm_changes = true
-enable_confirmations = false
+# **Load-bearing, and not merely hygiene** (T2-202 review, F1). With
+# confirmations off, `POST /auth/v1/signup` carrying a password answers 200
+# with an access token AND a refresh token: the one request in the system that
+# contains a password hands back a session, which is the thing ACC-01 forbids
+# however inert the stored credential is. It is also a pre-claim attack —
+# anyone signs up as an address they do not own, keeps rotating the refresh
+# token, and is sitting inside the account the real owner later magic-links
+# into, with SHR-01's whole blast radius and no proof of email ownership
+# anywhere in the chain.
+#
+# On, the same request answers 200 with a bare user object and no token: an
+# unconfirmed shell that authenticates nobody. Magic-link sign-up for a new
+# address is unaffected — that flow *is* an email confirmation.
+enable_confirmations = true
 secure_password_change = true
 max_frequency = "1s"
 otp_length = 6

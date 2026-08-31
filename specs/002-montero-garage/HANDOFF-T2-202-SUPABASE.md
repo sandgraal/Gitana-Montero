@@ -69,12 +69,19 @@ It should print four migrations applied, in this order:
 | `20260830120200_account_lifecycle.sql` | the profile trigger, `request_account_deletion()`, `purge_expired_accounts(p_now)` |
 | `20260830120300_no_password_auth.sql` | `deny_password_login()`, the hook that refuses every password sign-in |
 
-Then push the auth configuration, which is what turns the password hook on and
-pins the redirect allow-list:
+**Do not run `supabase config push`.** It pushes `supabase/config.toml`
+*verbatim*, and that file is the **local** stack's configuration: its
+`site_url` is `http://127.0.0.1:4321` and its redirect list is loopback plus
+this site's origins. Pushing it would overwrite the production auth settings
+you are about to set in Step 3b with development values, silently, and the
+first symptom would be magic links pointing at a machine that is not the
+reader's. The auth settings are dashboard steps instead — Step 3b lists every
+one of them, including the password hook.
 
-```sh
-supabase config push
-```
+(If you would rather keep production auth config as code later, the CLI's
+`[remotes.<ref>]` block in `config.toml` overrides per project ref. It cannot
+be committed today because the ref does not exist until Step 1 finishes, and a
+half-written remotes block is worse than none.)
 
 **Verify, in the dashboard:**
 
@@ -118,11 +125,28 @@ Two consoles, in this order.
      handoff to a host nobody reviewed. Preview deployments therefore cannot
      complete an OAuth round trip; that is the intended trade. If you need one
      preview to work, add its exact origin and remove it afterwards.
-3. **Authentication → Sign In / Providers → Email:** confirm it is enabled.
-   Magic link is ACC-01's other half and the site is unusable without it.
-4. While you are on that page: if this version of the dashboard offers a toggle
-   that disables **password** sign-in specifically, turn it off. At the time of
-   writing no such toggle exists — see "The password finding" below.
+3. **Authentication → Sign In / Providers → Email:** confirm it is enabled, and
+   set these two, which are what `config.toml` sets locally and what Step 2
+   deliberately does not push:
+   - **Enable email provider:** on. Magic link is ACC-01's other half and the
+     site is unusable without it.
+   - **Confirm email:** **on.** This one is security, not hygiene. With it off,
+     a sign-up request carrying a password comes back with an access token and
+     a refresh token — the one request in the system that contains a password
+     hands back a session, and anyone can pre-claim an address they do not own
+     and be sitting inside it when the real owner later signs in by magic link.
+     With it on, that request returns a bare unconfirmed user and no token.
+     Magic-link sign-up is unaffected; that flow *is* an email confirmation.
+4. **Authentication → Hooks → Password verification attempt:** enable it and
+   point it at the Postgres function `public.deny_password_login`, which
+   Step 2's migrations already created. **This is what closes ACC-01's deny
+   half** — without it, an account that somehow carries a password can sign in
+   with it. Verify by the message: any password attempt must answer
+   `400 invalid_credentials — Password sign-in is disabled.`
+5. While you are on the Email provider page: if this version of the dashboard
+   offers a toggle that disables **password** sign-in specifically, turn it off
+   too. At the time of writing no such toggle exists — see "The password
+   finding" below.
 
 ---
 
@@ -170,6 +194,22 @@ select public.purge_expired_accounts();
 
 Called with no argument it uses `now()`; the `p_now` parameter exists so a
 grader can reach "thirty days later" without waiting.
+
+**Assert it once, by hand, on the hosted project — a silent zero is the failure
+mode.** `purge_expired_accounts` is `security definer` and reads
+`public.profiles`, which has RLS *forced*; it works because the `postgres` role
+that owns it holds `BYPASSRLS`. If that ever stops being true on hosted
+Supabase, the function does not error — it selects no rows and returns `0`,
+which is byte-identical to a healthy run on a day when nothing expired. So the
+first time the cron has run, prove the difference:
+
+1. Make a throwaway account, sign in once so it has a profile row, then
+   backdate it past the window in the SQL editor:
+   `update public.profiles set deleted_at = now() - interval '31 days' where id = '<that uuid>';`
+2. Run `select public.purge_expired_accounts();` in the SQL editor.
+3. **It must return a non-zero count**, and the account must be gone from
+   Authentication → Users. A `0` here means the purge cannot see the rows it is
+   meant to delete, and ACC-03 is silently not happening.
 
 **One thing the SQL purge does not do.** It deletes the `storage.objects` rows,
 which removes every route to a receipt — download, list and signed URL all stop

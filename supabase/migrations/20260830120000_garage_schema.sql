@@ -18,16 +18,28 @@
 -- ---------------------------------------------------------------------------
 -- Deny by default, including for tables nobody has written yet
 -- ---------------------------------------------------------------------------
--- RLS filters rows; GRANT decides whether a role may reach the table at all.
--- These run before the first `create table` so the four tables below start with
--- no grants and receive exactly the ones named at the bottom of this file — and
--- so does the fifth table, written a year from now by someone who has not read
--- this comment.
+-- RLS filters rows; GRANT decides whether a role may reach the table at all,
+-- and **RLS does not filter TRUNCATE** — a role holding that privilege empties
+-- the table without a single policy being consulted.
+--
+-- The first version of this block revoked from `anon` and `public` and said the
+-- four tables therefore start with no grants. That was false in the running
+-- database (T2-202 review, F2): Supabase's own default privileges hand
+-- `authenticated` ALL on new tables in `public`, and an explicit
+-- `grant select, insert, update, delete` **adds to** that ACL rather than
+-- replacing it. `authenticated` kept TRUNCATE, and the reviewer emptied
+-- `profiles` as that role against the shipped schema.
+--
+-- So `authenticated` is revoked here too, and again by name on each table
+-- below. The declaration tier cannot catch this class on its own — it reads
+-- migration text, and a privilege nobody granted appears nowhere in it.
 
 alter default privileges in schema public revoke all on tables from anon;
 alter default privileges in schema public revoke all on tables from public;
+alter default privileges in schema public revoke all on tables from authenticated;
 alter default privileges in schema public revoke all on sequences from anon;
 alter default privileges in schema public revoke all on sequences from public;
+alter default privileges in schema public revoke all on sequences from authenticated;
 alter default privileges in schema public revoke all on functions from anon;
 alter default privileges in schema public revoke all on functions from public;
 
@@ -250,6 +262,12 @@ create policy "receipts owner all" on public.receipts
 -- `anon` reaches none of these tables at all: not a filtered view, nothing.
 -- The revoke is what makes a table that ships before its policies do an outage
 -- rather than a leak.
+--
+-- `authenticated` is revoked and then granted back **exactly four verbs**. The
+-- revoke is not redundant with the grant: a grant adds to whatever ACL the
+-- table already carries, and Supabase's default privileges give a new table in
+-- `public` ALL to `authenticated` — TRUNCATE included, which no policy filters
+-- (T2-202 review, F2). Revoke first, then name what is allowed.
 
 revoke all on public.profiles from anon;
 revoke all on public.vehicles from anon;
@@ -260,6 +278,11 @@ revoke all on public.profiles from public;
 revoke all on public.vehicles from public;
 revoke all on public.records from public;
 revoke all on public.receipts from public;
+
+revoke all on public.profiles from authenticated;
+revoke all on public.vehicles from authenticated;
+revoke all on public.records from authenticated;
+revoke all on public.receipts from authenticated;
 
 grant select, insert, update, delete on public.profiles to authenticated;
 grant select, insert, update, delete on public.vehicles to authenticated;
