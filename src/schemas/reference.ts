@@ -201,15 +201,32 @@ export function quantitySchema<Units extends readonly [string, ...string[]]>(
       const hasBand = min !== undefined && max !== undefined;
 
       if (value === undefined && !hasBand) {
+        /*
+         * The issue attaches to the field that is *present* — the lone `min`,
+         * or the lone `max` — because that is the field the author has to
+         * change, and because a structured error naming an absent key points
+         * an editor at nothing (T207 review, Copilot: this read `["min"]` for
+         * both halves, so a lone `max` was reported against a key that was not
+         * there). With neither present there is nothing half-written to point
+         * at, so it lands on `value`, the field that should have been used.
+         * `presentBound` is the single expression the path and the message are
+         * both derived from, so the two can no longer disagree.
+         */
+        const presentBound =
+          min !== undefined ? "min" : max !== undefined ? "max" : null;
+
         ctx.addIssue({
           code: "custom",
-          path: min === undefined && max === undefined ? ["value"] : ["min"],
+          path: [presentBound ?? "value"],
           message:
             `a figure is stated as \`value\`, as \`min\` + \`max\`, or as all ` +
-            `three (a nominal with its band). A lone \`${min === undefined ? "max" : "min"}\` ` +
-            `is half a specification, and the missing half is never derived — ` +
-            `a midpoint no source states is an invented number ` +
-            `(AGENTS.md "Facts"). refs specs/001-foundation (REF-01)`,
+            `three (a nominal with its band). ` +
+            (presentBound === null
+              ? `This one states none of them.`
+              : `A lone \`${presentBound}\` is half a specification, and the ` +
+                `missing half is never derived — a midpoint no source states ` +
+                `is an invented number`) +
+            ` (AGENTS.md "Facts"). refs specs/001-foundation (REF-01)`,
         });
         return;
       }

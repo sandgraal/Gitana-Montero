@@ -216,6 +216,12 @@ describe("quantities", () => {
     expect(JSON.stringify(outcome)).toMatch(/invented number/);
   });
 
+  it("rejects a lone max the same way", () => {
+    const outcome = torque({ max: 96, unit: "nm" });
+    expect(outcome.success).toBe(false);
+    expect(JSON.stringify(outcome)).toMatch(/invented number/);
+  });
+
   it("rejects a figure with no value, min or max", () => {
     expect(torque({ unit: "nm" }).success).toBe(false);
   });
@@ -228,6 +234,79 @@ describe("quantities", () => {
     const outcome = torque({ value: 120, min: 84, max: 96, unit: "nm" });
     expect(outcome.success).toBe(false);
     expect(JSON.stringify(outcome)).toMatch(/outside its own band/);
+  });
+
+  /**
+   * SCF-04 is "names the file and the *field*", and the structured `path` is
+   * the machine-readable half of that — it is what an editor jumps to and what
+   * `issuePaths` reads. The message being right is not enough, which is
+   * exactly how the lone-`max` case shipped pointing at `min`, a key that is
+   * not in the object at all (T207 review, Copilot). Every quantity issue's
+   * path is pinned here, and pinned at the *entry* level so the re-pathing
+   * through `torque.` is proved too.
+   */
+  describe("issue paths name the field that is actually there", () => {
+    /**
+     * De-duplicated on purpose, and the duplication is itself pinned below: a
+     * quantity is reached twice — once through the flattened shared shape and
+     * once through the per-kind re-parse in `checkReferenceEntry` — so each
+     * issue is reported twice with the same path. That is the `vehicles.ts`
+     * flatten-then-reparse pattern's cost, it is cosmetic (the same field,
+     * named twice), and it is not what these tests are about.
+     */
+    const pathsOf = (outcome: unknown) => [...new Set(issuePaths(outcome))];
+
+    it("attaches a lone min to `min`", () => {
+      expect(pathsOf(torque({ min: 84, unit: "nm" }))).toEqual(["torque.min"]);
+    });
+
+    it("attaches a lone max to `max`, not to the absent `min`", () => {
+      // The regression this file exists for: the path read `["min"]` for both
+      // halves, so a lone `max` was reported against a key not in the object.
+      expect(pathsOf(torque({ max: 96, unit: "nm" }))).toEqual(["torque.max"]);
+      expect(issuePaths(torque({ max: 96, unit: "nm" }))).not.toContain(
+        "torque.min"
+      );
+    });
+
+    it("attaches a wholly empty figure to `value`", () => {
+      // Nothing half-written to point at, so it lands on the field that
+      // should have been used.
+      expect(pathsOf(torque({ unit: "nm" }))).toEqual(["torque.value"]);
+    });
+
+    it("attaches an inverted band to `max`", () => {
+      expect(pathsOf(torque({ min: 96, max: 84, unit: "nm" }))).toEqual([
+        "torque.max",
+      ]);
+    });
+
+    it("attaches an out-of-band nominal to `value`", () => {
+      expect(
+        pathsOf(torque({ value: 120, min: 84, max: 96, unit: "nm" }))
+      ).toEqual(["torque.value"]);
+    });
+
+    it("names the same fields on a capacity, not just on a torque", () => {
+      // The rule lives in `quantitySchema`, so it must re-path identically
+      // wherever a quantity is embedded.
+      expect(
+        pathsOf(
+          schema.safeParse(fluidEntry({ capacity: { max: 4, unit: "l" } }))
+        )
+      ).toEqual(["capacity.max"]);
+    });
+
+    it("reports each quantity issue twice, at one path (known, cosmetic)", () => {
+      // Recorded rather than silently deduped: the flatten-then-reparse shape
+      // reaches every kind-owned field twice. Pinned so the day someone
+      // changes that (deliberately or not), a test says so — the field named
+      // is what SCF-04 is about, and that is unaffected.
+      expect(issuePaths(torque({ max: 96, unit: "nm" }))).toEqual([
+        "torque.max",
+        "torque.max",
+      ]);
+    });
   });
 
   it("requires a unit", () => {
