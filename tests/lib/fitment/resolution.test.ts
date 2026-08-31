@@ -99,19 +99,19 @@ const JDM_GEN2: VehicleSelection = {
 };
 
 describe("matchesVehicle: gens (FIT-04)", () => {
-  it.fails("matches a vehicle of the generation the fitment names", () => {
+  it("matches a vehicle of the generation the fitment names", () => {
     expect(matchesVehicle({ gens: ["gen3"] }, TRUCK, realTaxonomy())).toBe(
       true
     );
   });
 
-  it.fails("does not match a vehicle of another generation", () => {
+  it("does not match a vehicle of another generation", () => {
     expect(matchesVehicle({ gens: ["gen4"] }, TRUCK, realTaxonomy())).toBe(
       false
     );
   });
 
-  it.fails("matches when the vehicle's generation is one of several", () => {
+  it("matches when the vehicle's generation is one of several", () => {
     expect(
       matchesVehicle({ gens: ["gen1", "gen3", "gen4"] }, TRUCK, realTaxonomy())
     ).toBe(true);
@@ -119,7 +119,7 @@ describe("matchesVehicle: gens (FIT-04)", () => {
 });
 
 describe("matchesVehicle: an omitted facet is no restriction (VEH-03 note)", () => {
-  it.fails.each<[string, VehicleSelection]>([
+  it.each<[string, VehicleSelection]>([
     ["us", TRUCK],
     ["jdm", JDM_GEN25],
   ])(
@@ -131,7 +131,7 @@ describe("matchesVehicle: an omitted facet is no restriction (VEH-03 note)", () 
     }
   );
 
-  it.fails("a fitment with no `years` applies in every production year", () => {
+  it("a fitment with no `years` applies in every production year", () => {
     const taxonomy = realTaxonomy();
 
     expect(
@@ -142,7 +142,7 @@ describe("matchesVehicle: an omitted facet is no restriction (VEH-03 note)", () 
     ).toBe(true);
   });
 
-  it.fails("a fitment with no `engines` applies to every engine", () => {
+  it("a fitment with no `engines` applies to every engine", () => {
     expect(
       matchesVehicle(
         { gens: ["gen3"] },
@@ -154,13 +154,13 @@ describe("matchesVehicle: an omitted facet is no restriction (VEH-03 note)", () 
 });
 
 describe("matchesVehicle: markets (FIT-03, FIT-04)", () => {
-  it.fails("matches when the vehicle's market is named", () => {
+  it("matches when the vehicle's market is named", () => {
     expect(
       matchesVehicle({ gens: ["gen3"], markets: ["us"] }, TRUCK, realTaxonomy())
     ).toBe(true);
   });
 
-  it.fails("does not match when the vehicle's market is not named", () => {
+  it("does not match when the vehicle's market is not named", () => {
     expect(
       matchesVehicle(
         { gens: ["gen3"], markets: ["jdm", "au"] },
@@ -172,7 +172,7 @@ describe("matchesVehicle: markets (FIT-03, FIT-04)", () => {
 });
 
 describe("matchesVehicle: years (FIT-04)", () => {
-  it.fails.each<[string, YearWindow, boolean]>([
+  it.each<[string, YearWindow, boolean]>([
     ["a closed window containing the year", { from: 2001, to: 2002 }, true],
     ["a closed window ending before it", { from: 1999, to: 2001 }, false],
     ["a closed window starting after it", { from: 2003, to: 2006 }, false],
@@ -186,7 +186,7 @@ describe("matchesVehicle: years (FIT-04)", () => {
     ).toBe(expected);
   });
 
-  it.fails("treats both ends of a year window as inclusive", () => {
+  it("treats both ends of a year window as inclusive", () => {
     const taxonomy = realTaxonomy();
     const fitment = { gens: ["gen3"], years: { from: 2001, to: 2004 } };
 
@@ -206,7 +206,7 @@ describe("matchesVehicle: years (FIT-04)", () => {
 });
 
 describe("matchesVehicle: engines (FIT-03, FIT-04)", () => {
-  it.fails("matches when the vehicle's engine is named", () => {
+  it("matches when the vehicle's engine is named", () => {
     expect(
       matchesVehicle(
         { gens: ["gen3"], engines: ["6g74-sohc", "6g75"] },
@@ -216,7 +216,7 @@ describe("matchesVehicle: engines (FIT-03, FIT-04)", () => {
     ).toBe(true);
   });
 
-  it.fails("does not match when the vehicle's engine is not named", () => {
+  it("does not match when the vehicle's engine is not named", () => {
     expect(
       matchesVehicle(
         { gens: ["gen3"], engines: ["6g75"] },
@@ -228,7 +228,7 @@ describe("matchesVehicle: engines (FIT-03, FIT-04)", () => {
 });
 
 describe("matchesVehicle: every facet must hold at once (FIT-04)", () => {
-  it.fails("matches a fully specified fitment naming the truck", () => {
+  it("matches a fully specified fitment naming the truck", () => {
     expect(
       matchesVehicle(
         {
@@ -246,7 +246,7 @@ describe("matchesVehicle: every facet must hold at once (FIT-04)", () => {
     ).toBe(true);
   });
 
-  it.fails.each<[string, FitmentQuery]>([
+  it.each<[string, FitmentQuery]>([
     ["gens", { gens: ["gen2"] }],
     ["markets", { markets: ["jdm"] }],
     ["years", { years: { from: 2004, to: 2006 } }],
@@ -274,7 +274,7 @@ describe("matchesVehicle: every facet must hold at once (FIT-04)", () => {
 });
 
 describe("entryAppliesTo is matchesVehicle over an entry's own fitment (FIT-04)", () => {
-  it.fails.each<[string, FitmentQuery, VehicleSelection, boolean]>([
+  it.each<[string, FitmentQuery, VehicleSelection, boolean]>([
     ["the truck's own generation", { gens: ["gen3"] }, TRUCK, true],
     ["another generation", { gens: ["gen1"] }, TRUCK, false],
     [
@@ -304,7 +304,7 @@ describe("entryAppliesTo is matchesVehicle over an entry's own fitment (FIT-04)"
 });
 
 describe("determinism (FIT-04)", () => {
-  it.fails("returns the same answer for the same query, every time", () => {
+  it("returns the same answer for the same query, every time", () => {
     const taxonomy = realTaxonomy();
     const fitment = { gens: ["gen2"], markets: ["jdm"], years: { to: 1996 } };
 
@@ -317,7 +317,7 @@ describe("determinism (FIT-04)", () => {
     expect([...answers]).toEqual([true]);
   });
 
-  it.fails("does not depend on the order entries were indexed in", () => {
+  it("does not depend on the order entries were indexed in", () => {
     const entries = readVehicleEntries();
     const fitment = { gens: ["gen2"], markets: ["jdm"] };
 
@@ -332,7 +332,7 @@ describe("determinism (FIT-04)", () => {
     expect(answers).toEqual([true, true, true, true, true]);
   });
 
-  it.fails("does not mutate the fitment or the vehicle it is given", () => {
+  it("does not mutate the fitment or the vehicle it is given", () => {
     const taxonomy = realTaxonomy();
     const fitment = { gens: ["gen3"], markets: ["us"] };
     const vehicle = { ...TRUCK };
@@ -345,63 +345,50 @@ describe("determinism (FIT-04)", () => {
 });
 
 describe("fitment.drive — open ruling, not a grader (tasks.md T203)", () => {
-  it.fails(
-    "a fitment with no `drive` key resolves on gens and markets alone",
-    () => {
-      const taxonomy = realTaxonomy();
-      const withoutDrive = { gens: ["gen3"], markets: ["us"] };
+  it("a fitment with no `drive` key resolves on gens and markets alone", () => {
+    const taxonomy = realTaxonomy();
+    const withoutDrive = { gens: ["gen3"], markets: ["us"] };
 
-      // The one thing that follows from the spec without a ruling: today every
-      // entry omits `drive`, so resolution is decided entirely by the facets
-      // that do have a taxonomy. This is not a comparison against a `drive`-
-      // bearing fitment — no such comparison can be written until the ruling
-      // lands, which is what the skip below records.
-      expect(matchesVehicle(withoutDrive, TRUCK, taxonomy)).toBe(true);
-      expect(matchesVehicle(withoutDrive, JDM_GEN2, taxonomy)).toBe(false);
-    }
-  );
+    // The one thing that follows from the spec without a ruling: today every
+    // entry omits `drive`, so resolution is decided entirely by the facets
+    // that do have a taxonomy. This is not a comparison against a `drive`-
+    // bearing fitment — no such comparison can be written until the ruling
+    // lands, which is what the skip below records.
+    expect(matchesVehicle(withoutDrive, TRUCK, taxonomy)).toBe(true);
+    expect(matchesVehicle(withoutDrive, JDM_GEN2, taxonomy)).toBe(false);
+  });
 
   /*
-   * RULING NEEDED — do not activate this test; T203 must not invent the
-   * vocabulary it would need.
+   * RULING LANDED (owner, 2026-08-30) — T202's `it.skip` placeholder is
+   * resolved and therefore removed.
    *
-   * spec §2's fitment shape includes `drive`, and `fitmentSchema` in
-   * `src/schemas/entry.ts` carries it as an optional id list. VEH-01 defines
-   * no drive taxonomy: there is no `kind: "drive"` node, no closed enum, and
-   * nothing in the spec says whether "drive" means 4WD/2WD, the transfer-case
-   * mode, or the driveline layout. tasks.md T203 records this as an open item
-   * — "needs a ruling, not an invented vocabulary".
+   * The open item was that spec §2's fitment shape includes `drive` while
+   * VEH-01 defined no drive taxonomy, so T202 could pin nothing about a
+   * *present* `drive` list without inventing a vocabulary. The owner ruled it
+   * a **closed two-value vocabulary, not an entity kind**: `DRIVE_TYPES =
+   * ["2wd", "4wd"]` in `src/schemas/vehicles.ts`, validated by `fitmentSchema`
+   * and resolved as a facet exactly like `markets`.
    *
-   * Until the owner rules, T202 pins nothing about a *present* `drive` list.
-   * Whoever resolves the ruling replaces this skip with real graders (and a
-   * boundary table over whatever vocabulary is ratified) in a task that owns
-   * the decision.
+   * The real graders for the ruled semantics — matching, the omitted-facet
+   * rule on both sides, and `unknown-id` for a value outside the vocabulary —
+   * live in `tests/lib/fitment/drive.test.ts`, written by the task that owns
+   * the decision (T203), as the placeholder asked for.
    */
-  it.skip("RULING NEEDED: what a present `fitment.drive` resolves against", () => {
-    expect.unreachable("blocked on the fitment.drive ruling (tasks.md T203)");
-  });
 });
 
-describe("under-specified selections — open question, not a grader", () => {
-  /*
-   * OPEN QUESTION for T203's design (raised by T202, no ruling in the spec).
-   *
-   * FIT-03 fixes a selection as "gen + market + year + engine", so
-   * `VehicleSelection` requires exactly those four. Every grader in this file
-   * therefore states any facet it goes on to restrict. What the spec does not
-   * say is what should happen when a fitment restricts `transmissions`,
-   * `transferCases` or `trims` and the visitor's selection is silent about
-   * them: hiding the entry withholds information the reader may need, and
-   * showing it asserts a fitment the selection never satisfied. Both readings
-   * are defensible and the choice is user-facing (FIT-03's listing filter),
-   * so T202 will not settle it by grader.
-   *
-   * T203 must state its choice in `src/lib/fitment/`'s docstring and add the
-   * graders for it in that task's own test pass.
-   */
-  it.skip("OPEN: a fitment restricting a facet the selection omits", () => {
-    expect.unreachable(
-      "T203 decides show-or-hide for facets absent from the selection (FIT-03)"
-    );
-  });
-});
+/*
+ * DECIDED by T203 — T202's second `it.skip` placeholder is resolved and
+ * therefore removed.
+ *
+ * The open question was what happens when a fitment restricts
+ * `transmissions`, `transferCases` or `trims` (or, since the ruling, `drive`)
+ * and the visitor's selection — FIT-03's "gen + market + year + engine" — is
+ * silent about that facet. T202 would not settle it by grader because both
+ * readings are defensible and the choice is user-facing.
+ *
+ * **T203's decision: an absent selection facet is unrestricted, and the entry
+ * is shown.** The reasoning is stated in full in `src/lib/fitment/index.ts`'s
+ * module docstring under "decision (a)", and the graders for it live in
+ * `tests/lib/fitment/absent-selection-facets.test.ts` — in that task's own
+ * test pass, as the placeholder asked for.
+ */

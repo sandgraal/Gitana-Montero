@@ -55,6 +55,46 @@ export const RESERVED_ENTRY_FIELDS = [
   "prose",
 ];
 
+/**
+ * The confidence tiers, strongest evidence first — kept in sync with
+ * `CONFIDENCE_TIERS` in `src/schemas/entry.ts` by
+ * `tests/lib/content-entries.test.ts` (which imports the real export and
+ * asserts the two arrays are equal, order included: this list's index order
+ * is part of the contract, same as the source it mirrors).
+ *
+ * Duplicated here for the same reason `RESERVED_ENTRY_FIELDS` is duplicated
+ * above: `entry.ts` cannot be imported by plain-`node` scripts (see that
+ * constant's docstring for why).
+ */
+export const CONFIDENCE_TIERS = [
+  "fsm-confirmed",
+  "tsb",
+  "community-consensus",
+  "first-hand",
+  "anecdotal",
+];
+
+/**
+ * Tiers a `check:citations` entry must cite at least one source to claim —
+ * every tier stronger than `first-hand` (AGENTS.md "Facts": "cite what you
+ * actually read, or lower the confidence tier"). `first-hand` (the owner's
+ * own truck) and `anecdotal` (unsourced by definition) are the only tiers
+ * that may sit at zero sources.
+ *
+ * This is a strictly wider net than `src/schemas/entry.ts`'s
+ * `CITATION_REQUIRED_TIERS` (`fsm-confirmed`/`tsb` only, enforced at parse
+ * time because claiming "a document says so" with no document is a
+ * structural contradiction the schema can see). `community-consensus` is
+ * schema-legal with zero sources — a shape a schema refinement cannot tell
+ * apart from "the community really did agree, offline" — so this is a
+ * policy check-script rule (like REF-02's numeric-spec rule below), not a
+ * schema tightening.
+ */
+export const TIERS_REQUIRING_SOURCES = CONFIDENCE_TIERS.slice(
+  0,
+  CONFIDENCE_TIERS.indexOf("first-hand")
+);
+
 /** Same extensions `ENTRY_PATTERN` in `src/content.config.ts` loads. */
 const ENTRY_EXTENSIONS = new Set(["md", "mdx", "json", "yaml", "yml"]);
 

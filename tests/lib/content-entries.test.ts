@@ -9,7 +9,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  CONFIDENCE_TIERS as CONFIDENCE_TIERS_MJS,
   RESERVED_ENTRY_FIELDS as RESERVED_ENTRY_FIELDS_MJS,
+  TIERS_REQUIRING_SOURCES,
   blankStringPaths,
   deriveAstroEntryId,
   formatPath,
@@ -19,7 +21,10 @@ import {
   readEntryData,
   stringLeaves,
 } from "../../scripts/lib/content-entries.mjs";
-import { RESERVED_ENTRY_FIELDS } from "../../src/schemas/entry.ts";
+import {
+  CONFIDENCE_TIERS,
+  RESERVED_ENTRY_FIELDS,
+} from "../../src/schemas/entry.ts";
 
 const created: string[] = [];
 
@@ -48,6 +53,29 @@ describe("RESERVED_ENTRY_FIELDS", () => {
     expect([...RESERVED_ENTRY_FIELDS_MJS].sort()).toEqual(
       [...RESERVED_ENTRY_FIELDS].sort()
     );
+  });
+});
+
+describe("CONFIDENCE_TIERS", () => {
+  it("stays in sync with src/schemas/entry.ts's export, order included", () => {
+    // Order is the contract here (same as the real export it mirrors), so
+    // this is not a sorted-set comparison like RESERVED_ENTRY_FIELDS above.
+    expect([...CONFIDENCE_TIERS_MJS]).toEqual([...CONFIDENCE_TIERS]);
+  });
+});
+
+describe("TIERS_REQUIRING_SOURCES", () => {
+  it("is every tier stronger than first-hand", () => {
+    expect([...TIERS_REQUIRING_SOURCES]).toEqual([
+      "fsm-confirmed",
+      "tsb",
+      "community-consensus",
+    ]);
+  });
+
+  it("excludes first-hand and anecdotal", () => {
+    expect(TIERS_REQUIRING_SOURCES).not.toContain("first-hand");
+    expect(TIERS_REQUIRING_SOURCES).not.toContain("anecdotal");
   });
 });
 
