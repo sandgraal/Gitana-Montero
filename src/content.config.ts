@@ -25,6 +25,7 @@ import { z } from "astro/zod";
 import { defineEntrySchema } from "./schemas/entry";
 import { communitySchema } from "./schemas/community";
 import { glossaryEntrySchema } from "./schemas/glossary";
+import { referenceEntrySchema } from "./schemas/reference";
 import { vehiclesEntrySchema } from "./schemas/vehicles";
 
 /**
@@ -33,7 +34,52 @@ import { vehiclesEntrySchema } from "./schemas/vehicles";
  * lives in `prose.en` / `prose.es` either way, so a Markdown body is never the
  * canonical prose for one locale.
  */
-const ENTRY_PATTERN = "**/[^_]*.{md,mdx,json,yaml,yml}";
+export const ENTRY_PATTERN = "**/[^_]*.{md,mdx,json,yaml,yml}";
+
+/**
+ * The same pattern with the body-bearing formats removed — data files only.
+ *
+ * A `.md`/`.mdx` entry has a *body* as well as frontmatter, and the body is
+ * outside every schema: `defineEntrySchema` validates `data`, so a Markdown
+ * body is unvalidated, unlocalized free text that Astro will happily render.
+ * For most collections that is merely unused. For `reference` it is a hole in
+ * a copyright rule — the `fsm-section` kind caps its per-locale summary
+ * precisely so the field cannot hold a reproduced procedure (AGENTS.md: "Cite
+ * the Factory Service Manual, never reproduce it"), and a Markdown body walks
+ * straight around that cap (T207 review, F1).
+ *
+ * So the guard is made structural where the rule is: this collection has no
+ * legitimate use for a body, and a loader pattern cannot be forgotten the way
+ * a check can. A `.md` under `src/content/reference/` is simply not an entry —
+ * it never reaches the schema, never reaches a page, and never ships.
+ *
+ * **What this does not do, stated plainly** (measured, not assumed): such a
+ * file is inert, but it is not *flagged*. The plain-Node scanners in
+ * `scripts/lib/content-entries.mjs` walk every extension for every collection,
+ * so a well-formed-frontmatter `.md` here is counted and passed by
+ * `check:locales` / `check:citations` while Astro ignores it — the site is
+ * safe, but a reproduced procedure could still sit in the repository. Closing
+ * that (and the repo-wide fact that `.md` bodies are monolingual free text no
+ * check reads, pre-existing since T104) is the follow-up recorded on tasks.md's
+ * T207 line: it needs a decision about every collection, which this task does
+ * not own.
+ */
+export const DATA_ENTRY_PATTERN = "**/[^_]*.{json,yaml,yml}";
+
+/**
+ * Which loader pattern each collection uses — the one place the answer lives,
+ * so it is readable by a test rather than buried in a `glob()` call nobody can
+ * introspect (`glob()` returns a loader that does not expose its pattern).
+ *
+ * A collection absent from this table is on {@link ENTRY_PATTERN}. Only
+ * `reference` narrows, and only for the copyright reason above; widening it
+ * again would be a visible edit to this table with a failing test attached
+ * (`src/schemas/reference.test.ts`, "loads the reference collection from data
+ * files only").
+ */
+export const COLLECTION_ENTRY_PATTERNS: Readonly<Record<string, string>> = {
+  reference: DATA_ENTRY_PATTERN,
+};
 
 /**
  * Prose fields every entry carries, in both locales.
@@ -66,10 +112,18 @@ const baseEntrySchema = () => defineEntrySchema({}, baseProse);
  * types. A generic with a default value would need an unsound cast to keep
  * the default, so every collection names its schema instead — one visible
  * word per line, and no collection is silently on the base shape.
+ *
+ * The loader pattern comes from {@link COLLECTION_ENTRY_PATTERNS}, defaulting
+ * to {@link ENTRY_PATTERN} — a table rather than an argument, so the one
+ * collection that narrows cannot be narrowed (or silently re-widened) without
+ * the test that reads that table noticing.
  */
 function entryCollection<S extends z.ZodType>(name: string, schema: S) {
   return defineCollection({
-    loader: glob({ pattern: ENTRY_PATTERN, base: `./src/content/${name}` }),
+    loader: glob({
+      pattern: COLLECTION_ENTRY_PATTERNS[name] ?? ENTRY_PATTERN,
+      base: `./src/content/${name}`,
+    }),
     schema,
   });
 }
@@ -85,8 +139,21 @@ export const collections = {
    * merge-blocking check and deserves its own module and its own tests. T205.
    */
   glossary: entryCollection("glossary", glossaryEntrySchema),
-  /** REF-01, REF-02 — FSM index, fluids, torque master table, capacities. */
-  reference: entryCollection("reference", baseEntrySchema()),
+  /**
+   * REF-01, REF-02 — FSM index, fluids, torque master table, capacities.
+   *
+   * Assembled in `src/schemas/reference.ts` (still through
+   * `defineEntrySchema`): every figure is a `{ value, unit }` quantity in
+   * shared data, which is what puts it in `check:citations`' scan. T207
+   * (schema half). VIN/option-code decoder data is T208's kind to add.
+   *
+   * **Data files only** (`DATA_ENTRY_PATTERN`): the `fsm-section` kind caps
+   * its per-locale summary so the field cannot hold a reproduced FSM
+   * procedure, and a Markdown body would be unvalidated text that walks
+   * straight around that cap (T207 review, F1). The narrowing itself is in
+   * `COLLECTION_ENTRY_PATTERNS`.
+   */
+  reference: entryCollection("reference", referenceEntrySchema(baseProse)),
   /** GAR-01…05 — the build log for the truck. */
   garage: entryCollection("garage", baseEntrySchema()),
   /** PRB-01…06 — the symptom-driven problem finder. */
