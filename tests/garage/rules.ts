@@ -280,6 +280,41 @@ export function stripSubqueries(expr: string): {
  * unqualified form would fail a correct policy, so it is accepted — via the
  * outer table's declared columns, ignoring any that arrive with an alias
  * prefix.
+ *
+ * ## KNOWN GAP: a shared column name false-satisfies this check
+ *
+ * Accepting the unqualified spelling costs something, and the cost is not
+ * hypothetical. This matches column *names*; it does not resolve them against
+ * the subquery's own `from` list. **So when the inner table declares a column
+ * of the same name as an outer one, a bare mention of that name is read as a
+ * back-reference to the outer row when it is nothing of the kind — and the
+ * uncorrelated subquery D1 exists to catch is waved through.**
+ *
+ * It is reachable with this contract's own columns: `records` and `vehicles`
+ * share exactly `{id, odometer_km}`. Two shapes to watch, both verified
+ * against the live rule:
+ *
+ * ```sql
+ * -- `id = id` is a self-join on the INNER table. Reads as correlation. Is not.
+ * exists (select 1 from vehicles v where id = id and v.owner_id = auth.uid())
+ *
+ * -- bare `odometer_km` resolves to vehicles.odometer_km, never to records'.
+ * exists (select 1 from vehicles v where odometer_km > 0 and v.owner_id = auth.uid())
+ * ```
+ *
+ * Both return `true` here. Neither correlates. The failure is **open**, not
+ * closed: it lets a wide-open policy through rather than failing a correct
+ * one, which is the worse direction for a security grader — so it is written
+ * down rather than left for someone to rediscover.
+ *
+ * **The fix is small and belongs to T2-202**, once a real policy exists to
+ * test it against: this module already imports `USER_TABLES`, so subtracting
+ * the *inner* table's declared columns from `outerColumns` before the bare-name
+ * test closes both shapes above. Deferred rather than done here because a rule
+ * tightened against no real DDL is a rule tuned to its own fixtures. The
+ * handoff is recorded on the T2-202 line in
+ * `specs/002-montero-garage/tasks.md`, along with the probe fixtures to add
+ * when it lands.
  */
 export function isCorrelated(subquery: string, options: ScopeOptions): boolean {
   // With no table context there is nothing to correlate against, so this

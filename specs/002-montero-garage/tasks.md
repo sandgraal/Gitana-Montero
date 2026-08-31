@@ -150,6 +150,27 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   user/vehicle/record/receipt tables with RLS + private storage bucket.
   Activates T2-201 graders. Bilingual auth surface. Depends: T2-201 merged.
   *(ACC-01..04, SHR-01)*
+  <br>**Inherited from T2-201 — close the shared-name correlation gap when the
+  first real policy lands.** `isCorrelated` in `tests/garage/rules.ts` accepts
+  the unqualified back-reference spelling (`where v.id = vehicle_id`) by
+  matching the outer table's column *names*; it does not resolve them against
+  the subquery's own `from` list. So when the inner table declares a column of
+  the same name, a bare mention is read as correlation when it is not, and the
+  uncorrelated subquery D1 exists to catch is waved through. **This fails open,
+  not closed** — it admits a wide-open policy rather than rejecting a correct
+  one. Reachable with this contract's own columns: `records` and `vehicles`
+  share exactly `{id, odometer_km}`, and both `where id = id and owner_id =
+  auth.uid()` and a bare `odometer_km` predicate return `true` today.
+  <br>The fix is a few lines and `rules.ts` already imports `USER_TABLES`:
+  subtract the *inner* table's declared columns from `outerColumns` before the
+  bare-name test, which closes both shapes. It was deferred out of T2-201 on
+  purpose — a rule tightened against no real DDL is a rule tuned to its own
+  fixtures, and the right time is when there is an actual policy to test it
+  against. **Add both shapes to the probe corpus in
+  `tests/garage/reviewer-probes.test.ts` at the same time**, in the N-series
+  alongside N4, so the tightened rule is pinned the way every other rule there
+  is: break it on purpose and confirm the corpus goes red. Full note in the
+  `isCorrelated` docstring.
 
 ## Phase P2 — The garage
 
