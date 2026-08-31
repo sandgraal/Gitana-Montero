@@ -4,6 +4,25 @@
  * > **ACC-01** THE site SHALL authenticate users via Supabase Auth with email
  * > magic link and Google OAuth, **and no password flow**.
  *
+ * ## OWNER RULING, 2026-08-30 — what "no password flow" means
+ *
+ * > "No passwords" means **no password can ever authenticate**. Sessions come
+ * > only from a magic link or from Google.
+ *
+ * The stricter reading — that no account may *carry* a password — was put to
+ * the owner and **rejected as unachievable on Supabase Auth**. T2-202 proved
+ * live that GoTrue bcrypts a random secret even for accounts created without
+ * a password, so "carries no password" is not a state the platform can be put
+ * in; and every path that blocks creation also breaks the magic-link flow
+ * ACC-01 requires.
+ *
+ * That distinction decides what these graders may assert. Creating an account
+ * that has a password is **not** a finding. Getting a session out of one is.
+ * The enforcement point is the `password_verification_attempt` hook, which
+ * answers a correct password on a real account with
+ * `400 "Password sign-in is disabled."` — so that is what is pinned, rather
+ * than a refusal at signup.
+ *
  * The allow-list is the easy half and it is not the interesting one. What
  * makes ACC-01 a requirement rather than a preference is the closing clause:
  * a password flow that is merely *unused* is still a flow. Supabase Auth
@@ -21,8 +40,8 @@
  * 2. **The configuration** (declaration tier): `supabase/config.toml` enables
  *    Google, and every other provider it knows about is off.
  * 3. **The behaviour** (live tier): the running stack refuses the password
- *    grant **for an account that really has a password**, and still lets a
- *    real account request a magic link.
+ *    grant **for an account that really has a password, using the correct
+ *    one**, and still lets a real account request a magic link.
  *
  * ## Two of these graders used to be unfalsifiable
  *
@@ -47,6 +66,7 @@
  *
  * refs specs/002-montero-garage (ACC-01, ACC-04)
  */
+import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -77,6 +97,36 @@ const live = await detectLiveStack();
  * against a loopback stack.
  */
 const PROBE_PASSWORD = "TEST-T2-201-not-a-real-password";
+
+/**
+ * A fresh identity for every run of the file.
+ *
+ * **This is a defect fix, not a tidy-up** (found by T2-202 against a live
+ * stack). The fixture addresses used to be deterministic — `testEmail(
+ * "password", "signup")` — and the signup grader created accounts without
+ * removing them. So the *second* run against any given stack asked GoTrue to
+ * register an address it already knew, got `422 user_already_exists`, and the
+ * grader's `expect(response.ok).toBe(false)` passed. It passed because the
+ * address was taken, not because password sign-up was refused: an accidental
+ * green that survives exactly as long as the stack does, and that a developer
+ * re-running the suite locally would hit on their second run.
+ *
+ * Reproduced before fixing, twice against the same stack: run 1 expected
+ * failure, run 2 green for the wrong reason. Both halves are now closed —
+ * unique addresses so a collision cannot happen, and teardown so nothing is
+ * left behind to collide with.
+ */
+const RUN_ID = randomUUID().slice(0, 8);
+
+/**
+ * Pull a user id out of whatever shape an auth response carries — GoTrue
+ * returns a bare user for a confirmation-required signup and a session
+ * wrapping one otherwise.
+ */
+function userIdOf(body: unknown): string | undefined {
+  const shape = body as { id?: string; user?: { id?: string } } | null;
+  return shape?.id ?? shape?.user?.id;
+}
 
 const SRC_DIR = fileURLToPath(new URL("../../src/", import.meta.url));
 
@@ -234,18 +284,50 @@ describe("the local stack is configured for exactly two ways in", () => {
 describe.skipIf(!live.available)(
   liveTitle("the running stack refuses passwords", live),
   () => {
-    it.fails("refuses to create an account with a password", async () => {
-      const stack = stackOf(live);
+    it.fails(
+      "a password submitted at signup grants no session, then or later",
+      async () => {
+        // **OWNER RULING, 2026-08-30 — the ratified reading of ACC-01.**
+        // "No passwords" means *no password can ever authenticate*: a session
+        // comes only from a magic link or from Google. It does **not** mean no
+        // account may carry a password, and this grader used to pin that
+        // literal reading — it asserted the signup call itself was refused.
+        //
+        // The literal reading was rejected as unachievable on Supabase Auth.
+        // T2-202 proved live that GoTrue bcrypts a random secret even for
+        // accounts created without one, so "carries no password" is not a
+        // state the platform can be put in; and every path that blocks
+        // creation also breaks the magic-link flow ACC-01 requires. A grader
+        // that demands the impossible does not protect the requirement, it
+        // just blocks the branch that satisfies it.
+        //
+        // So what is pinned here is the guarantee that actually matters, along
+        // the public path a stranger would take: sign up with a password, and
+        // no session comes back — not from the signup call, and not from
+        // presenting that same correct password afterwards.
+        const stack = stackOf(live);
+        const email = testEmail("password-signup", RUN_ID);
 
-      const response = await passwordSignUp(
-        stack,
-        testEmail("password", "signup"),
-        PROBE_PASSWORD
-      );
+        const response = await passwordSignUp(stack, email, PROBE_PASSWORD);
+        const created = userIdOf(response.body);
 
-      expect(response.ok).toBe(false);
-      expect(response.body).not.toHaveProperty("access_token");
-    });
+        try {
+          // The account may exist afterwards — that is allowed now. What may
+          // not exist is a way in.
+          expect(response.body).not.toHaveProperty("access_token");
+          expect(response.body).not.toHaveProperty("refresh_token");
+
+          // And the password it was created with must not work later either,
+          // which is the half a signup-only check would miss entirely.
+          const grant = await passwordGrant(stack, email, PROBE_PASSWORD);
+
+          expect(grant.ok).toBe(false);
+          expect(grant.body).not.toHaveProperty("access_token");
+        } finally {
+          if (created) await adminDeleteUser(stack, created);
+        }
+      }
+    );
 
     it.fails(
       "refuses the password grant FOR AN ACCOUNT THAT REALLY HAS ONE",
@@ -261,23 +343,25 @@ describe.skipIf(!live.available)(
         // password has to be right, so this one provisions both through the
         // admin API first. Now a stack with passwords enabled returns a
         // session here and the grader goes red, which is the whole point.
+        //
+        // **Owner ruling 2026-08-30** also removed this grader's escape
+        // hatch. It used to treat "the admin API refused to mint a
+        // password-bearing account" as satisfying ACC-01 by a stronger route
+        // — which is the literal reading the ruling rejects, and which would
+        // have let the whole assertion be skipped by a `return`. Creating the
+        // account is now required, because a grader that cannot set up its
+        // own fixture proves nothing about what follows.
         const stack = stackOf(live);
-        const email = testEmail("password", "grant");
+        const email = testEmail("password-grant", RUN_ID);
         const created = await adminCreateUser(stack, {
           email,
           password: PROBE_PASSWORD,
           email_confirm: true,
         });
-        const userId = (created.body as { id?: string }).id;
+        const userId = userIdOf(created.body);
 
         try {
-          if (!created.ok) {
-            // Refusing to mint a password-bearing account at all satisfies
-            // ACC-01 by a stronger route. Asserted explicitly so this branch
-            // is a verdict rather than a silent skip.
-            expect(created.status).toBeGreaterThanOrEqual(400);
-            return;
-          }
+          expect(created.ok).toBe(true);
 
           const response = await passwordGrant(stack, email, PROBE_PASSWORD);
 
@@ -286,6 +370,13 @@ describe.skipIf(!live.available)(
           // And not merely because the account was unknown — the failure
           // mode that made the original grader vacuous.
           expect(JSON.stringify(response.body)).not.toContain("invalid_grant");
+          // The refusal has to come from the deliberate block, not from a
+          // wrong password or a missing user. This is the
+          // `password_verification_attempt` hook's contract, pinned loosely
+          // enough to survive punctuation.
+          expect(JSON.stringify(response.body)).toMatch(
+            /password sign[- ]?in is disabled/i
+          );
         } finally {
           if (userId) await adminDeleteUser(stack, userId);
         }
@@ -326,12 +417,12 @@ describe.skipIf(!live.available)(
         // attempt to shut off passwords takes email sign-in down with it, this
         // goes red.
         const stack = stackOf(live);
-        const email = testEmail("magiclink", "positive");
+        const email = testEmail("magiclink", RUN_ID);
         const created = await adminCreateUser(stack, {
           email,
           email_confirm: true,
         });
-        const userId = (created.body as { id?: string }).id;
+        const userId = userIdOf(created.body);
 
         try {
           expect(created.ok).toBe(true);

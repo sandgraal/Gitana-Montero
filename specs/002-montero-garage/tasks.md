@@ -150,6 +150,21 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   user/vehicle/record/receipt tables with RLS + private storage bucket.
   Activates T2-201 graders. Bilingual auth surface. Depends: T2-201 merged.
   *(ACC-01..04, SHR-01)*
+  <br>**OWNER RULING on ACC-01, 2026-08-30 — "no passwords" means no password
+  can ever _authenticate_.** Sessions come only from a magic link or from
+  Google. The stricter reading — that no account may *carry* a password — was
+  put to the owner and **rejected as unachievable on Supabase Auth**: T2-202
+  proved live that GoTrue bcrypts a random secret even for accounts created
+  without one, so "carries no password" is not a state the platform can be put
+  in, and every path that blocks creation also breaks the magic-link flow
+  ACC-01 requires. Creating an account that has a password is therefore **not**
+  a finding; getting a session out of one is. The enforcement point is the
+  `password_verification_attempt` hook, which answers a correct password on a
+  real account with `400 "Password sign-in is disabled."` The T2-201 graders in
+  `tests/garage/auth-surface.test.ts` were amended to the ratified reading
+  (branch `fix/002-acc01-grader-ruling`, merged ahead of T2-202); the grader
+  that demanded a refusal at signup is gone, as is the escape hatch that
+  treated "creation refused" as a pass.
   <br>**Inherited from T2-201 — close the shared-name correlation gap when the
   first real policy lands.** `isCorrelated` in `tests/garage/rules.ts` accepts
   the unqualified back-reference spelling (`where v.id = vehicle_id`) by
