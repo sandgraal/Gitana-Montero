@@ -1,65 +1,134 @@
 /**
- * SEAM STUB — declared by T202 [TEST], to be implemented by T203 [PLATFORM].
+ * The fitment engine (FIT-01, FIT-02, FIT-04) — the only code that interprets
+ * a fitment query.
  *
- * No implementation lives here. Every export below throws
- * `not implemented: T203 …`; the graders that describe what T203 must build
- * live in `tests/lib/fitment/`. A test-writer instance authored this file and
- * must not be the instance that fills it in (AGENTS.md separation rule,
- * plan.md "TDD and separation rules", audited by T901).
+ * > **FIT-01** THE fitment engine SHALL live in `src/lib/fitment/` with unit
+ * > tests, and SHALL be the only code that interprets fitment queries.
  *
- * ## Why the seam exists at all
+ * T202 declared this module's surface as a seam and wrote the graders in
+ * `tests/lib/fitment/` against it; T203 (this implementation) filled the
+ * bodies in. Nothing outside this directory may re-derive "does entry E apply
+ * to vehicle V" — a second answer is a second truth.
  *
- * FIT-01: "THE fitment engine SHALL live in `src/lib/fitment/` with unit
- * tests, and SHALL be the only code that interprets fitment queries." Graders
- * cannot be written against a module that does not resolve, and a grader that
- * fails on a missing import proves nothing. So T202 declares the surface and
- * the semantics; T203 replaces the bodies. `tests/lib/fitment/seam-contract.test.ts`
- * is the unmarked canary proving today's expected failures are *these* throws
- * and not a broken import.
+ * ## The shape of an answer
  *
- * ## What T203 must satisfy
+ * Three different questions live here and they are deliberately not the same
+ * function:
  *
- * - **FIT-02** — "WHEN an entry declares a fitment, THE build SHALL resolve it
- *   against the taxonomy and fail on any reference to a nonexistent ID or an
- *   impossible combination (per VEH-03)." That is `validateEntryFitments`
- *   (pure, returns every issue) plus `assertFitmentsResolve` (the build path,
- *   which throws). Two issue codes because the requirement names two failure
- *   classes.
- * - **FIT-04** — "THE fitment engine SHALL answer 'does entry E apply to
- *   vehicle V' deterministically, with boundary-year tests." That is
- *   `entryAppliesTo` / `matchesVehicle`, plus `generationsInProduction` for
- *   the 1999 Gen 2.5 / Gen 3 overlap the requirement names.
- * - **VEH-03's four resolver rules**, documented verbatim in
- *   `src/schemas/vehicles.ts` and restated on `classifyCombination` below.
- *   Those rules are the reason `CombinationVerdict` has three values and not
- *   two: "absent" is not one answer.
- * - **`gen2-5`'s `parentGeneration: "gen2"`** — `src/schemas/vehicles.ts`:
- *   "the resolver (T203) is what expands `gens: ["gen2"]` to its children."
- *   That is `expandGenerations`.
+ * | question                                   | function              | answer            |
+ * |--------------------------------------------|-----------------------|-------------------|
+ * | does this entry's fact apply to my truck?  | `matchesVehicle`      | `boolean`         |
+ * | did this exact truck leave the factory?    | `classifyCombination` | 3-valued verdict  |
+ * | does this entry's fitment resolve at all?  | `validateEntryFitments` | issue list      |
  *
- * ## What T202 deliberately did NOT decide
+ * The first is a **filter** and errs towards showing; the second is a **claim
+ * about the world** and errs towards `unknown`; the third is a **build gate**
+ * and errs towards failing loudly. Collapsing any two of them is how a
+ * reference site starts hiding content from the person who owns the truck.
  *
- * `fitment.drive` is in spec §2's fitment shape and in `fitmentSchema`, but
- * VEH-01 defines no drive taxonomy, so there is no vocabulary for a drive id
- * to resolve against. tasks.md (T203) says this "needs a ruling, not an
- * invented vocabulary". No function here interprets `drive`, and the graders
- * pin only the one thing that follows from the spec without a ruling: an
- * *omitted* `drive` changes no answer. The skipped grader in
- * `tests/lib/fitment/resolution.test.ts` names the open ruling.
+ * ## Rules this module implements, and where each comes from
  *
- * refs specs/001-foundation (FIT-01, FIT-02, FIT-04, VEH-03)
+ * 1. **An omitted fitment facet is no restriction** (`src/schemas/vehicles.ts`:
+ *    "`fitment.markets` is optional in the base fitment shape, where omitting
+ *    it correctly means 'no market restriction' — a torque figure applies in
+ *    every market").
+ * 2. **`parentGeneration` expands downwards, never upwards** — `gens: ["gen2"]`
+ *    covers a `gen2-5` truck; `gens: ["gen2-5"]` does not cover a `gen2` one.
+ *    The containment is content (`gen2-5`'s entry), stated once.
+ * 3. **VEH-03's four combination rules**, restated on `classifyCombination`.
+ * 4. **JDM-span contract** (conductor ruling, 2026-08-30): the `production`
+ *    spans in T201's generation entries are deliberately the *JDM* spans, so
+ *    `generationsInProduction` is JDM-scoped by contract rather than a global
+ *    production calendar. Per-market spans are a gaps-report item (GAP-01),
+ *    not a defect here, and `year-outside-production` is measured against the
+ *    same recorded spans for exactly that reason.
+ * 5. **Existential impossibility** (ratified in the T202 review, 2026-08-30):
+ *    a fitment is a query over a *set* of vehicles, so it is impossible only
+ *    when **nothing** it names could have existed. One surviving candidate
+ *    tuple is an accept.
+ * 6. **`fitment.drive`** (owner ruling, 2026-08-30): a closed two-value
+ *    vocabulary, `DRIVE_TYPES` in `src/schemas/vehicles.ts`, resolved here as
+ *    a facet exactly like `markets`.
+ *
+ * ## The two decisions T202 left to this task, and how they were decided
+ *
+ * ### (a) A fitment restricting a facet the *selection* is silent about
+ *
+ * FIT-03 fixes a selection as "gen + market + year + engine", so a visitor can
+ * always be silent about transmission, transfer case, trim and drive. When a
+ * fitment restricts one of those, the engine must either hide the entry or
+ * show it. **Decision: show it — an absent selection facet is treated as
+ * unrestricted, not as a failed match.**
+ *
+ * Why: hiding is the destructive answer. A visitor who has told us "Gen 3, US,
+ * 2002, 6G74 SOHC" and nothing else is not asserting that their truck has no
+ * transfer case; they simply have not said which one. Hiding a Super Select II
+ * article from them withholds information they may need and gives them no
+ * signal that anything was withheld — the same failure mode VEH-03's
+ * `unknown`-over-`impossible` asymmetry exists to prevent ("a wrong
+ * *impossible* silently hides a real vehicle from a reader who owns it, while
+ * a wrong *unknown* only fails to catch a typo"). Showing, by contrast, is
+ * recoverable in one click: the visitor narrows the selection and the entry
+ * disappears. The rule is therefore symmetrical and easy to state — **a facet
+ * neither side names is not a constraint** — and it degrades in the direction
+ * of more information rather than less.
+ *
+ * The cost is real and is accepted: a listing filtered on the FIT-03 quadruple
+ * alone will show some entries that a fully-specified truck would not match.
+ * T204's selector is where a visitor buys precision by saying more. Graded in
+ * `tests/lib/fitment/absent-selection-facets.test.ts`.
+ *
+ * ### (b) Combination scoping across `parentGeneration`
+ *
+ * Real content carries both `combos-gen2-jdm` and `combos-gen2-5-jdm`, so
+ * "what does `classifyCombination` answer for a `gen2-5` truck?" is a live
+ * question. **Decision: combination scoping is exact. `classifyCombination`
+ * consults only the entries whose `generation` is the selection's own
+ * generation id — `parentGeneration` is never followed, in either direction.**
+ *
+ * Why: `parentGeneration` expansion is a rule about *facts* ("does this torque
+ * figure apply to a facelift truck?" — yes, the facelift is a Gen 2 truck). A
+ * combination entry is not a fact about a truck; it is a **record of one
+ * offering list, sourced for one exact scope**. Following the link upwards
+ * would let the parent's list answer for the child, and both failure
+ * directions are bad:
+ *
+ * - a parent-scoped `complete` entry could declare a facelift-only powertrain
+ *   *impossible* — the confident wrong answer this taxonomy exists to prevent;
+ * - a parent-scoped listing could report a facelift tuple as having *existed*
+ *   when the source never said so. `combos-gen2-jdm`'s own prose is explicit:
+ *   "Ranges close at the last listing before the mid-cycle facelift, which has
+ *   its own entry." Inheriting its rows would fabricate a citation.
+ *
+ * A `gen2-5` selection in a scope with only a `gen2` entry therefore lands on
+ * VEH-03 rule 3 — `unknown`, never `impossible` — which is the honest answer
+ * and is already the graded behaviour for any unwritten scope. Graded in
+ * `tests/lib/fitment/combination-scoping.test.ts`.
+ *
+ * Note this does **not** contradict rule 2 above: `validateEntryFitments` does
+ * expand a fitment's `gens` before choosing which scopes to interrogate (a
+ * `gens: ["gen2"]` fitment genuinely names `gen2-5` vehicles), and each scope
+ * it lands on is then interrogated with its own exact generation id.
+ *
+ * refs specs/001-foundation (FIT-01, FIT-02, FIT-04, VEH-01, VEH-03, SCF-04)
  */
-
-/** The message every seam throw starts with, asserted by the canary. */
-export const SEAM_NOT_IMPLEMENTED = "not implemented: T203";
-
-function seam(symbol: string): Error {
-  return new Error(
-    `${SEAM_NOT_IMPLEMENTED} — ${symbol} is a T202 seam stub in ` +
-      `src/lib/fitment/index.ts; implement it in T203 ` +
-      `(refs specs/001-foundation)`
-  );
-}
+/*
+ * The `.ts` extension is deliberate and is repeated along this module's whole
+ * import chain (`src/schemas/vehicles.ts`, `src/schemas/entry.ts`,
+ * `src/i18n/routing.ts`). FIT-02's build hook reaches this module through a
+ * dynamic import that Astro hands to **Node's** ESM resolver rather than to
+ * Vite's, and Node does not guess extensions — see the note on
+ * `validateFitments` in `astro.config.mjs`. Extensions cost nothing under Vite
+ * or Vitest and buy the module chain the property of loading under plain
+ * `node` as well.
+ */
+import {
+  DRIVE_TYPES,
+  GENERATION_IDS,
+  MARKETS,
+  VEHICLE_KINDS,
+  type VehicleKind,
+} from "../../schemas/vehicles.ts";
 
 /* -------------------------------------------------------------------------
  * Types
@@ -68,9 +137,10 @@ function seam(symbol: string): Error {
 /**
  * The taxonomy index the resolver answers questions against.
  *
- * Deliberately opaque: T202 grades *answers*, not the shape of the index, so
- * T203 is free to choose it. Declared as an interface with no required member
- * so any concrete index is assignable.
+ * Opaque by design (T202 grades *answers*, not the index's shape): the real
+ * index is stashed under one private key so callers cannot reach into it, and
+ * so passing something that is not a `buildTaxonomy` result fails with a
+ * sentence instead of `undefined`.
  */
 export interface Taxonomy {
   readonly [key: string]: unknown;
@@ -80,10 +150,9 @@ export interface Taxonomy {
  * One vehicle a reader could be looking at.
  *
  * `gen`, `market`, `year` and `engine` are required because FIT-03 fixes
- * exactly that quadruple as a selection ("WHEN a visitor selects a vehicle
- * (gen + market + year + engine)"). The rest are optional: the spec's fitment
- * shape can restrict them, but nothing in phase 2 says a *selection* must
- * state them.
+ * exactly that quadruple as a selection. The rest are optional, and an omitted
+ * one is treated as unrestricted rather than as a mismatch — decision (a) in
+ * the module docstring.
  */
 export interface VehicleSelection {
   readonly gen: string;
@@ -93,6 +162,11 @@ export interface VehicleSelection {
   readonly transmission?: string;
   readonly transferCase?: string;
   readonly trim?: string;
+  /**
+   * `2wd` / `4wd` — `DRIVE_TYPES`. Optional like the other extra facets;
+   * added under the owner's 2026-08-30 drive ruling.
+   */
+  readonly drive?: string;
 }
 
 /**
@@ -104,10 +178,22 @@ export interface VehicleSelection {
  */
 export type CombinationVerdict = "existed" | "impossible" | "unknown";
 
-/** The two failure classes FIT-02 names, in FIT-02's order. */
+/**
+ * Every way a declared fitment can fail to resolve.
+ *
+ * FIT-02 names the first two ("a reference to a nonexistent ID or an
+ * impossible combination"). The third is the T202 review's adopted advisory,
+ * ratified on tasks.md's T203 line: a fitment whose year window is **disjoint**
+ * from every recorded production span of the generations it names cannot
+ * describe a vehicle that was ever built, and that is a typo in the content
+ * rather than a gap in the data. Partial overlap is *not* an error (that is
+ * gaps-report material, GAP-01), and `production.to: null` means the span is
+ * open at the cited source, so it can never make a window disjoint.
+ */
 export const FITMENT_ISSUE_CODES = [
   "unknown-id",
   "impossible-combination",
+  "year-outside-production",
 ] as const;
 
 export type FitmentIssueCode = (typeof FITMENT_ISSUE_CODES)[number];
@@ -117,8 +203,7 @@ export type FitmentIssueCode = (typeof FITMENT_ISSUE_CODES)[number];
  *
  * `path` is relative to the entry (`["fitment", "engines", 0]`) so the build
  * error names the field and not just the entry — SCF-04 ("names the file and
- * the field"), which the entry schema already honours and the resolver must
- * not regress.
+ * the field").
  */
 export interface FitmentIssue {
   readonly code: FitmentIssueCode;
@@ -129,19 +214,331 @@ export interface FitmentIssue {
 }
 
 /* -------------------------------------------------------------------------
+ * Facets — the one table every rule in this module is driven from
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The taxonomy-backed facets of a fitment: which field names them, which
+ * `kind` of entry their ids must resolve against, and which field of a
+ * `VehicleSelection` they are compared with.
+ *
+ * A table rather than six near-identical branches, because the failure this
+ * guards against is *asymmetry*: a facet that is validated but not matched
+ * (or matched but not validated) is exactly the drift FIT-02 and FIT-04 would
+ * otherwise disagree about, and no single grader would see it.
+ */
+const TAXONOMY_FACETS = [
+  { field: "gens", kind: "generation", select: "gen" },
+  { field: "markets", kind: "market", select: "market" },
+  { field: "engines", kind: "engine", select: "engine" },
+  { field: "transmissions", kind: "transmission", select: "transmission" },
+  { field: "transferCases", kind: "transfer-case", select: "transferCase" },
+  { field: "trims", kind: "trim", select: "trim" },
+] as const satisfies readonly {
+  field: string;
+  kind: VehicleKind;
+  select: keyof VehicleSelection;
+}[];
+
+/**
+ * Facets compared directly against a selection field, with `gens` and `years`
+ * left out because they have their own rules (generation expansion and the
+ * year window). `drive` joins them here rather than in `TAXONOMY_FACETS`
+ * because its vocabulary is a constant, not a set of taxonomy entries.
+ */
+const DIRECT_MATCH_FACETS = [
+  { field: "markets", select: "market" },
+  { field: "engines", select: "engine" },
+  { field: "transmissions", select: "transmission" },
+  { field: "transferCases", select: "transferCase" },
+  { field: "trims", select: "trim" },
+  { field: "drive", select: "drive" },
+] as const satisfies readonly {
+  field: string;
+  select: keyof VehicleSelection;
+}[];
+
+/** Every fitment field this module reads, for the parser below. */
+const ID_LIST_FIELDS = [
+  ...TAXONOMY_FACETS.map((facet) => facet.field),
+  "drive",
+] as const;
+
+/* -------------------------------------------------------------------------
+ * The index
+ * ---------------------------------------------------------------------- */
+
+/**
+ * `production` / `years` as recorded. `to: null` is "open at the time of the
+ * cited source" and is read as unbounded, never as an end year.
+ */
+interface YearSpan {
+  readonly from: number;
+  readonly to: number | null;
+}
+
+/** A half-open-capable year window; `±Infinity` stands for "unstated". */
+interface YearWindow {
+  readonly from: number;
+  readonly to: number;
+}
+
+const UNBOUNDED: YearWindow = { from: -Infinity, to: Infinity };
+
+interface GenerationNode {
+  readonly id: string;
+  readonly production: YearSpan | null;
+  readonly parentGeneration: string | null;
+}
+
+interface OfferingRecord {
+  readonly years: YearSpan;
+  readonly engine: string;
+  readonly transmission: string;
+  readonly transferCase: string;
+  /** `null` = "not recorded at trim granularity" (VEH-03 rule 4). */
+  readonly trims: readonly string[] | null;
+}
+
+interface CombinationNode {
+  readonly id: string;
+  readonly generation: string;
+  readonly market: string;
+  readonly coverage: "complete" | "partial";
+  readonly offerings: readonly OfferingRecord[];
+}
+
+/**
+ * Written as a `type` and not an `interface` on purpose: TypeScript only gives
+ * *type aliases* of object literals an implicit index signature, so this is
+ * what makes the index assignable to the deliberately-opaque `Taxonomy`.
+ */
+type FitmentIndex = {
+  readonly idsByKind: ReadonlyMap<VehicleKind, ReadonlySet<string>>;
+  readonly generations: ReadonlyMap<string, GenerationNode>;
+  readonly childGenerations: ReadonlyMap<string, readonly string[]>;
+  /** Keyed `${generation}|${market}`; a scope may have several entries. */
+  readonly combinations: ReadonlyMap<string, readonly CombinationNode[]>;
+};
+
+/**
+ * The one key a `Taxonomy` carries. Long and prefixed so nothing that is not a
+ * `buildTaxonomy` result can collide with it by accident.
+ */
+const INDEX_KEY = "@@montero/fitment-index";
+
+/** Marks a real index, so `indexOf` can tell one from an arbitrary object. */
+const INDEX_BRAND = Symbol.for("montero.fitment.index");
+
+type BrandedIndex = FitmentIndex & { readonly [INDEX_BRAND]: true };
+
+function indexOf(taxonomy: Taxonomy): FitmentIndex {
+  const candidate =
+    typeof taxonomy === "object" && taxonomy !== null
+      ? (taxonomy as Record<string, unknown>)[INDEX_KEY]
+      : undefined;
+
+  if (
+    typeof candidate === "object" &&
+    candidate !== null &&
+    (candidate as Partial<BrandedIndex>)[INDEX_BRAND] === true
+  ) {
+    return candidate as FitmentIndex;
+  }
+
+  throw new TypeError(
+    `this is not a taxonomy: pass the value \`buildTaxonomy(entries)\` ` +
+      `returned. The fitment engine answers questions against an index it ` +
+      `builds once (FIT-01, src/lib/fitment/). refs specs/001-foundation`
+  );
+}
+
+/* -------------------------------------------------------------------------
+ * Reading loosely-typed entries
+ *
+ * Every public function takes `unknown`, because the graders (and the build)
+ * feed it entry objects read off disk. Nothing here throws on a malformed
+ * entry: the *schemas* own "is this a legal entry", and this module owns "does
+ * a legal entry resolve". An object it cannot read is simply not a taxonomy
+ * node and not a fitment.
+ * ---------------------------------------------------------------------- */
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function asString(value: unknown): string | null {
+  return typeof value === "string" ? value : null;
+}
+
+function asStringList(value: unknown): readonly string[] | null {
+  if (!Array.isArray(value)) return null;
+  const out: string[] = [];
+  for (const item of value) {
+    if (typeof item !== "string") return null;
+    out.push(item);
+  }
+  return out;
+}
+
+function asYearSpan(value: unknown): YearSpan | null {
+  const record = asRecord(value);
+  if (record === null) return null;
+  const { from, to } = record;
+  if (typeof from !== "number" || !Number.isFinite(from)) return null;
+  if (to === null || to === undefined) return { from, to: null };
+  if (typeof to !== "number" || !Number.isFinite(to)) return null;
+  return { from, to };
+}
+
+function asOffering(value: unknown): OfferingRecord | null {
+  const record = asRecord(value);
+  if (record === null) return null;
+  const years = asYearSpan(record["years"]);
+  const engine = asString(record["engine"]);
+  const transmission = asString(record["transmission"]);
+  const transferCase = asString(record["transferCase"]);
+  if (
+    years === null ||
+    engine === null ||
+    transmission === null ||
+    transferCase === null
+  ) {
+    return null;
+  }
+  return {
+    years,
+    engine,
+    transmission,
+    transferCase,
+    trims: asStringList(record["trims"]),
+  };
+}
+
+/* -------------------------------------------------------------------------
  * Building the index
  * ---------------------------------------------------------------------- */
 
 /**
  * Builds the resolver's index from the parsed `vehicles` collection.
  *
- * Takes `unknown[]` on purpose: the graders feed it real entry objects read
- * off disk, and T203 is free to narrow the parameter to its own entry type
- * without a test-file edit.
+ * Takes `unknown[]` on purpose: the graders and the build both feed it entry
+ * objects read off disk. The result is independent of the order the entries
+ * arrive in — every lookup below is by key or by a sort with a total order,
+ * which is what makes FIT-04's determinism requirement structural rather than
+ * a promise.
  */
 export function buildTaxonomy(entries: readonly unknown[]): Taxonomy {
-  void entries;
-  throw seam("buildTaxonomy");
+  const idsByKind = new Map<VehicleKind, Set<string>>(
+    VEHICLE_KINDS.map((kind) => [kind, new Set<string>()])
+  );
+  const generations = new Map<string, GenerationNode>();
+  const combinations = new Map<string, CombinationNode[]>();
+
+  for (const entry of entries) {
+    const record = asRecord(entry);
+    if (record === null) continue;
+
+    const id = asString(record["id"]);
+    const kind = asString(record["kind"]);
+    if (id === null || kind === null) continue;
+    if (!(VEHICLE_KINDS as readonly string[]).includes(kind)) continue;
+
+    idsByKind.get(kind as VehicleKind)?.add(id);
+
+    if (kind === "generation") {
+      generations.set(id, {
+        id,
+        production: asYearSpan(record["production"]),
+        parentGeneration: asString(record["parentGeneration"]),
+      });
+      continue;
+    }
+
+    if (kind !== "combination") continue;
+
+    const generation = asString(record["generation"]);
+    const market = asString(record["market"]);
+    const coverage = asString(record["coverage"]);
+    if (generation === null || market === null) continue;
+
+    const offerings = (
+      Array.isArray(record["offerings"]) ? record["offerings"] : []
+    )
+      .map(asOffering)
+      .filter((offering): offering is OfferingRecord => offering !== null);
+
+    const node: CombinationNode = {
+      id,
+      generation,
+      market,
+      // Anything that is not an explicit `complete` is treated as `partial`.
+      // The schema requires the field, so this branch is unreachable through
+      // real content; it fails towards `unknown`, which is the direction
+      // VEH-03 says to fail in.
+      coverage: coverage === "complete" ? "complete" : "partial",
+      offerings,
+    };
+
+    const key = scopeKey(generation, market);
+    const existing = combinations.get(key);
+    if (existing === undefined) combinations.set(key, [node]);
+    else existing.push(node);
+  }
+
+  // Sorted so a scope's entries are in a stable order whatever order the
+  // collection was read in — the `shuffled()` determinism graders.
+  for (const nodes of combinations.values()) {
+    nodes.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  }
+
+  const childGenerations = new Map<string, string[]>();
+  for (const generation of sortedGenerations([...generations.values()])) {
+    const parent = generation.parentGeneration;
+    if (parent === null || parent === generation.id) continue;
+    const siblings = childGenerations.get(parent);
+    if (siblings === undefined) childGenerations.set(parent, [generation.id]);
+    else siblings.push(generation.id);
+  }
+
+  const index: BrandedIndex = {
+    [INDEX_BRAND]: true,
+    idsByKind,
+    generations,
+    childGenerations,
+    combinations,
+  };
+
+  return { [INDEX_KEY]: index };
+}
+
+function scopeKey(generation: string, market: string): string {
+  return `${generation}|${market}`;
+}
+
+/**
+ * Generation ids in `GENERATION_IDS` order, with anything unrecognised sorted
+ * after them alphabetically. A total order, so every list this module returns
+ * is stable.
+ */
+function sortedGenerations<T extends { readonly id: string }>(
+  nodes: readonly T[]
+): T[] {
+  const rank = (id: string) => {
+    const at = (GENERATION_IDS as readonly string[]).indexOf(id);
+    return at === -1 ? GENERATION_IDS.length : at;
+  };
+  return [...nodes].sort((a, b) => {
+    const byRank = rank(a.id) - rank(b.id);
+    if (byRank !== 0) return byRank;
+    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  });
+}
+
+function sortGenerationIds(ids: readonly string[]): string[] {
+  return sortedGenerations(ids.map((id) => ({ id }))).map((node) => node.id);
 }
 
 /* -------------------------------------------------------------------------
@@ -157,30 +554,73 @@ export function buildTaxonomy(entries: readonly unknown[]): Taxonomy {
  * resolver (T203) is what expands `gens: ["gen2"]` to its children."
  * Containment is one-directional: a fact scoped to the facelift is not a fact
  * about the whole of Gen 2.
+ *
+ * An id with no entry expands to itself. That is not a silent pass — an
+ * unknown generation id is a build error under `validateEntryFitments`, and
+ * making it vanish here would turn a typo into "matches nothing", which is the
+ * exact failure FIT-02 exists to catch.
  */
 export function expandGenerations(
   gens: readonly string[],
   taxonomy: Taxonomy
 ): readonly string[] {
-  void gens;
-  void taxonomy;
-  throw seam("expandGenerations");
+  return expandGenerationIds(gens, indexOf(taxonomy));
+}
+
+function expandGenerationIds(
+  gens: readonly string[],
+  index: FitmentIndex
+): readonly string[] {
+  const found = new Set<string>();
+  const pending = [...gens];
+
+  // Breadth-first with a `seen` set, so a malformed cycle in the content
+  // (`a` -> `b` -> `a`) terminates instead of hanging the build.
+  while (pending.length > 0) {
+    const id = pending.shift();
+    if (id === undefined || found.has(id)) continue;
+    found.add(id);
+    for (const child of index.childGenerations.get(id) ?? []) {
+      if (!found.has(child)) pending.push(child);
+    }
+  }
+
+  return sortGenerationIds([...found]);
 }
 
 /**
- * Every generation whose production span contains `year`, per the
- * `production` range on each generation entry.
+ * Every generation whose recorded production span contains `year`.
  *
  * FIT-04 names the hard case this exists for: "a 1999 vehicle matching both
  * Gen 2.5 and Gen 3 where production overlapped".
+ *
+ * **JDM-scoped by contract** (conductor ruling, 2026-08-30): T201 recorded the
+ * `production` spans from Japanese-market sources deliberately, and `gen2`'s
+ * fact-checked prose says so. This function answers from those spans and makes
+ * no claim about when a generation was on sale in the US or in Costa Rica.
+ * Per-market spans are a gaps-report item (GAP-01); when they land, they land
+ * as data and this function reads them.
  */
 export function generationsInProduction(
   year: number,
   taxonomy: Taxonomy
 ): readonly string[] {
-  void year;
-  void taxonomy;
-  throw seam("generationsInProduction");
+  const index = indexOf(taxonomy);
+  const inProduction = [...index.generations.values()].filter((generation) => {
+    const { production } = generation;
+    if (production === null) return false;
+    return spanContains(production, year);
+  });
+  return sortedGenerations(inProduction).map((generation) => generation.id);
+}
+
+/** Both ends inclusive; `to: null` is open-ended, never an end year. */
+function spanContains(span: YearSpan, year: number): boolean {
+  return year >= span.from && year <= (span.to ?? Infinity);
+}
+
+function spanOverlapsWindow(span: YearSpan, window: YearWindow): boolean {
+  return span.from <= window.to && (span.to ?? Infinity) >= window.from;
 }
 
 /* -------------------------------------------------------------------------
@@ -205,39 +645,188 @@ export function generationsInProduction(
  * The asymmetry is deliberate and is graded: "a wrong *impossible* silently
  * hides a real vehicle from a reader who owns it, while a wrong *unknown* only
  * fails to catch a typo."
+ *
+ * Two consequences of that asymmetry, decided here:
+ *
+ * - A facet the selection omits (`transmission`, `transferCase`, `trim`) is a
+ *   question that was not asked, so it constrains nothing — asking about a
+ *   2002 US 6G74 with no gearbox named is asking "did *any* such truck exist".
+ * - A scope covered by several combination entries is closed only if **every**
+ *   one of them says `complete`. One `partial` entry in the scope means the
+ *   offering list is admittedly unfinished, and an unfinished list cannot
+ *   support "never existed".
+ *
+ * **Combination scoping is exact** — `parentGeneration` is not followed here.
+ * See decision (b) in the module docstring for why.
  */
 export function classifyCombination(
   selection: VehicleSelection,
   taxonomy: Taxonomy
 ): CombinationVerdict {
-  void selection;
-  void taxonomy;
-  throw seam("classifyCombination");
+  return classifyScope(indexOf(taxonomy), {
+    generation: selection.gen,
+    market: selection.market,
+    window: { from: selection.year, to: selection.year },
+    engines: selection.engine === undefined ? null : [selection.engine],
+    transmissions:
+      selection.transmission === undefined ? null : [selection.transmission],
+    transferCases:
+      selection.transferCase === undefined ? null : [selection.transferCase],
+    trims: selection.trim === undefined ? null : [selection.trim],
+  });
+}
+
+/**
+ * One combination question. Every `null` is a wildcard ("not asked"), and a
+ * list is a set of acceptable values — which is what lets the single-vehicle
+ * question and the whole-fitment question (ruling 5, existential
+ * impossibility) share one implementation and therefore one set of rules.
+ */
+interface ScopeQuery {
+  readonly generation: string;
+  readonly market: string;
+  readonly window: YearWindow;
+  readonly engines: readonly string[] | null;
+  readonly transmissions: readonly string[] | null;
+  readonly transferCases: readonly string[] | null;
+  readonly trims: readonly string[] | null;
+}
+
+function classifyScope(
+  index: FitmentIndex,
+  query: ScopeQuery
+): CombinationVerdict {
+  const entries =
+    index.combinations.get(scopeKey(query.generation, query.market)) ?? [];
+
+  // Rule 3 — nobody has written this scope up.
+  if (entries.length === 0) return "unknown";
+
+  const matching = entries.flatMap((entry) =>
+    entry.offerings.filter(
+      (offering) =>
+        accepts(query.engines, offering.engine) &&
+        accepts(query.transmissions, offering.transmission) &&
+        accepts(query.transferCases, offering.transferCase) &&
+        spanOverlapsWindow(offering.years, query.window)
+    )
+  );
+
+  if (matching.length === 0) {
+    // Rules 1 and 2 — only a wholly closed scope licenses "never existed".
+    return entries.every((entry) => entry.coverage === "complete")
+      ? "impossible"
+      : "unknown";
+  }
+
+  // Rule 4 — `trims` is an assertion about what is listed and closes nothing.
+  if (query.trims === null) return "existed";
+  const trimmed = matching.some(
+    (offering) =>
+      offering.trims !== null &&
+      offering.trims.some((trim) => query.trims?.includes(trim))
+  );
+  return trimmed ? "existed" : "unknown";
+}
+
+/** `null` asks nothing and therefore accepts everything. */
+function accepts(allowed: readonly string[] | null, value: string): boolean {
+  return allowed === null || allowed.includes(value);
 }
 
 /* -------------------------------------------------------------------------
  * FIT-04 — does entry E apply to vehicle V?
  * ---------------------------------------------------------------------- */
 
+/** A fitment as this module reads it; every facet absent means "unrestricted". */
+interface FitmentQuery {
+  readonly gens: readonly string[];
+  readonly years: YearWindow | null;
+  readonly facets: ReadonlyMap<string, readonly string[]>;
+}
+
+/**
+ * Reads a fitment object. Returns `null` when there is nothing resolvable —
+ * no object, or no `gens`. `gens` is required by `fitmentSchema` ("at least
+ * one generation: 'it's a Montero thing' is not a fitment"), so an entry
+ * without it names no vehicles and matches none.
+ */
+function readFitment(fitment: unknown): FitmentQuery | null {
+  const record = asRecord(fitment);
+  if (record === null) return null;
+
+  const gens = asStringList(record["gens"]);
+  if (gens === null) return null;
+
+  const facets = new Map<string, readonly string[]>();
+  for (const field of ID_LIST_FIELDS) {
+    if (field === "gens") continue;
+    if (record[field] === undefined) continue;
+    const values = asStringList(record[field]);
+    // A present-but-unreadable facet is a schema failure, not a match: it is
+    // read as a restriction nothing satisfies rather than silently dropped.
+    facets.set(field, values ?? []);
+  }
+
+  return { gens, years: readYearWindow(record["years"]), facets };
+}
+
+/**
+ * A fitment's `years`. Either end may be absent, and an absent end is
+ * unbounded — `{ from: 1999 }` is "1999 onwards". An empty or absent object is
+ * no window at all.
+ */
+function readYearWindow(value: unknown): YearWindow | null {
+  if (value === undefined || value === null) return null;
+  const record = asRecord(value);
+  if (record === null) return null;
+  const { from, to } = record;
+  const hasFrom = typeof from === "number" && Number.isFinite(from);
+  const hasTo = typeof to === "number" && Number.isFinite(to);
+  if (!hasFrom && !hasTo) return null;
+  return {
+    from: hasFrom ? (from as number) : -Infinity,
+    to: hasTo ? (to as number) : Infinity,
+  };
+}
+
 /**
  * Resolves a fitment query against one vehicle. Pure and deterministic: the
- * same `(fitment, vehicle, taxonomy)` always yields the same answer, and the
- * answer does not depend on the order entries were indexed in.
+ * same `(fitment, vehicle, taxonomy)` always yields the same answer, the answer
+ * does not depend on the order entries were indexed in, and neither argument is
+ * mutated.
  *
- * An omitted facet is no restriction — `src/schemas/vehicles.ts`:
- * "`fitment.markets` is optional in the base fitment shape, where omitting it
- * correctly means 'no market restriction' — a torque figure applies in every
- * market."
+ * An omitted *fitment* facet is no restriction. An omitted *selection* facet is
+ * a question the visitor has not answered, and is likewise not a restriction —
+ * decision (a) in the module docstring.
  */
 export function matchesVehicle(
   fitment: unknown,
   vehicle: VehicleSelection,
   taxonomy: Taxonomy
 ): boolean {
-  void fitment;
-  void vehicle;
-  void taxonomy;
-  throw seam("matchesVehicle");
+  const index = indexOf(taxonomy);
+  const query = readFitment(fitment);
+  if (query === null) return false;
+
+  if (!expandGenerationIds(query.gens, index).includes(vehicle.gen)) {
+    return false;
+  }
+
+  if (query.years !== null) {
+    if (vehicle.year < query.years.from) return false;
+    if (vehicle.year > query.years.to) return false;
+  }
+
+  for (const facet of DIRECT_MATCH_FACETS) {
+    const allowed = query.facets.get(facet.field);
+    if (allowed === undefined) continue; // the fitment does not restrict it
+    const selected = vehicle[facet.select];
+    if (selected === undefined) continue; // the selection does not state it
+    if (!allowed.includes(String(selected))) return false;
+  }
+
+  return true;
 }
 
 /**
@@ -250,10 +839,9 @@ export function entryAppliesTo(
   vehicle: VehicleSelection,
   taxonomy: Taxonomy
 ): boolean {
-  void entry;
-  void vehicle;
-  void taxonomy;
-  throw seam("entryAppliesTo");
+  const record = asRecord(entry);
+  if (record === null) return false;
+  return matchesVehicle(record["fitment"], vehicle, taxonomy);
 }
 
 /* -------------------------------------------------------------------------
@@ -266,28 +854,266 @@ export function entryAppliesTo(
  *
  * Returned rather than thrown so one build reports every bad fitment instead
  * of the first — the same choice `validateSlugRegistry` makes.
+ *
+ * The three checks are staged, and the staging is deliberate: a fitment with
+ * an unknown id gets *only* the `unknown-id` issues. Asking "was this
+ * combination possible" about a `gen9` is asking a question with no answer,
+ * and reporting a second, derived failure alongside the real one sends the
+ * author chasing a symptom.
  */
 export function validateEntryFitments(
   entries: readonly unknown[],
   taxonomy: Taxonomy
 ): readonly FitmentIssue[] {
-  void entries;
-  void taxonomy;
-  throw seam("validateEntryFitments");
+  const index = indexOf(taxonomy);
+  const issues: FitmentIssue[] = [];
+
+  for (const entry of entries) {
+    const record = asRecord(entry);
+    if (record === null) continue;
+    if (record["fitment"] === undefined) continue;
+
+    const entryId = asString(record["id"]) ?? "(entry with no id)";
+    const query = readFitment(record["fitment"]);
+    if (query === null) continue; // shape is the schema's business, not ours
+
+    const unknownIds = collectUnknownIds(entryId, record["fitment"], index);
+    issues.push(...unknownIds);
+    if (unknownIds.length > 0) continue;
+
+    const gens = expandGenerationIds(query.gens, index);
+
+    const outsideProduction = checkYearWindow(entryId, query, gens, index);
+    if (outsideProduction !== null) {
+      issues.push(outsideProduction);
+      continue;
+    }
+
+    const impossible = checkCombination(entryId, query, gens, index);
+    if (impossible !== null) issues.push(impossible);
+  }
+
+  return issues;
+}
+
+/**
+ * FIT-02's first failure class. Ids resolve **by kind** —
+ * `src/schemas/vehicles.ts`: "References between taxonomy nodes are
+ * `(kind, id)` pairs … so an id need only be unique within its kind" — which
+ * is why a real trim id in `transferCases` is as wrong as an invented one.
+ *
+ * Read from the raw fitment rather than from the parsed `FitmentQuery` so the
+ * reported index is the author's own array index (SCF-04).
+ */
+function collectUnknownIds(
+  entryId: string,
+  fitment: unknown,
+  index: FitmentIndex
+): FitmentIssue[] {
+  const record = asRecord(fitment);
+  if (record === null) return [];
+  const issues: FitmentIssue[] = [];
+
+  for (const facet of TAXONOMY_FACETS) {
+    const values = asStringList(record[facet.field]);
+    if (values === null) continue;
+    const known = index.idsByKind.get(facet.kind) ?? new Set<string>();
+    values.forEach((value, at) => {
+      if (known.has(value)) return;
+      issues.push({
+        code: "unknown-id",
+        entryId,
+        path: ["fitment", facet.field, at],
+        message:
+          `\`${value}\` is not the id of a \`${facet.kind}\` entry in the ` +
+          `vehicle taxonomy, so this fitment names a vehicle the site has no ` +
+          `vocabulary for. Fitment ids resolve against their own kind ` +
+          `(VEH-01); add the taxonomy entry or fix the id. ` +
+          `refs specs/001-foundation (FIT-02)`,
+      });
+    });
+  }
+
+  // `drive` is the one facet whose vocabulary is a constant rather than a set
+  // of entries (owner ruling, 2026-08-30), but a value outside it is the same
+  // failure: an id that resolves against nothing.
+  const drive = asStringList(record["drive"]);
+  if (drive !== null) {
+    drive.forEach((value, at) => {
+      if ((DRIVE_TYPES as readonly string[]).includes(value)) return;
+      issues.push({
+        code: "unknown-id",
+        entryId,
+        path: ["fitment", "drive", at],
+        message:
+          `\`${value}\` is not a drive type: \`fitment.drive\` resolves ` +
+          `against the closed vocabulary ` +
+          `${DRIVE_TYPES.map((type) => `\`${type}\``).join(" / ")} ` +
+          `(owner ruling 2026-08-30, \`DRIVE_TYPES\` in ` +
+          `src/schemas/vehicles.ts). refs specs/001-foundation (FIT-02)`,
+      });
+    });
+  }
+
+  return issues;
+}
+
+/**
+ * The third issue code, adopted from the T202 review's advisory and ratified
+ * on tasks.md's T203 line.
+ *
+ * A fitment year window **disjoint** from every recorded production span of
+ * the generations it names describes no vehicle that was ever built — a
+ * transposed digit, not a gap. Three things this deliberately does not do:
+ *
+ * - **Partial overlap is not an error.** A `gen3` fitment for 1998–2002 is
+ *   half outside the recorded span; that is a content question for the gaps
+ *   report (GAP-01), not a build break, because the recorded span is JDM and
+ *   another market's may legitimately differ.
+ * - **`production.to: null` never makes a window disjoint** — an open span is
+ *   open, and reading it as an end year would invent one.
+ * - **A generation with no recorded span is skipped**, not treated as empty:
+ *   absence of data is not evidence of absence, the same reading VEH-03 rule 3
+ *   takes.
+ */
+function checkYearWindow(
+  entryId: string,
+  query: FitmentQuery,
+  gens: readonly string[],
+  index: FitmentIndex
+): FitmentIssue | null {
+  const window = query.years;
+  if (window === null) return null;
+
+  const spans = gens.flatMap((gen) => {
+    const production = index.generations.get(gen)?.production;
+    return production === undefined || production === null ? [] : [production];
+  });
+  if (spans.length === 0) return null;
+
+  if (spans.some((span) => spanOverlapsWindow(span, window))) return null;
+
+  return {
+    code: "year-outside-production",
+    entryId,
+    path: ["fitment", "years"],
+    message:
+      `this fitment's year window (${describeWindow(window)}) does not ` +
+      `overlap the recorded production of ${gens.map((gen) => `\`${gen}\``).join(", ")} ` +
+      `(${spans.map(describeSpan).join(", ")}), so it names no vehicle that ` +
+      `was ever built. Those spans are the JDM spans by contract (conductor ` +
+      `ruling 2026-08-30); a window that merely *overlaps* them is fine and ` +
+      `is gaps-report material, but a disjoint one is a typo. ` +
+      `refs specs/001-foundation (FIT-02)`,
+  };
+}
+
+function describeWindow(window: YearWindow): string {
+  const from = window.from === -Infinity ? "…" : String(window.from);
+  const to = window.to === Infinity ? "…" : String(window.to);
+  return `${from}–${to}`;
+}
+
+function describeSpan(span: YearSpan): string {
+  return `${span.from}–${span.to ?? "open"}`;
+}
+
+/**
+ * FIT-02's second failure class, under the **existential** reading ratified in
+ * the T202 review (2026-08-30): a fitment is a query over a set of vehicles,
+ * so it is impossible only when *nothing* it names could have existed. One
+ * surviving candidate scope is an accept.
+ *
+ * Every scope is interrogated with its own exact generation id — the fitment's
+ * `gens` are expanded to choose *which* scopes to ask (a `gens: ["gen2"]`
+ * fitment genuinely names `gen2-5` trucks), but no scope ever answers on
+ * another's behalf. Decision (b) in the module docstring.
+ */
+function checkCombination(
+  entryId: string,
+  query: FitmentQuery,
+  gens: readonly string[],
+  index: FitmentIndex
+): FitmentIssue | null {
+  const markets = query.facets.get("markets") ?? MARKETS;
+  const window = query.years ?? UNBOUNDED;
+
+  const scopes: string[] = [];
+  for (const generation of gens) {
+    for (const market of markets) {
+      const verdict = classifyScope(index, {
+        generation,
+        market,
+        window,
+        engines: query.facets.get("engines") ?? null,
+        transmissions: query.facets.get("transmissions") ?? null,
+        transferCases: query.facets.get("transferCases") ?? null,
+        trims: query.facets.get("trims") ?? null,
+      });
+      // Anything other than a flat "never existed" keeps the fitment alive.
+      if (verdict !== "impossible") return null;
+      scopes.push(`${generation} × ${market}`);
+    }
+  }
+
+  if (scopes.length === 0) return null;
+
+  return {
+    code: "impossible-combination",
+    entryId,
+    path: ["fitment"],
+    message:
+      `every vehicle this fitment names is a combination the taxonomy says ` +
+      `never existed (${scopes.join(", ")}): each of those scopes has a ` +
+      `\`coverage: "complete"\` combination entry and none of them lists a ` +
+      `powertrain this fitment allows (VEH-03 rule 1). A fitment is only ` +
+      `impossible when nothing it names could have existed, so one correct ` +
+      `id is enough to fix it. refs specs/001-foundation (FIT-02)`,
+  };
+}
+
+/**
+ * What `assertFitmentsResolve` throws.
+ *
+ * Carries the structured `issues` as well as the rendered message, so a caller
+ * that knows something the resolver does not — the build integration knows
+ * which *file* each entry id came from (SCF-04) — can add it without
+ * re-deriving the failures by grepping the message. An earlier draft did grep
+ * it, and matched the market entry `me` inside the word "names".
+ */
+export class FitmentResolutionError extends Error {
+  readonly issues: readonly FitmentIssue[];
+
+  constructor(issues: readonly FitmentIssue[], message: string) {
+    super(message);
+    this.name = "FitmentResolutionError";
+    this.issues = issues;
+  }
 }
 
 /**
  * The build path FIT-02 requires: throws when any entry's fitment fails to
- * resolve, with a message naming the entry and the offending field.
+ * resolve, with a message naming every offending entry and field.
  *
- * T203 owns wiring this into the build (`npm run build` / `npm run verify`) so
- * a bad fitment is a red build and not a warning nobody reads.
+ * Wired into the real build by `src/integrations/validate-fitments.ts`, so a
+ * bad fitment is a red `npm run build` and not a warning nobody reads.
  */
 export function assertFitmentsResolve(
   entries: readonly unknown[],
   taxonomy: Taxonomy
 ): void {
-  void entries;
-  void taxonomy;
-  throw seam("assertFitmentsResolve");
+  const issues = validateEntryFitments(entries, taxonomy);
+  if (issues.length === 0) return;
+
+  const lines = issues.map(
+    (issue) =>
+      `  • [${issue.code}] ${issue.entryId} at ` +
+      `${issue.path.map(String).join(".")}: ${issue.message}`
+  );
+
+  throw new FitmentResolutionError(
+    issues,
+    `${issues.length} fitment${issues.length === 1 ? "" : "s"} did not ` +
+      `resolve against the vehicle taxonomy (FIT-02):\n${lines.join("\n")}`
+  );
 }

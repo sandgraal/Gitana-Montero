@@ -31,7 +31,12 @@
  * refs specs/001-foundation (I18N-05, I18N-06, SCF-01, SCF-04)
  */
 import { z } from "astro/zod";
-import { LOCALES, type Locale } from "../i18n/routing";
+// `.ts` on purpose throughout: this module is on FIT-02's build-hook import
+// chain, which Node's ESM resolver walks directly. See `src/lib/fitment/index.ts`.
+import { LOCALES, type Locale } from "../i18n/routing.ts";
+// Cyclic by construction — see `driveListSchema` below for why that is safe
+// here and why the constant lives in `vehicles.ts` rather than in this module.
+import { DRIVE_TYPES } from "./vehicles.ts";
 
 /* -------------------------------------------------------------------------
  * Structural surface the graders read (see tests/helpers/schema-outcome.ts).
@@ -53,8 +58,8 @@ export interface SchemaIssue {
  * schemas do not (or the reverse) is exactly the drift I18N-01 forbids.
  * ---------------------------------------------------------------------- */
 
-export { LOCALES } from "../i18n/routing";
-export type { Locale } from "../i18n/routing";
+export { LOCALES } from "../i18n/routing.ts";
+export type { Locale } from "../i18n/routing.ts";
 
 export const localeSchema = z.enum(LOCALES);
 
@@ -220,11 +225,47 @@ export type Source = z.infer<typeof sourceSchema>;
  * Fitment placeholder — spec §2 "Fitment", AGENTS.md "explicit fitment"
  *
  * Shape only. Resolving gen / market / engine ids against the taxonomy, and
- * rejecting combinations that never existed, is FIT-02 — T203's contract, not
- * this one. Until then these are opaque id lists.
+ * rejecting combinations that never existed, is FIT-02 — `src/lib/fitment/`
+ * (T203), not this one. These are opaque id lists, with the one exception the
+ * owner ruled on below.
  * ---------------------------------------------------------------------- */
 
 const idListSchema = () => z.array(nonBlankString()).min(1);
+
+/**
+ * `drive` is the one fitment facet whose vocabulary is closed at the schema
+ * level (owner ruling, 2026-08-30 — see `DRIVE_TYPES` in
+ * `src/schemas/vehicles.ts`). Every other facet names a taxonomy *entry*,
+ * which only the resolver can see; `drive` names a value from a two-item
+ * constant, so a typo is catchable here and there is no reason to defer it.
+ *
+ * ## Why the membership test is inside a refinement and not `z.enum`
+ *
+ * `DRIVE_TYPES` lives in `src/schemas/vehicles.ts` (the ruling puts it with
+ * the other vehicle vocabularies), and that module imports `defineEntrySchema`
+ * from this one. The import cycle is real and unavoidable given where the
+ * constant was ruled to live. A `z.enum(DRIVE_TYPES)` would read the binding
+ * while *this* module's body evaluates, which under ESM cycle semantics is a
+ * temporal-dead-zone `ReferenceError` whenever `vehicles.ts` is the module
+ * entered first. Reading it inside the refinement defers the access to parse
+ * time, by which point both modules are fully evaluated. Same rule, same
+ * message; only the moment of the lookup moves.
+ */
+const driveListSchema = () =>
+  idListSchema().superRefine((values, ctx) => {
+    values.forEach((value, index) => {
+      if ((DRIVE_TYPES as readonly string[]).includes(value)) return;
+      ctx.addIssue({
+        code: "custom",
+        path: [index],
+        message:
+          `\`${value}\` is not a drive type: \`fitment.drive\` is the closed ` +
+          `vocabulary ${DRIVE_TYPES.map((type) => `\`${type}\``).join(" / ")} ` +
+          `(owner ruling 2026-08-30, \`DRIVE_TYPES\` in ` +
+          `src/schemas/vehicles.ts). refs specs/001-foundation`,
+      });
+    });
+  });
 
 export const fitmentSchema = z
   .object({
@@ -242,7 +283,7 @@ export const fitmentSchema = z
     transmissions: idListSchema().optional(),
     transferCases: idListSchema().optional(),
     trims: idListSchema().optional(),
-    drive: idListSchema().optional(),
+    drive: driveListSchema().optional(),
   })
   .strict();
 

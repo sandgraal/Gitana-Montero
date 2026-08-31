@@ -70,70 +70,67 @@ const GEN3_TRUCK: VehicleSelection = {
 };
 
 describe("expandGenerations follows parentGeneration downwards (VEH-01)", () => {
-  it.fails("expands `gen2` to itself and its facelift child", () => {
+  it("expands `gen2` to itself and its facelift child", () => {
     expect(expandedAt(["gen2"])).toEqual(["gen2", "gen2-5"]);
   });
 
-  it.fails("does not expand `gen2-5` upwards to its parent", () => {
+  it("does not expand `gen2-5` upwards to its parent", () => {
     expect(expandedAt(["gen2-5"])).toEqual(["gen2-5"]);
   });
 
-  it.fails.each<[string]>([["gen1"], ["gen3"], ["gen4"]])(
+  it.each<[string]>([["gen1"], ["gen3"], ["gen4"]])(
     "leaves %s alone — it has no children in the taxonomy",
     (gen) => {
       expect(expandedAt([gen])).toEqual([gen]);
     }
   );
 
-  it.fails("expands each id of a multi-generation fitment", () => {
+  it("expands each id of a multi-generation fitment", () => {
     expect(expandedAt(["gen2", "gen3"])).toEqual(["gen2", "gen2-5", "gen3"]);
   });
 
-  it.fails(
-    "returns each generation once when parent and child are both named",
-    () => {
-      expect(expandedAt(["gen2", "gen2-5"])).toEqual(["gen2", "gen2-5"]);
-    }
-  );
+  it("returns each generation once when parent and child are both named", () => {
+    expect(expandedAt(["gen2", "gen2-5"])).toEqual(["gen2", "gen2-5"]);
+  });
 
-  it.fails("returns nothing for an empty list", () => {
+  it("returns nothing for an empty list", () => {
     expect(expandedAt([])).toEqual([]);
   });
 });
 
 describe("the observable contract through matchesVehicle (FIT-04)", () => {
-  it.fails("a gen2-scoped entry applies to a gen2-5 vehicle", () => {
+  it("a gen2-scoped entry applies to a gen2-5 vehicle", () => {
     expect(
       matchesVehicle({ gens: ["gen2"] }, GEN25_TRUCK, realTaxonomy())
     ).toBe(true);
   });
 
-  it.fails("a gen2-5-scoped entry does NOT apply to a gen2 vehicle", () => {
+  it("a gen2-5-scoped entry does NOT apply to a gen2 vehicle", () => {
     expect(
       matchesVehicle({ gens: ["gen2-5"] }, GEN2_TRUCK, realTaxonomy())
     ).toBe(false);
   });
 
-  it.fails("a gen2-scoped entry still applies to a plain gen2 vehicle", () => {
+  it("a gen2-scoped entry still applies to a plain gen2 vehicle", () => {
     expect(matchesVehicle({ gens: ["gen2"] }, GEN2_TRUCK, realTaxonomy())).toBe(
       true
     );
   });
 
-  it.fails("a gen2-5-scoped entry applies to a gen2-5 vehicle", () => {
+  it("a gen2-5-scoped entry applies to a gen2-5 vehicle", () => {
     expect(
       matchesVehicle({ gens: ["gen2-5"] }, GEN25_TRUCK, realTaxonomy())
     ).toBe(true);
   });
 
-  it.fails.each<[string, string[]]>([
+  it.each<[string, string[]]>([
     ["gen2", ["gen2"]],
     ["gen2-5", ["gen2-5"]],
   ])("a %s-scoped entry never leaks onto a gen3 vehicle", (_label, gens) => {
     expect(matchesVehicle({ gens }, GEN3_TRUCK, realTaxonomy())).toBe(false);
   });
 
-  it.fails("expansion respects the other facets of the fitment", () => {
+  it("expansion respects the other facets of the fitment", () => {
     const taxonomy = realTaxonomy();
 
     // Inheriting the parent's generation must not inherit a market the entry

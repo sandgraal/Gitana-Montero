@@ -79,7 +79,7 @@ const listedInComplete: VehicleSelection = {
 };
 
 describe("rule 1 — absent from a `complete` entry is IMPOSSIBLE (VEH-03)", () => {
-  it.fails("rejects a powertrain the complete entry does not list", () => {
+  it("rejects a powertrain the complete entry does not list", () => {
     // Every id here exists in the taxonomy: this is a combination question,
     // not an unknown-id question (FIT-02 names those separately).
     expect(
@@ -90,34 +90,31 @@ describe("rule 1 — absent from a `complete` entry is IMPOSSIBLE (VEH-03)", () 
     ).toBe("impossible");
   });
 
-  it.fails(
-    "rejects a listed powertrain outside the years it was offered",
-    () => {
-      // The late-only offering runs 2003–2006; a 2002 example of it never left
-      // the factory, and `complete` is what licenses saying so.
-      expect(
-        classifyCombination(
-          {
-            gen: "gen3",
-            market: "us",
-            year: 2002,
-            engine: SYNTHETIC.engineLateOnly,
-            transmission: SYNTHETIC.gearboxListed,
-            transferCase: SYNTHETIC.transferCase,
-          },
-          syntheticTaxonomy()
-        )
-      ).toBe("impossible");
-    }
-  );
+  it("rejects a listed powertrain outside the years it was offered", () => {
+    // The late-only offering runs 2003–2006; a 2002 example of it never left
+    // the factory, and `complete` is what licenses saying so.
+    expect(
+      classifyCombination(
+        {
+          gen: "gen3",
+          market: "us",
+          year: 2002,
+          engine: SYNTHETIC.engineLateOnly,
+          transmission: SYNTHETIC.gearboxListed,
+          transferCase: SYNTHETIC.transferCase,
+        },
+        syntheticTaxonomy()
+      )
+    ).toBe("impossible");
+  });
 
-  it.fails("accepts the tuple the complete entry does list", () => {
+  it("accepts the tuple the complete entry does list", () => {
     expect(classifyCombination(listedInComplete, syntheticTaxonomy())).toBe(
       "existed"
     );
   });
 
-  it.fails("accepts the late-only tuple inside its own year range", () => {
+  it("accepts the late-only tuple inside its own year range", () => {
     expect(
       classifyCombination(
         {
@@ -135,7 +132,7 @@ describe("rule 1 — absent from a `complete` entry is IMPOSSIBLE (VEH-03)", () 
 });
 
 describe("rule 2 — absent from a `partial` entry is UNKNOWN (VEH-03)", () => {
-  it.fails("does not reject a powertrain the partial entry omits", () => {
+  it("does not reject a powertrain the partial entry omits", () => {
     const verdict = classifyCombination(
       {
         gen: "gen3",
@@ -152,7 +149,7 @@ describe("rule 2 — absent from a `partial` entry is UNKNOWN (VEH-03)", () => {
     expect(verdict).toBe("unknown");
   });
 
-  it.fails("accepts the tuple the partial entry does list", () => {
+  it("accepts the tuple the partial entry does list", () => {
     expect(
       classifyCombination(
         { ...listedInComplete, market: "cr" },
@@ -161,7 +158,7 @@ describe("rule 2 — absent from a `partial` entry is UNKNOWN (VEH-03)", () => {
     ).toBe("existed");
   });
 
-  it.fails("answers the same absent tuple differently by coverage", () => {
+  it("answers the same absent tuple differently by coverage", () => {
     const taxonomy = syntheticTaxonomy();
     const absent = {
       ...listedInComplete,
@@ -180,7 +177,7 @@ describe("rule 2 — absent from a `partial` entry is UNKNOWN (VEH-03)", () => {
 });
 
 describe("rule 3 — no combination entry at all is UNKNOWN (VEH-03)", () => {
-  it.fails.each<[string, string, string, number]>([
+  it.each<[string, string, string, number]>([
     ["gen2 × us, a scope nobody has written up", "gen2", "us", 1995],
     ["gen2 × cr, likewise", "gen2", "cr", 1995],
     ["gen2-5 × us, the facelift in an unwritten market", "gen2-5", "us", 1998],
@@ -201,61 +198,55 @@ describe("rule 3 — no combination entry at all is UNKNOWN (VEH-03)", () => {
     expect(verdict).toBe("unknown");
   });
 
-  it.fails(
-    "stays unknown even for a tuple another scope calls impossible",
-    () => {
-      const taxonomy = syntheticTaxonomy();
-      const tuple = {
-        engine: SYNTHETIC.engineListed,
-        transmission: SYNTHETIC.gearboxUnlisted,
-        transferCase: SYNTHETIC.transferCase,
-      };
+  it("stays unknown even for a tuple another scope calls impossible", () => {
+    const taxonomy = syntheticTaxonomy();
+    const tuple = {
+      engine: SYNTHETIC.engineListed,
+      transmission: SYNTHETIC.gearboxUnlisted,
+      transferCase: SYNTHETIC.transferCase,
+    };
 
-      // A closed world in one (generation, market) says nothing about another:
-      // completeness is scoped to the entry, not global.
-      expect(
-        classifyCombination(
-          { gen: "gen3", market: "us", year: 2002, ...tuple },
-          taxonomy
-        )
-      ).toBe("impossible");
-      expect(
-        classifyCombination(
-          { gen: "gen2", market: "us", year: 1995, ...tuple },
-          taxonomy
-        )
-      ).toBe("unknown");
-    }
-  );
+    // A closed world in one (generation, market) says nothing about another:
+    // completeness is scoped to the entry, not global.
+    expect(
+      classifyCombination(
+        { gen: "gen3", market: "us", year: 2002, ...tuple },
+        taxonomy
+      )
+    ).toBe("impossible");
+    expect(
+      classifyCombination(
+        { gen: "gen2", market: "us", year: 1995, ...tuple },
+        taxonomy
+      )
+    ).toBe("unknown");
+  });
 });
 
 describe("rule 4 — `trims` is never closed by `coverage` (VEH-03)", () => {
-  it.fails(
-    "a trim question against an offering with no `trims` is unknown",
-    () => {
-      // Offering B of the *complete* entry omits `trims`. "Unaffected by
-      // `coverage`, which is a claim about the offering list and not about any
-      // offering's internals" — so the strongest available answer is "not
-      // recorded".
-      const verdict = classifyCombination(
-        {
-          gen: "gen3",
-          market: "us",
-          year: 2004,
-          engine: SYNTHETIC.engineLateOnly,
-          transmission: SYNTHETIC.gearboxListed,
-          transferCase: SYNTHETIC.transferCase,
-          trim: SYNTHETIC.trimUnlisted,
-        },
-        syntheticTaxonomy()
-      );
+  it("a trim question against an offering with no `trims` is unknown", () => {
+    // Offering B of the *complete* entry omits `trims`. "Unaffected by
+    // `coverage`, which is a claim about the offering list and not about any
+    // offering's internals" — so the strongest available answer is "not
+    // recorded".
+    const verdict = classifyCombination(
+      {
+        gen: "gen3",
+        market: "us",
+        year: 2004,
+        engine: SYNTHETIC.engineLateOnly,
+        transmission: SYNTHETIC.gearboxListed,
+        transferCase: SYNTHETIC.transferCase,
+        trim: SYNTHETIC.trimUnlisted,
+      },
+      syntheticTaxonomy()
+    );
 
-      expect(verdict).not.toBe("impossible");
-      expect(verdict).toBe("unknown");
-    }
-  );
+    expect(verdict).not.toBe("impossible");
+    expect(verdict).toBe("unknown");
+  });
 
-  it.fails("a trim the offering does list existed", () => {
+  it("a trim the offering does list existed", () => {
     expect(
       classifyCombination(
         { ...listedInComplete, trim: SYNTHETIC.trimListed },
@@ -264,43 +255,37 @@ describe("rule 4 — `trims` is never closed by `coverage` (VEH-03)", () => {
     ).toBe("existed");
   });
 
-  it.fails(
-    "a trim absent from a listed `trims` is unknown, not impossible",
-    () => {
-      // Offering A lists exactly one trim, inside a `complete` entry. Listing
-      // trims asserts those trims existed; it does not close the list, and
-      // `coverage` does not close it either. So neither "existed" nor
-      // "impossible" is supported by the data.
-      const verdict = classifyCombination(
-        { ...listedInComplete, trim: SYNTHETIC.trimUnlisted },
-        syntheticTaxonomy()
-      );
+  it("a trim absent from a listed `trims` is unknown, not impossible", () => {
+    // Offering A lists exactly one trim, inside a `complete` entry. Listing
+    // trims asserts those trims existed; it does not close the list, and
+    // `coverage` does not close it either. So neither "existed" nor
+    // "impossible" is supported by the data.
+    const verdict = classifyCombination(
+      { ...listedInComplete, trim: SYNTHETIC.trimUnlisted },
+      syntheticTaxonomy()
+    );
 
-      expect(verdict).not.toBe("impossible");
-      expect(verdict).toBe("unknown");
-    }
-  );
+    expect(verdict).not.toBe("impossible");
+    expect(verdict).toBe("unknown");
+  });
 
-  it.fails(
-    "asking no trim question still answers the powertrain question",
-    () => {
-      // Positive control for the three above: dropping `trim` must not change
-      // the powertrain verdict in either direction.
-      const taxonomy = syntheticTaxonomy();
+  it("asking no trim question still answers the powertrain question", () => {
+    // Positive control for the three above: dropping `trim` must not change
+    // the powertrain verdict in either direction.
+    const taxonomy = syntheticTaxonomy();
 
-      expect(classifyCombination(listedInComplete, taxonomy)).toBe("existed");
-      expect(
-        classifyCombination(
-          { ...listedInComplete, transmission: SYNTHETIC.gearboxUnlisted },
-          taxonomy
-        )
-      ).toBe("impossible");
-    }
-  );
+    expect(classifyCombination(listedInComplete, taxonomy)).toBe("existed");
+    expect(
+      classifyCombination(
+        { ...listedInComplete, transmission: SYNTHETIC.gearboxUnlisted },
+        taxonomy
+      )
+    ).toBe("impossible");
+  });
 });
 
 describe("classifyCombination is deterministic (FIT-04)", () => {
-  it.fails("gives one answer per query, whatever the index order", () => {
+  it("gives one answer per query, whatever the index order", () => {
     const entries = makeSyntheticTaxonomyEntries();
 
     const verdicts = [3, 9, 21, 42].map((seed) =>
@@ -322,7 +307,7 @@ describe("classifyCombination is deterministic (FIT-04)", () => {
 describe("the same rules over T201's real taxonomy (VEH-03)", () => {
   const realTaxonomy = () => buildTaxonomy(readVehicleEntries());
 
-  it.fails("recognises a tuple `combos-gen3-us` really lists", () => {
+  it("recognises a tuple `combos-gen3-us` really lists", () => {
     // 2002 US Limited: 6G74 SOHC + 5-speed auto + Super Select II.
     expect(
       classifyCombination(
@@ -339,7 +324,7 @@ describe("the same rules over T201's real taxonomy (VEH-03)", () => {
     ).toBe("existed");
   });
 
-  it.fails.each<[string, PartialSelection]>([
+  it.each<[string, PartialSelection]>([
     [
       "a tuple absent from the partial gen3 × us entry",
       { gen: "gen3", market: "us", year: 2002, engine: "4m41" },
