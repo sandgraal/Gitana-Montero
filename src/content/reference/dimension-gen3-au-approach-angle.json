@@ -1,0 +1,36 @@
+{
+  "id": "dimension-gen3-au-approach-angle",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["au"],
+    "years": {
+      "from": 2003
+    }
+  },
+  "kind": "dimension",
+  "system": "general",
+  "dimension": {
+    "value": 39.0,
+    "unit": "deg"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors Australia — Limited Edition 21st Anniversary Pajero (NP) brochure, ©MMAL ABN 53 007 870 395, publication codes PAJERONP0309 / SEP'03 MMAL1624 — mirrored at xr793.com (Dezo's Garage)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Approach angle — Australian NP",
+      "summary": "The approach angle Mitsubishi Australia publishes for the NP Pajero, printed in the same ground-clearance block as the ramp breakover and departure angles and given as one figure for the GLX, GLS and Exceed grades. It matches the figure on the 2002 US sheet and is smaller than the one the general-export chassis manual gives, which is why all three are recorded separately by market."
+    },
+    "es": {
+      "title": "Ángulo de ataque — NP australiano",
+      "summary": "El ángulo de ataque que publica Mitsubishi Australia para el Pajero NP, impreso en el mismo bloque de altura libre que el ángulo ventral y el de salida, y dado como una sola cifra para las versiones GLX, GLS y Exceed. Coincide con la cifra de la ficha estadounidense de 2002 y es menor que la del manual de chasis de exportación general, y por eso las tres se registran por separado según el mercado."
+    }
+  }
+}

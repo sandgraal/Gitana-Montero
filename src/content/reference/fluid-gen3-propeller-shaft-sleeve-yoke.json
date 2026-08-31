@@ -2,7 +2,11 @@
   "id": "fluid-gen3-propeller-shaft-sleeve-yoke",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["global"]
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
   },
   "kind": "fluid",
   "system": "drivetrain",

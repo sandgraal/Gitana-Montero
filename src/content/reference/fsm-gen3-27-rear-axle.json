@@ -2,7 +2,11 @@
   "id": "fsm-gen3-27-rear-axle",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["global"]
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
   },
   "kind": "fsm-section",
   "system": "drivetrain",
@@ -25,7 +29,7 @@
     },
     "es": {
       "title": "Manual de taller, grupo 27 — Eje trasero",
-      "summary": "El grupo del eje trasero: la tabla de especificaciones del diferencial normal, del autoblocante y del diferencial con bloqueo, las especificaciones de juego entre dientes, de par de rodamientos y de juego de la maza, las tablas de lubricantes y de selladores, y las secuencias de desmontaje y montaje de la maza trasera, el muñón, los palieres, el bloqueo del diferencial y el portadiferencial."
+      "summary": "El grupo del eje trasero: la tabla de especificaciones del diferencial normal, del autoblocante y del diferencial con bloqueo, las especificaciones de juego entre dientes, de par de rodamientos y de juego de la maza, las tablas de lubricantes y de selladores, y las secuencias de desmontaje y montaje de la maza trasera, la muñeca, los palieres, el bloqueo del diferencial y el portadiferencial."
     }
   }
 }

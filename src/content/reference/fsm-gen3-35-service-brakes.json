@@ -2,7 +2,11 @@
   "id": "fsm-gen3-35-service-brakes",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["global"]
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
   },
   "kind": "fsm-section",
   "system": "brakes",
@@ -25,7 +29,7 @@
     },
     "es": {
       "title": "Manual de taller, grupo 35 — Frenos de servicio",
-      "summary": "El grupo de frenos de servicio, en dos partes: 35A sistema de freno básico y 35B sistema antibloqueo para los modelos de doble tracción. En 35A están la información general y las especificaciones de frenos, la revisión del pedal, las pruebas de los boosters, la purga de frenos, la revisión de pastillas de freno y discos, y las secuencias de desmontaje y montaje de los frenos delanteros y traseros. El trabajo de frenos es crítico para la seguridad: hágalo con un mecánico calificado."
+      "summary": "El grupo de frenos de servicio, en dos partes: 35A sistema de freno básico y 35B sistema antibloqueo para los modelos de doble tracción. En 35A están la información general y las especificaciones, la revisión del pedal, las pruebas del booster y del booster hidráulico, la purga de frenos, la revisión de pastillas de freno y discos, y las secuencias de desmontaje y montaje de los frenos delanteros y traseros. El trabajo de frenos es crítico para la seguridad: hágalo con un mecánico calificado."
     }
   }
 }

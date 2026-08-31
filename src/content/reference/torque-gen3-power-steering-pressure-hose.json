@@ -2,7 +2,11 @@
   "id": "torque-gen3-power-steering-pressure-hose",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["global"]
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
   },
   "kind": "torque",
   "system": "steering",
@@ -29,7 +33,7 @@
     },
     "es": {
       "title": "Par de apriete de la manguera de presión de la dirección hidráulica",
-      "summary": "El par de apriete de la manguera de presión de la dirección hidráulica en la bomba, indicado en el grupo de dirección donde el manual describe volver a montar la manguera después de una prueba de presión de aceite o de la revisión del interruptor de presión. La parte hidráulica de la dirección es crítica para la seguridad: una fuga que se descubre en carretera se descubre tarde."
+      "summary": "El par de apriete de la manguera de presión de la dirección hidráulica en la bomba, indicado en el grupo de dirección donde el manual describe volver a montar la manguera después de una prueba de presión de aceite o de la revisión del bulbo de presión. La parte hidráulica de la dirección es crítica para la seguridad: una fuga que se descubre en carretera se descubre tarde."
     }
   }
 }

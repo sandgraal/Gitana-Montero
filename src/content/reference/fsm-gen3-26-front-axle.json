@@ -2,7 +2,11 @@
   "id": "fsm-gen3-26-front-axle",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["global"]
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
   },
   "kind": "fsm-section",
   "system": "drivetrain",
@@ -25,7 +29,7 @@
     },
     "es": {
       "title": "Manual de taller, grupo 26 — Eje delantero",
-      "summary": "El grupo del eje delantero: las especificaciones de la maza, del palier y del diferencial, las tablas de lubricantes y de selladores, las revisiones sobre el vehículo del juego de la maza, del nivel de aceite de engranajes y del mecanismo de rueda libre, y las secuencias de desmontaje y montaje de la maza y el muñón, los palieres, el eje interno con su tubo y el portadiferencial."
+      "summary": "El grupo del eje delantero: las especificaciones de la maza, del palier y del diferencial, las tablas de lubricantes y de selladores, las revisiones sobre el vehículo del juego de la maza, del nivel de aceite de engranajes y del mecanismo de rueda libre, y las secuencias de desmontaje y montaje de la maza y la muñeca, los palieres, el eje interno con su tubo y el portadiferencial."
     }
   }
 }

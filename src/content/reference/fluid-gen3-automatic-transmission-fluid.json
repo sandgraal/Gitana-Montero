@@ -3,6 +3,10 @@
   "fitment": {
     "gens": ["gen3"],
     "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
     "transmissions": ["automatic-5-speed"]
   },
   "kind": "fluid",

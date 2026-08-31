@@ -2,7 +2,11 @@
   "id": "fsm-gen3-36-parking-brakes",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["global"]
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
   },
   "kind": "fsm-section",
   "system": "brakes",

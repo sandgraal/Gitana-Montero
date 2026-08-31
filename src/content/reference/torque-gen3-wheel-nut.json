@@ -2,7 +2,11 @@
   "id": "torque-gen3-wheel-nut",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["global"]
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
   },
   "kind": "torque",
   "system": "wheels-tires",

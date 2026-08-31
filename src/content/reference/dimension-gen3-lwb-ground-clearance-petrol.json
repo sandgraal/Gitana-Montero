@@ -3,6 +3,10 @@
   "fitment": {
     "gens": ["gen3"],
     "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
     "engines": ["6g74-gdi"]
   },
   "kind": "dimension",
@@ -27,8 +31,8 @@
       "summary": "Unladen ground clearance from the chassis manual's major specifications table for the long-wheelbase direct-injection petrol models. The manual lists a smaller figure for the diesel variants in the same table, so the number really does depend on which engine is under the hood."
     },
     "es": {
-      "title": "Despeje al suelo sin carga — carrocería larga con motor GDI de gasolina, exportación general",
-      "summary": "El despeje al suelo sin carga de la tabla de especificaciones principales del manual de chasis, para los modelos de carrocería larga con motor de gasolina de inyección directa. En esa misma tabla el manual da una cifra menor para las versiones diésel, o sea que el número sí depende de cuál motor traiga el vehículo bajo el capó."
+      "title": "Altura libre sin carga — carrocería larga con motor GDI de gasolina, exportación general",
+      "summary": "La altura libre sin carga de la tabla de especificaciones principales del manual de chasis, para los modelos de carrocería larga con motor de gasolina de inyección directa. En esa misma tabla el manual da una cifra menor para las versiones diésel, o sea que el número sí depende de cuál motor traiga el vehículo bajo el capó."
     }
   }
 }

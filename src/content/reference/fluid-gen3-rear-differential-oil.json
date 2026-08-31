@@ -2,7 +2,11 @@
   "id": "fluid-gen3-rear-differential-oil",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["global"]
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
   },
   "kind": "fluid",
   "system": "drivetrain",
@@ -24,11 +28,11 @@
   "prose": {
     "en": {
       "title": "Rear differential gear oil",
-      "summary": "The gear oil and approximate fill for the rear differential, from the rear axle group. The manual prints this quantity as an approximation and checks the level at the filler plug, so treat the figure as what to buy rather than what to measure. Limited-slip and locking rear differentials were both offered, and a friction modifier requirement is a question for the differential you actually have."
+      "summary": "The gear oil and approximate fill for the rear differential, from the rear axle group. The manual prints this one with an \"Approx.\" qualifier in front of it — the front differential figure in the neighbouring group carries no such qualifier — and it checks the level at the filler plug, so treat the figure as what to buy rather than what to measure. Limited-slip and locking rear differentials were both offered, and a friction modifier requirement is a question for the differential you actually have."
     },
     "es": {
       "title": "Aceite del diferencial trasero",
-      "summary": "El aceite de engranajes y el llenado aproximado del diferencial trasero, del grupo de eje trasero. El manual imprime esta cantidad como aproximada y revisa el nivel en el tapón de llenado, así que tome la cifra como lo que hay que comprar y no como lo que hay que medir. Se ofrecieron diferenciales autoblocantes y con bloqueo, y si hace falta un modificador de fricción es cuestión del diferencial que traiga su vehículo."
+      "summary": "El aceite de engranajes y el llenado aproximado del diferencial trasero, del grupo de eje trasero. El manual imprime esta cifra precedida de la palabra «Approx.» —la del diferencial delantero, en el grupo vecino, no lleva esa salvedad— y revisa el nivel en el tapón de llenado, así que tómela como lo que hay que comprar y no como lo que hay que medir. Se ofrecieron diferenciales autoblocantes y con bloqueo, y si hace falta un modificador de fricción es cuestión del diferencial que traiga su vehículo."
     }
   }
 }

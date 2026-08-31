@@ -2,7 +2,11 @@
   "id": "fsm-gen3-37-steering",
   "fitment": {
     "gens": ["gen3"],
-    "markets": ["global"]
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
   },
   "kind": "fsm-section",
   "system": "steering",
