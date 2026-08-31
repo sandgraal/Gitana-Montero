@@ -1,0 +1,38 @@
+{
+  "id": "dimension-gen3-us-approach-angle",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2002,
+      "to": 2002
+    },
+    "engines": ["6g74-sohc"]
+  },
+  "kind": "dimension",
+  "system": "general",
+  "dimension": {
+    "value": 39.0,
+    "unit": "deg"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motor Sales of America — 2002 Montero specifications (XLS and Limited)",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Approach angle — 2002 US Montero",
+      "summary": "The approach angle on the 2002 US specification sheet. The general-export chassis manual prints a larger approach angle for its own models, so the two figures are kept apart by market rather than averaged — each document describes the vehicle its own market was sold, and this is the one that describes the North American truck."
+    },
+    "es": {
+      "title": "Ángulo de ataque — Montero 2002 de Estados Unidos",
+      "summary": "El ángulo de ataque de la ficha técnica de Estados Unidos de 2002. El manual de chasis de exportación general imprime un ángulo de ataque mayor para sus propios modelos, así que las dos cifras se mantienen separadas por mercado en vez de promediarse: cada documento describe el vehículo que se vendió en su propio mercado, y este describe el norteamericano."
+    }
+  }
+}

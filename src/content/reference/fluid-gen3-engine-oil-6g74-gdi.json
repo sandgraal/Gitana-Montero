@@ -1,0 +1,35 @@
+{
+  "id": "fluid-gen3-engine-oil-6g74-gdi",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "engines": ["6g74-gdi"]
+  },
+  "kind": "fluid",
+  "system": "engine",
+  "specification": "Engine oil, API classification SG or higher",
+  "capacity": {
+    "value": 4.6,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine oil — 6G74 GDI",
+      "summary": "The oil grade and total fill the chassis manual gives for the direct-injection petrol V6, in the engine lubrication group. The total includes the volume inside the oil filter. Fill to the quantity, then confirm on the dipstick with the engine warm and the truck level — the figure is what the system takes dry, not a substitute for checking."
+    },
+    "es": {
+      "title": "Aceite de motor — 6G74 GDI",
+      "summary": "El grado de aceite y el llenado total que el manual de chasis indica para el V6 de gasolina de inyección directa, en el grupo de lubricación del motor. El total incluye el volumen que queda dentro del filtro de aceite. Sirva la cantidad indicada y después confirme con la varilla, con el motor caliente y el carro en piso plano: la cifra es lo que recibe el sistema en seco, no sustituye la revisión."
+    }
+  }
+}

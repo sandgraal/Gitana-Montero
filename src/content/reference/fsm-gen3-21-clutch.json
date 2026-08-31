@@ -1,0 +1,31 @@
+{
+  "id": "fsm-gen3-21-clutch",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "fsm-section",
+  "system": "transmission",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 21 — Clutch",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 21 — Clutch",
+      "summary": "The clutch group for manual-transmission models: service specifications, the lubricants table, clutch pedal checks and adjustment, and the hydraulic release circuit — master cylinder, release cylinder and bleeding."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 21 — Clutch",
+      "summary": "El grupo del clutch para los modelos con caja de cambios: especificaciones de servicio, tabla de lubricantes, revisión y ajuste del pedal, y el circuito hidráulico de accionamiento: bomba de clutch, bombín y purga."
+    }
+  }
+}

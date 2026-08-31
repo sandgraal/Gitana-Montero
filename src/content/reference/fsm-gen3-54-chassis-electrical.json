@@ -1,0 +1,31 @@
+{
+  "id": "fsm-gen3-54-chassis-electrical",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "fsm-section",
+  "system": "electrical",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 54 — Chassis Electrical",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 54 — Chassis Electrical",
+      "summary": "Two parts: 54A chassis electrical — battery, ignition switch, lighting, wipers, meters and gauges, horn and the accessory circuits — and 54B the smart wiring system, the multiplexed body network with its own diagnosis codes. The separate electrical wiring manual carries the circuit diagrams themselves."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 54 — Sistema eléctrico del chasis",
+      "summary": "Dos partes: 54A sistema eléctrico del chasis —batería, interruptor de encendido, luces, limpiaparabrisas, tablero e instrumentos, pito y circuitos de accesorios— y 54B el sistema de cableado inteligente, la red multiplexada de carrocería con sus propios códigos de falla. Los diagramas de circuito están en el manual de cableado eléctrico aparte."
+    }
+  }
+}

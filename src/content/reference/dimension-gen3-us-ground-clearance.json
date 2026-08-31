@@ -1,0 +1,38 @@
+{
+  "id": "dimension-gen3-us-ground-clearance",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2002,
+      "to": 2002
+    },
+    "engines": ["6g74-sohc"]
+  },
+  "kind": "dimension",
+  "system": "general",
+  "dimension": {
+    "value": 8.6,
+    "unit": "in"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motor Sales of America — 2002 Montero specifications (XLS and Limited)",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Minimum ground clearance — 2002 US Montero",
+      "summary": "Minimum ground clearance as published for the 2002 US Montero. It is a factory figure for a standard, unladen truck: tyres, load, a lift or a bash plate all change it, and the measurement is to the lowest point, not to the axle."
+    },
+    "es": {
+      "title": "Despeje mínimo al suelo — Montero 2002 de Estados Unidos",
+      "summary": "El despeje mínimo al suelo publicado para el Montero 2002 de Estados Unidos. Es una cifra de fábrica para un vehículo estándar y sin carga: las llantas, la carga, un levante de suspensión o un protector de cárter la cambian, y la medida es hasta el punto más bajo, no hasta el eje."
+    }
+  }
+}

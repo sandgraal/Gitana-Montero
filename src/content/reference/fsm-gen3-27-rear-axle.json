@@ -1,0 +1,31 @@
+{
+  "id": "fsm-gen3-27-rear-axle",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "fsm-section",
+  "system": "drivetrain",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 27 — Rear Axle",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 27 — Rear Axle",
+      "summary": "The rear axle group: the specifications table for the plain differential, the limited-slip unit and the locking differential, the service specifications for backlash, bearing torque and hub play, the lubricants and sealants tables, and the removal and installation sequences for the rear hub, knuckle, drive shafts, differential lock and differential carrier."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 27 — Eje trasero",
+      "summary": "El grupo del eje trasero: la tabla de especificaciones del diferencial normal, del autoblocante y del diferencial con bloqueo, las especificaciones de juego entre dientes, de par de rodamientos y de juego de la maza, las tablas de lubricantes y de selladores, y las secuencias de desmontaje y montaje de la maza trasera, el muñón, los palieres, el bloqueo del diferencial y el portadiferencial."
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "fluid-gen3-engine-oil-4d56",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "engines": ["4d56"]
+  },
+  "kind": "fluid",
+  "system": "engine",
+  "specification": "Engine oil, API classification CD or higher",
+  "capacity": {
+    "value": 6.5,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine oil — 4D56 diesel",
+      "summary": "The oil grade and total fill for the 2.5-litre turbodiesel, from the engine lubrication group. The total includes the volume inside the oil filter and the engine oil cooler."
+    },
+    "es": {
+      "title": "Aceite de motor — diésel 4D56",
+      "summary": "El grado de aceite y el llenado total del turbodiésel de 2.5 litros, del grupo de lubricación del motor. El total incluye el volumen del filtro de aceite y del enfriador de aceite del motor."
+    }
+  }
+}

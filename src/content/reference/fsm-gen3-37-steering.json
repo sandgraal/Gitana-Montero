@@ -1,0 +1,31 @@
+{
+  "id": "fsm-gen3-37-steering",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "fsm-section",
+  "system": "steering",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 37 — Steering",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 37 — Steering",
+      "summary": "The steering group: service specifications for the rack, the pump and the fluid, the lubricant table, the on-vehicle checks including fluid level, drive-belt tension, oil pressure and steering-wheel free play, and the removal and installation sequences for the steering wheel and column, the gearbox and the oil pump. Steering work is safety-critical."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 37 — Dirección",
+      "summary": "El grupo de dirección: las especificaciones de la cremallera de dirección, de la bomba y del líquido de dirección hidráulica, la tabla de lubricantes, las revisiones sobre el vehículo —nivel de líquido, tensión de la faja, presión de aceite y juego libre del volante— y las secuencias de desmontaje y montaje del volante y la columna, la caja de dirección y la bomba. El trabajo de dirección es crítico para la seguridad."
+    }
+  }
+}

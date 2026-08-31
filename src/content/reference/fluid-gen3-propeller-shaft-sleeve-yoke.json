@@ -1,0 +1,30 @@
+{
+  "id": "fluid-gen3-propeller-shaft-sleeve-yoke",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "fluid",
+  "system": "drivetrain",
+  "specification": "Hypoid gear oil SAE 75W-90, 75W-85W or 80W conforming to API GL-4, applied as required",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000), second scanned part: groups 25 to 55",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203149/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Propeller shaft sleeve yoke lubricant",
+      "summary": "The lubricant the propeller shaft group specifies for the sleeve yoke, the sliding splined joint that lets the shaft change length as the suspension moves. The manual gives no quantity — it is applied as required on reassembly — so this entry records the specification only."
+    },
+    "es": {
+      "title": "Lubricante del yugo deslizante del cardán",
+      "summary": "El lubricante que el grupo del cardán especifica para el yugo deslizante, la unión estriada que le permite al cardán cambiar de largo cuando trabaja la suspensión. El manual no da cantidad —se aplica la que se requiera al armar—, así que esta entrada registra únicamente la especificación."
+    }
+  }
+}

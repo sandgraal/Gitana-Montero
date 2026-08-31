@@ -1,0 +1,37 @@
+{
+  "id": "dimension-gen3-au-towing-unbraked",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["au"],
+    "years": {
+      "from": 2003
+    }
+  },
+  "kind": "dimension",
+  "system": "general",
+  "safetyCritical": true,
+  "dimension": {
+    "value": 750,
+    "unit": "kg"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Maximum towing capacity, trailer without brakes — Australian NP",
+      "summary": "The unbraked towing limit from the same Mitsubishi Australia sheet. A trailer with no brakes of its own is limited far below the braked figure, and the difference is stopping distance, not pulling power. Towing limits are a manufacturer figure; the road rules that apply to you are set by your jurisdiction."
+    },
+    "es": {
+      "title": "Capacidad máxima de remolque sin freno — NP australiano",
+      "summary": "El límite de remolque sin freno de la misma ficha de Mitsubishi Australia. Un remolque que no trae frenos propios queda muy por debajo de la cifra con freno, y la diferencia está en la distancia de frenado, no en la fuerza de arrastre. Los límites de remolque son una cifra del fabricante; las reglas de tránsito que le aplican a usted las fija su jurisdicción."
+    }
+  }
+}

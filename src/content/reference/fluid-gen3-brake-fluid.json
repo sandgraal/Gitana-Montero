@@ -1,0 +1,30 @@
+{
+  "id": "fluid-gen3-brake-fluid",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "fluid",
+  "system": "brakes",
+  "specification": "Brake fluid DOT3 or DOT4",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000), second scanned part: groups 25 to 55",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203149/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Brake fluid specification",
+      "summary": "The brake fluid grade the chassis manual specifies, from the basic brake system group. The manual lists the quantity as \"as required\" — it is a bleed-until-clean job, not a measured fill — and the same fluid is what it calls for on the caliper piston and cylinder body at reassembly. Brake fluid absorbs moisture over its service life, which is why it is a scheduled service item and not a fill-and-forget. Brakes are safety-critical: have this work done by a qualified mechanic."
+    },
+    "es": {
+      "title": "Especificación del líquido de frenos",
+      "summary": "El grado de líquido de frenos que especifica el manual de chasis, en el grupo del sistema de freno básico. El manual da la cantidad como «la que se requiera» —es un trabajo de purga de frenos hasta que salga limpio, no un llenado medido— y es el mismo líquido que pide para el pistón del cáliper y el cuerpo del cilindro al armar. El líquido de frenos absorbe humedad con el tiempo, y por eso es un punto de mantenimiento programado y no algo que se sirve una vez y se olvida. Los frenos son críticos para la seguridad: deje este trabajo a un mecánico calificado."
+    }
+  }
+}

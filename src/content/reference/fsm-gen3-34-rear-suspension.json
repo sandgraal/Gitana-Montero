@@ -1,0 +1,31 @@
+{
+  "id": "fsm-gen3-34-rear-suspension",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "fsm-section",
+  "system": "suspension",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 34 — Rear Suspension",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 34 — Rear Suspension",
+      "summary": "The rear suspension group: general information and specifications for the independent multi-link rear end, the service specifications and special tools, and the removal and installation sequences for the shock absorbers, coil springs, arms and stabilizer bar. Suspension work is safety-critical."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 34 — Suspensión trasera",
+      "summary": "El grupo de suspensión trasera: información general y especificaciones de la suspensión independiente multibrazo, las especificaciones de servicio y las herramientas especiales, y las secuencias de desmontaje y montaje de los amortiguadores, los resortes, los brazos y la barra estabilizadora. El trabajo de suspensión es crítico para la seguridad."
+    }
+  }
+}

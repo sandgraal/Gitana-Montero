@@ -1,0 +1,36 @@
+{
+  "id": "capacity-gen3-au-fuel-tank",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["au"],
+    "years": {
+      "from": 2003
+    }
+  },
+  "kind": "capacity",
+  "system": "fuel",
+  "capacity": {
+    "value": 90,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Fuel tank capacity — Australian NP",
+      "summary": "The fuel tank capacity Mitsubishi Australia publishes for the NP Pajero, printed as a single figure for the GLX, GLS and Exceed grades alike and for both the petrol and the diesel. The North American Montero is a separate entry here, taken from its own market's sheet and stated in US gallons, because that is how each document prints it."
+    },
+    "es": {
+      "title": "Capacidad del tanque de combustible — NP australiano",
+      "summary": "La capacidad del tanque de combustible que publica Mitsubishi Australia para el Pajero NP, impresa como una sola cifra para las versiones GLX, GLS y Exceed y tanto para gasolina como para diésel. El Montero norteamericano es una entrada aparte aquí, tomada de la ficha de su propio mercado y expresada en galones estadounidenses, porque así la imprime cada documento."
+    }
+  }
+}

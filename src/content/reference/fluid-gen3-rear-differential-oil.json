@@ -1,0 +1,34 @@
+{
+  "id": "fluid-gen3-rear-differential-oil",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "fluid",
+  "system": "drivetrain",
+  "specification": "Hypoid gear oil, API classification GL-5 or higher, SAE viscosity No. 90 or 80W",
+  "capacity": {
+    "value": 1.6,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000), second scanned part: groups 25 to 55",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203149/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Rear differential gear oil",
+      "summary": "The gear oil and approximate fill for the rear differential, from the rear axle group. The manual prints this quantity as an approximation and checks the level at the filler plug, so treat the figure as what to buy rather than what to measure. Limited-slip and locking rear differentials were both offered, and a friction modifier requirement is a question for the differential you actually have."
+    },
+    "es": {
+      "title": "Aceite del diferencial trasero",
+      "summary": "El aceite de engranajes y el llenado aproximado del diferencial trasero, del grupo de eje trasero. El manual imprime esta cantidad como aproximada y revisa el nivel en el tapón de llenado, así que tome la cifra como lo que hay que comprar y no como lo que hay que medir. Se ofrecieron diferenciales autoblocantes y con bloqueo, y si hace falta un modificador de fricción es cuestión del diferencial que traiga su vehículo."
+    }
+  }
+}

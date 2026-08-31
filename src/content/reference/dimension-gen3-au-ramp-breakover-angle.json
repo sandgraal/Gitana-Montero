@@ -1,0 +1,36 @@
+{
+  "id": "dimension-gen3-au-ramp-breakover-angle",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["au"],
+    "years": {
+      "from": 2003
+    }
+  },
+  "kind": "dimension",
+  "system": "general",
+  "dimension": {
+    "value": 24.5,
+    "unit": "deg"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Ramp breakover angle — Australian NP",
+      "summary": "The ramp breakover angle from Mitsubishi Australia's NP sheet — the crest angle the truck can straddle before it beaches on its belly. It is published alongside the approach and departure angles on the same sheet, and it is the one of the three a wheelbase this long tends to run out of first on a rutted climb."
+    },
+    "es": {
+      "title": "Ángulo ventral — NP australiano",
+      "summary": "El ángulo ventral de la ficha del NP de Mitsubishi Australia: el ángulo de lomo que el vehículo puede montar antes de quedarse sentado sobre la panza. Viene publicado en esa misma ficha junto a los ángulos de ataque y de salida, y de los tres es el que primero se le acaba a una distancia entre ejes así de larga en una subida con huellas profundas."
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "fluid-gen3-manual-transmission-oil",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "transmissions": ["manual-5-speed"]
+  },
+  "kind": "fluid",
+  "system": "transmission",
+  "specification": "Hypoid gear oil SAE 75W-90 or 75W-85W conforming to API GL-4",
+  "capacity": {
+    "value": 3.2,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Manual transmission oil",
+      "summary": "The gear oil and fill quantity the chassis manual gives for the five-speed manual gearbox. Note which API rating the manual asks for: GL-4, not GL-5. The two ratings describe different additive packages rather than two strengths of the same oil, so a GL-5 bottle is a substitution and not an upgrade — match what the manual specifies."
+    },
+    "es": {
+      "title": "Aceite de la caja de cambios",
+      "summary": "El aceite de engranajes y la cantidad de llenado que el manual de chasis indica para la caja de cambios de cinco velocidades. Fíjese en cuál clasificación API pide el manual: GL-4, no GL-5. Las dos clasificaciones describen paquetes de aditivos distintos, no dos grados de fuerza del mismo aceite, así que una botella GL-5 es un cambio de especificación y no una mejora: use lo que indica el manual."
+    }
+  }
+}

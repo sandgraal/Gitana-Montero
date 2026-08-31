@@ -1,0 +1,31 @@
+{
+  "id": "fsm-gen3-55-heater-ac",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "fsm-section",
+  "system": "hvac",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 55 — Heater, Air Conditioner and Ventilation",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 55 — Heater, Air Conditioner and Ventilation",
+      "summary": "Two parts: 55A manual air conditioning and 55B automatic air conditioning. The group covers the refrigerant service specifications and lubricant, the blower and heater unit, the compressor and refrigerant lines, the control panel and, on the automatic system, the diagnosis codes and sensor checks."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 55 — Calefacción, aire acondicionado y ventilación",
+      "summary": "Dos partes: 55A aire acondicionado manual y 55B aire acondicionado automático. El grupo cubre las especificaciones del gas refrigerante y su lubricante, el soplador y la unidad de calefacción, el compresor y las cañerías, el panel de control y, en el sistema automático, los códigos de falla y las revisiones de sensores."
+    }
+  }
+}

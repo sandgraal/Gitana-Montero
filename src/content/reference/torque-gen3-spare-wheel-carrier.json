@@ -1,0 +1,35 @@
+{
+  "id": "torque-gen3-spare-wheel-carrier",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"]
+  },
+  "kind": "torque",
+  "system": "wheels-tires",
+  "torque": {
+    "value": 46,
+    "min": 38,
+    "max": 54,
+    "unit": "nm"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000), second scanned part: groups 25 to 55",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203149/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Tailgate spare wheel carrier — lock cylinder and bolt torque",
+      "summary": "The tightening torque the chassis manual gives for the lock cylinder and bolt that hold the full-size spare on the tailgate, in the same wheel and tyre section as the road wheel torque. The manual also asks that the valve be positioned as shown so rainwater cannot sit in it. A spare that works loose on the tailgate is a hazard to everyone behind you."
+    },
+    "es": {
+      "title": "Portallanta de la puerta trasera — apriete del cilindro de llave y del tornillo",
+      "summary": "El par de apriete que el manual de chasis indica para el cilindro de llave y el tornillo que sujetan la llanta de repuesto en la puerta trasera, en la misma sección de rueda y llanta que el apriete de las tuercas. El manual pide además dejar la válvula en la posición que muestra, para que no se le acumule agua de lluvia. Un repuesto flojo en la puerta trasera es un peligro para todo el que venga atrás."
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "dimension-gen3-au-fording-depth",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["au"],
+    "years": {
+      "from": 2003
+    }
+  },
+  "kind": "dimension",
+  "system": "general",
+  "dimension": {
+    "value": 600,
+    "unit": "mm"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors Australia — Pajero NP brochure and specifications (publication code PAJERONP0309)",
+      "url": "https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260410201706/https://xr793.com/wp-content/uploads/2023/04/2004-Mitsubishi-Pajero-AUS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Fording depth — Australian NP",
+      "summary": "The fording depth Mitsubishi Australia publishes for the NP Pajero. It is a figure for a standard vehicle, and nothing on the sheet says a river will behave: a bow wave, a current or a soft bottom all cut into what is actually safe. The chassis manual carries its own inspection for before and after fording a stream in group 00, and it is worth reading before the first river, not after it."
+    },
+    "es": {
+      "title": "Profundidad de vadeo — NP australiano",
+      "summary": "La profundidad de vadeo que publica Mitsubishi Australia para el Pajero NP. Es una cifra para un vehículo estándar, y la ficha no promete nada sobre cómo se va a portar un río: una ola de proa, una corriente o un fondo blando le recortan lo que de verdad es seguro. El manual de chasis trae su propia revisión antes y después de vadear en el grupo 00, y conviene leerla antes del primer río, no después."
+    }
+  }
+}

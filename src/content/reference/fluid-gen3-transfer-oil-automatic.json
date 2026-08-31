@@ -1,0 +1,36 @@
+{
+  "id": "fluid-gen3-transfer-oil-automatic",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "transmissions": ["automatic-5-speed"],
+    "transferCases": ["super-select-ii"]
+  },
+  "kind": "fluid",
+  "system": "transfer-case",
+  "specification": "Hypoid gear oil SAE 75W-90 or 75W-85W conforming to API GL-4",
+  "capacity": {
+    "value": 2.8,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Transfer case oil — automatic transmission",
+      "summary": "The transfer case fill listed in the automatic transmission group. On these trucks the transfer case takes gear oil while the automatic gearbox in front of it takes automatic transmission fluid: two different fluids, two separate fills, two sets of plugs on one assembly."
+    },
+    "es": {
+      "title": "Aceite de la caja de transferencia — con transmisión automática",
+      "summary": "El llenado de la caja de transferencia que aparece en el grupo de transmisión automática. En estos vehículos la caja de transferencia lleva aceite de engranajes mientras que la transmisión automática que va adelante lleva aceite de transmisión automática: dos fluidos distintos, dos llenados independientes y dos juegos de tapones en un mismo conjunto."
+    }
+  }
+}
