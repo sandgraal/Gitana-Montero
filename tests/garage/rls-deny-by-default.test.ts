@@ -74,14 +74,14 @@ const live = await detectLiveStack();
  * ====================================================================== */
 
 describe("RLS is declared on every user table", () => {
-  it.fails.each(USER_TABLE_NAMES.map((table) => [table]))(
+  it.each(USER_TABLE_NAMES.map((table) => [table]))(
     "public.%s has row level security enabled",
     (table) => {
       expect(enablesRls(migrationSql(), table)).toBe(true);
     }
   );
 
-  it.fails.each(USER_TABLE_NAMES.map((table) => [table]))(
+  it.each(USER_TABLE_NAMES.map((table) => [table]))(
     "public.%s has row level security FORCED, not merely enabled",
     (table) => {
       // `enable` exempts the table's owner role, and Supabase migrations run
@@ -92,7 +92,7 @@ describe("RLS is declared on every user table", () => {
     }
   );
 
-  it.fails.each(USER_TABLE_NAMES.map((table) => [table]))(
+  it.each(USER_TABLE_NAMES.map((table) => [table]))(
     "every %s policy is owner-scoped in BOTH `using` and `with check`",
     (table) => {
       // The finding that rebuilt this file (T2-201 review, F1). The previous
@@ -112,7 +112,7 @@ describe("RLS is declared on every user table", () => {
     }
   );
 
-  it.fails("grants no policy to anon or public on any user table", () => {
+  it("grants no policy to anon or public on any user table", () => {
     // `roles.length === 0` counts as a leak on purpose: a `create policy`
     // with no `to` clause defaults to `public`, which includes `anon`.
     const leaks = userTablePolicyIssues(migrationSql(), [
@@ -122,28 +122,25 @@ describe("RLS is declared on every user table", () => {
     expect(leaks).toEqual([]);
   });
 
-  it.fails(
-    "covers select, insert, update, and delete on every user table",
-    () => {
-      // A table with only a `for select` policy is not readable by strangers —
-      // and not writable by its owner either. More to the point, one with
-      // select and update but no delete makes ACC-03's "a user SHALL be able
-      // to delete their account" impossible to perform as the user.
-      const missing: string[] = [];
-      for (const table of USER_TABLE_NAMES) {
-        const covered = coveredCommands(migrationSql(), table);
-        for (const command of ["select", "insert", "update", "delete"]) {
-          if (!covered.has(command)) missing.push(`${table}.${command}`);
-        }
+  it("covers select, insert, update, and delete on every user table", () => {
+    // A table with only a `for select` policy is not readable by strangers —
+    // and not writable by its owner either. More to the point, one with
+    // select and update but no delete makes ACC-03's "a user SHALL be able
+    // to delete their account" impossible to perform as the user.
+    const missing: string[] = [];
+    for (const table of USER_TABLE_NAMES) {
+      const covered = coveredCommands(migrationSql(), table);
+      for (const command of ["select", "insert", "update", "delete"]) {
+        if (!covered.has(command)) missing.push(`${table}.${command}`);
       }
-
-      expect(missing).toEqual([]);
     }
-  );
+
+    expect(missing).toEqual([]);
+  });
 });
 
 describe("deny-by-default is declared, not assumed", () => {
-  it.fails("revokes anon's grants on the user tables", () => {
+  it("revokes anon's grants on the user tables", () => {
     // RLS filters rows; GRANT decides whether a role may reach the table at
     // all. Supabase's `anon` role ships with broad grants on `public`, so
     // "we wrote policies" is not the whole story — the revoke is what makes a
@@ -156,7 +153,7 @@ describe("deny-by-default is declared, not assumed", () => {
     expect(revokes.length).toBeGreaterThan(0);
   });
 
-  it.fails("revokes future default privileges too", () => {
+  it("revokes future default privileges too", () => {
     // The revoke above covers the four tables that exist. This covers the
     // fifth one, written a year from now by someone who has not read this
     // file.
@@ -173,7 +170,7 @@ describe("deny-by-default is declared, not assumed", () => {
 describe.skipIf(!live.available)(
   liveTitle("anonymous clients read nothing private", live),
   () => {
-    it.fails.each(USER_TABLE_NAMES.map((table) => [table]))(
+    it.each(USER_TABLE_NAMES.map((table) => [table]))(
       "anon selects zero rows from %s even when rows exist",
       async (table) => {
         const scenario = await provisionScenario(stackOf(live));
@@ -195,7 +192,7 @@ describe.skipIf(!live.available)(
       }
     );
 
-    it.fails("anon cannot insert a row it would then own", async () => {
+    it("anon cannot insert a row it would then own", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const response = await insertRow(scenario, scenario.anon, "vehicles", {
@@ -210,35 +207,32 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "POSITIVE CONTROL: the same read succeeds for the owner",
-      async () => {
-        // Without this, every assertion above is satisfied by a database that
-        // is simply broken, a bucket that does not exist, or a PostgREST that
-        // 404s everything. "Nobody can read it" is only a security property
-        // if somebody can.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
+    it("POSITIVE CONTROL: the same read succeeds for the owner", async () => {
+      // Without this, every assertion above is satisfied by a database that
+      // is simply broken, a bucket that does not exist, or a PostgREST that
+      // 404s everything. "Nobody can read it" is only a security property
+      // if somebody can.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
 
-          const response = await selectRows(
-            scenario,
-            scenario.ownerA,
-            "vehicles"
-          );
+        const response = await selectRows(
+          scenario,
+          scenario.ownerA,
+          "vehicles"
+        );
 
-          expect(response.ok).toBe(true);
-          expect(rowCount(response)).toBe(1);
-          expect(response.text).toContain(testVehicleName("a"));
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(response.ok).toBe(true);
+        expect(rowCount(response)).toBe(1);
+        expect(response.text).toContain(testVehicleName("a"));
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
   }
 );
 
@@ -265,7 +259,7 @@ describe.skipIf(!live.available)(
       ["delete", "receipts"],
     ] as const;
 
-    it.fails.each(CROSS_USER_OPERATIONS)(
+    it.each(CROSS_USER_OPERATIONS)(
       "owner B cannot %s owner A's %s",
       async (operation, table) => {
         const scenario = await provisionScenario(stackOf(live));
@@ -313,34 +307,31 @@ describe.skipIf(!live.available)(
       }
     );
 
-    it.fails(
-      "owner B cannot enumerate owner A's rows without naming them",
-      async () => {
-        // The graders above name a row id. Enumeration is the other shape of
-        // the same leak: an unfiltered list.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
+    it("owner B cannot enumerate owner A's rows without naming them", async () => {
+      // The graders above name a row id. Enumeration is the other shape of
+      // the same leak: an unfiltered list.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
 
-          const response = await selectRows(
-            scenario,
-            scenario.ownerB,
-            "vehicles"
-          );
+        const response = await selectRows(
+          scenario,
+          scenario.ownerB,
+          "vehicles"
+        );
 
-          expect(rowCount(response)).toBe(0);
-          expect(response.text).not.toContain(testVehicleName("a"));
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(rowCount(response)).toBe(0);
+        expect(response.text).not.toContain(testVehicleName("a"));
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails("owner B cannot create a row belonging to owner A", async () => {
+    it("owner B cannot create a row belonging to owner A", async () => {
       // `with check`, specifically.
       const scenario = await provisionScenario(stackOf(live));
       try {
@@ -367,7 +358,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("owner B cannot reassign their own row to owner A", async () => {
+    it("owner B cannot reassign their own row to owner A", async () => {
       // The other half of `with check`: an insert that is legal at write time,
       // followed by an update that walks it across the ownership boundary.
       const scenario = await provisionScenario(stackOf(live));
@@ -392,34 +383,31 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "POSITIVE CONTROL: each owner reads their own row and only their own",
-      async () => {
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
-          await createOwnedFixture(
-            scenario,
-            scenario.ownerB,
-            testReceiptPath(scenario.ownerB.userId ?? "", "1")
-          );
+    it("POSITIVE CONTROL: each owner reads their own row and only their own", async () => {
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
+        await createOwnedFixture(
+          scenario,
+          scenario.ownerB,
+          testReceiptPath(scenario.ownerB.userId ?? "", "1")
+        );
 
-          const a = await selectRows(scenario, scenario.ownerA, "vehicles");
-          const b = await selectRows(scenario, scenario.ownerB, "vehicles");
+        const a = await selectRows(scenario, scenario.ownerA, "vehicles");
+        const b = await selectRows(scenario, scenario.ownerB, "vehicles");
 
-          expect(rowCount(a)).toBe(1);
-          expect(rowCount(b)).toBe(1);
-          expect(a.text).toContain(testVehicleName("a"));
-          expect(b.text).toContain(testVehicleName("b"));
-          expect(a.text).not.toContain(testVehicleName("b"));
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(rowCount(a)).toBe(1);
+        expect(rowCount(b)).toBe(1);
+        expect(a.text).toContain(testVehicleName("a"));
+        expect(b.text).toContain(testVehicleName("b"));
+        expect(a.text).not.toContain(testVehicleName("b"));
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
   }
 );

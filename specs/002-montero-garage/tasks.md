@@ -146,7 +146,7 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   `admin`/`api`, and what a handle change does to a published URL are each a
   grader of their own and none is in T2-201's scope. **They belong to T2-401**
   with the public pages. This file's silence is not permission.
-- [ ] **T2-202 [PLATFORM]** Supabase auth (magic link + Google, no passwords) +
+- [x] **T2-202 [PLATFORM]** Supabase auth (magic link + Google, no passwords) +
   user/vehicle/record/receipt tables with RLS + private storage bucket.
   Activates T2-201 graders. Bilingual auth surface. Depends: T2-201 merged.
   *(ACC-01..04, SHR-01)*
@@ -165,27 +165,44 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   (branch `fix/002-acc01-grader-ruling`, merged ahead of T2-202); the grader
   that demanded a refusal at signup is gone, as is the escape hatch that
   treated "creation refused" as a pass.
-  <br>**Inherited from T2-201 — close the shared-name correlation gap when the
-  first real policy lands.** `isCorrelated` in `tests/garage/rules.ts` accepts
-  the unqualified back-reference spelling (`where v.id = vehicle_id`) by
-  matching the outer table's column *names*; it does not resolve them against
-  the subquery's own `from` list. So when the inner table declares a column of
-  the same name, a bare mention is read as correlation when it is not, and the
-  uncorrelated subquery D1 exists to catch is waved through. **This fails open,
-  not closed** — it admits a wide-open policy rather than rejecting a correct
-  one. Reachable with this contract's own columns: `records` and `vehicles`
-  share exactly `{id, odometer_km}`, and both `where id = id and owner_id =
-  auth.uid()` and a bare `odometer_km` predicate return `true` today.
-  <br>The fix is a few lines and `rules.ts` already imports `USER_TABLES`:
-  subtract the *inner* table's declared columns from `outerColumns` before the
-  bare-name test, which closes both shapes. It was deferred out of T2-201 on
-  purpose — a rule tightened against no real DDL is a rule tuned to its own
-  fixtures, and the right time is when there is an actual policy to test it
-  against. **Add both shapes to the probe corpus in
-  `tests/garage/reviewer-probes.test.ts` at the same time**, in the N-series
-  alongside N4, so the tightened rule is pinned the way every other rule there
-  is: break it on purpose and confirm the corpus goes red. Full note in the
-  `isCorrelated` docstring.
+  <br>**Landed.** `supabase/config.toml` + four migrations; all 161 marked
+  declaration graders activated by deleting `.fails` and nothing else (proved
+  mechanically: every grader file is byte-identical to `main` modulo `.fails`
+  and Prettier's re-wrap, `auth-surface.test.ts` against its amended text).
+  Tier A 321/321. **Tier B ran for real** — Docker via colima, Supabase CLI
+  2.114 / GoTrue 2.195 / Postgres 17.6 — **376/376 on a fresh stack**.
+  `tests/garage/seam-canary.test.ts` deleted per its own docstring ("T2-202
+  deletes this whole file"), the T203 precedent for a self-authorising grader
+  file.
+  <br>**Two defects the T2-202 review found by running it, both fixed here.**
+  *F1, blocker:* `enable_confirmations = false` meant a signup carrying a
+  password answered 200 with an access token **and** a refresh token — the one
+  request in the system containing a password handed back a session, and worse,
+  a pre-claim attack: sign up as an address you do not own, rotate the refresh
+  token, and be inside the account the real owner later magic-links into, with
+  SHR-01's blast radius and no proof of email ownership anywhere. On, that
+  request returns a bare unconfirmed user and no token; magic-link sign-up is
+  unaffected because that flow *is* an email confirmation. *F2, major:*
+  `authenticated` held TRUNCATE on all four tables — Supabase's default
+  privileges grant ALL on new tables in `public`, and an explicit
+  `grant select, insert, update, delete` **adds to** that ACL rather than
+  replacing it, so the role could empty `profiles` with no policy consulted
+  (RLS does not filter TRUNCATE). Revoked in the default privileges and again
+  by name per table before each grant; `role_table_grants` now reads exactly
+  four verbs for `authenticated` and nothing for `anon`.
+  <br>**One thing ACC-03 does not do, recorded rather than hidden:** the SQL
+  purge needs Supabase's own `storage.allow_delete_query` opt-out, and it
+  removes storage object *rows* — every route to a receipt — but not the bytes
+  in the backend. Only the Storage API can, and reaching it from Postgres would
+  mean a service key in the database, which AGENTS.md forbids. An Edge Function
+  running inside Supabase is the follow-up; the runbook says so, and says how to
+  assert the purge is really working (its `BYPASSRLS` dependence makes failure
+  return `0`, indistinguishable from "nothing expired").
+  <br>**Inherited from T2-201 — the shared-name correlation gap. DONE:**
+  `isCorrelated` now subtracts the subquery's own tables' declared columns
+  before the bare-name test, and N13/N14 (the reviewer's P1/P2) pin it
+  end-to-end. Mutation-proved: reverting the rule turns exactly those probes
+  plus the corpus sweep red (4 failures), restoring it returns 82/82.
 
 ## Phase P2 — The garage
 
@@ -207,6 +224,32 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
 - [ ] **T2-401 [TEST]** Sharing graders: private-by-default proofs at the URL
   level, per-record cost masking on public work-logs, showcase toggle
   round-trip. Depends: T2-302. *(SHR-01..03)*
+  <br>**Two blind spots the T2-202 review found in the declaration tier. Both
+  are for this task, and both are "verify, do not assume".**
+  <br>*(a) An ACL probe.* Tier A reads migration **text**, so it can only see
+  privileges someone wrote down — and the privilege that nearly shipped a hole
+  was one **nobody granted**: Supabase's default privileges hand `authenticated`
+  ALL on every new table in `public`, `grant select, insert, update, delete`
+  *adds to* that ACL instead of replacing it, and **RLS does not filter
+  TRUNCATE**. The reviewer emptied `profiles` as role `authenticated` against a
+  schema whose 321 declaration graders were green. T2-202 fixed the schema
+  (revoke before grant, per table and in the default privileges), but nothing
+  *grades* it: a fifth table added later re-opens it silently. The grader has to
+  ask the running database — `information_schema.role_table_grants` or
+  `has_table_privilege` — that `authenticated` holds exactly
+  `SELECT, INSERT, UPDATE, DELETE` on every user table and `anon` holds nothing.
+  Behavioural tier, because an ACL is not a string in a file.
+  <br>*(b) Join-semantics blindness.* `isOwnerScoped` judges whether a
+  subquery *correlates*, not whether the correlation is **true**: a policy whose
+  `exists` joins `on true` (or on the wrong pair of columns) passes Tier A
+  intact, because the outer table's name does appear inside the subquery. What
+  saved the shipped `records`/`receipts` policies is that RLS on `vehicles`
+  applies *inside* the subquery as well, so a nonsense join still cannot reach
+  another owner's row — defence that was inherited, not designed. Record it as
+  **a property to verify rather than a property to rely on**: a behavioural
+  grader that writes a deliberately mis-joined policy and proves owner B still
+  reads nothing. If that ever stops being true, the declaration tier will not
+  notice.
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*

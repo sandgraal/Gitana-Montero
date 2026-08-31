@@ -181,6 +181,38 @@ export interface UiStrings
    * caveat AGENTS.md requires below `tsb` (`src/lib/confidence.ts`).
    */
   readonly communityConfidenceCaveatTemplate: string;
+  /* Sign-in / account page — 002 T2-202, ACC-01, ACC-02 */
+  readonly navSignIn: string;
+  readonly signInHeading: string;
+  readonly signInIntro: string;
+  /**
+   * ACC-01's deny half, said out loud to the reader. This is not decoration:
+   * a visitor who is never asked for a password should be told that is on
+   * purpose, or the missing field reads as a broken form.
+   */
+  readonly signInNoPasswordNote: string;
+  /** SHR-01, said before the account exists rather than after. */
+  readonly signInPrivacyNote: string;
+  readonly signInEmailLabel: string;
+  readonly signInEmailPlaceholder: string;
+  readonly signInEmailSubmit: string;
+  readonly signInEmailSubmitBusy: string;
+  readonly signInAlternativeLabel: string;
+  readonly signInGoogleLabel: string;
+  /** `{email}` is the address the reader just typed — interpolated, never stored. */
+  readonly signInLinkSentTemplate: string;
+  readonly signInEmailInvalid: string;
+  readonly signInError: string;
+  /** `{email}` is the signed-in account's own address. */
+  readonly signInSignedInTemplate: string;
+  readonly signInSignOut: string;
+  /**
+   * Shown when `PUBLIC_SUPABASE_URL` / `PUBLIC_SUPABASE_ANON_KEY` are absent —
+   * every build until the owner provisions the project. A page that renders a
+   * dead form would be worse than one that says why it is dead.
+   */
+  readonly signInUnavailable: string;
+  readonly signInScriptRequired: string;
 }
 
 const en: UiStrings = {
@@ -290,6 +322,31 @@ const en: UiStrings = {
   "confidenceTier.community-consensus": "Community consensus",
   "confidenceTier.first-hand": "First-hand experience",
   "confidenceTier.anecdotal": "Anecdotal",
+  navSignIn: "Sign in",
+  signInHeading: "Sign in to your garage",
+  signInIntro:
+    "Your garage holds your vehicles, your work records and your receipts. Sign in to open it, or to start one.",
+  signInNoPasswordNote:
+    "There is no password to choose or forget. We send a one-time link to your email, or you can continue with Google.",
+  signInPrivacyNote:
+    "Everything you store is private by default. Nothing is published until you publish it, one vehicle and one record at a time.",
+  signInEmailLabel: "Email address",
+  signInEmailPlaceholder: "name@example.com",
+  signInEmailSubmit: "Email me a sign-in link",
+  signInEmailSubmitBusy: "Sending…",
+  signInAlternativeLabel: "or",
+  signInGoogleLabel: "Continue with Google",
+  signInLinkSentTemplate:
+    "A sign-in link is on its way to {email}. It works once, and only from this device's browser session.",
+  signInEmailInvalid: "Enter an email address you can open right now.",
+  signInError:
+    "That did not work. Try again in a moment, and if it keeps failing, report it from the footer link.",
+  signInSignedInTemplate: "Signed in as {email}.",
+  signInSignOut: "Sign out",
+  signInUnavailable:
+    "Accounts are not switched on yet on this deployment. The reference side of the site works without one.",
+  signInScriptRequired:
+    "Signing in needs JavaScript. Everything else on this site works without it.",
 };
 
 const es: UiStrings = {
@@ -406,6 +463,31 @@ const es: UiStrings = {
   "confidenceTier.community-consensus": "Consenso de la comunidad",
   "confidenceTier.first-hand": "Experiencia de primera mano",
   "confidenceTier.anecdotal": "Anecdótico",
+  navSignIn: "Ingresar",
+  signInHeading: "Ingrese a su taller",
+  signInIntro:
+    "En su taller quedan sus carros, sus trabajos y sus facturas. Ingrese para abrirlo, o para empezar uno.",
+  signInNoPasswordNote:
+    "No hay contraseña que escoger ni que olvidar. Le enviamos un enlace de un solo uso a su correo, o puede continuar con Google.",
+  signInPrivacyNote:
+    "Todo lo que guarde queda privado desde el inicio. Nada se publica hasta que usted lo publique, carro por carro y ficha por ficha.",
+  signInEmailLabel: "Correo electrónico",
+  signInEmailPlaceholder: "nombre@ejemplo.com",
+  signInEmailSubmit: "Envíeme un enlace de acceso",
+  signInEmailSubmitBusy: "Enviando…",
+  signInAlternativeLabel: "o",
+  signInGoogleLabel: "Continúe con Google",
+  signInLinkSentTemplate:
+    "Va en camino un enlace de acceso a {email}. Sirve una sola vez, y solo desde el navegador de este dispositivo.",
+  signInEmailInvalid: "Escriba un correo que pueda abrir en este momento.",
+  signInError:
+    "No se pudo completar. Inténtelo de nuevo en un momento y, si sigue fallando, repórtelo con el enlace del pie de página.",
+  signInSignedInTemplate: "Sesión iniciada como {email}.",
+  signInSignOut: "Cerrar sesión",
+  signInUnavailable:
+    "Las cuentas todavía no están activas en este despliegue. La parte de referencia del sitio funciona sin cuenta.",
+  signInScriptRequired:
+    "Para ingresar se necesita JavaScript. Todo lo demás en este sitio funciona sin él.",
 };
 
 export const ui: Record<Locale, UiStrings> = { en, es };

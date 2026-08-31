@@ -195,7 +195,7 @@ describe("no password ever reaches the client surface (ACC-01)", () => {
  * ====================================================================== */
 
 describe("the local stack is configured for exactly two ways in", () => {
-  it.fails("enables Google (ACC-01)", () => {
+  it("enables Google (ACC-01)", () => {
     const config = readSupabaseConfig();
     const section = config.slice(config.indexOf("[auth.external.google]"));
 
@@ -203,7 +203,7 @@ describe("the local stack is configured for exactly two ways in", () => {
     expect(section.slice(0, 400)).toMatch(/enabled\s*=\s*true/);
   });
 
-  it.fails.each(
+  it.each(
     KNOWN_EXTERNAL_PROVIDERS.filter(
       (provider) =>
         !(ALLOWED_AUTH_PROVIDERS as readonly string[]).includes(provider)
@@ -225,7 +225,7 @@ describe("the local stack is configured for exactly two ways in", () => {
     expect(section).toMatch(/enabled\s*=\s*false/);
   });
 
-  it.fails("configures the email provider ACC-01 requires", () => {
+  it("configures the email provider ACC-01 requires", () => {
     // **This grader used to demand `enable_signup = false`, and that was
     // wrong** (T2-201 review, F4). In the Supabase CLI that knob gates *all*
     // new accounts, not the password half — turning it off would break the
@@ -250,7 +250,7 @@ describe("the local stack is configured for exactly two ways in", () => {
     expect(section).toMatch(/enable_signup\s*=\s*true/);
   });
 
-  it.fails(
+  it(
     "allows no OAuth redirect target outside the site's own origins",
     () => {
       // F9, acknowledged rather than left silent: GoTrue's redirect allow-list
@@ -266,7 +266,7 @@ describe("the local stack is configured for exactly two ways in", () => {
     }
   );
 
-  it.fails("does not weaken the boundary with an analytics or ads key", () => {
+  it("does not weaken the boundary with an analytics or ads key", () => {
     // ACC-04 / AGENTS.md: "no third-party analytics or ad SDK with the auth
     // surface". The auth branch is exactly where one tends to arrive.
     const config = readSupabaseConfig();
@@ -284,7 +284,7 @@ describe("the local stack is configured for exactly two ways in", () => {
 describe.skipIf(!live.available)(
   liveTitle("the running stack refuses passwords", live),
   () => {
-    it.fails(
+    it(
       "a password submitted at signup grants no session, then or later",
       async () => {
         // **OWNER RULING, 2026-08-30 — the ratified reading of ACC-01.**
@@ -329,7 +329,7 @@ describe.skipIf(!live.available)(
       }
     );
 
-    it.fails(
+    it(
       "refuses the password grant FOR AN ACCOUNT THAT REALLY HAS ONE",
       async () => {
         // **The grader that could not fail** (T2-201 review, F3). It used to
@@ -383,7 +383,7 @@ describe.skipIf(!live.available)(
       }
     );
 
-    it.fails("advertises Google and no other external provider", async () => {
+    it("advertises Google and no other external provider", async () => {
       const stack = stackOf(live);
 
       const response = await authSettings(stack);
@@ -403,7 +403,7 @@ describe.skipIf(!live.available)(
       expect(enabled).toEqual([]);
     });
 
-    it.fails(
+    it(
       "POSITIVE CONTROL: an existing account can request a magic link",
       async () => {
         // **The control that was satisfied by an auth service refusing
@@ -436,7 +436,7 @@ describe.skipIf(!live.available)(
       }
     );
 
-    it.fails("POSITIVE CONTROL: Google is a live sign-in option", async () => {
+    it("POSITIVE CONTROL: Google is a live sign-in option", async () => {
       // The other half of ACC-01's allow-list. Authorising against Google
       // needs a browser, so what is checkable here is that the provider is
       // configured and advertised rather than merely written in a file.

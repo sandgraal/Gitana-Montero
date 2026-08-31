@@ -1,0 +1,266 @@
+# Supabase local stack + auth configuration (T2-202, refs specs/002-montero-garage).
+#
+# This file is the *declaration* half of ACC-01. It is read by two things:
+#   1. `supabase start`, which brings up the local Docker stack the behavioural
+#      graders in `tests/garage/` talk to;
+#   2. `tests/garage/auth-surface.test.ts`, which grades it as text — Google on,
+#      every other external provider off, an email provider that still works,
+#      and a redirect allow-list that is a list rather than a wildcard.
+#
+# Values that differ between local and the hosted project (site_url, the Google
+# client id/secret, the redirect list) are set in the Supabase dashboard by the
+# owner; see `specs/002-montero-garage/HANDOFF-T2-202-SUPABASE.md`. No secret
+# is committed here: every credential is `env(...)` substitution.
+#
+# For the full reference: https://supabase.com/docs/guides/local-development/cli/config
+
+project_id = "monterogarage"
+
+[api]
+enabled = true
+port = 54321
+# `public` holds the four user-data tables and the three RPCs; `graphql_public`
+# is the CLI default and harmless.
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+# `auto_expose_new_tables` is deliberately left unset — the current default is
+# "new entities are NOT auto-exposed to anon/authenticated without an explicit
+# GRANT", which is exactly the deny-by-default posture SHR-01 wants. The
+# migrations grant on the four user tables by name and nothing else.
+
+[api.tls]
+enabled = false
+
+[db]
+port = 54322
+shadow_port = 54320
+health_timeout = "2m"
+major_version = 17
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[db.migrations]
+enabled = true
+schema_paths = []
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[realtime]
+# Nothing in phase 2 subscribes to changes, and realtime is another surface
+# that reads user rows. Off until something needs it.
+enabled = false
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+# Local mail sink: magic links land here instead of a real inbox.
+# http://127.0.0.1:54324
+[local_smtp]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[storage.s3_protocol]
+enabled = true
+
+[storage.analytics]
+enabled = false
+
+[storage.vector]
+enabled = false
+
+[auth]
+enabled = true
+# The base URL magic links point back at, and the root of the redirect
+# allow-list. Local dev = the Astro dev server. The hosted project's value is
+# https://monterogarage.com (owner sets it — see the T2-202 handoff).
+site_url = "http://127.0.0.1:4321"
+# An explicit list of *exact* origins, never a wildcard. `["*"]` — or a
+# `*.vercel.app` pattern, which anyone can deploy under — turns a Google
+# sign-in into a token handoff to a host nobody reviewed. Preview deployments
+# therefore cannot complete an OAuth round trip unless their exact origin is
+# added here; that is the intended trade (T2-201 review, F9).
+additional_redirect_urls = [
+  "http://localhost:4321",
+  "http://127.0.0.1:4321",
+  "https://monterogarage.com",
+  "https://www.monterogarage.com",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+# ACC-01 needs new accounts to be creatable — a magic link for an address that
+# has never signed in has to be able to make one. This knob gates *all* signup,
+# not the password half (T2-201 review, F4); the password half is closed by the
+# migrations, see below.
+enable_signup = true
+enable_anonymous_sign_ins = false
+enable_manual_linking = false
+minimum_password_length = 8
+password_requirements = "lower_upper_letters_digits_symbols"
+
+[auth.rate_limit]
+email_sent = 10
+sms_sent = 30
+anonymous_users = 30
+token_refresh = 150
+sign_in_sign_ups = 30
+token_verifications = 30
+web3 = 30
+
+[auth.email]
+# Email is one of ACC-01's two ways in — the magic-link half. Enabled, and it
+# has to stay enabled: turning this off to "disable passwords" would take the
+# magic link down with it.
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+secure_password_change = true
+max_frequency = "1s"
+otp_length = 6
+otp_expiry = 3600
+
+# ACC-01, the deny half — "and no password flow".
+#
+# **Finding (T2-202): GoTrue exposes no setting that disables password
+# authentication.** Every password knob in CLI 2.114 / GoTrue 2.195 makes
+# passwords *stronger* and none makes them *absent*:
+# `minimum_password_length`, `password_requirements`, `secure_password_change`,
+# the leaked-password check. The two that look like off switches are not —
+# `[auth.email] enable_signup = false` takes magic-link sign-up down with the
+# password half, and an absurd `minimum_password_length` rejects
+# `POST /auth/v1/otp` with `create_user` exactly as it rejects a password
+# sign-up, because GoTrue validates the internal password it generates for a
+# passwordless account through the same rule. Both were tried against a running
+# stack, not reasoned about.
+#
+# The hook below is the mechanism that does work. GoTrue calls it on every
+# password verification attempt and honours a `reject` decision, so
+# `POST /auth/v1/token?grant_type=password` answers `400 invalid_credentials`
+# even for an account whose password is correct. It is a migration rather than
+# a config value, so it holds on the hosted project too; the full note,
+# including what is left open, is in
+# `supabase/migrations/20260830120300_no_password_auth.sql`.
+[auth.hook.password_verification_attempt]
+enabled = true
+uri = "pg-functions://postgres/public/deny_password_login"
+
+# ── External providers ────────────────────────────────────────────────────────
+# ACC-01's allow-list is closed: Google, and nothing else. Every other provider
+# the CLI knows about is written out with `enabled = false` rather than left to
+# a default, because an allow-list is only a guarantee when the deny half is
+# enumerated. Providers absent from this file (the CLI does not accept them)
+# are disabled by absence.
+
+[auth.external.google]
+enabled = true
+# No secret is committed. Set these in the shell before `supabase start`
+# locally (any placeholder works — Google is never contacted by the graders),
+# and in the Supabase dashboard for the hosted project.
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+redirect_uri = ""
+url = ""
+skip_nonce_check = false
+
+[auth.external.apple]
+enabled = false
+[auth.external.azure]
+enabled = false
+[auth.external.bitbucket]
+enabled = false
+[auth.external.discord]
+enabled = false
+[auth.external.facebook]
+enabled = false
+[auth.external.github]
+enabled = false
+[auth.external.gitlab]
+enabled = false
+[auth.external.keycloak]
+enabled = false
+[auth.external.linkedin_oidc]
+enabled = false
+[auth.external.notion]
+enabled = false
+[auth.external.slack]
+enabled = false
+[auth.external.spotify]
+enabled = false
+[auth.external.twitch]
+enabled = false
+[auth.external.twitter]
+enabled = false
+[auth.external.workos]
+enabled = false
+[auth.external.x]
+enabled = false
+[auth.external.zoom]
+enabled = false
+
+[auth.web3.solana]
+enabled = false
+
+[auth.sms]
+enable_signup = false
+enable_confirmations = false
+
+[auth.sms.twilio]
+enabled = false
+account_sid = ""
+message_service_sid = ""
+auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
+
+[auth.mfa]
+max_enrolled_factors = 10
+
+[auth.mfa.totp]
+enroll_enabled = false
+verify_enabled = false
+
+[auth.mfa.phone]
+enroll_enabled = false
+verify_enabled = false
+otp_length = 6
+template = "Your code is {{ .Code }}"
+max_frequency = "5s"
+
+[auth.third_party.firebase]
+enabled = false
+[auth.third_party.auth0]
+enabled = false
+[auth.third_party.aws_cognito]
+enabled = false
+[auth.third_party.clerk]
+enabled = false
+
+[auth.oauth_server]
+enabled = false
+
+[edge_runtime]
+# No edge functions in this phase. ACC-04 (no third-party SDKs on the auth
+# surface) is easier to keep true when there is no second runtime to slip one
+# into.
+enabled = false
+
+# Product/usage telemetry off. ACC-04 and AGENTS.md forbid an analytics or ad
+# SDK anywhere near the auth surface; the local Logflare container is not that,
+# but there is no reason to run it either.
+[analytics]
+enabled = false
+
+[experimental]
+orioledb_version = ""

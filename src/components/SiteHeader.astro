@@ -35,6 +35,15 @@ const navItems = [
     href: collectionRoutePath("community", locale),
     label: strings.navCommunity,
   },
+  /**
+   * 002 T2-202 — the account surface has to be reachable from the chrome, in
+   * both locales, or ACC-02's "fully bilingual account surface" is a page with
+   * no door. It is last on purpose: this is a reference site first.
+   */
+  {
+    href: collectionRoutePath("signIn", locale),
+    label: strings.navSignIn,
+  },
 ];
 ---
 

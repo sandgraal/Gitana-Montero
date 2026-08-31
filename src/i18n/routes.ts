@@ -44,6 +44,18 @@ export const COLLECTION_ROUTE_SEGMENTS = {
   glossary: { en: "glossary", es: "glosario" },
   /** T703a — the public community directory page (COM-01, COM-02). */
   community: { en: "community", es: "comunidad" },
+  /**
+   * T2-202 — the sign-in / account page (002 ACC-01, ACC-02).
+   *
+   * Not a content collection: it has no entries and never will. It is here
+   * because this registry is what `BaseLayout` reads to emit hreflang pairs
+   * and what the locale switcher reads to cross between `/en/sign-in/` and
+   * `/es/ingresar/` — and a second registry with the same rule, for the same
+   * job, is how the two drift apart. The type is
+   * `Record<string, Record<Locale, string>>`, so "collection" was always the
+   * *usual* caller rather than the only permitted one.
+   */
+  signIn: { en: "sign-in", es: "ingresar" },
 } as const satisfies Readonly<Record<string, Readonly<Record<Locale, string>>>>;
 
 export type CollectionRouteId = keyof typeof COLLECTION_ROUTE_SEGMENTS;
