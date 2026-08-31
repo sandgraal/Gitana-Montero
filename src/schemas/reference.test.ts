@@ -20,12 +20,18 @@ import { describe, expect, it } from "vitest";
 import { z } from "astro/zod";
 import { issuePaths } from "../../tests/helpers/schema-outcome.ts";
 import {
+  COLLECTION_ENTRY_PATTERNS,
+  DATA_ENTRY_PATTERN,
+  ENTRY_PATTERN,
+} from "../content.config.ts";
+import {
   ANGLE_UNITS,
   DIMENSION_UNITS,
   FSM_SUMMARY_MAX_LENGTH,
   REFERENCE_KINDS,
   TORQUE_UNITS,
   VOLUME_UNITS,
+  assertNoFieldCollisions,
   quantitySchema,
   referenceEntrySchema,
 } from "./reference";
@@ -400,6 +406,74 @@ describe("the FSM section index — cite, never reproduce", () => {
       es: { title: "T", summary: atCap },
     };
     expect(schema.safeParse(entry).success).toBe(true);
+  });
+});
+
+/**
+ * T207 review, F1 + F2: the anti-reproduction guard has two halves — the cap
+ * on the field, and the loader that stops a Markdown *body* from being a place
+ * to put a procedure the cap never sees. Both are pinned here, because both
+ * enforce a copyright non-negotiable and neither is load-bearing for anything
+ * else, which is exactly the kind of code a later refactor removes without
+ * anyone noticing.
+ */
+describe("the anti-reproduction guard is pinned, not incidental", () => {
+  it("caps the fsm-section summary at 500 characters", () => {
+    // AGENTS.md, "Safety and legal": "Cite the Factory Service Manual, never
+    // reproduce it. Section references only. It is copyrighted." 500
+    // characters is a sentence or two — enough to say what a section covers,
+    // far too little to paste a procedure into. The reviewer set this to
+    // 100 000 and every other test stayed green; this assertion is why that
+    // cannot happen twice. Changing the number is a deliberate act that
+    // updates this line and says why.
+    expect(FSM_SUMMARY_MAX_LENGTH).toBe(500);
+  });
+
+  it("loads the reference collection from data files only", () => {
+    // A `.md`/`.mdx` entry carries an unvalidated body outside every schema,
+    // so a verbatim procedure in a body passes the cap, the schema, and every
+    // check (T207 review, F1). The reference collection has no legitimate use
+    // for a body, so the narrowing lives in the loader, where it cannot be
+    // forgotten.
+    expect(COLLECTION_ENTRY_PATTERNS["reference"]).toBe(DATA_ENTRY_PATTERN);
+    expect(DATA_ENTRY_PATTERN).not.toMatch(/md/);
+    // Positive control: the default pattern really does admit bodies, so the
+    // assertion above is a difference and not a tautology.
+    expect(ENTRY_PATTERN).toMatch(/md/);
+  });
+});
+
+describe("assertNoFieldCollisions", () => {
+  const capacity = quantitySchema(VOLUME_UNITS);
+
+  it("accepts two kinds sharing literally the same field", () => {
+    expect(() =>
+      assertNoFieldCollisions({
+        alpha: { capacity: capacity.optional() },
+        beta: { capacity },
+      })
+    ).not.toThrow();
+  });
+
+  it("THROWS when two kinds declare one field name with different schemas", () => {
+    // The failure this prevents: flattening resolves the collision by
+    // last-writer-wins, and one kind silently starts validating against the
+    // other kind's rules.
+    expect(() =>
+      assertNoFieldCollisions({
+        alpha: { capacity },
+        beta: { capacity: quantitySchema(TORQUE_UNITS) },
+      })
+    ).toThrow(/`capacity` is declared by `alpha` and by `beta`/);
+  });
+
+  it("names both kinds, so the author knows where to look", () => {
+    expect(() =>
+      assertNoFieldCollisions({
+        alpha: { threads: z.string() },
+        beta: { threads: z.number() },
+      })
+    ).toThrow(/refs specs\/001-foundation \(REF-01\)/);
   });
 });
 

@@ -410,9 +410,16 @@ function unwrapOptional(schema: unknown): unknown {
     : schema;
 }
 
-function assertNoFieldCollisions(): void {
+/**
+ * Exported and parameterised so the guard itself is testable without mutating
+ * the real {@link REFERENCE_KIND_SHAPES} — T207 review, F2: the guard worked,
+ * but nothing would have noticed if a later task deleted it.
+ */
+export function assertNoFieldCollisions(
+  shapes: Record<string, Record<string, unknown>>
+): void {
   const declaredBy = new Map<string, { kind: string; schema: unknown }>();
-  for (const [kind, shape] of Object.entries(REFERENCE_KIND_SHAPES)) {
+  for (const [kind, shape] of Object.entries(shapes)) {
     for (const [field, schema] of Object.entries(
       shape as Record<string, unknown>
     )) {
@@ -434,7 +441,9 @@ function assertNoFieldCollisions(): void {
   }
 }
 
-assertNoFieldCollisions();
+assertNoFieldCollisions(
+  REFERENCE_KIND_SHAPES as unknown as Record<string, Record<string, unknown>>
+);
 
 export const referenceSharedShape: z.ZodRawShape = {
   kind: referenceKindSchema,
