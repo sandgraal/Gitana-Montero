@@ -1,15 +1,38 @@
 ---
 /**
- * The layout every localized page uses. It owns the three things that must be
+ * The layout every localized page uses. It owns the four things that must be
  * true of every page in this site:
  *
  *  - `<html lang>` matches the locale (I18N-01),
  *  - a full `hreflang` set — one link per locale plus `x-default` — is emitted
  *    (I18N-04), verified after every build by `npm run check:hreflang`,
- *  - all chrome text comes from the typed UI-strings module (I18N-08).
+ *  - all chrome text comes from the typed UI-strings module (I18N-08),
+ *  - the vehicle selector is present, so a reader's truck follows them from
+ *    page to page and across the locale switch (FIT-03, T204).
+ *
+ * ## Typefaces (T204)
+ *
+ * `../styles/fonts.css` is imported here rather than in each page's own
+ * `<style>` block because the design handoff's two faces are *site* chrome:
+ * every page renders Archivo, and every page that shows a figure renders IBM
+ * Plex Mono. Importing it once means no page can ship without them and the
+ * `@font-face` set is defined exactly once for the whole bundle.
+ *
+ * The two faces a first paint always needs — Archivo's latin subset and IBM
+ * Plex Mono 400's — are preloaded, because a font referenced only from inside
+ * a stylesheet is not discovered until that stylesheet has been parsed. The
+ * remaining subsets and weights are deliberately not preloaded: a browser
+ * fetches them only if a glyph on the page falls in their `unicode-range`, and
+ * preloading a file that is never used is a wasted request against SCF-06's
+ * performance budget.
  */
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import VehicleSelector from "../components/VehicleSelector.astro";
+import "../styles/fonts.css";
+import "../styles/vehicle-fit.css";
+import archivoLatin from "../styles/fonts/archivo-400-800-latin.woff2?url";
+import plexMonoLatin from "../styles/fonts/ibm-plex-mono-400-latin.woff2?url";
 import {
   LOCALE_BCP47,
   absoluteUrl,
@@ -66,8 +89,40 @@ const strings = t(locale);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {
+      /*
+       * The one inline, render-blocking script on the site, and it is two
+       * statements long.
+       *
+       * Progressive enhancement here has a cost the other enhanced controls on
+       * this site do not pay: the vehicle selector sits *above* the page
+       * content, so revealing it after its module script loads pushes
+       * everything down — a layout shift on every page, which is a real
+       * annoyance for a reader and a measured one against SCF-06's performance
+       * budget. Marking the document as script-capable before first paint lets
+       * CSS lay the bar out immediately, so the enhancement costs no shift and
+       * a reader without JavaScript still never sees a dead control.
+       */
+    }
+    <script is:inline>
+      document.documentElement.classList.add("js");
+    </script>
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    <link
+      rel="preload"
+      href={archivoLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href={plexMonoLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="canonical" href={absoluteUrl(canonicalHref, Astro.site)} />
     {
       alternates.map((alternate) => (
@@ -81,10 +136,24 @@ const strings = t(locale);
     <slot name="head" />
   </head>
   <body>
-    <a class="skip-link" href="#main">{strings.skipToContent}</a>
+    {
+      /*
+       * The skip link targets the *content*, not the `<main>` landmark, because
+       * T204 put the vehicle selector inside `main` (T204 review, F7). Landing
+       * on `#main` would drop a keyboard or screen-reader user at the top of a
+       * filter control they have just chosen to skip past — which is precisely
+       * the navigation the link exists to bypass. `<main>` stays the landmark;
+       * only the anchor moves. `tabindex="-1"` makes the target focusable so
+       * the jump actually moves focus rather than only the scroll position.
+       */
+    }
+    <a class="skip-link" href="#content">{strings.skipToContent}</a>
     <SiteHeader locale={locale} routePath={route} routePathByLocale={routes} />
-    <main id="main">
-      <slot />
+    <main>
+      <VehicleSelector locale={locale} />
+      <div id="content" tabindex="-1">
+        <slot />
+      </div>
     </main>
     <SiteFooter locale={locale} />
   </body>
@@ -100,5 +169,15 @@ const strings = t(locale);
     position: static;
     display: inline-block;
     padding: 0.5rem;
+  }
+
+  /*
+   * The skip target is programmatically focusable (`tabindex="-1"`) so the
+   * jump moves focus and not just the scroll position. It is not a control, so
+   * the focus ring it would otherwise draw around the entire page content is
+   * noise; the reader knows where they are because the page just moved.
+   */
+  #content:focus {
+    outline: none;
   }
 </style>
