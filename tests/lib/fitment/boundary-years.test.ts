@@ -63,7 +63,7 @@ const generationsAt = (year: number): string[] =>
   [...generationsInProduction(year, realTaxonomy())].sort();
 
 describe("generationsInProduction: boundary years (FIT-04)", () => {
-  it.fails.each<[string, number, string[]]>([
+  it.each<[string, number, string[]]>([
     ["1981, before any Montero", 1981, []],
     ["1982, gen1's first year", 1982, ["gen1"]],
     ["1990, mid-gen1", 1990, ["gen1"]],
@@ -84,7 +84,7 @@ describe("generationsInProduction: boundary years (FIT-04)", () => {
     expect(generationsAt(year)).toEqual(expected);
   });
 
-  it.fails("answers 1999 the same way however the taxonomy was indexed", () => {
+  it("answers 1999 the same way however the taxonomy was indexed", () => {
     const entries = readVehicleEntries();
 
     const answers = [7, 11, 13].map((seed) =>
@@ -99,7 +99,7 @@ describe("generationsInProduction: boundary years (FIT-04)", () => {
 });
 
 describe("first and last year of every generation are inclusive (FIT-04)", () => {
-  it.fails.each<[string, number, number]>([
+  it.each<[string, number, number]>([
     ["gen1", 1982, 1991],
     ["gen2", 1991, 1999],
     ["gen2-5", 1997, 1999],
@@ -110,7 +110,7 @@ describe("first and last year of every generation are inclusive (FIT-04)", () =>
     expect(generationsAt(last)).toContain(gen);
   });
 
-  it.fails.each<[string, number, number]>([
+  it.each<[string, number, number]>([
     ["gen1", 1981, 1992],
     ["gen2", 1990, 2000],
     ["gen2-5", 1996, 2000],
@@ -137,7 +137,7 @@ describe("a 1999 vehicle still resolves by its own generation (FIT-04)", () => {
     engine: "6g74-gdi",
   };
 
-  it.fails.each<[string, FitmentQuery, boolean, boolean]>([
+  it.each<[string, FitmentQuery, boolean, boolean]>([
     ["a gen2-5 fitment", { gens: ["gen2-5"] }, true, false],
     ["a gen3 fitment", { gens: ["gen3"] }, false, true],
     ["a fitment naming both", { gens: ["gen2-5", "gen3"] }, true, true],
@@ -152,16 +152,13 @@ describe("a 1999 vehicle still resolves by its own generation (FIT-04)", () => {
     }
   );
 
-  it.fails(
-    "year 1999 alone never widens a fitment to another generation",
-    () => {
-      const taxonomy = realTaxonomy();
-      const fitment = { gens: ["gen3"], years: { from: 1999, to: 1999 } };
+  it("year 1999 alone never widens a fitment to another generation", () => {
+    const taxonomy = realTaxonomy();
+    const fitment = { gens: ["gen3"], years: { from: 1999, to: 1999 } };
 
-      // Both trucks are 1999 and both generations were in production; only the
-      // one whose generation the fitment names may match.
-      expect(matchesVehicle(fitment, gen3At1999, taxonomy)).toBe(true);
-      expect(matchesVehicle(fitment, gen25At1999, taxonomy)).toBe(false);
-    }
-  );
+    // Both trucks are 1999 and both generations were in production; only the
+    // one whose generation the fitment names may match.
+    expect(matchesVehicle(fitment, gen3At1999, taxonomy)).toBe(true);
+    expect(matchesVehicle(fitment, gen25At1999, taxonomy)).toBe(false);
+  });
 });

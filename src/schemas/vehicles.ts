@@ -94,7 +94,9 @@
  * refs specs/001-foundation (VEH-01, VEH-02, VEH-03)
  */
 import { z } from "astro/zod";
-import { defineEntrySchema } from "./entry";
+// `.ts` on purpose: this module is on FIT-02's build-hook import chain, which
+// Node's ESM resolver walks directly. See `src/lib/fitment/index.ts`.
+import { defineEntrySchema } from "./entry.ts";
 
 /* -------------------------------------------------------------------------
  * Node kinds
@@ -237,6 +239,39 @@ export const TRANSFER_CASE_FAMILIES = [
 ] as const;
 
 export type TransferCaseFamily = (typeof TRANSFER_CASE_FAMILIES)[number];
+
+/* -------------------------------------------------------------------------
+ * Drive — spec §2's fitment shape (OWNER RULING, 2026-08-30)
+ * ---------------------------------------------------------------------- */
+
+/**
+ * What a `fitment.drive` id may say. **Owner ruling, 2026-08-30**, closing the
+ * open item T200's review raised and T202 refused to guess at: spec §2's
+ * fitment shape carries `drive`, but VEH-01 defines no drive taxonomy, so
+ * `fitmentSchema` accepted any string and nothing could resolve it.
+ *
+ * The ruling is that drive is a **closed vocabulary, not an entity kind** —
+ * exactly the T200 reviewer's suggestion. There is no `kind: "drive"` node and
+ * no drive entry to write, because there is nothing to say about "4wd" that a
+ * transfer-case entry does not already say better. It is a two-valued
+ * discriminator a fitment can restrict on, and that is all:
+ *
+ * - `2wd` — the two-wheel-drive variants (spec §2 markets sold them).
+ * - `4wd` — everything with a transfer case.
+ *
+ * Closed for the same reason `GENERATION_IDS` and `MARKETS` are: a free-form
+ * id makes `4WD`, `four-wheel-drive` and `4wd` three spellings of one fact.
+ * Widening it (a hypothetical `awd`) is a taxonomy change, not a content edit.
+ *
+ * Resolution semantics live in `src/lib/fitment/` (T203): drive is a facet
+ * like `markets` — omitted from a fitment means no drive restriction, and a
+ * `VehicleSelection` may carry an optional `drive`.
+ */
+export const DRIVE_TYPES = ["2wd", "4wd"] as const;
+
+export type DriveType = (typeof DRIVE_TYPES)[number];
+
+export const driveTypeSchema = z.enum(DRIVE_TYPES);
 
 /* -------------------------------------------------------------------------
  * Combination coverage — VEH-03
