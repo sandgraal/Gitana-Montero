@@ -15,6 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "test:garage": "GARAGE_LIVE=1 GARAGE_LIVE_REQUIRED=1 vitest run tests/garage",
     "test:a11y": "node scripts/check-a11y.mjs",
     "test:lighthouse": "node scripts/check-lighthouse.mjs",
     "serve:dist": "node scripts/serve-dist.mjs",
@@ -52,6 +53,7 @@
     "vitest": "^4.1.11"
   },
   "notes": {
-    "typescript": "Pinned to ^5.9.3, not the ^7.x line currently resolvable: @astrojs/check's peerDependency is '^5.0.0 || ^6.0.0' and typescript-eslint's is '>=4.8.4 <6.1.0' — both exclude TS 7 as of this writing. Bump this pin only once those peer ranges do."
+    "typescript": "Pinned to ^5.9.3, not the ^7.x line currently resolvable: @astrojs/check's peerDependency is '^5.0.0 || ^6.0.0' and typescript-eslint's is '>=4.8.4 <6.1.0' — both exclude TS 7 as of this writing. Bump this pin only once those peer ranges do.",
+    "test:garage": "T2-201's behavioural RLS tier. Needs a local Supabase stack (`supabase start`, which needs Docker) and nothing else — no dependency, no hosted project, no key. GARAGE_LIVE_REQUIRED=1 makes a missing stack an error rather than a skip, which is the point of running it deliberately. Plain `npm test` and `npm run verify` skip the same suites with a named reason. See tests/garage/harness.ts."
   }
 }
