@@ -41,11 +41,37 @@
  *
  * Four independent facets — region, language, generation, activity — each a
  * pill group in the Glosario artboard's filter-pill vocabulary (active =
- * ink-filled). Client-side and progressive: the toolbar ships `hidden` and is
- * revealed by the enhancement script, so a visitor with no JavaScript sees
- * every entry and no dead control. What a facet *matches* is
+ * ink-filled). Client-side and progressive: the toolbar is laid out only when
+ * the document is marked script-capable (see the CSS note below), so a visitor
+ * with no JavaScript sees every entry and no dead control. What a facet *matches* is
  * `src/lib/community-filter.ts`, unit-tested without a browser; this script
  * is DOM wiring only.
+ *
+ * ## The vehicle filter is a *second*, differently-shaped filter (T204, FIT-03)
+ *
+ * The four pills above **hide** what does not match: a reader who picks
+ * "Costa Rica" is asking for a shorter list. The vehicle selector does not
+ * hide anything — a row that does not fit the reader's truck stays on the
+ * page at 55% opacity, carrying a "filtered" tag, exactly as the Selector
+ * artboard draws it ("never hidden silently"). The two are different
+ * questions: a facet pill is the reader narrowing on purpose, while a
+ * fitment mismatch is the *site* deciding something is not for them, and the
+ * site owes them the chance to disagree.
+ *
+ * Whether an entry fits is `matchesVehicle` and only `matchesVehicle`
+ * (FIT-01). Whether the fit was *provisional* — matched partly because the
+ * reader has not said which transfer case they have — is
+ * `provisionalMatchFacets`, and it is rendered per row, because that is the
+ * binding condition under which T203's permissive semantics were accepted
+ * (T203 review, F8): the trade-off is only safe if the reader can see it.
+ *
+ * ## Dates
+ *
+ * `activityAssessed` renders through `Intl.DateTimeFormat` in the page
+ * locale, inside a `<time datetime="…">` carrying the stored `YYYY-MM-DD`.
+ * That answers the ambiguity T703a's F5 note deferred to this task — a long
+ * month name cannot be read day-first or month-first by mistake, and the
+ * machine-readable form is still in the markup for anything that wants it.
  *
  * ## Region and language names
  *
@@ -80,14 +106,21 @@ import {
 import { collectionRouteParams, collectionRoutePaths } from "../../i18n/routes";
 import {
   communityActivityLabel,
-  communityGenerationLabel,
   communityLinkKindLabel,
   communityTypeLabel,
   confidenceTierLabel,
+  fitmentFacetLabel,
+  generationLabel,
   t,
 } from "../../i18n/ui";
 import { formatCount } from "../../lib/glossary-filter";
 import { needsConfidenceCaveat } from "../../lib/confidence";
+import {
+  OPTIONAL_SELECTION_FACETS,
+  buildTaxonomy,
+  expandGenerations,
+} from "../../lib/fitment";
+import { selectorTaxonomyData } from "../../lib/vehicle-taxonomy";
 import {
   ACTIVITY_LEVELS,
   WORLDWIDE_REGION,
@@ -150,6 +183,32 @@ function caveatSentence(each: Locale, tier: ConfidenceTier): string {
   );
 }
 
+/**
+ * The same taxonomy the selector ships to the browser, built here so the
+ * *server* render answers generation questions the same way the client does —
+ * one engine, one answer, whichever side of the wire asks (FIT-01).
+ */
+const taxonomy = buildTaxonomy(
+  selectorTaxonomyData(
+    (await getCollection("vehicles")).map((entry) => entry.data)
+  ).nodes
+);
+
+/** `2026-08-28` → `28 de agosto de 2026` / `August 28, 2026`. */
+const assessedDate = new Intl.DateTimeFormat(LOCALE_BCP47[locale], {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
+function formatAssessed(iso: string): string {
+  // Parsed as UTC midnight, formatted in UTC: an ISO date is a calendar day,
+  // and letting the runtime's local zone shift it would print the day before
+  // for anyone west of Greenwich — Costa Rica included.
+  return assessedDate.format(new Date(`${iso}T00:00:00Z`));
+}
+
 const entries = await getCollection("community");
 
 const communities = entries
@@ -179,9 +238,17 @@ const communities = entries
       languages,
       languageLabels: languages.map((tag) => languageNames.of(tag) ?? tag),
       gens,
-      genLabels: gens.map((id) =>
-        isKnownGeneration(id) ? communityGenerationLabel(strings, id) : id
+      /**
+       * The generations this entry's fitment *covers*, engine-expanded — a
+       * club scoped to `["gen2"]` covers the `gen2-5` facelift too. Rendered
+       * as the tags, and read by the client filter, so the page and the
+       * filter cannot disagree about what an entry is for.
+       */
+      coveredGens: expandGenerations(gens, taxonomy),
+      genLabels: expandGenerations(gens, taxonomy).map((id) =>
+        isKnownGeneration(id) ? generationLabel(strings, id) : id
       ),
+      fitment,
       activity: activity as ActivityLevel,
       activityLabel: communityActivityLabel(strings, activity as ActivityLevel),
       activityAssessed,
@@ -232,8 +299,16 @@ const languageOptions = labeledOptions(
 
 /** Canonical taxonomy order, not alphabetical — same rule the system pills use. */
 const generationOptions = GENERATION_IDS.filter((id) =>
-  communities.some((community) => community.gens.includes(id))
-).map((id) => ({ code: id, label: communityGenerationLabel(strings, id) }));
+  communities.some((community) => community.coveredGens.includes(id))
+).map((id) => ({ code: id, label: generationLabel(strings, id) }));
+
+/** `fitmentFacet.*` in the page locale, for the client's provisional detail. */
+const facetLabels = Object.fromEntries(
+  OPTIONAL_SELECTION_FACETS.map((facet) => [
+    facet,
+    fitmentFacetLabel(strings, facet),
+  ])
+);
 
 /** Most-active-first, per `ACTIVITY_LEVELS`' own order. */
 const activityOptions = ACTIVITY_LEVELS.filter((level) =>
@@ -261,7 +336,7 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
         <p class="community__empty">{strings.communityEmpty}</p>
       ) : (
         <>
-          <div class="community__toolbar" data-community-toolbar hidden>
+          <div class="community__toolbar" data-community-toolbar>
             <div class="community__filter-group">
               <span class="community__filter-label">
                 {strings.communityFilterRegionLabel}
@@ -397,6 +472,29 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
             )}
           </p>
 
+          {/*
+           * The vehicle-filter readout (FIT-03). Ships `hidden` and stays
+           * hidden until a selection exists: with no truck chosen there is no
+           * fit count to report and no provisional matching to warn about.
+           */}
+          <div
+            class="community__vehicle"
+            data-community-vehicle
+            data-fit-template={strings.vehicleFitCountTemplate}
+            data-provisional-template={strings.vehicleProvisionalDetailTemplate}
+            data-facet-labels={JSON.stringify(facetLabels)}
+            hidden
+          >
+            <p class="community__fit" data-community-fit aria-live="polite" />
+            <p
+              class="community__provisional-note"
+              data-community-provisional-note
+              hidden
+            >
+              {strings.vehicleProvisionalNote}
+            </p>
+          </div>
+
           <ul class="community__list" data-community-list>
             {communities.map((community) => (
               <li
@@ -406,11 +504,33 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
                 data-languages={community.languages.join(" ")}
                 data-gens={community.gens.join(" ")}
                 data-activity={community.activity}
+                data-fitment={JSON.stringify(community.fitment)}
               >
                 <div class="entry__head">
                   <h2 class="entry__title">{community.title}</h2>
                   <span class="entry__type">{community.typeLabel}</span>
                 </div>
+
+                {/*
+                 * The two vehicle-filter states, both shipped hidden and both
+                 * turned on by the script. Rendered here — directly under the
+                 * title, above everything a reader would act on — rather than
+                 * at the foot of the card, because "this does not fit your
+                 * truck" and "this match is provisional" are qualifications on
+                 * everything below them.
+                 */}
+                <p class="entry__fit" data-entry-fit hidden>
+                  <span class="entry__fit-tag">
+                    {strings.vehicleFilteredTag}
+                  </span>
+                  <span>{strings.vehicleDoesNotFitLabel}</span>
+                </p>
+                <p class="entry__provisional" data-entry-provisional hidden>
+                  <span class="entry__provisional-tag">
+                    {strings.vehicleProvisionalLabel}
+                  </span>
+                  <span data-entry-provisional-detail />
+                </p>
 
                 <p class="entry__summary">{community.summary}</p>
 
@@ -433,22 +553,25 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
                   >
                     {community.activityLabel}
                   </span>
-                  <span class="entry__activity-date">
-                    {/*
-                     * F5 (code review, ruled) — rendered as the raw
-                     * `YYYY-MM-DD` from the schema, not through
-                     * `Intl.DateTimeFormat`: a field-manual reference reads
-                     * unambiguously in both locales this way, where a
-                     * localized short date (`28/08` en vs `08/24` es-style
-                     * day/month order) would not. Revisiting this with a
-                     * proper `Intl.DateTimeFormat` render is T204's, not
-                     * this task's.
-                     */}
+                  {/*
+                   * T703a's F5 note, settled (it deferred this to T204). The
+                   * raw `YYYY-MM-DD` was chosen because a localized *short*
+                   * date is genuinely ambiguous — `08/09` is two different
+                   * days depending on the reader. A localized *long* date is
+                   * not: "28 de agosto de 2026" names the month in words and
+                   * cannot be misread in either direction. The stored ISO
+                   * value stays in `datetime`, so nothing machine-readable is
+                   * lost and the figure is still stored exactly once.
+                   */}
+                  <time
+                    class="entry__activity-date"
+                    datetime={community.activityAssessed}
+                  >
                     {strings.communityActivityAssessedTemplate.replace(
                       "{date}",
-                      community.activityAssessed
+                      formatAssessed(community.activityAssessed)
                     )}
-                  </span>
+                  </time>
                 </p>
 
                 {community.goodFor.length > 0 && (
@@ -536,23 +659,156 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
     type CommunityFilterState,
   } from "../../lib/community-filter";
   import { formatCount } from "../../lib/glossary-filter";
+  import {
+    buildTaxonomy,
+    matchesVehicle,
+    provisionalMatchFacets,
+    type OptionalSelectionFacet,
+  } from "../../lib/fitment";
+  import { readSelectorPayload } from "../../lib/vehicle-taxonomy";
+  import {
+    onVehicleSelectionChange,
+    readVehicleSelection,
+    type StoredVehicleSelection,
+  } from "../../lib/vehicle-selection";
 
   /**
-   * Client-side filtering (T703a). Enhancement only — see the glossary page's
-   * identical rationale: the toolbar ships `hidden` and is revealed here, so
-   * a visitor with no JavaScript sees the whole directory. DOM wiring only;
-   * `matchesCommunityFilter` (`src/lib/community-filter.ts`) owns the rule.
+   * Client-side filtering (T703a) and vehicle fitment (T204). Enhancement
+   * only — see the glossary page's identical rationale: the toolbar ships
+   * `hidden` and is revealed here, so a visitor with no JavaScript sees the
+   * whole directory. DOM wiring only; `matchesCommunityFilter`
+   * (`src/lib/community-filter.ts`) owns the facet rule and
+   * `src/lib/fitment/` owns every fitment answer.
    */
   function enhance(root: HTMLElement): void {
     const toolbar = root.querySelector<HTMLElement>("[data-community-toolbar]");
     const count = root.querySelector<HTMLElement>("[data-community-count]");
     const none = root.querySelector<HTMLElement>("[data-community-none]");
+    const vehicleBox = root.querySelector<HTMLElement>(
+      "[data-community-vehicle]"
+    );
+    const fitLine = root.querySelector<HTMLElement>("[data-community-fit]");
+    const provisionalNote = root.querySelector<HTMLElement>(
+      "[data-community-provisional-note]"
+    );
     const cards = [...root.querySelectorAll<HTMLElement>(".entry")];
     if (!toolbar || !count || !none) return;
 
     const template = count.dataset.countTemplate ?? "";
     const total = Number(count.dataset.total ?? cards.length);
     const state: CommunityFilterState = { ...EMPTY_COMMUNITY_FILTER };
+
+    const payload = readSelectorPayload(document);
+    // The same nodes the selector shipped, read once. Without a selector on
+    // the page there is no taxonomy and no vehicle filter — the facet pills
+    // still work, and `buildTaxonomy([])` gives the generation facet its
+    // "no expansion" reading rather than throwing.
+    const taxonomy = buildTaxonomy(payload?.nodes ?? []);
+
+    const facetLabels: Record<string, string> = parseFacetLabels(
+      vehicleBox?.dataset.facetLabels
+    );
+    const listFormat = new Intl.ListFormat(document.documentElement.lang, {
+      style: "long",
+      type: "conjunction",
+    });
+
+    function parseFacetLabels(raw: string | undefined): Record<string, string> {
+      if (raw === undefined) return {};
+      try {
+        const parsed: unknown = JSON.parse(raw);
+        return typeof parsed === "object" && parsed !== null
+          ? (parsed as Record<string, string>)
+          : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function fitmentOf(card: HTMLElement): unknown {
+      const raw = card.dataset.fitment;
+      if (raw === undefined) return null;
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    /**
+     * Paint one card's fitment state.
+     *
+     * Nothing is hidden here: a row that does not fit stays on the page,
+     * dimmed and tagged, per the Selector artboard's "never hidden silently".
+     * Returns whether the row fits, so the caller can count.
+     */
+    function paintFitment(
+      card: HTMLElement,
+      selection: StoredVehicleSelection | null
+    ): { fits: boolean; provisional: boolean } {
+      const fitLabel = card.querySelector<HTMLElement>("[data-entry-fit]");
+      const provisional = card.querySelector<HTMLElement>(
+        "[data-entry-provisional]"
+      );
+      const detail = card.querySelector<HTMLElement>(
+        "[data-entry-provisional-detail]"
+      );
+
+      if (selection === null) {
+        card.removeAttribute("data-fits");
+        if (fitLabel !== null) fitLabel.hidden = true;
+        if (provisional !== null) provisional.hidden = true;
+        return { fits: true, provisional: false };
+      }
+
+      const fitment = fitmentOf(card);
+      const fits = matchesVehicle(fitment, selection, taxonomy);
+      const facets = provisionalMatchFacets(fitment, selection, taxonomy);
+
+      card.setAttribute("data-fits", String(fits));
+      if (fitLabel !== null) fitLabel.hidden = fits;
+      if (provisional !== null)
+        provisional.hidden = !fits || facets.length === 0;
+      if (detail !== null && fits && facets.length > 0) {
+        detail.textContent = (
+          vehicleBox?.dataset.provisionalTemplate ?? ""
+        ).replace(
+          "{facets}",
+          listFormat.format(
+            facets.map(
+              (facet: OptionalSelectionFacet) => facetLabels[facet] ?? facet
+            )
+          )
+        );
+      }
+
+      return { fits, provisional: fits && facets.length > 0 };
+    }
+
+    function applyVehicle(selection: StoredVehicleSelection | null): void {
+      let fitting = 0;
+      let visible = 0;
+      let anyProvisional = false;
+
+      for (const card of cards) {
+        const painted = paintFitment(card, selection);
+        if (card.hidden) continue;
+        visible += 1;
+        if (painted.fits) fitting += 1;
+        if (painted.provisional) anyProvisional = true;
+      }
+
+      if (vehicleBox === null || fitLine === null) return;
+      vehicleBox.hidden = selection === null;
+      if (selection === null) return;
+
+      fitLine.textContent = formatCount(
+        vehicleBox.dataset.fitTemplate ?? "",
+        fitting,
+        visible
+      );
+      if (provisionalNote !== null) provisionalNote.hidden = !anyProvisional;
+    }
 
     function apply(): void {
       let shown = 0;
@@ -566,13 +822,15 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
             gens: (card.dataset.gens ?? "").split(" ").filter(Boolean),
             activity: card.dataset.activity ?? "",
           },
-          state
+          state,
+          taxonomy
         );
         card.hidden = !visible;
         if (visible) shown += 1;
       }
       count!.textContent = formatCount(template, shown, total);
       none!.hidden = shown > 0;
+      applyVehicle(readVehicleSelection(window));
     }
 
     const FACET_KEYS = ["region", "language", "gen", "activity"] as const;
@@ -604,7 +862,10 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
       });
     }
 
-    toolbar.hidden = false;
+    // The selector lives in the site chrome and knows nothing about this
+    // page; it announces, and the listing re-filters (FIT-03).
+    onVehicleSelectionChange(window, (selection) => applyVehicle(selection));
+
     apply();
   }
 
@@ -670,10 +931,32 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
     max-width: 62ch;
   }
 
+  /*
+   * T204, from two findings that pull against each other.
+   *
+   * The toolbar shipped with the `hidden` attribute and this page's docstring
+   * promises "no dead control" — but an author `display: flex` beats the
+   * user-agent stylesheet's `[hidden] { display: none }`, so with JavaScript
+   * off the filter pills were visible and inert (found by the new e2e no-JS
+   * case). Adding `.community__toolbar[hidden] { display: none }` fixed that
+   * and immediately broke the other half: the toolbar then occupied no space
+   * until the module script revealed it, and every card below jumped down —
+   * CLS 0.345 on this page, well past SCF-06's budget.
+   *
+   * Both halves are satisfied by asking the question earlier. `BaseLayout`
+   * marks the document `js` before first paint, so CSS can lay the toolbar
+   * out immediately when scripting is available and omit it entirely when it
+   * is not. No `hidden` attribute, no shift, no dead control. Same pattern as
+   * `src/components/VehicleSelector.astro`.
+   */
   .community__toolbar {
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  :global(html.js) .community__toolbar {
+    display: flex;
   }
 
   .community__filter-group {
@@ -746,6 +1029,96 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
   }
 
   .entry[hidden] {
+    display: none;
+  }
+
+  /*
+   * The Selector artboard's third state: a row that does not fit the reader's
+   * truck is de-emphasized, not removed. 55% opacity and `panel-soft`, with a
+   * "filtered" tag saying so in words — opacity alone is not information, and
+   * it is not information at all to a screen reader.
+   */
+  .entry[data-fits="false"] {
+    background: var(--panel-soft);
+    opacity: 0.55;
+  }
+
+  .entry__fit,
+  .entry__provisional {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--muted-strong);
+  }
+
+  .entry__fit[hidden],
+  .entry__provisional[hidden] {
+    display: none;
+  }
+
+  .entry__fit-tag,
+  .entry__provisional-tag {
+    flex: 0 0 auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 0.1875rem 0.5rem;
+  }
+
+  .entry__fit-tag {
+    color: var(--muted);
+    background: var(--chip);
+  }
+
+  /*
+   * The confidence-chip token from HANDOFF-DESIGN.md, reused deliberately: a
+   * provisional match is a statement about how much the site knows, which is
+   * the same kind of claim a confidence chip makes. It is *not* the
+   * safety/amber palette — those are reserved for triage and safety so that
+   * warnings never compete with chrome, and "we matched on four facets" is
+   * not a warning about the truck.
+   */
+  .entry__provisional-tag {
+    color: #4a5568;
+    background: var(--confidence-bg);
+    border: 1px solid var(--confidence-border);
+  }
+
+  .community__vehicle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .community__vehicle[hidden] {
+    display: none;
+  }
+
+  .community__fit {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  .community__provisional-note {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--caveat-text);
+    background: var(--caveat-bg);
+    border: 1.5px dashed var(--caveat-border);
+    border-radius: 8px;
+    padding: 0.625rem 0.875rem;
+    max-width: 78ch;
+  }
+
+  .community__provisional-note[hidden] {
     display: none;
   }
 

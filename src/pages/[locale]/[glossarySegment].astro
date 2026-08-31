@@ -28,7 +28,7 @@
  * ## Filtering
  *
  * Filtering is client-side and progressive: the search box and the system
- * pills are `hidden` in the served HTML and unhidden by the script, so a
+ * pills are laid out only when the document is marked script-capable, so a
  * visitor without JavaScript sees every term and no dead controls, and the
  * first render is the complete, indexable page. The script builds each
  * card's search haystack once, from the same text the card already renders
@@ -170,7 +170,7 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
         <p class="glossary__empty">{strings.glossaryEmpty}</p>
       ) : (
         <>
-          <div class="glossary__toolbar" data-glossary-toolbar hidden>
+          <div class="glossary__toolbar" data-glossary-toolbar>
             <div class="glossary__search">
               <label class="visually-hidden" for="glossary-search">
                 {strings.glossarySearchLabel}
@@ -386,7 +386,6 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     }
 
     search.addEventListener("input", apply);
-    toolbar.hidden = false;
     apply();
   }
 
@@ -499,11 +498,27 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     max-width: 62ch;
   }
 
+  /*
+   * T204, the same pair of findings as on the sibling community page (see the
+   * long note there). The toolbar's `hidden` attribute was overridden by this
+   * `display: flex`, so the search box and system pills were visible and inert
+   * with JavaScript off — against the contract stated in this file's own
+   * docstring. Hiding them properly then moved the whole term list down when
+   * the script revealed the toolbar, which is a layout shift on every load.
+   *
+   * `BaseLayout` marks the document `js` before first paint, so the question
+   * is answered by CSS in the first layout: laid out when scripting is
+   * available, absent when it is not.
+   */
   .glossary .glossary__toolbar {
-    display: flex;
+    display: none;
     flex-wrap: wrap;
     gap: 0.75rem;
     align-items: center;
+  }
+
+  :global(html.js) .glossary .glossary__toolbar {
+    display: flex;
   }
 
   .glossary .glossary__search {

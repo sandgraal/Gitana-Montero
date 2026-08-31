@@ -118,6 +118,10 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+  # The display name is unchanged on purpose — it is one of the three contexts
+  # `main`'s branch protection requires, and renaming it would leave a required
+  # check that never reports. T204 added the Playwright step inside it; see the
+  # note on that step.
   links-a11y:
     name: Links + a11y
     runs-on: ubuntu-latest
@@ -157,6 +161,20 @@ jobs:
 
       - name: Lighthouse budgets (a11y ≥ 95, performance ≥ 90)
         run: npm run test:lighthouse
+
+      # T204 fills the constitution's e2e slot. It runs *here* rather than in a
+      # job of its own for the reason spelled out at the top of this file: a
+      # required status check is required by display name, and a new job would
+      # not be in `main`'s required contexts — so it would be advisory at best
+      # and would hang PRs at worst. This job already has the two things the
+      # suite needs and the `verify` job does not: a built `dist/` and a real
+      # Chrome at `CHROME_PATH`.
+      #
+      # `playwright test` rather than `npm run test:e2e`, which would rebuild
+      # `dist/` a second time in this job for nothing — the same reasoning as
+      # the `npx astro build` above.
+      - name: End-to-end (Playwright, vehicle selector + locale switcher)
+        run: npx playwright test
   # ── Where the deploy job went (T2-102, 002 MIG-02) ──────────────────────
   #
   # A `deploy` job used to live here: on a push to `main`, after all three

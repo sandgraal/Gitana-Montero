@@ -21,6 +21,15 @@ export default getViteConfig(
         "src/**/*.{test,spec}.{ts,mts}",
         "tests/**/*.{test,spec}.{ts,mts}",
       ],
+      /*
+       * `tests/e2e/` belongs to Playwright (T204). Its specs import
+       * `@playwright/test`, whose `test()` throws when it is called outside
+       * the Playwright runner, so without this exclusion `npm test` fails on
+       * files it was never meant to run. The two suites are deliberately
+       * separate commands — `npm test` must stay fast and browser-free, and
+       * `npm run test:e2e` needs a built `dist/` and a real Chrome.
+       */
+      exclude: ["node_modules/**", "dist/**", "tests/e2e/**"],
       environment: "node",
       passWithNoTests: false,
     },

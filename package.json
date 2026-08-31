@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:garage": "GARAGE_LIVE=1 GARAGE_LIVE_REQUIRED=1 vitest run tests/garage",
+    "test:e2e": "astro build && playwright test",
     "test:a11y": "node scripts/check-a11y.mjs",
     "test:lighthouse": "node scripts/check-lighthouse.mjs",
     "serve:dist": "node scripts/serve-dist.mjs",
@@ -34,6 +35,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
     "@types/js-yaml": "^4.0.9",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^24.0.0",

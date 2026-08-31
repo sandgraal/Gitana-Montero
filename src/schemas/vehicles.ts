@@ -97,22 +97,45 @@ import { z } from "astro/zod";
 // `.ts` on purpose: this module is on FIT-02's build-hook import chain, which
 // Node's ESM resolver walks directly. See `src/lib/fitment/index.ts`.
 import { defineEntrySchema } from "./entry.ts";
+/*
+ * The closed vocabularies live in a Zod-free leaf module and are re-exported
+ * below, so every existing `from "./vehicles.ts"` import keeps working
+ * unchanged. The split is T204's and its reason is bundle size, not taxonomy:
+ * the fitment engine runs client-side for the selector, and importing a
+ * `const` array from *this* module dragged all of `astro/zod` (75 KB) into
+ * every page. See `src/schemas/vehicle-vocabulary.ts`. No value moved and no
+ * rule changed.
+ */
+import {
+  DRIVE_TYPES,
+  GENERATION_IDS,
+  MARKETS,
+  PRODUCTION_YEAR_RANGE,
+  TAXONOMY_ID_PATTERN,
+  VEHICLE_KINDS,
+  type GenerationId,
+  type Market,
+  type VehicleKind,
+} from "./vehicle-vocabulary.ts";
+
+export {
+  DRIVE_TYPES,
+  GENERATION_IDS,
+  MARKETS,
+  PRODUCTION_YEAR_RANGE,
+  TAXONOMY_ID_PATTERN,
+  VEHICLE_KINDS,
+};
+export type {
+  DriveType,
+  GenerationId,
+  Market,
+  VehicleKind,
+} from "./vehicle-vocabulary.ts";
 
 /* -------------------------------------------------------------------------
  * Node kinds
  * ---------------------------------------------------------------------- */
-
-export const VEHICLE_KINDS = [
-  "generation",
-  "market",
-  "engine",
-  "transmission",
-  "transfer-case",
-  "trim",
-  "combination",
-] as const;
-
-export type VehicleKind = (typeof VEHICLE_KINDS)[number];
 
 export const vehicleKindSchema = z.enum(VEHICLE_KINDS);
 
@@ -125,19 +148,6 @@ export const vehicleKindSchema = z.enum(VEHICLE_KINDS);
  * carry the bilingual prose for "Costa Rica / LatAm" — but their id can only
  * ever be one of these, so the enum and the entries cannot drift apart.
  * ---------------------------------------------------------------------- */
-
-export const MARKETS = [
-  "us",
-  "cr",
-  "uk",
-  "au",
-  "jdm",
-  "eu",
-  "me",
-  "global",
-] as const;
-
-export type Market = (typeof MARKETS)[number];
 
 export const marketSchema = z.enum(MARKETS);
 
@@ -153,16 +163,6 @@ export const marketSchema = z.enum(MARKETS);
  * Closed on purpose: adding a generation is a taxonomy change, which AGENTS.md
  * requires to be deliberate rather than a content edit.
  * ---------------------------------------------------------------------- */
-
-export const GENERATION_IDS = [
-  "gen1",
-  "gen2",
-  "gen2-5",
-  "gen3",
-  "gen4",
-] as const;
-
-export type GenerationId = (typeof GENERATION_IDS)[number];
 
 export const generationIdSchema = z.enum(GENERATION_IDS);
 
@@ -267,10 +267,6 @@ export type TransferCaseFamily = (typeof TRANSFER_CASE_FAMILIES)[number];
  * like `markets` — omitted from a fitment means no drive restriction, and a
  * `VehicleSelection` may carry an optional `drive`.
  */
-export const DRIVE_TYPES = ["2wd", "4wd"] as const;
-
-export type DriveType = (typeof DRIVE_TYPES)[number];
-
 export const driveTypeSchema = z.enum(DRIVE_TYPES);
 
 /* -------------------------------------------------------------------------
@@ -301,13 +297,6 @@ export type CombinationCoverage = (typeof COMBINATION_COVERAGE)[number];
  * ---------------------------------------------------------------------- */
 
 /**
- * Stable ids are kebab-case: lowercase alphanumerics joined by single hyphens.
- * Uppercase or underscored ids would make `6G74_SOHC` and `6g74-sohc` two
- * spellings of one engine, and every reference a coin flip.
- */
-export const TAXONOMY_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-/**
  * A reference to a taxonomy node by id. Exported so the fitment engine (T203)
  * validates the id strings in an entry's `fitment` against the same rule the
  * taxonomy stores them under, rather than a second copy of the regex.
@@ -321,14 +310,6 @@ export const taxonomyIdSchema = () =>
  * least three long, so a two-character `V6` is a truncation, not a code.
  */
 export const CHASSIS_CODE_PATTERN = /^[A-Z][A-Z0-9]{2,5}$/;
-
-/**
- * Production years the taxonomy covers, from spec §1 ("all generations
- * (1982–2021)") and §2. Bounded so a transposed digit (`1892`, `2201`) is a
- * build error rather than a silently impossible fitment. Extending coverage
- * past 2021 is a taxonomy change, not a content edit.
- */
-export const PRODUCTION_YEAR_RANGE = { from: 1982, to: 2021 } as const;
 
 const yearSchema = () =>
   z
@@ -553,6 +534,54 @@ export type CombinationData = z.infer<
 >;
 
 /**
+ * The seven kind shapes merged into one object type.
+ *
+ * Field names are unique across kinds by construction (see
+ * {@link vehicleSharedShape}), so intersecting them loses nothing — no field
+ * ends up with two different schemas. Written as an intersection rather than
+ * spelled out so adding a field to `VEHICLE_KIND_SHAPES` needs no second edit
+ * here.
+ */
+type UnionToIntersection<Union> = (
+  Union extends unknown ? (value: Union) => void : never
+) extends (value: infer Intersection) => void
+  ? Intersection
+  : never;
+
+type MergedKindShapes = UnionToIntersection<
+  (typeof VEHICLE_KIND_SHAPES)[VehicleKind]
+> & { kind: typeof vehicleKindSchema };
+
+/**
+ * The declared type of {@link vehicleSharedShape} — every taxonomy field as an
+ * optional schema, plus the required `kind`.
+ *
+ * **This type is why the constant is not just `as z.ZodRawShape`** (T205
+ * carry-forward CF1). `z.ZodRawShape` is an index signature, and spreading one
+ * into `defineEntrySchema`'s object gives the resulting `z.ZodObject` an index
+ * signature too. Zod's output inference maps over `keyof Shape`, so an index
+ * signature makes *every* key — `prose` included — infer as the index
+ * signature's value type, i.e. `unknown`. The symptom was that
+ * `entry.data.prose` was `unknown` on every page reading the `vehicles`
+ * collection, which is exactly the erasure `src/content.config.ts`'s
+ * `entryCollection` generic was introduced to prevent one level up.
+ *
+ * A mapped type over the merged kind shapes has concrete keys, so inference
+ * survives: `vehiclesEntrySchema(baseProse)` now yields
+ * `{ …, prose: { en: { title: string, summary: string }, es: … } }`. It is a
+ * type alias of a mapped type on purpose — TypeScript only gives *those* an
+ * implicit index signature, which is what keeps the value assignable to
+ * `defineEntrySchema`'s `Shared extends z.ZodRawShape` constraint.
+ */
+export type VehicleSharedShape = {
+  [Field in keyof MergedKindShapes]: Field extends "kind"
+    ? typeof vehicleKindSchema
+    : MergedKindShapes[Field] extends z.ZodType
+      ? z.ZodOptional<MergedKindShapes[Field]>
+      : never;
+};
+
+/**
  * Every taxonomy field, optional, as the collection's shared shape.
  *
  * Why optional-and-then-refined rather than a `z.discriminatedUnion`: the
@@ -578,7 +607,7 @@ export const vehicleSharedShape = {
       )
     )
   ),
-} as z.ZodRawShape;
+} as VehicleSharedShape;
 
 /** Every field name owned by a kind — `kind` itself is not one. */
 const TAXONOMY_FIELDS: readonly string[] = Object.keys(

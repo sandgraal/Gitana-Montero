@@ -13,8 +13,30 @@
  * is `""` unconditionally, which is what makes the initial state (every
  * facet `""`) render the same set the server already produced.
  *
- * refs specs/001-foundation (COM-01, COM-02)
+ * ## The generation facet answers through the fitment engine (T204)
+ *
+ * This module was written before `src/lib/fitment/` existed, and its
+ * generation facet was a bare `card.gens.includes(selected)` — a miniature
+ * fitment answer, and therefore a second one. The T703a review flagged it as
+ * a divergence waiting to happen and made re-pointing it T204's job.
+ *
+ * It is re-pointed at {@link expandGenerations}, which is the engine's own
+ * reading of "which generations does this fitment's `gens` cover". The
+ * difference is visible in real content today: `parentGeneration` makes
+ * `gen2-5` a Gen 2 truck, so an entry scoped to `["gen2"]` is an answer for a
+ * reader with a facelift truck. `includes` said no; the engine says yes, and
+ * the engine is right (FIT-01 — nothing outside `src/lib/fitment/` interprets
+ * a fitment).
+ *
+ * The taxonomy is a required argument rather than a defaulted one on purpose.
+ * A default would be a second, quieter implementation of the same rule for
+ * any caller that forgot to pass one, which is the exact failure this change
+ * exists to close.
+ *
+ * refs specs/001-foundation (COM-01, COM-02, FIT-01)
  */
+
+import { expandGenerations, type Taxonomy } from "./fitment/index.ts";
 
 /** One card's already-resolved filterable facts. */
 export interface CommunityFilterCard {
@@ -68,7 +90,8 @@ function languageMatches(tag: string, selected: string): boolean {
 /** Whether `card` survives every active facet in `state`. */
 export function matchesCommunityFilter(
   card: CommunityFilterCard,
-  state: CommunityFilterState
+  state: CommunityFilterState,
+  taxonomy: Taxonomy
 ): boolean {
   // Region is exact-match, not prefix: `001` (worldwide, M49 "world") is its
   // own pill precisely because a worldwide community is not a Costa Rican
@@ -86,7 +109,10 @@ export function matchesCommunityFilter(
   ) {
     return false;
   }
-  if (state.gen !== "" && !card.gens.includes(state.gen)) {
+  if (
+    state.gen !== "" &&
+    !expandGenerations(card.gens, taxonomy).includes(state.gen)
+  ) {
     return false;
   }
   if (state.activity !== "" && card.activity !== state.activity) {
@@ -98,10 +124,12 @@ export function matchesCommunityFilter(
 /** How many of `cards` the filter keeps. */
 export function countCommunityMatches(
   cards: readonly CommunityFilterCard[],
-  state: CommunityFilterState
+  state: CommunityFilterState,
+  taxonomy: Taxonomy
 ): number {
   return cards.reduce(
-    (total, card) => (matchesCommunityFilter(card, state) ? total + 1 : total),
+    (total, card) =>
+      matchesCommunityFilter(card, state, taxonomy) ? total + 1 : total,
     0
   );
 }
