@@ -41,11 +41,37 @@
  *
  * Four independent facets — region, language, generation, activity — each a
  * pill group in the Glosario artboard's filter-pill vocabulary (active =
- * ink-filled). Client-side and progressive: the toolbar ships `hidden` and is
- * revealed by the enhancement script, so a visitor with no JavaScript sees
- * every entry and no dead control. What a facet *matches* is
+ * ink-filled). Client-side and progressive: the toolbar is laid out only when
+ * the document is marked script-capable (see the CSS note below), so a visitor
+ * with no JavaScript sees every entry and no dead control. What a facet *matches* is
  * `src/lib/community-filter.ts`, unit-tested without a browser; this script
  * is DOM wiring only.
+ *
+ * ## The vehicle filter is a *second*, differently-shaped filter (T204, FIT-03)
+ *
+ * The four pills above **hide** what does not match: a reader who picks
+ * "Costa Rica" is asking for a shorter list. The vehicle selector does not
+ * hide anything — a row that does not fit the reader's truck stays on the
+ * page at 55% opacity, carrying a "filtered" tag, exactly as the Selector
+ * artboard draws it ("never hidden silently"). The two are different
+ * questions: a facet pill is the reader narrowing on purpose, while a
+ * fitment mismatch is the *site* deciding something is not for them, and the
+ * site owes them the chance to disagree.
+ *
+ * Whether an entry fits is `matchesVehicle` and only `matchesVehicle`
+ * (FIT-01). Whether the fit was *provisional* — matched partly because the
+ * reader has not said which transfer case they have — is
+ * `provisionalMatchFacets`, and it is rendered per row, because that is the
+ * binding condition under which T203's permissive semantics were accepted
+ * (T203 review, F8): the trade-off is only safe if the reader can see it.
+ *
+ * ## Dates
+ *
+ * `activityAssessed` renders through `Intl.DateTimeFormat` in the page
+ * locale, inside a `<time datetime="…">` carrying the stored `YYYY-MM-DD`.
+ * That answers the ambiguity T703a's F5 note deferred to this task — a long
+ * month name cannot be read day-first or month-first by mistake, and the
+ * machine-readable form is still in the markup for anything that wants it.
  *
  * ## Region and language names
  *
@@ -78,16 +104,20 @@ import {
   type Locale,
 } from "../../i18n/routing";
 import { collectionRouteParams, collectionRoutePaths } from "../../i18n/routes";
+import VehicleFitSummary from "../../components/VehicleFitSummary.astro";
 import {
   communityActivityLabel,
-  communityGenerationLabel,
   communityLinkKindLabel,
   communityTypeLabel,
   confidenceTierLabel,
+  generationLabel,
   t,
 } from "../../i18n/ui";
 import { formatCount } from "../../lib/glossary-filter";
 import { needsConfidenceCaveat } from "../../lib/confidence";
+import { buildTaxonomy, expandGenerations } from "../../lib/fitment";
+import { buildFitmentTable } from "../../lib/vehicle-listing";
+import { selectorTaxonomyData } from "../../lib/vehicle-taxonomy";
 import {
   ACTIVITY_LEVELS,
   WORLDWIDE_REGION,
@@ -150,6 +180,32 @@ function caveatSentence(each: Locale, tier: ConfidenceTier): string {
   );
 }
 
+/**
+ * The same taxonomy the selector ships to the browser, built here so the
+ * *server* render answers generation questions the same way the client does —
+ * one engine, one answer, whichever side of the wire asks (FIT-01).
+ */
+const taxonomy = buildTaxonomy(
+  selectorTaxonomyData(
+    (await getCollection("vehicles")).map((entry) => entry.data)
+  ).nodes
+);
+
+/** `2026-08-28` → `28 de agosto de 2026` / `August 28, 2026`. */
+const assessedDate = new Intl.DateTimeFormat(LOCALE_BCP47[locale], {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
+function formatAssessed(iso: string): string {
+  // Parsed as UTC midnight, formatted in UTC: an ISO date is a calendar day,
+  // and letting the runtime's local zone shift it would print the day before
+  // for anyone west of Greenwich — Costa Rica included.
+  return assessedDate.format(new Date(`${iso}T00:00:00Z`));
+}
+
 const entries = await getCollection("community");
 
 const communities = entries
@@ -179,9 +235,17 @@ const communities = entries
       languages,
       languageLabels: languages.map((tag) => languageNames.of(tag) ?? tag),
       gens,
-      genLabels: gens.map((id) =>
-        isKnownGeneration(id) ? communityGenerationLabel(strings, id) : id
+      /**
+       * The generations this entry's fitment *covers*, engine-expanded — a
+       * club scoped to `["gen2"]` covers the `gen2-5` facelift too. Rendered
+       * as the tags, and read by the client filter, so the page and the
+       * filter cannot disagree about what an entry is for.
+       */
+      coveredGens: expandGenerations(gens, taxonomy),
+      genLabels: expandGenerations(gens, taxonomy).map((id) =>
+        isKnownGeneration(id) ? generationLabel(strings, id) : id
       ),
+      fitment,
       activity: activity as ActivityLevel,
       activityLabel: communityActivityLabel(strings, activity as ActivityLevel),
       activityAssessed,
@@ -232,8 +296,16 @@ const languageOptions = labeledOptions(
 
 /** Canonical taxonomy order, not alphabetical — same rule the system pills use. */
 const generationOptions = GENERATION_IDS.filter((id) =>
-  communities.some((community) => community.gens.includes(id))
-).map((id) => ({ code: id, label: communityGenerationLabel(strings, id) }));
+  communities.some((community) => community.coveredGens.includes(id))
+).map((id) => ({ code: id, label: generationLabel(strings, id) }));
+
+/**
+ * One entry per *distinct* fitment, so a listing whose rows mostly share one
+ * does not repeat it in every card's attribute (T204 review, F3).
+ */
+const fitmentTable = buildFitmentTable(
+  communities.map((community) => community.fitment)
+);
 
 /** Most-active-first, per `ACTIVITY_LEVELS`' own order. */
 const activityOptions = ACTIVITY_LEVELS.filter((level) =>
@@ -261,7 +333,7 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
         <p class="community__empty">{strings.communityEmpty}</p>
       ) : (
         <>
-          <div class="community__toolbar" data-community-toolbar hidden>
+          <div class="community__toolbar" data-community-toolbar>
             <div class="community__filter-group">
               <span class="community__filter-label">
                 {strings.communityFilterRegionLabel}
@@ -397,6 +469,8 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
             )}
           </p>
 
+          <VehicleFitSummary locale={locale} fitments={fitmentTable.table} />
+
           <ul class="community__list" data-community-list>
             {communities.map((community) => (
               <li
@@ -406,6 +480,7 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
                 data-languages={community.languages.join(" ")}
                 data-gens={community.gens.join(" ")}
                 data-activity={community.activity}
+                data-fitment={fitmentTable.indexOf(community.fitment)}
               >
                 <div class="entry__head">
                   <h2 class="entry__title">{community.title}</h2>
@@ -433,22 +508,25 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
                   >
                     {community.activityLabel}
                   </span>
-                  <span class="entry__activity-date">
-                    {/*
-                     * F5 (code review, ruled) — rendered as the raw
-                     * `YYYY-MM-DD` from the schema, not through
-                     * `Intl.DateTimeFormat`: a field-manual reference reads
-                     * unambiguously in both locales this way, where a
-                     * localized short date (`28/08` en vs `08/24` es-style
-                     * day/month order) would not. Revisiting this with a
-                     * proper `Intl.DateTimeFormat` render is T204's, not
-                     * this task's.
-                     */}
+                  {/*
+                   * T703a's F5 note, settled (it deferred this to T204). The
+                   * raw `YYYY-MM-DD` was chosen because a localized *short*
+                   * date is genuinely ambiguous — `08/09` is two different
+                   * days depending on the reader. A localized *long* date is
+                   * not: "28 de agosto de 2026" names the month in words and
+                   * cannot be misread in either direction. The stored ISO
+                   * value stays in `datetime`, so nothing machine-readable is
+                   * lost and the figure is still stored exactly once.
+                   */}
+                  <time
+                    class="entry__activity-date"
+                    datetime={community.activityAssessed}
+                  >
                     {strings.communityActivityAssessedTemplate.replace(
                       "{date}",
-                      community.activityAssessed
+                      formatAssessed(community.activityAssessed)
                     )}
-                  </span>
+                  </time>
                 </p>
 
                 {community.goodFor.length > 0 && (
@@ -536,12 +614,23 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
     type CommunityFilterState,
   } from "../../lib/community-filter";
   import { formatCount } from "../../lib/glossary-filter";
+  import { buildTaxonomy } from "../../lib/fitment";
+  import { readSelectorPayload } from "../../lib/vehicle-taxonomy";
+  import { createVehicleListingView } from "../../lib/vehicle-listing";
+  import {
+    onVehicleSelectionChange,
+    readVehicleSelection,
+    type StoredVehicleSelection,
+  } from "../../lib/vehicle-selection";
 
   /**
-   * Client-side filtering (T703a). Enhancement only — see the glossary page's
-   * identical rationale: the toolbar ships `hidden` and is revealed here, so
-   * a visitor with no JavaScript sees the whole directory. DOM wiring only;
-   * `matchesCommunityFilter` (`src/lib/community-filter.ts`) owns the rule.
+   * Client-side filtering (T703a) and vehicle fitment (T204). Enhancement
+   * only — see the glossary page's identical rationale: the toolbar is laid
+   * out only when the document is marked script-capable, so a visitor with no
+   * JavaScript sees the whole directory and no dead control. DOM wiring only;
+   * `matchesCommunityFilter` (`src/lib/community-filter.ts`) owns the facet
+   * rule, `src/lib/vehicle-listing.ts` owns the vehicle filter, and
+   * `src/lib/fitment/` owns every fitment answer.
    */
   function enhance(root: HTMLElement): void {
     const toolbar = root.querySelector<HTMLElement>("[data-community-toolbar]");
@@ -553,6 +642,31 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
     const template = count.dataset.countTemplate ?? "";
     const total = Number(count.dataset.total ?? cards.length);
     const state: CommunityFilterState = { ...EMPTY_COMMUNITY_FILTER };
+
+    const payload = readSelectorPayload(document);
+    // The same nodes the selector shipped, read once. Without a selector on
+    // the page there is no taxonomy and no vehicle filter — the facet pills
+    // still work, and `buildTaxonomy([])` gives the generation facet its
+    // "no expansion" reading rather than throwing.
+    const taxonomy = buildTaxonomy(payload?.nodes ?? []);
+
+    /*
+     * The vehicle filter itself is `src/lib/vehicle-listing.ts`, shared with
+     * the glossary and unit-tested against JSDOM — including the provisional
+     * marker's text in both locales, which no real content entry currently
+     * exercises (T204 review, F1). This page supplies the cards and the
+     * taxonomy; it decides nothing about fitment.
+     */
+    const vehicle = createVehicleListingView({
+      root,
+      cards,
+      taxonomy,
+      lang: document.documentElement.lang,
+    });
+
+    function applyVehicle(selection: StoredVehicleSelection | null): void {
+      vehicle?.apply(selection);
+    }
 
     function apply(): void {
       let shown = 0;
@@ -566,13 +680,15 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
             gens: (card.dataset.gens ?? "").split(" ").filter(Boolean),
             activity: card.dataset.activity ?? "",
           },
-          state
+          state,
+          taxonomy
         );
         card.hidden = !visible;
         if (visible) shown += 1;
       }
       count!.textContent = formatCount(template, shown, total);
       none!.hidden = shown > 0;
+      applyVehicle(readVehicleSelection(window));
     }
 
     const FACET_KEYS = ["region", "language", "gen", "activity"] as const;
@@ -604,7 +720,10 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
       });
     }
 
-    toolbar.hidden = false;
+    // The selector lives in the site chrome and knows nothing about this
+    // page; it announces, and the listing re-filters (FIT-03).
+    onVehicleSelectionChange(window, (selection) => applyVehicle(selection));
+
     apply();
   }
 
@@ -670,10 +789,32 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
     max-width: 62ch;
   }
 
+  /*
+   * T204, from two findings that pull against each other.
+   *
+   * The toolbar shipped with the `hidden` attribute and this page's docstring
+   * promises "no dead control" — but an author `display: flex` beats the
+   * user-agent stylesheet's `[hidden] { display: none }`, so with JavaScript
+   * off the filter pills were visible and inert (found by the new e2e no-JS
+   * case). Adding `.community__toolbar[hidden] { display: none }` fixed that
+   * and immediately broke the other half: the toolbar then occupied no space
+   * until the module script revealed it, and every card below jumped down —
+   * CLS 0.345 on this page, well past SCF-06's budget.
+   *
+   * Both halves are satisfied by asking the question earlier. `BaseLayout`
+   * marks the document `js` before first paint, so CSS can lay the toolbar
+   * out immediately when scripting is available and omit it entirely when it
+   * is not. No `hidden` attribute, no shift, no dead control. Same pattern as
+   * `src/components/VehicleSelector.astro`.
+   */
   .community__toolbar {
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  :global(html.js) .community__toolbar {
+    display: flex;
   }
 
   .community__filter-group {
@@ -748,6 +889,24 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
   .entry[hidden] {
     display: none;
   }
+
+  /*
+   * The Selector artboard's third state: a row that does not fit the reader's
+   * truck is de-emphasized, not removed. 55% opacity and `panel-soft`, with a
+   * "filtered" tag saying so in words — opacity alone is not information, and
+   * it is not information at all to a screen reader.
+   */
+  .entry[data-fits="false"] {
+    background: var(--panel-soft);
+    opacity: 0.55;
+  }
+
+  /*
+   * The marker rows and the summary block are styled by
+   * `src/styles/vehicle-fit.css` and `VehicleFitSummary.astro`, so the two
+   * listings that use them cannot drift apart on what "filtered" looks like.
+   * Only the dimming lives here, because it is a change to *this page's* card.
+   */
 
   .entry__head {
     display: flex;

@@ -24,7 +24,8 @@ import type {
   LinkKind,
 } from "../schemas/community";
 import type { ConfidenceTier } from "../schemas/entry";
-import type { GenerationId } from "../schemas/vehicles";
+import type { DriveType, GenerationId } from "../schemas/vehicles";
+import type { OptionalSelectionFacet } from "../lib/fitment";
 import {
   COMMUNITY_TYPE_BRAND_NAMES,
   LINK_KIND_BRAND_NAMES,
@@ -79,9 +80,37 @@ export type CommunityLinkKindStrings = {
   ]: string;
 };
 
-/** One flat key per `GENERATION_IDS` value (T703a's generation filter pills). */
-export type CommunityGenerationStrings = {
-  readonly [Gen in GenerationId as `communityGeneration.${Gen}`]: string;
+/**
+ * One flat key per `GENERATION_IDS` value.
+ *
+ * Renamed off T703a's `communityGeneration.` prefix by T204: the vehicle
+ * selector's generation button row needs exactly these five words, and a
+ * second `selectorGeneration.` copy of "Gen 3" / "Generación 3" would be the
+ * same string translated twice. Same reasoning as
+ * {@link ConfidenceTierStrings}, which was left unprefixed for this reason
+ * from the start.
+ */
+export type GenerationStrings = {
+  readonly [Gen in GenerationId as `generation.${Gen}`]: string;
+};
+
+/**
+ * One flat key per `DRIVE_TYPES` value — the selector's optional drive
+ * control (owner ruling 2026-08-30). Derived from the constant, so widening
+ * the vocabulary is a type error rather than an untranslated option.
+ */
+export type DriveStrings = {
+  readonly [Drive in DriveType as `drive.${Drive}`]: string;
+};
+
+/**
+ * One flat key per facet a visitor may leave unanswered — the four
+ * `OPTIONAL_SELECTION_FACETS` the fitment engine reports when a match leaned
+ * on silence (T203 decision (a)). Derived, so a facet added to the match table
+ * cannot reach the provisional notice untranslated.
+ */
+export type FitmentFacetStrings = {
+  readonly [Facet in OptionalSelectionFacet as `fitmentFacet.${Facet}`]: string;
 };
 
 /**
@@ -99,7 +128,9 @@ export interface UiStrings
     CommunityTypeStrings,
     CommunityActivityStrings,
     CommunityLinkKindStrings,
-    CommunityGenerationStrings,
+    GenerationStrings,
+    DriveStrings,
+    FitmentFacetStrings,
     ConfidenceTierStrings {
   readonly siteTagline: string;
   readonly skipToContent: string;
@@ -213,6 +244,43 @@ export interface UiStrings
    */
   readonly signInUnavailable: string;
   readonly signInScriptRequired: string;
+  /* Vehicle selector — T204, FIT-03 */
+  readonly vehicleSelectorLabel: string;
+  readonly vehicleSelectorIdle: string;
+  readonly vehicleSelectorOpen: string;
+  readonly vehicleSelectorChange: string;
+  readonly vehicleSelectorPanelLabel: string;
+  readonly vehicleSelectorClear: string;
+  readonly vehicleSelectorReset: string;
+  readonly vehicleSelectorApply: string;
+  readonly vehicleSelectorGenerationLabel: string;
+  readonly vehicleSelectorMarketLabel: string;
+  readonly vehicleSelectorYearLabel: string;
+  readonly vehicleSelectorEngineLabel: string;
+  readonly vehicleSelectorDriveLabel: string;
+  /** The drive control's "I have not said" option — see `OPTIONAL_SELECTION_FACETS`. */
+  readonly vehicleSelectorDriveAny: string;
+  readonly vehicleSelectorFilterNote: string;
+  /** `<optgroup>` for powertrains a `combination` entry lists (VEH-03 rule 1/2). */
+  readonly vehicleSelectorEnginesRecorded: string;
+  /** `<optgroup>` for powertrains no combination entry mentions — *unknown*, not impossible. */
+  readonly vehicleSelectorEnginesUnrecorded: string;
+  readonly vehicleSelectorNoEngines: string;
+  /* Vehicle-filtered listings — T204, FIT-03 */
+  /** `{shown}` / `{total}`, computed and interpolated — see `glossaryCountTemplate`. */
+  readonly vehicleFitCountTemplate: string;
+  readonly vehicleFilteredTag: string;
+  readonly vehicleDoesNotFitLabel: string;
+  readonly vehicleProvisionalLabel: string;
+  /**
+   * The standing warning that a filtered listing was matched on FIT-03's
+   * quadruple alone (T203 review, F8). Shown whenever any visible row's match
+   * leaned on a facet the visitor has not named; narrowing the selection is
+   * what removes it.
+   */
+  readonly vehicleProvisionalNote: string;
+  /** `{facets}` is an `Intl.ListFormat` list of `fitmentFacet.*` labels. */
+  readonly vehicleProvisionalDetailTemplate: string;
 }
 
 const en: UiStrings = {
@@ -311,11 +379,11 @@ const en: UiStrings = {
   "communityLinkKind.website": "Website",
   "communityLinkKind.forum": "Forum",
   "communityLinkKind.map": "Map",
-  "communityGeneration.gen1": "Gen 1",
-  "communityGeneration.gen2": "Gen 2",
-  "communityGeneration.gen2-5": "Gen 2.5",
-  "communityGeneration.gen3": "Gen 3",
-  "communityGeneration.gen4": "Gen 4",
+  "generation.gen1": "Gen 1",
+  "generation.gen2": "Gen 2",
+  "generation.gen2-5": "Gen 2.5",
+  "generation.gen3": "Gen 3",
+  "generation.gen4": "Gen 4",
   "confidenceTier.fsm-confirmed":
     "Confirmed in the Factory Service Manual (FSM)",
   "confidenceTier.tsb": "Technical service bulletin (TSB)",
@@ -347,6 +415,39 @@ const en: UiStrings = {
     "Accounts are not switched on yet on this deployment. The reference side of the site works without one.",
   signInScriptRequired:
     "Signing in needs JavaScript. Everything else on this site works without it.",
+  vehicleSelectorLabel: "Your vehicle",
+  vehicleSelectorIdle: "Browsing all vehicles",
+  vehicleSelectorOpen: "Select your vehicle",
+  vehicleSelectorChange: "Change vehicle",
+  vehicleSelectorPanelLabel: "Which truck do you have?",
+  vehicleSelectorClear: "Forget this vehicle",
+  vehicleSelectorReset: "Clear",
+  vehicleSelectorApply: "Set vehicle",
+  vehicleSelectorGenerationLabel: "Generation",
+  vehicleSelectorMarketLabel: "Market",
+  vehicleSelectorYearLabel: "Year",
+  vehicleSelectorEngineLabel: "Engine",
+  vehicleSelectorDriveLabel: "Drive",
+  vehicleSelectorDriveAny: "I have not said",
+  vehicleSelectorFilterNote:
+    "Combinations the taxonomy says never existed are filtered out as you pick.",
+  vehicleSelectorEnginesRecorded: "Recorded for this combination",
+  vehicleSelectorEnginesUnrecorded: "Not recorded — may still have existed",
+  vehicleSelectorNoEngines: "No engine is listed for that combination yet.",
+  vehicleFitCountTemplate: "{shown} of {total} fit your truck",
+  vehicleFilteredTag: "filtered",
+  vehicleDoesNotFitLabel: "Does not fit the vehicle you selected",
+  vehicleProvisionalLabel: "Provisional match",
+  vehicleProvisionalNote:
+    "Matched on generation, market, year and engine only. Entries marked provisional also depend on something you have not told us, so some of them will not fit your truck. Narrowing your selection removes the mark.",
+  vehicleProvisionalDetailTemplate:
+    "This entry also depends on details you have not given: {facets}.",
+  "drive.2wd": "Two-wheel drive",
+  "drive.4wd": "Four-wheel drive",
+  "fitmentFacet.transmission": "transmission",
+  "fitmentFacet.transferCase": "transfer case",
+  "fitmentFacet.trim": "trim",
+  "fitmentFacet.drive": "drive",
 };
 
 const es: UiStrings = {
@@ -453,11 +554,11 @@ const es: UiStrings = {
   "communityLinkKind.website": "Sitio web",
   "communityLinkKind.forum": "Foro",
   "communityLinkKind.map": "Mapa",
-  "communityGeneration.gen1": "Generación 1",
-  "communityGeneration.gen2": "Generación 2",
-  "communityGeneration.gen2-5": "Generación 2.5",
-  "communityGeneration.gen3": "Generación 3",
-  "communityGeneration.gen4": "Generación 4",
+  "generation.gen1": "Generación 1",
+  "generation.gen2": "Generación 2",
+  "generation.gen2-5": "Generación 2.5",
+  "generation.gen3": "Generación 3",
+  "generation.gen4": "Generación 4",
   "confidenceTier.fsm-confirmed": "Confirmado en el manual de fábrica (FSM)",
   "confidenceTier.tsb": "Boletín técnico de servicio (TSB)",
   "confidenceTier.community-consensus": "Consenso de la comunidad",
@@ -488,6 +589,40 @@ const es: UiStrings = {
     "Las cuentas todavía no están activas en este despliegue. La parte de referencia del sitio funciona sin cuenta.",
   signInScriptRequired:
     "Para ingresar se necesita JavaScript. Todo lo demás en este sitio funciona sin él.",
+  vehicleSelectorLabel: "Su vehículo",
+  vehicleSelectorIdle: "Está viendo todos los vehículos",
+  vehicleSelectorOpen: "Elija su vehículo",
+  vehicleSelectorChange: "Cambie de vehículo",
+  vehicleSelectorPanelLabel: "¿Cuál carro tiene usted?",
+  vehicleSelectorClear: "Olvide este vehículo",
+  vehicleSelectorReset: "Limpiar",
+  vehicleSelectorApply: "Guardar el vehículo",
+  vehicleSelectorGenerationLabel: "Generación",
+  vehicleSelectorMarketLabel: "Mercado",
+  vehicleSelectorYearLabel: "Año",
+  vehicleSelectorEngineLabel: "Motor",
+  vehicleSelectorDriveLabel: "Tracción",
+  vehicleSelectorDriveAny: "No lo he indicado",
+  vehicleSelectorFilterNote:
+    "Conforme usted elige, se descartan las combinaciones que la taxonomía da por inexistentes.",
+  vehicleSelectorEnginesRecorded: "Registrados para esta combinación",
+  vehicleSelectorEnginesUnrecorded: "Sin registrar — pudieron haber existido",
+  vehicleSelectorNoEngines:
+    "Todavía no hay ningún motor registrado para esa combinación.",
+  vehicleFitCountTemplate: "{shown} de {total} le sirven a su carro",
+  vehicleFilteredTag: "descartada",
+  vehicleDoesNotFitLabel: "No le sirve al vehículo que usted eligió",
+  vehicleProvisionalLabel: "Coincidencia provisional",
+  vehicleProvisionalNote:
+    "La coincidencia se hizo solo con generación, mercado, año y motor. Las fichas marcadas como provisionales dependen además de algún dato que usted no nos ha dado, así que algunas no le van a servir a su carro. Si afina su selección, la marca desaparece.",
+  vehicleProvisionalDetailTemplate:
+    "Esta ficha depende además de datos que usted no ha indicado: {facets}.",
+  "drive.2wd": "Tracción sencilla",
+  "drive.4wd": "Doble tracción",
+  "fitmentFacet.transmission": "la transmisión",
+  "fitmentFacet.transferCase": "la caja de transferencia",
+  "fitmentFacet.trim": "el nivel de equipamiento",
+  "fitmentFacet.drive": "la tracción",
 };
 
 export const ui: Record<Locale, UiStrings> = { en, es };
@@ -534,12 +669,25 @@ export function communityActivityLabel(
   return strings[`communityActivity.${level}`];
 }
 
-/** The label for a generation id, in T703a's short "Gen N" / "Generación N" form. */
-export function communityGenerationLabel(
+/** The label for a generation id, in the short "Gen N" / "Generación N" form. */
+export function generationLabel(strings: UiStrings, gen: GenerationId): string {
+  return strings[`generation.${gen}`];
+}
+
+/** The label for a `DRIVE_TYPES` value — the selector's drive control. */
+export function driveLabel(strings: UiStrings, drive: DriveType): string {
+  return strings[`drive.${drive}`];
+}
+
+/**
+ * The label for one facet the visitor may have left unanswered, as named by
+ * `provisionalMatchFacets` in `src/lib/fitment/`.
+ */
+export function fitmentFacetLabel(
   strings: UiStrings,
-  gen: GenerationId
+  facet: OptionalSelectionFacet
 ): string {
-  return strings[`communityGeneration.${gen}`];
+  return strings[`fitmentFacet.${facet}`];
 }
 
 /** The label for a confidence tier id. */

@@ -1,0 +1,150 @@
+/*
+ * The two typefaces HANDOFF-DESIGN.md names, loaded site-wide (T204).
+ *
+ * ## Self-hosted, not `fonts.googleapis.com`
+ *
+ * The design handoff names Archivo and IBM Plex Mono as *Google Fonts*, and
+ * the artboards link the CDN stylesheet. This ships the same files from our
+ * own origin instead, for three reasons that all point the same way:
+ *
+ *  1. **The budget.** SCF-06 holds every sampled page at performance >= 90.
+ *     The CDN form costs two extra DNS + TLS handshakes (`fonts.googleapis.com`
+ *     for the CSS, `fonts.gstatic.com` for the files) *before* the first byte
+ *     of a font can be requested, and the stylesheet is render-blocking. From
+ *     our own origin the `@font-face` rules arrive inside the page's own CSS
+ *     bundle and the files come over the connection that is already open.
+ *  2. **No third-party request.** A reader loading a page here should not
+ *     announce it to a third party. That is not the analytics/ad boundary
+ *     AGENTS.md names — it is the same instinct one step earlier.
+ *  3. **Reproducibility.** The bytes are pinned in git, so a Lighthouse
+ *     number measured today is measurable again tomorrow.
+ *
+ * The files are the exact subsets `fonts.googleapis.com/css2` serves to a
+ * current Chrome (Archivo v25, IBM Plex Mono v20), with their `unicode-range`
+ * declarations preserved verbatim. Both faces are SIL Open Font License 1.1.
+ *
+ * ## Which subsets, and why only two
+ *
+ * `latin` and `latin-ext` only. Everything either locale writes lives in
+ * `latin` (`n~`, `u:`, `a'`, `!` and `?` inverted are all under U+00FF); the
+ * `latin-ext` pair is kept because taxonomy and community data carry the
+ * occasional European name, and an unused subset costs nothing — the
+ * `unicode-range` on each face means a browser only downloads the file whose
+ * range a glyph on the page actually falls in. The Cyrillic, Greek and
+ * Vietnamese subsets Google serves are dropped: nothing on this site can
+ * reach them.
+ *
+ * Imported once, by `src/layouts/BaseLayout.astro`, so every localized page
+ * gets it and no page can forget. The URLs below are relative on purpose —
+ * Vite rewrites and fingerprints them, so the deploy `base` is applied for
+ * free and a font file is never a hard-coded absolute path that breaks when
+ * the site moves (the failure `check:hreflang` guards against, one layer
+ * down).
+ *
+ * `font-display: swap` matches what the artboards were designed under: text
+ * is readable in the fallback immediately and reflows once, rather than being
+ * invisible while a font loads. The fallback stacks in the components name
+ * metrically similar faces so that reflow stays small.
+ *
+ * refs specs/001-foundation (SCF-06), specs/001-foundation/design/HANDOFF-DESIGN.md
+ */
+
+/* Archivo — one variable file per subset, covering weights 400-800. */
+@font-face {
+  font-family: Archivo;
+  font-style: normal;
+  font-weight: 400 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("./fonts/archivo-400-800-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: Archivo;
+  font-style: normal;
+  font-weight: 400 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("./fonts/archivo-400-800-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* IBM Plex Mono — static weights, one file per weight per subset. */
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-mono-400-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-mono-400-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-mono-500-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-mono-500-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-mono-600-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-mono-600-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}

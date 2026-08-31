@@ -128,7 +128,7 @@ import {
   MARKETS,
   VEHICLE_KINDS,
   type VehicleKind,
-} from "../../schemas/vehicles.ts";
+} from "../../schemas/vehicle-vocabulary.ts";
 
 /* -------------------------------------------------------------------------
  * Types
@@ -842,6 +842,94 @@ export function entryAppliesTo(
   const record = asRecord(entry);
   if (record === null) return false;
   return matchesVehicle(record["fitment"], vehicle, taxonomy);
+}
+
+/* -------------------------------------------------------------------------
+ * FIT-03 — what a match cost, so the reader can see it
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The `VehicleSelection` fields that decision (a) lets a visitor stay silent
+ * about. FIT-03 fixes a selection as gen + market + year + engine, so these
+ * four are the entire surface on which "an absent selection facet is treated
+ * as unrestricted" can bite.
+ *
+ * Derived from {@link DIRECT_MATCH_FACETS} rather than hand-listed: a facet
+ * added to the match table without being added here would be silently
+ * unreportable, which is the one failure this function exists to prevent.
+ */
+const REQUIRED_SELECTION_FIELDS = ["gen", "market", "year", "engine"] as const;
+
+export type OptionalSelectionFacet = Exclude<
+  (typeof DIRECT_MATCH_FACETS)[number]["select"],
+  (typeof REQUIRED_SELECTION_FIELDS)[number]
+>;
+
+export const OPTIONAL_SELECTION_FACETS: readonly OptionalSelectionFacet[] =
+  DIRECT_MATCH_FACETS.map((facet) => facet.select).filter(
+    (select): select is OptionalSelectionFacet =>
+      !(REQUIRED_SELECTION_FIELDS as readonly string[]).includes(select)
+  );
+
+/**
+ * Why a match is only *provisional*: the facets this fitment restricts that
+ * the selection says nothing about. Empty when the match used no silence at
+ * all, i.e. when the entry genuinely applies to the vehicle as specified.
+ *
+ * ## What this is for (T203 review, F8 — binding on T204)
+ *
+ * `matchesVehicle` errs towards showing: a fitment that names a transfer case
+ * still matches a visitor who never said which transfer case they have
+ * (decision (a) in the module docstring). That trade-off buys information
+ * instead of hiding it, and its cost — "a listing filtered on the FIT-03
+ * quadruple alone will show some entries that a fully-specified truck would
+ * not match" — was accepted *on the condition that the reader can see it*.
+ * This function is how a page sees it, per entry, so the indicator appears on
+ * exactly the rows whose match leaned on an unanswered question and
+ * disappears from a row the moment the visitor narrows the selection enough to
+ * answer it.
+ *
+ * Answering it here rather than in a component is the same rule as everything
+ * else in this module: a page that re-derived "did this match depend on
+ * silence?" would be a second reading of a fitment, and a second reading is a
+ * second truth (FIT-01).
+ *
+ * Returns `[]` for a fitment that does not match at all — an entry that is not
+ * shown has no provisional-ness to report — and for an unreadable fitment.
+ * The result is in {@link OPTIONAL_SELECTION_FACETS} order, so a caller
+ * rendering the list gets a stable sentence (FIT-04's determinism).
+ */
+export function provisionalMatchFacets(
+  fitment: unknown,
+  vehicle: VehicleSelection,
+  taxonomy: Taxonomy
+): readonly OptionalSelectionFacet[] {
+  if (!matchesVehicle(fitment, vehicle, taxonomy)) return [];
+
+  const query = readFitment(fitment);
+  if (query === null) return [];
+
+  return OPTIONAL_SELECTION_FACETS.filter((select) => {
+    const facet = DIRECT_MATCH_FACETS.find((entry) => entry.select === select);
+    if (facet === undefined) return false;
+    // Restricted by the fitment, unanswered by the visitor — the exact pair
+    // `matchesVehicle` waves through.
+    return (
+      query.facets.get(facet.field) !== undefined &&
+      vehicle[select] === undefined
+    );
+  });
+}
+
+/** `provisionalMatchFacets` for a whole entry — the `entryAppliesTo` pairing. */
+export function entryProvisionalFacets(
+  entry: unknown,
+  vehicle: VehicleSelection,
+  taxonomy: Taxonomy
+): readonly OptionalSelectionFacet[] {
+  const record = asRecord(entry);
+  if (record === null) return [];
+  return provisionalMatchFacets(record["fitment"], vehicle, taxonomy);
 }
 
 /* -------------------------------------------------------------------------

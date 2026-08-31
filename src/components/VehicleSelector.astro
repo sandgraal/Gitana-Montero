@@ -1,0 +1,950 @@
+---
+/**
+ * The vehicle selector (FIT-03) — the site chrome that lets a reader say which
+ * truck they have, and keeps that answer across pages and locales.
+ *
+ * The Selector artboard's three states, in one component
+ * (`specs/001-foundation/design/artboards/Selector.dc.html`):
+ *
+ *  1. **idle** — a dark `ink` bar, "Browsing all vehicles" plus a rust CTA;
+ *  2. **open** — a white panel: generation as a button row with the selected
+ *     one in `rust-tint`, then market / year / engine dropdowns that narrow as
+ *     you pick, with combinations the taxonomy says never existed removed;
+ *  3. **active** — an `ink` chip carrying the selection with an `x` to clear
+ *     it, and the listing on the page filtered behind it.
+ *
+ * ## Everything it does not do
+ *
+ * It does not decide whether a vehicle is possible (`classifyCombination`), it
+ * does not decide what an option list contains (`src/lib/vehicle-options.ts`),
+ * it does not decide how a selection is stored
+ * (`src/lib/vehicle-selection.ts`), and it does not decide whether an entry
+ * fits (`matchesVehicle`). This file is markup, style, and the DOM wiring
+ * between them — the same division the glossary and community filters already
+ * hold to, and the one FIT-01 requires: nothing outside `src/lib/fitment/`
+ * interprets a fitment query.
+ *
+ * ## Progressive enhancement, and why it is CSS rather than `hidden`
+ *
+ * The bar is `display: none` until `<html>` carries the `js` class that
+ * `BaseLayout`'s inline head script adds before first paint. Without
+ * JavaScript there is no selector and no dead control; with it, the bar is in
+ * the very first layout.
+ *
+ * The obvious alternative — ship `hidden`, drop it from the script — is what
+ * this component did first, and it is wrong for a control that sits *above*
+ * the page content: revealing it after the module script loads pushes every
+ * row down, which measured 0.345 CLS on the community page. The script still
+ * sets `hidden` in exactly one case, an unreadable payload, and a companion
+ * CSS rule makes that attribute win.
+ *
+ * Every listing renders complete and unfiltered either way — filtering is an
+ * enhancement over a whole page, never a precondition for reading one.
+ *
+ * ## The taxonomy travels with the page
+ *
+ * Narrowing has to happen as the visitor picks, and this is a statically built
+ * site, so the fitment engine runs in the browser and needs a taxonomy there.
+ * `selectorTaxonomyData` projects the `vehicles` collection down to what the
+ * engine reads (~10 KB, ~1.2 KB compressed) and it is inlined as JSON rather
+ * than fetched: one request saved on every page, and no window in which the
+ * bar is present but cannot answer.
+ *
+ * The payload carries *labels* separately from *data*, because only the labels
+ * are per-locale: `Montero`, `V60`, `6G74`, `2002` are shared data stored once
+ * (AGENTS.md), while "Generation" and "United States and Canada" are the page
+ * locale's own words, from `src/i18n/ui.ts` and from the market entries' prose
+ * respectively.
+ *
+ * refs specs/001-foundation (FIT-01, FIT-03, I18N-01, I18N-08, SCF-03)
+ */
+import { getCollection } from "astro:content";
+import { LOCALE_BCP47, type Locale } from "../i18n/routing";
+import { driveLabel, generationLabel, t } from "../i18n/ui";
+import { chassisLabel, engineLabel } from "../lib/vehicle-labels";
+import { selectorTaxonomyData } from "../lib/vehicle-taxonomy";
+import { DRIVE_TYPES, type GenerationId } from "../schemas/vehicles";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale);
+
+const entries = await getCollection("vehicles");
+const data = selectorTaxonomyData(entries.map((entry) => entry.data));
+
+/**
+ * A market's human name in this locale, from the `market` entry's own prose —
+ * "United States and Canada" / "Estados Unidos y Canadá". The *model* name
+ * (`Montero`, `Pajero`) is shared data and travels in `data.generations`.
+ */
+const marketTitles: Record<string, string> = {};
+for (const entry of entries) {
+  if (entry.data.kind !== "market") continue;
+  marketTitles[entry.data.id] = entry.data.prose[locale].title;
+}
+
+const payload = {
+  ...data,
+  labels: {
+    generation: Object.fromEntries(
+      data.generations.map((generation) => [
+        generation.id,
+        generationLabel(strings, generation.id as GenerationId),
+      ])
+    ),
+    market: marketTitles,
+    engine: Object.fromEntries(
+      data.engines.map((engine) => [
+        engine.id,
+        engineLabel(engine, LOCALE_BCP47[locale]),
+      ])
+    ),
+  },
+  text: {
+    recorded: strings.vehicleSelectorEnginesRecorded,
+    unrecorded: strings.vehicleSelectorEnginesUnrecorded,
+    noEngines: strings.vehicleSelectorNoEngines,
+    open: strings.vehicleSelectorOpen,
+    change: strings.vehicleSelectorChange,
+  },
+};
+
+/**
+ * `<` is escaped so no value in the payload can close this `<script>` early.
+ * `JSON.stringify` alone does not do it — it is legal JSON either way, and
+ * legal JSON inside an HTML `<script>` element is not the same grammar.
+ */
+const payloadJson = JSON.stringify(payload).replaceAll("<", "\\u003c");
+---
+
+<div class="vs" data-vehicle-selector>
+  <script
+    type="application/json"
+    data-vehicle-selector-data
+    is:inline
+    set:html={payloadJson}
+  />
+
+  <div class="vs__bar">
+    <p class="vs__state" aria-live="polite">
+      <span data-vs-idle>{strings.vehicleSelectorIdle}</span>
+      <span class="vs__chip" data-vs-chip hidden>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M5 17h14M7 17l1.5-4.5h7L17 17M8.5 12.5 10 8h4l1.5 4.5"
+          ></path>
+          <circle cx="7.5" cy="19" r="1.5"></circle>
+          <circle cx="16.5" cy="19" r="1.5"></circle>
+        </svg>
+        <span class="vs__chip-text" data-vs-chip-text></span>
+        <button
+          type="button"
+          class="vs__chip-clear"
+          data-vs-clear
+          aria-label={strings.vehicleSelectorClear}
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M18 6 6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </span>
+    </p>
+
+    <button
+      type="button"
+      class="vs__cta"
+      data-vs-toggle
+      aria-expanded="false"
+      aria-controls="vehicle-selector-panel"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M5 17h14M7 17l1.5-4.5h7L17 17M8.5 12.5 10 8h4l1.5 4.5"></path>
+        <circle cx="7.5" cy="19" r="1.5"></circle>
+        <circle cx="16.5" cy="19" r="1.5"></circle>
+      </svg>
+      <span data-vs-toggle-text>{strings.vehicleSelectorOpen}</span>
+    </button>
+  </div>
+
+  <div
+    class="vs__panel"
+    id="vehicle-selector-panel"
+    data-vs-panel
+    hidden
+    role="group"
+    aria-label={strings.vehicleSelectorPanelLabel}
+  >
+    <div class="vs__field">
+      <span class="vs__label" id="vs-generation-label">
+        {strings.vehicleSelectorGenerationLabel}
+      </span>
+      <div
+        class="vs__generations"
+        role="group"
+        aria-labelledby="vs-generation-label"
+        data-vs-generations
+      >
+        {
+          data.generations.map((generation) => (
+            <button
+              type="button"
+              class="vs__generation"
+              data-vs-generation={generation.id}
+              aria-pressed="false"
+            >
+              <span class="vs__generation-name">
+                {generationLabel(strings, generation.id as GenerationId)}
+              </span>
+              <span class="vs__generation-code">
+                {chassisLabel(generation)}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="vs__grid">
+      <p class="vs__field">
+        <label class="vs__label" for="vs-market">
+          {strings.vehicleSelectorMarketLabel}
+        </label>
+        <select class="vs__select" id="vs-market" data-vs-market></select>
+      </p>
+
+      <p class="vs__field">
+        <label class="vs__label" for="vs-year">
+          {strings.vehicleSelectorYearLabel}
+        </label>
+        <select class="vs__select vs__select--data" id="vs-year" data-vs-year
+        ></select>
+      </p>
+
+      <p class="vs__field">
+        <label class="vs__label" for="vs-engine">
+          {strings.vehicleSelectorEngineLabel}
+        </label>
+        <select
+          class="vs__select vs__select--data"
+          id="vs-engine"
+          data-vs-engine></select>
+      </p>
+
+      <p class="vs__field">
+        <label class="vs__label" for="vs-drive">
+          {strings.vehicleSelectorDriveLabel}
+        </label>
+        {
+          /*
+           * The only select whose options are static: `DRIVE_TYPES` is a closed
+           * two-value vocabulary and nothing narrows it. `selected` is explicit
+           * so the control has a value in the accessibility tree before the
+           * script runs (HTML CodeSniffer H91.Select.Value); the three narrowing
+           * selects below are filled on load and are empty until then.
+           */
+        }
+        <select class="vs__select" id="vs-drive" data-vs-drive>
+          <option value="" selected>{strings.vehicleSelectorDriveAny}</option>
+          {
+            DRIVE_TYPES.map((drive) => (
+              <option value={drive}>{driveLabel(strings, drive)}</option>
+            ))
+          }
+        </select>
+      </p>
+    </div>
+
+    <div class="vs__actions">
+      <p class="vs__note">{strings.vehicleSelectorFilterNote}</p>
+      <div class="vs__buttons">
+        <button type="button" class="vs__button" data-vs-reset>
+          {strings.vehicleSelectorReset}
+        </button>
+        <button
+          type="button"
+          class="vs__button vs__button--primary"
+          data-vs-apply
+        >
+          {strings.vehicleSelectorApply}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import {
+    createVehicleOptions,
+    selectionIsOfferable,
+    type EngineChoice,
+    type SelectorTaxonomyData,
+    type VehicleOptions,
+  } from "../lib/vehicle-options";
+  import { vehicleChipLabel } from "../lib/vehicle-labels";
+  import { readSelectorPayload } from "../lib/vehicle-taxonomy";
+  import {
+    clearVehicleSelection,
+    onVehicleSelectionChange,
+    readVehicleSelection,
+    writeVehicleSelection,
+    type StoredVehicleSelection,
+  } from "../lib/vehicle-selection";
+
+  interface SelectorPayload extends SelectorTaxonomyData {
+    labels: {
+      generation: Record<string, string>;
+      market: Record<string, string>;
+      engine: Record<string, string>;
+    };
+    text: {
+      recorded: string;
+      unrecorded: string;
+      noEngines: string;
+      open: string;
+      change: string;
+    };
+  }
+
+  /** The panel's working copy: complete enough to apply, or not yet. */
+  interface Draft {
+    gen: string;
+    market: string;
+    year: number | null;
+    engine: string;
+    drive: string;
+  }
+
+  function enhance(root: HTMLElement): void {
+    // A payload we cannot read is a selector that would lie about what
+    // exists. Hide the bar and leave the page unfiltered.
+    const parsed = readSelectorPayload(document);
+    if (parsed === null) {
+      root.hidden = true;
+      return;
+    }
+    const payload = parsed as unknown as SelectorPayload;
+
+    const options: VehicleOptions = createVehicleOptions(payload);
+
+    const query = <T extends Element>(selector: string): T | null =>
+      root.querySelector<T>(selector);
+
+    const panel = query<HTMLElement>("[data-vs-panel]");
+    const toggle = query<HTMLButtonElement>("[data-vs-toggle]");
+    const toggleText = query<HTMLElement>("[data-vs-toggle-text]");
+    const idle = query<HTMLElement>("[data-vs-idle]");
+    const chip = query<HTMLElement>("[data-vs-chip]");
+    const chipText = query<HTMLElement>("[data-vs-chip-text]");
+    const clear = query<HTMLButtonElement>("[data-vs-clear]");
+    const reset = query<HTMLButtonElement>("[data-vs-reset]");
+    const apply = query<HTMLButtonElement>("[data-vs-apply]");
+    const market = query<HTMLSelectElement>("[data-vs-market]");
+    const year = query<HTMLSelectElement>("[data-vs-year]");
+    const engine = query<HTMLSelectElement>("[data-vs-engine]");
+    const drive = query<HTMLSelectElement>("[data-vs-drive]");
+    const generationButtons = [
+      ...root.querySelectorAll<HTMLButtonElement>("[data-vs-generation]"),
+    ];
+
+    if (
+      panel === null ||
+      toggle === null ||
+      toggleText === null ||
+      idle === null ||
+      chip === null ||
+      chipText === null ||
+      clear === null ||
+      reset === null ||
+      apply === null ||
+      market === null ||
+      year === null ||
+      engine === null ||
+      drive === null ||
+      generationButtons.length === 0
+    ) {
+      root.hidden = true;
+      return;
+    }
+
+    const firstGeneration = payload.generations[0]?.id ?? "";
+    const draft: Draft = {
+      gen: firstGeneration,
+      market: "",
+      year: null,
+      engine: "",
+      drive: "",
+    };
+
+    function option(value: string, label: string): HTMLOptionElement {
+      const element = document.createElement("option");
+      element.value = value;
+      element.textContent = label;
+      return element;
+    }
+
+    /** Rebuild market, year and engine from `draft.gen` downwards. */
+    function refill(): void {
+      const markets = options.marketsFor(draft.gen);
+      market!.replaceChildren(
+        ...markets.map((entry) =>
+          option(
+            entry.id,
+            // The market's own name, then the badge this generation wore
+            // there: "United States and Canada — Montero" (VEH-02).
+            `${payload.labels.market[entry.id] ?? entry.id} — ${entry.name}`
+          )
+        )
+      );
+      if (!markets.some((entry) => entry.id === draft.market)) {
+        draft.market = markets[0]?.id ?? "";
+      }
+      market!.value = draft.market;
+
+      const years = options.yearsFor(draft.gen);
+      year!.replaceChildren(
+        ...years.map((value) => option(String(value), String(value)))
+      );
+      if (draft.year === null || !years.includes(draft.year)) {
+        draft.year = years[0] ?? null;
+      }
+      year!.value = draft.year === null ? "" : String(draft.year);
+
+      refillEngines();
+      updateApply();
+    }
+
+    function refillEngines(): void {
+      const choices =
+        draft.market === "" || draft.year === null
+          ? []
+          : options.enginesFor(draft.gen, draft.market, draft.year);
+
+      const groups: [string, EngineChoice[]][] = [
+        [payload.text.recorded, choices.filter((choice) => choice.recorded)],
+        [payload.text.unrecorded, choices.filter((choice) => !choice.recorded)],
+      ];
+
+      const children: HTMLElement[] = [];
+      for (const [label, members] of groups) {
+        if (members.length === 0) continue;
+        const group = document.createElement("optgroup");
+        group.label = label;
+        for (const choice of members) {
+          group.append(
+            option(
+              choice.option.id,
+              payload.labels.engine[choice.option.id] ?? choice.option.id
+            )
+          );
+        }
+        children.push(group);
+      }
+
+      if (children.length === 0) {
+        const placeholder = option("", payload.text.noEngines);
+        placeholder.disabled = true;
+        children.push(placeholder);
+      }
+
+      engine!.replaceChildren(...children);
+      if (!choices.some((choice) => choice.option.id === draft.engine)) {
+        draft.engine = choices[0]?.option.id ?? "";
+      }
+      engine!.value = draft.engine;
+    }
+
+    function updateApply(): void {
+      apply!.disabled =
+        draft.gen === "" ||
+        draft.market === "" ||
+        draft.year === null ||
+        draft.engine === "";
+    }
+
+    function paintGenerations(): void {
+      for (const button of generationButtons) {
+        button.setAttribute(
+          "aria-pressed",
+          String(button.dataset.vsGeneration === draft.gen)
+        );
+      }
+    }
+
+    /** The bar: idle sentence, or the chip carrying the current selection. */
+    function paintBar(selection: StoredVehicleSelection | null): void {
+      const active = selection !== null;
+      idle!.hidden = active;
+      chip!.hidden = !active;
+      toggleText!.textContent = active
+        ? payload.text.change
+        : payload.text.open;
+      if (selection === null) return;
+
+      chipText!.textContent = vehicleChipLabel({
+        generationLabel:
+          payload.labels.generation[selection.gen] ?? selection.gen,
+        market: selection.market,
+        year: selection.year,
+        engine:
+          payload.engines.find((entry) => entry.id === selection.engine) ??
+          null,
+        drive: selection.drive,
+      });
+    }
+
+    function seedDraft(selection: StoredVehicleSelection | null): void {
+      if (selection !== null) {
+        draft.gen = selection.gen;
+        draft.market = selection.market;
+        draft.year = selection.year;
+        draft.engine = selection.engine;
+        draft.drive = selection.drive ?? "";
+      }
+      drive!.value = draft.drive;
+      paintGenerations();
+      refill();
+    }
+
+    function openPanel(): void {
+      seedDraft(readVehicleSelection(window));
+      panel!.hidden = false;
+      toggle!.setAttribute("aria-expanded", "true");
+      const pressed = generationButtons.find(
+        (button) => button.getAttribute("aria-pressed") === "true"
+      );
+      (pressed ?? generationButtons[0])?.focus();
+    }
+
+    function closePanel({ restoreFocus = true } = {}): void {
+      panel!.hidden = true;
+      toggle!.setAttribute("aria-expanded", "false");
+      if (restoreFocus) toggle!.focus();
+    }
+
+    toggle.addEventListener("click", () => {
+      if (panel.hidden) openPanel();
+      else closePanel();
+    });
+
+    for (const button of generationButtons) {
+      button.addEventListener("click", () => {
+        draft.gen = button.dataset.vsGeneration ?? "";
+        paintGenerations();
+        refill();
+      });
+    }
+
+    market.addEventListener("change", () => {
+      draft.market = market.value;
+      refillEngines();
+      updateApply();
+    });
+
+    year.addEventListener("change", () => {
+      const parsed = Number.parseInt(year.value, 10);
+      draft.year = Number.isNaN(parsed) ? null : parsed;
+      refillEngines();
+      updateApply();
+    });
+
+    engine.addEventListener("change", () => {
+      draft.engine = engine.value;
+      updateApply();
+    });
+
+    drive.addEventListener("change", () => {
+      draft.drive = drive.value;
+    });
+
+    apply.addEventListener("click", () => {
+      if (draft.year === null) return;
+      writeVehicleSelection(
+        {
+          gen: draft.gen,
+          market: draft.market,
+          year: draft.year,
+          engine: draft.engine,
+          ...(draft.drive === "" ? {} : { drive: draft.drive }),
+        },
+        window
+      );
+      closePanel();
+    });
+
+    reset.addEventListener("click", () => {
+      clearVehicleSelection(window);
+      closePanel();
+    });
+
+    clear.addEventListener("click", () => {
+      clearVehicleSelection(window);
+      toggle.focus();
+    });
+
+    root.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || panel.hidden) return;
+      event.stopPropagation();
+      closePanel();
+    });
+
+    // A selection made in another tab, or cleared by a listing, repaints here.
+    onVehicleSelectionChange(window, (selection) => paintBar(selection));
+
+    const stored = readVehicleSelection(window);
+    /*
+     * A stored selection can outlive the taxonomy that produced it. Dropping a
+     * stale one here rather than rendering it is the difference between "the
+     * site forgot my truck" and "the site is filtering everything away and I
+     * cannot see why".
+     */
+    if (stored !== null && !selectionIsOfferable(stored, options)) {
+      clearVehicleSelection(window);
+      paintBar(null);
+    } else {
+      paintBar(stored);
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>(
+    "[data-vehicle-selector]"
+  )) {
+    enhance(root);
+  }
+</script>
+
+<style>
+  /*
+   * Tokens from specs/001-foundation/design/HANDOFF-DESIGN.md. Scoped to this
+   * component like every other page's block: restyling the site chrome as a
+   * whole is its own task, and this bar is the first piece of it to land.
+   */
+  .vs {
+    --paper: #f7f4ee;
+    --panel: #ffffff;
+    --ink: #2b2620;
+    --ink-soft: #3b342b;
+    --muted: #6e6559;
+    --muted-strong: #55493c;
+    --line: #e4ddd1;
+    --rust: #b0532a;
+    --rust-deep: #93441f;
+    --rust-tint: #fbeee6;
+    --rust-tint-border: #e9cdbb;
+    --on-dark: #f7f4ee;
+    --on-dark-soft: #c9bfaf;
+
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+
+    /*
+     * Hidden by *CSS*, not by the `hidden` attribute, and shown by the `js`
+     * class `BaseLayout` sets before first paint. The attribute form pushed
+     * the whole page down the moment the module script revealed the bar; this
+     * form reserves the space in the very first layout, so a reader with
+     * JavaScript sees no shift and a reader without it still sees nothing at
+     * all rather than a control that does nothing.
+     */
+    display: none;
+  }
+
+  :global(html.js) .vs {
+    display: flex;
+  }
+
+  /*
+   * The one case the script still hides the bar at runtime: a payload it
+   * cannot read, or markup it cannot find. Later in source order than the rule
+   * above and at the same specificity, so `hidden` wins — a control that
+   * cannot work is worse than no control.
+   */
+  :global(html.js) .vs[hidden] {
+    display: none;
+  }
+
+  .vs__bar {
+    background: var(--ink);
+    border-radius: 8px;
+    padding: 0.875rem 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .vs__state {
+    margin: 0;
+    color: var(--on-dark-soft);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .vs__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--ink-soft);
+    color: var(--on-dark);
+    border: 1px solid var(--muted-strong);
+    border-radius: 6px;
+    padding: 0.375rem 0.5rem 0.375rem 0.75rem;
+  }
+
+  .vs__chip[hidden] {
+    display: none;
+  }
+
+  .vs__chip-text {
+    font-family:
+      "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8125rem;
+  }
+
+  /*
+   * 2.75rem = 44px, the design handoff's "mobile tap targets >= 44px" and
+   * WCAG 2.5.5's target size — the same floor every other control in this
+   * component uses. It was 1.75rem, which looked right next to a 13px chip and
+   * was the smallest, most-easily-mis-hit control on the page; the one that
+   * throws away the reader's selection is the last place to shave a target
+   * down (T204 review, F6).
+   *
+   * The `x` glyph stays 14px. The button grows around it, and the negative
+   * margins keep the chip's own height unchanged so the bar does not get
+   * taller to buy the hit area.
+   */
+  .vs__chip-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    margin: -0.5rem -0.25rem -0.5rem 0;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--on-dark-soft);
+    cursor: pointer;
+  }
+
+  .vs__chip-clear:hover,
+  .vs__chip-clear:focus-visible {
+    color: var(--on-dark);
+    background: var(--muted-strong);
+  }
+
+  .vs__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--rust);
+    border: none;
+    border-radius: 6px;
+    padding: 0.625rem 1rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+  }
+
+  .vs__cta:hover {
+    background: var(--rust-deep);
+  }
+
+  .vs__panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    box-shadow: 0 8px 24px rgb(43 38 32 / 8%);
+  }
+
+  .vs__panel[hidden] {
+    display: none;
+  }
+
+  .vs__field {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .vs__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .vs__generations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .vs__generation {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+    font: inherit;
+    font-size: 0.8125rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel);
+    color: var(--muted-strong);
+    padding: 0.5rem 0.875rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+  }
+
+  .vs__generation[aria-pressed="true"] {
+    border: 2px solid var(--rust);
+    background: var(--rust-tint);
+    color: var(--rust-deep);
+    font-weight: 700;
+    padding: calc(0.5rem - 1px) calc(0.875rem - 1px);
+  }
+
+  .vs__generation-code {
+    font-family:
+      "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.6875rem;
+    color: var(--muted);
+  }
+
+  .vs__generation[aria-pressed="true"] .vs__generation-code {
+    color: var(--rust-deep);
+  }
+
+  .vs__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .vs__select {
+    font: inherit;
+    font-size: 0.875rem;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.625rem 0.75rem;
+    min-height: 2.75rem;
+    width: 100%;
+  }
+
+  .vs__select--data {
+    font-family:
+      "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  .vs__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+  }
+
+  .vs__note {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    max-width: 46ch;
+  }
+
+  .vs__buttons {
+    display: flex;
+    gap: 0.625rem;
+  }
+
+  .vs__button {
+    font: inherit;
+    font-size: 0.875rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel);
+    color: var(--muted-strong);
+    padding: 0.625rem 1.125rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+  }
+
+  .vs__button--primary {
+    border-color: var(--rust);
+    background: var(--rust);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .vs__button--primary:hover:not(:disabled) {
+    background: var(--rust-deep);
+    border-color: var(--rust-deep);
+  }
+
+  .vs__button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 60rem) {
+    .vs__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .vs__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

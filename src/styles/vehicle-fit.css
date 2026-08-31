@@ -1,0 +1,66 @@
+/*
+ * The vehicle filter's per-row markers (FIT-03).
+ *
+ * ## Why this is a global stylesheet and not a scoped component
+ *
+ * These two rows are created by `src/lib/vehicle-listing.ts` at runtime, and
+ * only on the rows that actually need one. That is a deliberate reversal of
+ * the first implementation, which rendered them into every card server-side
+ * from a `VehicleFitMarkers.astro` component: on the glossary — 154 term
+ * cards — that added about 98 KB to the served HTML, roughly 40% of the page,
+ * to ship two hidden paragraphs per card that only ever appear for a reader
+ * who has both JavaScript and a selected vehicle. The measured cost was the
+ * glossary falling from 92 to 87 against SCF-06's performance budget.
+ *
+ * Runtime-created elements cannot carry Astro's scoped-style attribute, so
+ * their styles live here, in a plain global stylesheet imported once by
+ * `BaseLayout`. The class names are prefixed and specific for exactly that
+ * reason.
+ *
+ * Nothing is lost by building them in the browser: without JavaScript there is
+ * no selector, no selection and no filtering, so there is nothing for these
+ * rows to say. Their *text* still comes from `src/i18n/ui.ts` in both locales
+ * — it rides on `VehicleFitSummary.astro`'s data attributes (I18N-08).
+ *
+ * refs specs/001-foundation (FIT-03, I18N-08, SCF-06)
+ */
+
+.vehicle-fit {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.8125rem;
+  color: #55493c;
+}
+
+.vehicle-fit[hidden] {
+  display: none;
+}
+
+.vehicle-fit__tag {
+  flex: 0 0 auto;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 0.1875rem 0.5rem;
+  color: #6e6559;
+  background: #efe9dd;
+}
+
+/*
+ * HANDOFF-DESIGN's confidence-chip token, reused deliberately: a provisional
+ * match is a statement about how much the site knows, which is the same kind
+ * of claim a confidence chip makes. It is *not* the amber/red palette — those
+ * are reserved for triage and safety so warnings never compete with chrome,
+ * and "we matched on four facets" is not a warning about the truck.
+ */
+.vehicle-fit__tag--provisional {
+  color: #4a5568;
+  background: #e8edf2;
+  border: 1px solid #d2dae3;
+}
