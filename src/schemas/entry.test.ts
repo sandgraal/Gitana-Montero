@@ -309,12 +309,22 @@ describe("manufacturer and reference source kinds", () => {
   });
 
   /**
-   * Kind and tier stay independent fields: nothing in the schema stops a
-   * `reference` source from backing `fsm-confirmed`. Pinned so the day a
-   * kind→tier rule is added (recorded on T207), this test fails and forces the
-   * decision to be deliberate rather than discovered.
+   * **T207 resolved this (2026-08-30).** The predecessor of this test was
+   * named "does not yet constrain which kind may support which tier" and was
+   * pinned so that the day a kind→tier rule arrived, the decision would be
+   * deliberate rather than discovered. The decision: the rule exists — a
+   * documentary tier (`fsm-confirmed`, `tsb`) requires a documentary source
+   * (`fsm`, `tsb`, `manufacturer`) — and it is enforced by
+   * `scripts/check-citations.mjs`, not by this schema, for the reason recorded
+   * on `SOURCE_KINDS` and on the tier/source invariant that landed the same
+   * way: a schema refines on structural contradictions, and "is this the right
+   * *class* of evidence" is content policy.
+   *
+   * So the schema-level answer is unchanged and is now *deliberate* rather
+   * than merely unwritten. The graders for the rule itself live in
+   * `tests/check-citations.test.ts` ("findKindTierIssues").
    */
-  it("does not yet constrain which kind may support which tier", () => {
+  it("leaves kind→tier coherence to check:citations, not to the schema", () => {
     const outcome = defineEntrySchema(shared, prose).safeParse(
       entryCitedBy("fsm-confirmed", "reference")
     );

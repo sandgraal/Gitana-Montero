@@ -10,6 +10,9 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   CONFIDENCE_TIERS as CONFIDENCE_TIERS_MJS,
+  DOCUMENTARY_TIERS,
+  FACTORY_DOCUMENTED_KINDS as FACTORY_DOCUMENTED_KINDS_MJS,
+  KIND_TIER_LEGACY_EXCEPTIONS,
   RESERVED_ENTRY_FIELDS as RESERVED_ENTRY_FIELDS_MJS,
   TIERS_REQUIRING_SOURCES,
   blankStringPaths,
@@ -22,8 +25,11 @@ import {
   stringLeaves,
 } from "../../scripts/lib/content-entries.mjs";
 import {
+  CITATION_REQUIRED_TIERS,
   CONFIDENCE_TIERS,
+  FACTORY_DOCUMENTED_KINDS,
   RESERVED_ENTRY_FIELDS,
+  SOURCE_KINDS,
 } from "../../src/schemas/entry.ts";
 
 const created: string[] = [];
@@ -76,6 +82,57 @@ describe("TIERS_REQUIRING_SOURCES", () => {
   it("excludes first-hand and anecdotal", () => {
     expect(TIERS_REQUIRING_SOURCES).not.toContain("first-hand");
     expect(TIERS_REQUIRING_SOURCES).not.toContain("anecdotal");
+  });
+});
+
+describe("the kind→tier coherence rule's constants (T207)", () => {
+  it("DOCUMENTARY_TIERS mirrors CITATION_REQUIRED_TIERS", () => {
+    // Same tier set, two questions: the schema asks whether a document is
+    // cited at all, check:citations asks whether it is the right kind of
+    // document. If they drift, one of those questions starts being asked
+    // about a tier the other has never heard of.
+    expect([...DOCUMENTARY_TIERS]).toEqual([...CITATION_REQUIRED_TIERS]);
+  });
+
+  it("FACTORY_DOCUMENTED_KINDS mirrors src/schemas/entry.ts's export", () => {
+    expect([...FACTORY_DOCUMENTED_KINDS_MJS]).toEqual([
+      ...FACTORY_DOCUMENTED_KINDS,
+    ]);
+  });
+
+  it("every documentary kind is a real source kind", () => {
+    for (const kind of FACTORY_DOCUMENTED_KINDS_MJS) {
+      expect(SOURCE_KINDS).toContain(kind);
+    }
+  });
+
+  it("excludes every kind that is somebody reporting a document", () => {
+    for (const kind of [
+      "forum",
+      "video",
+      "vendor",
+      "reference",
+      "first-hand",
+    ]) {
+      expect(FACTORY_DOCUMENTED_KINDS_MJS).not.toContain(kind);
+    }
+  });
+
+  it("holds no duplicate legacy exceptions", () => {
+    // A path listed twice would survive one deletion and keep suppressing.
+    expect(new Set(KIND_TIER_LEGACY_EXCEPTIONS).size).toBe(
+      KIND_TIER_LEGACY_EXCEPTIONS.length
+    );
+  });
+
+  it("lists legacy exceptions as repo-relative POSIX content paths", () => {
+    // The register is matched against `loadContentEntries`' `file` field; an
+    // absolute or backslashed path would silently never match and the
+    // exception would do nothing (while the staleness check flagged it).
+    for (const file of KIND_TIER_LEGACY_EXCEPTIONS) {
+      expect(file.startsWith("src/content/")).toBe(true);
+      expect(file).not.toContain("\\");
+    }
   });
 });
 

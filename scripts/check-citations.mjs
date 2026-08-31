@@ -54,12 +54,55 @@
  * `TIERS_REQUIRING_SOURCES` for the tier list and how it stays in sync with
  * `src/schemas/entry.ts`'s `CONFIDENCE_TIERS`.
  *
+ * ## Kind→tier coherence (T207, 2026-08-30)
+ *
+ * A third rule, and the one T207's task line reserved the decision on: an
+ * entry claiming a **documentary tier** (`fsm-confirmed` or `tsb` — the tiers
+ * whose whole meaning is "a document says so") must cite at least one source
+ * of a **documentary kind** (`fsm`, `tsb`, `manufacturer`). Before it, nothing
+ * stopped an `fsm-confirmed` entry whose only citation was a forum thread.
+ *
+ * **The decision, and why it went this way.** AGENTS.md does not describe
+ * `fsm-confirmed` as "very confident"; it defines it: "`fsm-confirmed` means
+ * **factory-documented**: the FSM, official spec sheets, factory brochures and
+ * catalogues — manufacturer primary literature (owner ruling 2026-08-28)".
+ * That is a statement about *what kind of document backs the claim*, so an
+ * `fsm-confirmed` entry citing only a forum is not an overconfident claim —
+ * it is a mislabelled one, and the label is exactly what a reader uses to
+ * decide whether to trust a torque figure on their brakes. A rule that can be
+ * checked mechanically and whose failure mode is a reader trusting the wrong
+ * number is not a review-time concern.
+ *
+ * **Why here and not in the schema.** Same reasoning as the tier/source
+ * invariant above, and the same precedent: `src/schemas/entry.ts` refines on
+ * structural contradictions a shape can see. "Is this evidence the right
+ * *class* of evidence for the claim" is content policy — it reads a value in
+ * an array and applies an editorial standard to it — and content policy lives
+ * on the merge path in this script, where it can also carry the legacy
+ * register below. The schema's `CITATION_REQUIRED_TIERS` gate is untouched.
+ *
+ * **Scope.** Deliberately only the documentary tiers. `community-consensus`
+ * has no document in its definition (it is an aggregate of people agreeing),
+ * so there is no kind a machine could require of it; the `SOURCE_KINDS`
+ * docstring's notes about which kinds suit the weaker tiers stay reader
+ * guidance, and `src/schemas/entry.ts` now says so explicitly.
+ *
+ * **Legacy register.** 19 `vehicles` entries fail this rule on the day it
+ * lands, all of them by citing official Mitsubishi pages filed as `vendor`
+ * because the `manufacturer` kind did not exist when they were written. They
+ * are listed in `KIND_TIER_LEGACY_EXCEPTIONS` (see that constant for the
+ * ratchet properties) and are a content follow-up, not a reason to withhold
+ * the rule from the entries being written now.
+ *
  * Usage: node scripts/check-citations.mjs
  *
  * refs specs/001-foundation (REF-02)
  */
 import {
   CONTENT_ROOT,
+  DOCUMENTARY_TIERS,
+  FACTORY_DOCUMENTED_KINDS,
+  KIND_TIER_LEGACY_EXCEPTIONS,
   RESERVED_ENTRY_FIELDS,
   TIERS_REQUIRING_SOURCES,
   formatPath,
@@ -138,16 +181,116 @@ export function findTierSourceIssues(entry) {
   ];
 }
 
+const LEGACY_EXCEPTIONS = new Set(KIND_TIER_LEGACY_EXCEPTIONS);
+
+/** The `kind` of every source on an entry, as strings. */
+function sourceKinds(data) {
+  const sources = data && typeof data === "object" ? data.sources : undefined;
+  if (!Array.isArray(sources)) return [];
+  return sources.flatMap((source) =>
+    source && typeof source === "object" && typeof source.kind === "string"
+      ? [source.kind]
+      : []
+  );
+}
+
+/**
+ * Kind→tier coherence for one entry (see module docstring): an entry at a
+ * documentary tier that cites no documentary source, named by entry id, file,
+ * tier, and the kinds it actually cites.
+ *
+ * Returns `[]` when the tier is not documentary, or when at least one source
+ * is `fsm` / `tsb` / `manufacturer`. An entry with *no* sources at all is not
+ * reported here — that is `findTierSourceIssues`' finding, and reporting the
+ * same entry twice for one mistake sends the author chasing two problems.
+ *
+ * The legacy register is **not** consulted here: this function answers "does
+ * this entry violate the rule", which is what the register's own staleness
+ * check needs. Suppression happens in {@link auditCitations}.
+ */
+export function findKindTierIssues(entry) {
+  const { collection, file, data } = entry;
+  const confidence =
+    data && typeof data === "object" ? data.confidence : undefined;
+  if (typeof confidence !== "string") return [];
+  if (!DOCUMENTARY_TIERS.includes(confidence)) return [];
+
+  const kinds = sourceKinds(data);
+  if (kinds.length === 0) return [];
+  if (kinds.some((kind) => FACTORY_DOCUMENTED_KINDS.includes(kind))) return [];
+
+  const id =
+    data && typeof data === "object" && typeof data.id === "string"
+      ? data.id
+      : file;
+
+  return [
+    {
+      collection,
+      file,
+      field: "sources",
+      message:
+        `${file}: entry \`${id}\` claims confidence \`${confidence}\`, which ` +
+        `means factory-documented (AGENTS.md, owner ruling 2026-08-28), but ` +
+        `its sources are ${kinds.map((kind) => `\`${kind}\``).join(", ")} — ` +
+        `none of ${FACTORY_DOCUMENTED_KINDS.map((kind) => `\`${kind}\``).join(", ")}. ` +
+        `Either cite the factory document, re-file a source that IS factory ` +
+        `literature under \`manufacturer\` (official manufacturer pages, spec ` +
+        `sheets, brochures), or lower the tier.`,
+    },
+  ];
+}
+
+/**
+ * Register entries that no longer describe a violation — see
+ * `KIND_TIER_LEGACY_EXCEPTIONS`. A stale line is a failure, not a shrug: if a
+ * fixed (or deleted, or renamed) file could keep its exception silently, the
+ * register would outlive the debt and start hiding the next violation to land
+ * in that file.
+ *
+ * Separate from {@link auditCitations} on purpose: every other rule here is a
+ * question about one entry, and this one is a question about the *corpus* —
+ * asking it of a partial entry list would report every unexamined file as
+ * fixed. `main()` calls both.
+ */
+export function findStaleLegacyExceptions(entries) {
+  const violating = new Set(
+    entries
+      .flatMap((entry) => findKindTierIssues(entry))
+      .map((issue) => issue.file)
+  );
+
+  return KIND_TIER_LEGACY_EXCEPTIONS.filter((file) => !violating.has(file)).map(
+    (file) => ({
+      collection: "(register)",
+      file,
+      field: "KIND_TIER_LEGACY_EXCEPTIONS",
+      message:
+        `${file}: listed in \`KIND_TIER_LEGACY_EXCEPTIONS\` ` +
+        `(scripts/lib/content-entries.mjs) but it no longer violates the ` +
+        `kind→tier coherence rule — the exception is stale. Delete that line: ` +
+        `the register is a ratchet and only ever shrinks.`,
+    })
+  );
+}
+
+/** Every per-entry rule, with the legacy register applied. */
 export function auditCitations(entries) {
   return entries.flatMap((entry) => [
     ...findCitationIssues(entry),
     ...findTierSourceIssues(entry),
+    ...findKindTierIssues(entry).filter(
+      (issue) => !LEGACY_EXCEPTIONS.has(issue.file)
+    ),
   ]);
 }
 
 async function main() {
   const entries = await loadContentEntries(CONTENT_ROOT);
-  const problems = auditCitations(entries);
+  const problems = [
+    ...auditCitations(entries),
+    ...findStaleLegacyExceptions(entries),
+  ];
 
   if (problems.length > 0) {
     console.error(`check:citations — ${problems.length} problem(s):`);
@@ -156,10 +299,23 @@ async function main() {
     return;
   }
 
+  const outstanding = KIND_TIER_LEGACY_EXCEPTIONS.length;
+
   console.log(
     `check:citations — OK: ${entries.length} entr${entries.length === 1 ? "y" : "ies"} checked, ` +
-      `every numeric spec is cited and every tier above first-hand cites a source.`
+      `every numeric spec is cited, every tier above first-hand cites a ` +
+      `source, and every documentary tier cites a documentary source.`
   );
+
+  if (outstanding > 0) {
+    console.log(
+      `check:citations — ${outstanding} entr${outstanding === 1 ? "y" : "ies"} ` +
+        `still exempt from the kind→tier rule ` +
+        `(KIND_TIER_LEGACY_EXCEPTIONS, scripts/lib/content-entries.mjs): ` +
+        `pre-\`manufacturer\` citations awaiting the content re-kinding ` +
+        `follow-up recorded on T207.`
+    );
+  }
 }
 
 if (
