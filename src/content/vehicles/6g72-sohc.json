@@ -16,14 +16,14 @@
       "url": "https://www.mitsubishi-motors.com/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
       "archiveUrl": "https://web.archive.org/web/20180128021206/http://www.mitsubishi-motors.com:80/en/showroom/pajero/specifications/pdf/18my_pajero_gexp_specifications.pdf",
       "accessed": "2026-08-28",
-      "kind": "vendor"
+      "kind": "manufacturer"
     },
     {
       "title": "Mitsubishi 6G7 engine — Wikipedia",
       "url": "https://en.wikipedia.org/wiki/Mitsubishi_6G7_engine",
       "archiveUrl": "https://web.archive.org/web/20260804110625/https://en.wikipedia.org/wiki/Mitsubishi_6G7_engine",
       "accessed": "2026-08-28",
-      "kind": "forum"
+      "kind": "reference"
     },
     {
       "title": "GAZOO catalogue — Mitsubishi Pajero, September 1999 to October 2006 (Japanese-market grades, type designations and displacements)",
@@ -37,7 +37,7 @@
       "url": "https://www.fueleconomy.gov/feg/bymodel/1989_Mitsubishi_Montero.shtml",
       "archiveUrl": "https://web.archive.org/web/20250502212911/https://fueleconomy.gov/feg/bymodel/1989_Mitsubishi_Montero.shtml",
       "accessed": "2026-08-28",
-      "kind": "vendor"
+      "kind": "reference"
     }
   ],
   "prose": {

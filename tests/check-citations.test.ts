@@ -3,7 +3,30 @@
  *
  * refs specs/001-foundation (REF-02)
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+/**
+ * The kind→tier legacy register (`KIND_TIER_LEGACY_EXCEPTIONS`) is content
+ * state, not grader state — the re-kind sweep (`fix/001-source-rekind-sweep`,
+ * 2026-08-31) emptied it, which is the register working exactly as designed
+ * (a ratchet that only shrinks). But `auditCitations` and
+ * `findStaleLegacyExceptions` still need coverage for "a listed file" and "a
+ * stale listed file", so this file supplies its own fixture entry instead of
+ * reading `KIND_TIER_LEGACY_EXCEPTIONS[0]` — pinning grader mechanics to
+ * whatever the register happens to contain today would make this suite pass
+ * or fail based on unrelated content edits, which is the same coupling
+ * mistake the register's docstring warns against for content authors.
+ */
+const { MOCK_LEGACY_EXCEPTIONS } = vi.hoisted(() => ({
+  MOCK_LEGACY_EXCEPTIONS: ["src/content/vehicles/_test-legacy-fixture.json"],
+}));
+
+vi.mock("../scripts/lib/content-entries.mjs", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../scripts/lib/content-entries.mjs")>();
+  return { ...actual, KIND_TIER_LEGACY_EXCEPTIONS: MOCK_LEGACY_EXCEPTIONS };
+});
+
 import {
   auditCitations,
   findCitationIssues,
@@ -315,7 +338,7 @@ describe("the kind→tier legacy register", () => {
     },
   });
 
-  const listed = KIND_TIER_LEGACY_EXCEPTIONS[0] as string;
+  const listed = MOCK_LEGACY_EXCEPTIONS[0] as string;
 
   it("suppresses a listed file's violation in auditCitations", () => {
     expect(findKindTierIssues(violating(listed))).toHaveLength(1);
