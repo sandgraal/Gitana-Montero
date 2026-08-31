@@ -360,38 +360,110 @@ export interface PolicyDefinition {
   readonly statement: string;
 }
 
-/** Every `create policy` in the normalised SQL. */
+function policyName(statement: string, verb: string): string {
+  return (
+    new RegExp(`${verb} policy "?([a-z0-9_ -]+)"? on`)
+      .exec(statement)?.[1]
+      ?.trim() ?? ""
+  );
+}
+
+function policyTable(statement: string): string {
+  return (
+    /\bon (?:(?:public|storage)\.)?([a-z0-9_]+)/.exec(statement)?.[1] ?? ""
+  );
+}
+
+function policyRoles(statement: string): string[] {
+  const clause = /\bto ([a-z0-9_, ]+?)(?= using| with check|$)/.exec(
+    statement
+  )?.[1];
+  return clause
+    ? clause
+        .split(",")
+        .map((role) => role.trim())
+        .filter(Boolean)
+    : [];
+}
+
+/**
+ * Every policy the migrations leave **in force**, after replaying
+ * `create` / `alter` / `drop` in order.
+ *
+ * ## Why this replays instead of listing `create policy`
+ *
+ * It used to filter for `create policy` and stop there, which made
+ * `alter policy` invisible (T2-201 confirm review, D2). A second migration
+ * saying
+ *
+ * ```sql
+ * alter policy "records are owner-only" on public.records using (true);
+ * ```
+ *
+ * reopened the exact hole finding F1 was about, and every grader in the suite
+ * reported green — they were still reading the original, safe `create`. A
+ * migration directory is a *sequence*, and the only honest question to ask of
+ * it is what the database looks like at the end.
+ *
+ * `alter policy` may change the roles and either predicate; it cannot change
+ * the command, so that is carried forward. `drop policy` removes the entry
+ * entirely — a table left with no policy is then caught by the "no policy at
+ * all" finding rather than silently passing.
+ */
 export function policies(normalized: string): PolicyDefinition[] {
-  return statements(normalized)
-    .filter((statement) => statement.startsWith("create policy"))
-    .map((statement) => {
-      const name =
-        /create policy "?([a-z0-9_ -]+)"? on/.exec(statement)?.[1]?.trim() ??
-        "";
-      const table =
-        /\bon (?:(?:public|storage)\.)?([a-z0-9_]+)/.exec(statement)?.[1] ?? "";
-      const command = /\bfor (all|select|insert|update|delete)\b/.exec(
-        statement
-      )?.[1];
-      const roleClause = /\bto ([a-z0-9_, ]+?)(?= using| with check|$)/.exec(
-        statement
-      )?.[1];
-      return {
+  const inForce = new Map<string, PolicyDefinition>();
+  const key = (table: string, name: string) => `${table}::${name}`;
+
+  for (const statement of statements(normalized)) {
+    if (statement.startsWith("create policy")) {
+      const table = policyTable(statement);
+      const name = policyName(statement, "create");
+      inForce.set(key(table, name), {
         name,
         table,
-        command: command ?? "all",
-        roles: roleClause
-          ? roleClause
-              .split(",")
-              .map((role) => role.trim())
-              .filter(Boolean)
-          : [],
+        command:
+          /\bfor (all|select|insert|update|delete)\b/.exec(statement)?.[1] ??
+          "all",
+        roles: policyRoles(statement),
         usingExpr: parenExpression(statement, "using"),
         withCheckExpr: parenExpression(statement, "with check"),
         permissive: !/\bas restrictive\b/.test(statement),
         statement,
-      };
-    });
+      });
+      continue;
+    }
+
+    if (statement.startsWith("alter policy")) {
+      const table = policyTable(statement);
+      const name = policyName(statement, "alter");
+      const existing = inForce.get(key(table, name));
+      const usingExpr = parenExpression(statement, "using");
+      const withCheckExpr = parenExpression(statement, "with check");
+      const roles = policyRoles(statement);
+      inForce.set(key(table, name), {
+        name,
+        table,
+        // ALTER POLICY cannot change the command.
+        command: existing?.command ?? "all",
+        roles: roles.length > 0 ? roles : (existing?.roles ?? []),
+        usingExpr: usingExpr ?? existing?.usingExpr ?? null,
+        withCheckExpr: withCheckExpr ?? existing?.withCheckExpr ?? null,
+        permissive: existing?.permissive ?? true,
+        // The statement now in force is the one that last set the predicate,
+        // so a finding quotes the ALTER a reader has to go and look at.
+        statement,
+      });
+      continue;
+    }
+
+    if (statement.startsWith("drop policy")) {
+      inForce.delete(
+        key(policyTable(statement), policyName(statement, "drop"))
+      );
+    }
+  }
+
+  return [...inForce.values()];
 }
 
 /**

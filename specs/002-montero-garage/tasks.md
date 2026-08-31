@@ -116,6 +116,31 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   row via `auth.uid()` — a victim is unrepresentable, not merely forbidden —
   and `purge_expired_accounts(p_now)` is the scheduled job, service-role only,
   taking the clock so a grader can reach "thirty days later" without waiting.
+  <br>**Round 2 closed two more holes in the same guarantee class, both found
+  by writing DDL rather than by reading code.** *Uncorrelated `exists`*: a
+  subquery can carry a real `owner_id = auth.uid()` and still say nothing about
+  the current row — `exists (select 1 from vehicles where owner_id =
+  auth.uid())` means "own any truck, read everyone's records". Correlation back
+  to the outer row *is* the ownership claim, so a predicate whose only equality
+  lives in a subquery must now join back (qualified `records.vehicle_id` or the
+  unqualified form Postgres resolves outward; both accepted). *`alter policy`
+  was invisible*: `policies()` filtered on `create policy`, so a follow-up
+  migration saying `alter policy … using (true)` reopened the original hole with
+  every grader green. It now replays create/alter/drop in order and asks what
+  the database looks like at the **end** of the directory. Also accepted:
+  Supabase's own recommended `(select auth.uid()) = owner_id` and
+  `owner_id in (select auth.uid())`, which were failing closed — a grader that
+  rejects the officially recommended spelling pushes the implementation toward
+  the slower one to get a green build.
+  <br>**The probe corpus was itself mutation-tested, and had a hole.**
+  Reintroducing the original F1 bug left every end-to-end probe green: P1 and
+  P4 are caught by the tautology list and the path rule *before* the equality
+  rule is reached, so the load-bearing rule was pinned only by unit tests of
+  its own helper. N11/N12 close that — neither is tautological, neither is
+  storage, so nothing but the equality rule can reject them. The same treatment
+  was applied to the new rules (N4 for correlation, N3 for `alter policy`):
+  each was verified by breaking its rule on purpose and confirming the corpus
+  goes red. Four mutations, four caught by end-to-end probes.
   <br>**Also not graded here, and deliberately: SHR-02's public handle.**
   Uniqueness under concurrent signup, case folding, reserved words like
   `admin`/`api`, and what a handle change does to a published URL are each a

@@ -35,10 +35,11 @@
  * 1. The graders became thin — they assert `issues == []` — so a rule can be
  *    fixed in one place instead of six.
  * 2. The rules are **testable against DDL with a known answer**, which is what
- *    `reviewer-probes.test.ts` does: twelve variants, the wide-open ones must
- *    be rejected and the correctly-spelled ones must be accepted. That suite
- *    is unmarked and green, and it is what stops this entire finding class
- *    from coming back.
+ *    `reviewer-probes.test.ts` does: the wide-open variants must be rejected
+ *    and the correctly-spelled ones must be accepted. That suite is unmarked
+ *    and green, and it is what stops this entire finding class from coming
+ *    back — and it has itself been mutation-tested, because a corpus that
+ *    only reaches the rules it happens to hit first has holes in it.
  * 3. Being about semantics rather than substrings, the rules accept spellings
  *    the string-matching version rejected — `primary key` for `not null`,
  *    `references auth.users` with no column list, table-level constraints,
@@ -55,8 +56,15 @@
  * - *every* branch, because `or` is how a scoped predicate gets widened:
  *   `owner_id = auth.uid() or true` reads as careful and grants everything.
  *
+ * And one more, added after the confirm review: when the equality lives inside
+ * a subquery, the subquery must **correlate** back to the outer row. Without
+ * that, `exists (select 1 from vehicles where owner_id = auth.uid())` is a
+ * global "does this person own anything at all" and grants every record in the
+ * database to anyone with one truck. See `isCorrelated`.
+ *
  * refs specs/002-montero-garage (SHR-01, SHR-03, GAR-05′, ACC-03)
  */
+import { USER_TABLES } from "./contract.ts";
 import {
   createTableBody,
   columnDefinition,
@@ -149,9 +157,33 @@ export function isTautological(expr: string): boolean {
   return false;
 }
 
-/** Operands that are not row terms — comparing to these proves nothing. */
+/**
+ * Rewrite the two idioms Supabase's own RLS performance guide recommends into
+ * the plain form the comparand matcher understands.
+ *
+ * `(select auth.uid()) = owner_id` and `owner_id in (select auth.uid())` are
+ * not exotic: wrapping the call in a scalar subquery lets Postgres hoist it
+ * out of the per-row loop, so they are what a schema written for scale will
+ * actually say. Both were being rejected as unscoped — a grader that fails
+ * closed on the officially recommended spelling would have pushed T2-202
+ * toward the slower one to get a green build (T2-201 confirm review, R4).
+ */
+export function canonicalizeAuthUid(expr: string): string {
+  return expr
+    .replace(/\bin\s*\(\s*select\s+auth\.uid\(\)\s*\)/g, "= auth.uid()")
+    .replace(/\(\s*select\s+auth\.uid\(\)\s*\)/g, "auth.uid()");
+}
+
+/**
+ * Operands that are not row terms — comparing to these proves nothing.
+ *
+ * `current_setting('request.jwt…')` is here because `auth.uid()` *is*
+ * `current_setting('request.jwt.claims')::json->>'sub'` underneath. Comparing
+ * the two is comparing the caller to themselves: always true, and it reads
+ * like a careful check (T2-201 confirm review, R3).
+ */
 const NON_ROW_TERMS =
-  /^(true|false|null|\d+|'.*'|auth\.uid\(\)(::[a-z_]+)?|auth\.role\(\)|auth\.jwt\(\).*|current_user|session_user)$/;
+  /^(true|false|null|\d+|'.*'|auth\.uid\(\)(::[a-z_]+)?|auth\.role\(\)|auth\.jwt\(\).*|current_setting\(.*|current_user|session_user)$/;
 
 /**
  * Every term compared for **equality** with `auth.uid()` in `expr`.
@@ -160,7 +192,8 @@ const NON_ROW_TERMS =
  * `auth.uid() is not null`, `coalesce(auth.uid(), …)` — has not tied the row
  * to the caller, and that distinction is the whole of finding F1.
  */
-export function authUidComparands(expr: string): string[] {
+export function authUidComparands(rawExpr: string): string[] {
+  const expr = canonicalizeAuthUid(rawExpr);
   const term = "[a-z0-9_.\"'\\[\\]()>-]+(?:::[a-z_ \\[\\]]+)?";
   const out: string[] = [];
   for (const pattern of [
@@ -182,6 +215,80 @@ const PATH_EXTRACTORS = /storage\.foldername|split_part|string_to_array|ltree/;
 export interface ScopeOptions {
   /** Storage policies must also derive the owner from the object path. */
   readonly requirePathExtraction?: boolean;
+  /** The table the policy is on — needed to judge subquery correlation. */
+  readonly outerTable?: string;
+  /** That table's declared columns, for the unqualified-reference case. */
+  readonly outerColumns?: readonly string[];
+}
+
+/**
+ * Split `expr` into the part outside any subquery and the subqueries
+ * themselves. A subquery is a parenthesised group whose body starts `select`.
+ */
+export function stripSubqueries(expr: string): {
+  readonly outer: string;
+  readonly subqueries: string[];
+} {
+  const subqueries: string[] = [];
+  let outer = "";
+  let index = 0;
+  while (index < expr.length) {
+    if (expr[index] === "(" && /^\(\s*select\b/.test(expr.slice(index))) {
+      let depth = 0;
+      let end = index;
+      for (let cursor = index; cursor < expr.length; cursor += 1) {
+        if (expr[cursor] === "(") depth += 1;
+        else if (expr[cursor] === ")") {
+          depth -= 1;
+          if (depth === 0) {
+            end = cursor;
+            break;
+          }
+        }
+      }
+      subqueries.push(expr.slice(index + 1, end).trim());
+      outer += " SUBQUERY ";
+      index = end + 1;
+      continue;
+    }
+    outer += expr[index];
+    index += 1;
+  }
+  return { outer, subqueries };
+}
+
+/**
+ * `true` when `subquery` refers back to the row the policy is filtering.
+ *
+ * This is the whole of finding D1. A subquery can contain a perfectly good
+ * `owner_id = auth.uid()` and still say nothing about the current row:
+ *
+ * ```sql
+ * -- "if you own ANY vehicle, read EVERYONE's records"
+ * using (exists (select 1 from vehicles v where v.owner_id = auth.uid()))
+ * ```
+ *
+ * The equality is there, the tautology check passes, and the policy is wide
+ * open to every user who owns a single truck. What is missing is the join back
+ * to the outer row — `v.id = records.vehicle_id`. Correlation *is* the
+ * ownership claim; without it the subquery is a global yes/no about the
+ * caller.
+ *
+ * Both spellings of the back-reference count: qualified (`records.vehicle_id`,
+ * which is the clearer one) and unqualified (`vehicle_id`, which Postgres
+ * resolves outward when the inner tables have no such column). Rejecting the
+ * unqualified form would fail a correct policy, so it is accepted — via the
+ * outer table's declared columns, ignoring any that arrive with an alias
+ * prefix.
+ */
+export function isCorrelated(subquery: string, options: ScopeOptions): boolean {
+  // With no table context there is nothing to correlate against, so this
+  // cannot judge and must not invent a finding.
+  if (!options.outerTable) return true;
+  if (subquery.includes(`${options.outerTable}.`)) return true;
+  return (options.outerColumns ?? []).some((column) =>
+    new RegExp(`(^|[^.a-z0-9_])${column}\\b`).test(subquery)
+  );
 }
 
 /**
@@ -199,14 +306,28 @@ export function isOwnerScoped(
   if (expr === null) return false;
   const branches = splitTopLevel(unwrap(expr), "or");
   if (branches.length === 0) return false;
-  return branches.every((branch) => {
-    if (isTautological(branch)) return false;
-    if (authUidComparands(branch).length === 0) return false;
-    if (options.requirePathExtraction && !PATH_EXTRACTORS.test(branch)) {
-      return false;
-    }
-    return true;
-  });
+  return branches.every((branch) => branchIsOwnerScoped(branch, options));
+}
+
+function branchIsOwnerScoped(branch: string, options: ScopeOptions): boolean {
+  if (isTautological(branch)) return false;
+  const canonical = canonicalizeAuthUid(branch);
+  if (options.requirePathExtraction && !PATH_EXTRACTORS.test(canonical)) {
+    return false;
+  }
+
+  const { outer, subqueries } = stripSubqueries(canonical);
+
+  // A comparison on the row itself needs no correlation — it *is* the row.
+  if (authUidComparands(outer).length > 0) return true;
+
+  // Otherwise the claim rests entirely on a subquery, and a subquery only
+  // speaks about this row if it mentions this row (D1).
+  const owning = subqueries.filter(
+    (subquery) => authUidComparands(subquery).length > 0
+  );
+  if (owning.length === 0) return false;
+  return owning.some((subquery) => isCorrelated(subquery, options));
 }
 
 /* -------------------------------------------------------------------------
@@ -272,6 +393,15 @@ function policyIssues(
   return issues;
 }
 
+/** The declared columns of a contract table, for correlation checking. */
+function columnsOf(table: string): readonly string[] {
+  return (
+    USER_TABLES.find((entry) => entry.name === table)?.columns.map(
+      (column) => column.name
+    ) ?? []
+  );
+}
+
 /** Every finding against the policies on the named user tables. */
 export function userTablePolicyIssues(
   normalized: string,
@@ -280,7 +410,12 @@ export function userTablePolicyIssues(
   const found = policies(normalized).filter((policy) =>
     tables.includes(policy.table)
   );
-  const issues = found.flatMap((policy) => policyIssues(policy, {}));
+  const issues = found.flatMap((policy) =>
+    policyIssues(policy, {
+      outerTable: policy.table,
+      outerColumns: columnsOf(policy.table),
+    })
+  );
 
   for (const table of tables) {
     if (!found.some((policy) => policy.table === table)) {
@@ -304,7 +439,11 @@ export function storagePolicyIssues(normalized: string): string[] {
   );
   if (found.length === 0) return ["storage.objects: no policy at all"];
   return found.flatMap((policy) =>
-    policyIssues(policy, { requirePathExtraction: true })
+    policyIssues(policy, {
+      requirePathExtraction: true,
+      outerTable: "objects",
+      outerColumns: ["name", "bucket_id", "owner", "id"],
+    })
   );
 }
 

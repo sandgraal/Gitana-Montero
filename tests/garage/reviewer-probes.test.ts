@@ -7,7 +7,7 @@
  * were rejected. The graders were measuring string similarity to an imagined
  * implementation and calling it row-level security.
  *
- * Those twelve schemas live here now, as a suite with a known answer:
+ * Those schemas live here now, as a corpus with a known answer:
  *
  * - **WIDE-OPEN variants must be rejected.** Each one leaks, and each one is
  *   written the way somebody would actually write it while believing it was
@@ -24,6 +24,25 @@
  * test rather than being a whole schema, because a probe that fails for six
  * reasons proves nothing about any of them.
  *
+ * ## The corpus was itself found wanting, and mutation-tested since
+ *
+ * The confirm review mutation-tested this file and found the load-bearing
+ * rule — that a comparand must be *found*, not merely a mention — was pinned
+ * by nothing here (R5). Reintroducing that bug failed only the unit tests of
+ * `authUidComparands`; every end-to-end DDL probe stayed green, because P1 and
+ * P4 are both caught by *other* rules (the tautology list, the path-extraction
+ * requirement) before the equality rule is ever reached. A corpus that only
+ * exercises the rules it happens to reach first is a corpus with holes in it.
+ *
+ * N11 and N12 exist to close that: neither is tautological, neither is a
+ * storage policy, so **nothing but the equality rule can reject them**.
+ * Re-running the mutation now fails 4 end-to-end probes instead of 0.
+ *
+ * Same treatment for the two rules added in that round — N4 is the only thing
+ * standing between `isCorrelated` and silence (D1), and N3 the only thing
+ * watching `alter policy` (D2). Each was verified by breaking its rule on
+ * purpose and confirming this file goes red.
+ *
  * refs specs/002-montero-garage (SHR-01, SHR-03, GAR-02′, GAR-05′, ACC-03)
  */
 import { describe, expect, it } from "vitest";
@@ -32,11 +51,13 @@ import {
   authUidComparands,
   bucketPrivacyIssues,
   effectiveCheck,
+  isCorrelated,
   isOptionalColumn,
   isOwnerScoped,
   isTautological,
   splitTopLevel,
   storagePolicyIssues,
+  stripSubqueries,
   userTablePolicyIssues,
 } from "./rules.ts";
 import {
@@ -108,6 +129,65 @@ const P7_INSERT_UNCHECKED = sql(`
     with check (true);
 `);
 
+/**
+ * N3 — a follow-up migration reopens F1 with `alter policy`.
+ *
+ * The `create` is impeccable. The database at the end of the directory is
+ * wide open. A grader that reads only `create policy` reports green
+ * (confirm review, D2).
+ */
+const N3_ALTER_POLICY_REOPENS = sql(`
+  create policy "records are owner-only" on public.records
+    for all to authenticated
+    using (exists (
+      select 1 from public.vehicles v
+      where v.id = records.vehicle_id and v.owner_id = auth.uid()
+    ));
+
+  alter policy "records are owner-only" on public.records
+    using (true);
+`);
+
+/**
+ * N4 — an UNCORRELATED exists: own any vehicle, read everyone's records.
+ *
+ * Contains a real `owner_id = auth.uid()` equality and is not a tautology, so
+ * every rule except correlation is satisfied. What is missing is the join back
+ * to the outer row (confirm review, D1).
+ */
+const N4_UNCORRELATED_EXISTS = sql(`
+  create policy "records are owner-only" on public.records
+    for all to authenticated
+    using (exists (
+      select 1 from public.vehicles v where v.owner_id = auth.uid()
+    ));
+`);
+
+/**
+ * N11 — mentions `auth.uid()` without ever comparing it, in a conjunction the
+ * tautology list cannot reach.
+ *
+ * **This probe exists to pin the equality rule itself** (confirm review, R5).
+ * Mutation-testing the corpus showed the load-bearing rule — that a comparand
+ * must be found, not merely a mention — was graded only by unit tests of the
+ * helper: reintroducing the bug there left every end-to-end probe green.
+ * `deleted_at is null` is not tautological, so `isTautological` returns false
+ * for the conjunction, and the path-extraction rule does not apply to a table.
+ * Nothing but the equality rule can reject this.
+ */
+const N11_MENTION_NOT_EQUALITY = sql(`
+  create policy "vehicles are owner-only" on public.vehicles
+    for all to authenticated
+    using (display_name is not null and auth.uid() is not null);
+`);
+
+/** N12 — the same, hidden inside a function call rather than a comparison. */
+const N12_MENTION_IN_FUNCTION = sql(`
+  create policy "vehicles are owner-only" on public.vehicles
+    for all to authenticated
+    using (coalesce(auth.uid(), owner_id) is not null and model_year > 1982);
+`);
+
 describe("WIDE-OPEN: schemas that leak must be rejected", () => {
   it("P1 rejects a wide-open `using` behind a correct `with check`", () => {
     const issues = userTablePolicyIssues(P1_USING_ANY_LOGGED_IN, ["records"]);
@@ -160,28 +240,109 @@ describe("WIDE-OPEN: schemas that leak must be rejected", () => {
     ).toContain("`with check` is not owner-scoped");
   });
 
+  it("N3 rejects a policy reopened by a later `alter policy`", () => {
+    expect(
+      userTablePolicyIssues(N3_ALTER_POLICY_REOPENS, ["records"]).join(" | ")
+    ).toContain("not owner-scoped");
+  });
+
+  it("N3: the CREATE on its own would have been fine", () => {
+    // Proving the finding is about the ALTER and not about a parser that
+    // stopped understanding the original policy.
+    const createOnly = N3_ALTER_POLICY_REOPENS.slice(
+      0,
+      N3_ALTER_POLICY_REOPENS.indexOf("alter policy")
+    );
+
+    expect(userTablePolicyIssues(createOnly, ["records"])).toEqual([]);
+  });
+
+  it("N3: a dropped policy leaves the table uncovered, not silently passing", () => {
+    const dropped = sql(`
+      create policy "records are owner-only" on public.records
+        for all to authenticated using (owner_id = auth.uid());
+      drop policy "records are owner-only" on public.records;
+    `);
+
+    expect(userTablePolicyIssues(dropped, ["records"])).toEqual([
+      "records: no policy at all",
+    ]);
+  });
+
+  it("N4 rejects an UNCORRELATED exists — own any, read all", () => {
+    expect(
+      userTablePolicyIssues(N4_UNCORRELATED_EXISTS, ["records"]).join(" | ")
+    ).toContain("not owner-scoped");
+  });
+
+  it("N4 vs C8: correlation is the ONLY difference between them", () => {
+    // Both subqueries contain `v.owner_id = auth.uid()`. Only one joins back
+    // to the outer row. If this pair ever agrees, the D1 rule has stopped
+    // doing anything.
+    expect(
+      userTablePolicyIssues(N4_UNCORRELATED_EXISTS, ["records"]).length
+    ).toBeGreaterThan(0);
+    expect(userTablePolicyIssues(C8_NESTED_OWNERSHIP, ["records"])).toEqual([]);
+  });
+
+  it("N11 rejects a MENTION of auth.uid() that is never an equality", () => {
+    // The probe that pins the equality rule end-to-end (R5). Not a tautology,
+    // not a storage policy: nothing else in the ruleset can reject it.
+    expect(
+      userTablePolicyIssues(N11_MENTION_NOT_EQUALITY, ["vehicles"]).join(" | ")
+    ).toContain("not owner-scoped");
+  });
+
+  it("N12 rejects auth.uid() buried in a function call", () => {
+    expect(
+      userTablePolicyIssues(N12_MENTION_IN_FUNCTION, ["vehicles"]).join(" | ")
+    ).toContain("not owner-scoped");
+  });
+
   it("every wide-open probe produces at least one finding", () => {
     // The sweep. A rule refactor that quietly stopped detecting one of these
     // would otherwise only show up as one silent green test.
-    const verdicts = [
-      userTablePolicyIssues(P1_USING_ANY_LOGGED_IN, ["records"]),
-      userTablePolicyIssues(P2_ONE_EQUALS_ONE, ["vehicles"]),
-      userTablePolicyIssues(P3_OR_WIDENED, ["vehicles"]),
-      storagePolicyIssues(P4_STORAGE_NO_PATH),
-      bucketPrivacyIssues(P5_BUCKET_FLIPPED_LATER, RECEIPTS_BUCKET),
-      bucketPrivacyIssues(P6_BUCKET_PUBLIC_REVERSED, RECEIPTS_BUCKET),
-      userTablePolicyIssues(P7_INSERT_UNCHECKED, ["vehicles"]),
+    const verdicts: [string, string[]][] = [
+      [
+        "P1 using-any-logged-in",
+        userTablePolicyIssues(P1_USING_ANY_LOGGED_IN, ["records"]),
+      ],
+      ["P2 1=1", userTablePolicyIssues(P2_ONE_EQUALS_ONE, ["vehicles"])],
+      ["P3 or-widened", userTablePolicyIssues(P3_OR_WIDENED, ["vehicles"])],
+      ["P4 storage-no-path", storagePolicyIssues(P4_STORAGE_NO_PATH)],
+      [
+        "P5 bucket-flipped",
+        bucketPrivacyIssues(P5_BUCKET_FLIPPED_LATER, RECEIPTS_BUCKET),
+      ],
+      [
+        "P6 bucket-reversed",
+        bucketPrivacyIssues(P6_BUCKET_PUBLIC_REVERSED, RECEIPTS_BUCKET),
+      ],
+      [
+        "P7 insert-unchecked",
+        userTablePolicyIssues(P7_INSERT_UNCHECKED, ["vehicles"]),
+      ],
+      [
+        "N3 alter-policy",
+        userTablePolicyIssues(N3_ALTER_POLICY_REOPENS, ["records"]),
+      ],
+      [
+        "N4 uncorrelated-exists",
+        userTablePolicyIssues(N4_UNCORRELATED_EXISTS, ["records"]),
+      ],
+      [
+        "N11 mention-not-equality",
+        userTablePolicyIssues(N11_MENTION_NOT_EQUALITY, ["vehicles"]),
+      ],
+      [
+        "N12 mention-in-function",
+        userTablePolicyIssues(N12_MENTION_IN_FUNCTION, ["vehicles"]),
+      ],
     ];
 
-    expect(verdicts.map((issues) => issues.length > 0)).toEqual([
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-    ]);
+    expect(
+      verdicts.filter(([, issues]) => issues.length === 0).map(([name]) => name)
+    ).toEqual([]);
   });
 });
 
@@ -281,6 +442,26 @@ const C10_RESTRICTIVE_NARROWS = sql(`
   create policy "no deleted accounts" on public.vehicles
     as restrictive for all to authenticated
     using (auth.uid() is not null);
+`);
+
+/**
+ * N9 — `(select auth.uid()) = owner_id`, straight out of Supabase's own RLS
+ * performance guide: the scalar subquery lets Postgres hoist the call out of
+ * the per-row loop. This is what T2-202 will write at scale, and it was
+ * failing closed (confirm review, R4).
+ */
+const N9_SELECT_WRAPPED_UID = sql(`
+  create policy "vehicles are owner-only" on public.vehicles
+    for all to authenticated
+    using ((select auth.uid()) = owner_id)
+    with check ((select auth.uid()) = owner_id);
+`);
+
+/** N10 — the `in (select auth.uid())` spelling of the same idiom. */
+const N10_IN_SELECT_UID = sql(`
+  create policy "vehicles are owner-only" on public.vehicles
+    for all to authenticated
+    using (owner_id in (select auth.uid()));
 `);
 
 /** C11 — the bucket created private, explicitly. */
@@ -405,6 +586,30 @@ describe("CORRECT: valid schemas must be accepted", () => {
     );
   });
 
+  it("N9 accepts `(select auth.uid()) = owner_id` — Supabase's own idiom", () => {
+    expect(userTablePolicyIssues(N9_SELECT_WRAPPED_UID, ["vehicles"])).toEqual(
+      []
+    );
+  });
+
+  it("N10 accepts `owner_id in (select auth.uid())`", () => {
+    expect(userTablePolicyIssues(N10_IN_SELECT_UID, ["vehicles"])).toEqual([]);
+  });
+
+  it("N9/N10: the subquery wrapper does not smuggle past the equality rule", () => {
+    // Accepting the idiom must not decay into "any (select …) counts". A
+    // wrapped call that is still only a mention has to stay rejected.
+    const wrappedMention = sql(`
+      create policy "vehicles are owner-only" on public.vehicles
+        for all to authenticated
+        using ((select auth.uid()) is not null and display_name is not null);
+    `);
+
+    expect(
+      userTablePolicyIssues(wrappedMention, ["vehicles"]).join(" | ")
+    ).toContain("not owner-scoped");
+  });
+
   it("every correct probe produces no findings", () => {
     const verdicts = [
       userTablePolicyIssues(C7_FOR_ALL_USING_ONLY, ["vehicles"]),
@@ -412,6 +617,8 @@ describe("CORRECT: valid schemas must be accepted", () => {
       storagePolicyIssues(C9_STORAGE_PATH_SCOPED),
       userTablePolicyIssues(C10_RESTRICTIVE_NARROWS, ["vehicles"]),
       bucketPrivacyIssues(C11_BUCKET_PRIVATE, RECEIPTS_BUCKET),
+      userTablePolicyIssues(N9_SELECT_WRAPPED_UID, ["vehicles"]),
+      userTablePolicyIssues(N10_IN_SELECT_UID, ["vehicles"]),
     ];
 
     expect(verdicts.flat()).toEqual([]);
@@ -491,6 +698,83 @@ describe("authUidComparands — equality, not mention", () => {
 
   it("does not count a comparison with a literal", () => {
     expect(authUidComparands("auth.uid() = 'some-uuid'")).toEqual([]);
+  });
+
+  it("does not count the caller compared with themselves (R3)", () => {
+    // `auth.uid()` IS `current_setting('request.jwt.claims')…->>'sub'`
+    // underneath, so this is always true while reading like a careful check.
+    expect(
+      authUidComparands(
+        "current_setting('request.jwt.claim.sub') = auth.uid()::text"
+      )
+    ).toEqual([]);
+  });
+
+  it("sees through Supabase's `(select auth.uid())` idiom (R4)", () => {
+    expect(authUidComparands("(select auth.uid()) = owner_id")).toEqual([
+      "owner_id",
+    ]);
+  });
+
+  it("sees through the `in (select auth.uid())` idiom (R4)", () => {
+    expect(authUidComparands("owner_id in (select auth.uid())")).toEqual([
+      "owner_id",
+    ]);
+  });
+});
+
+describe("stripSubqueries / isCorrelated — the D1 rule, directly", () => {
+  it("separates a subquery from the predicate around it", () => {
+    const { outer, subqueries } = stripSubqueries(
+      "exists (select 1 from vehicles v where v.owner_id = auth.uid())"
+    );
+
+    expect(subqueries).toHaveLength(1);
+    expect(outer).not.toContain("auth.uid()");
+  });
+
+  it("calls a subquery that names the outer table correlated", () => {
+    expect(
+      isCorrelated("select 1 from vehicles v where v.id = records.vehicle_id", {
+        outerTable: "records",
+        outerColumns: ["id", "vehicle_id"],
+      })
+    ).toBe(true);
+  });
+
+  it("calls a subquery referencing an outer column UNqualified correlated", () => {
+    // Legal Postgres — resolved outward when the inner table has no such
+    // column. Rejecting it would fail a correct policy.
+    expect(
+      isCorrelated("select 1 from vehicles v where v.id = vehicle_id", {
+        outerTable: "records",
+        outerColumns: ["id", "vehicle_id"],
+      })
+    ).toBe(true);
+  });
+
+  it("calls a subquery that never mentions the outer row UNcorrelated", () => {
+    expect(
+      isCorrelated("select 1 from vehicles v where v.owner_id = auth.uid()", {
+        outerTable: "records",
+        outerColumns: ["id", "vehicle_id", "occurred_on", "kind"],
+      })
+    ).toBe(false);
+  });
+
+  it("is not fooled by `id` appearing inside `owner_id`", () => {
+    // The word-boundary case: a substring match would call this correlated
+    // and D1 would quietly stop working.
+    expect(
+      isCorrelated("select 1 from vehicles v where v.owner_id = auth.uid()", {
+        outerTable: "records",
+        outerColumns: ["id"],
+      })
+    ).toBe(false);
+  });
+
+  it("declines to judge when there is no outer table, rather than inventing a finding", () => {
+    expect(isCorrelated("select 1 from vehicles v", {})).toBe(true);
   });
 });
 
