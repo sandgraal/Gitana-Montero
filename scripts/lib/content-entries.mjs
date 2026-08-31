@@ -95,6 +95,90 @@ export const TIERS_REQUIRING_SOURCES = CONFIDENCE_TIERS.slice(
   CONFIDENCE_TIERS.indexOf("first-hand")
 );
 
+/**
+ * The **documentary tiers** — the tiers whose whole meaning is "a document
+ * says so", and therefore the left-hand side of T207's kind→tier coherence
+ * rule.
+ *
+ * Mirrors `CITATION_REQUIRED_TIERS` in `src/schemas/entry.ts` exactly, and is
+ * pinned to it by `tests/lib/content-entries.test.ts`. Same tier set, two
+ * different questions: the schema asks *is there a document at all*, this
+ * script asks *is it the kind of document the tier claims*.
+ *
+ * Duplicated here rather than imported for the reason `RESERVED_ENTRY_FIELDS`
+ * is — see that constant's docstring.
+ */
+export const DOCUMENTARY_TIERS = ["fsm-confirmed", "tsb"];
+
+/**
+ * The **documentary kinds** — AGENTS.md's "factory-documented" set: the FSM,
+ * the bulletins, and manufacturer primary literature (owner ruling
+ * 2026-08-28, which widened the top tier from the FSM alone).
+ *
+ * Mirrors `FACTORY_DOCUMENTED_KINDS` in `src/schemas/entry.ts`, pinned by
+ * `tests/lib/content-entries.test.ts`.
+ */
+export const FACTORY_DOCUMENTED_KINDS = ["fsm", "tsb", "manufacturer"];
+
+/**
+ * Entries that violate the kind→tier coherence rule today and are exempt from
+ * it **until the content follow-up lands** — a ratchet, not an amnesty.
+ *
+ * ## Why this register exists
+ *
+ * T207 introduced the rule (see `findKindTierIssues` in
+ * `scripts/check-citations.mjs`). Its first run against real content found 19
+ * `vehicles` entries at `fsm-confirmed` whose strongest citation is
+ * `www.mitsubishi-motors.com` — Mitsubishi's own site — filed as `vendor`,
+ * because T201 was written before the `manufacturer` kind existed (added
+ * 2026-08-28, `fix/001-source-kinds-v2`). That is precisely the mis-filing the
+ * amendment was made to fix, and the amendment did not re-kind the content it
+ * was made for.
+ *
+ * So the finding is real, the *tier* is very likely right, and the repair is a
+ * content change — re-kinding those citations — that belongs to a
+ * content-researcher with a fact-check pass, not to the schema task that
+ * surfaced it. Shipping the rule with this register keeps the gate live for
+ * every new and every re-touched entry (which is the point: the T207 content
+ * half writes the first entries it governs) instead of deferring the rule
+ * until the backlog clears.
+ *
+ * ## The properties that keep it from rotting
+ *
+ * - **Self-cleaning.** A listed file that no longer violates the rule is a
+ *   *stale exception* and fails `check:citations` by itself, naming the line
+ *   to delete. The register can only shrink, and it cannot silently outlive
+ *   the debt.
+ * - **Closed.** Adding a path here is a code change in a reviewed file, on a
+ *   branch whose diff shows it. No entry can grandfather itself.
+ * - **Loud.** `check:citations` prints the outstanding count on every green
+ *   run, so the debt is in every CI log until it is zero.
+ *
+ * Paths are repo-relative POSIX, exactly as `loadContentEntries` reports
+ * `file`.
+ */
+export const KIND_TIER_LEGACY_EXCEPTIONS = [
+  "src/content/vehicles/4m40.json",
+  "src/content/vehicles/4m41.json",
+  "src/content/vehicles/6g72-sohc.json",
+  "src/content/vehicles/6g74-sohc.json",
+  "src/content/vehicles/6g75.json",
+  "src/content/vehicles/automatic-4-speed.json",
+  "src/content/vehicles/automatic-5-speed.json",
+  "src/content/vehicles/combos-gen3-au.json",
+  "src/content/vehicles/combos-gen3-us.json",
+  "src/content/vehicles/combos-gen4-global.json",
+  "src/content/vehicles/gl.json",
+  "src/content/vehicles/global.json",
+  "src/content/vehicles/gls.json",
+  "src/content/vehicles/glx.json",
+  "src/content/vehicles/limited.json",
+  "src/content/vehicles/manual-5-speed.json",
+  "src/content/vehicles/me.json",
+  "src/content/vehicles/super-select-ii.json",
+  "src/content/vehicles/xls.json",
+];
+
 /** Same extensions `ENTRY_PATTERN` in `src/content.config.ts` loads. */
 const ENTRY_EXTENSIONS = new Set(["md", "mdx", "json", "yaml", "yml"]);
 

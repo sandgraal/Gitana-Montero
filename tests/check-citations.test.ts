@@ -7,8 +7,11 @@ import { describe, expect, it } from "vitest";
 import {
   auditCitations,
   findCitationIssues,
+  findKindTierIssues,
+  findStaleLegacyExceptions,
   findTierSourceIssues,
 } from "../scripts/check-citations.mjs";
+import { KIND_TIER_LEGACY_EXCEPTIONS } from "../scripts/lib/content-entries.mjs";
 
 const SOURCE = {
   title: "TEST fixture source",
@@ -206,6 +209,143 @@ describe("findTierSourceIssues", () => {
       expect(issues).toHaveLength(1);
     }
   );
+});
+
+/**
+ * The kind→tier coherence rule (T207). Replaces the schema-level
+ * "does not yet constrain which kind may support which tier" pin in
+ * `src/schemas/entry.test.ts`, which now records that the coupling lives here
+ * rather than in the schema.
+ */
+describe("findKindTierIssues", () => {
+  const sourceOfKind = (kind: string) => ({ ...SOURCE, kind });
+
+  const tiered = (confidence: string, kinds: string[]) =>
+    entry({
+      data: {
+        id: "g3-brakes-caliper-bolt",
+        confidence,
+        sources: kinds.map(sourceOfKind),
+        prose: {},
+      },
+    });
+
+  // Negative control: the case the rule exists to catch.
+  it("FAILS an fsm-confirmed entry cited only by a forum thread", () => {
+    const issues = findKindTierIssues(tiered("fsm-confirmed", ["forum"]));
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.field).toBe("sources");
+    expect(issues[0]?.message).toMatch(/g3-brakes-caliper-bolt/);
+    expect(issues[0]?.message).toMatch(/fsm-confirmed/);
+    expect(issues[0]?.message).toMatch(/factory-documented/);
+    // Names what it actually cites, so the author can see the mismatch.
+    expect(issues[0]?.message).toMatch(/`forum`/);
+  });
+
+  it.each(["vendor", "video", "reference", "first-hand"])(
+    "FAILS an fsm-confirmed entry cited only by a `%s` source",
+    (kind) => {
+      expect(findKindTierIssues(tiered("fsm-confirmed", [kind]))).toHaveLength(
+        1
+      );
+    }
+  );
+
+  it("FAILS a tsb entry with no documentary source", () => {
+    expect(findKindTierIssues(tiered("tsb", ["vendor", "forum"]))).toHaveLength(
+      1
+    );
+  });
+
+  // Positive controls: one documentary source anywhere in the list is enough.
+  it.each(["fsm", "tsb", "manufacturer"])(
+    "passes an fsm-confirmed entry with a `%s` source among weaker ones",
+    (kind) => {
+      expect(
+        findKindTierIssues(tiered("fsm-confirmed", ["vendor", kind, "forum"]))
+      ).toEqual([]);
+    }
+  );
+
+  it("passes a community-consensus entry cited only by forums", () => {
+    // Scope: the rule is deliberately about the documentary tiers only —
+    // `community-consensus` has no document in its definition.
+    expect(
+      findKindTierIssues(tiered("community-consensus", ["forum"]))
+    ).toEqual([]);
+  });
+
+  it.each(["first-hand", "anecdotal"])(
+    "passes a %s entry whatever it cites",
+    (confidence) => {
+      expect(findKindTierIssues(tiered(confidence, ["forum"]))).toEqual([]);
+    }
+  );
+
+  it("stays silent on a documentary entry with no sources at all", () => {
+    // That is findTierSourceIssues' finding; reporting one mistake twice
+    // sends the author chasing two problems.
+    expect(findKindTierIssues(tiered("fsm-confirmed", []))).toEqual([]);
+  });
+
+  it("ignores a malformed source rather than crediting it", () => {
+    const issues = findKindTierIssues(
+      entry({
+        data: {
+          id: "x",
+          confidence: "fsm-confirmed",
+          sources: [{ kind: 7 }, sourceOfKind("forum")],
+          prose: {},
+        },
+      })
+    );
+    expect(issues).toHaveLength(1);
+  });
+});
+
+describe("the kind→tier legacy register", () => {
+  const violating = (file: string) => ({
+    collection: "vehicles",
+    file,
+    data: {
+      id: "legacy",
+      confidence: "fsm-confirmed",
+      sources: [{ ...SOURCE, kind: "vendor" }],
+      prose: {},
+    },
+  });
+
+  const listed = KIND_TIER_LEGACY_EXCEPTIONS[0] as string;
+
+  it("suppresses a listed file's violation in auditCitations", () => {
+    expect(findKindTierIssues(violating(listed))).toHaveLength(1);
+    expect(auditCitations([violating(listed)])).toEqual([]);
+  });
+
+  it("does not suppress an unlisted file's violation", () => {
+    const issues = auditCitations([
+      violating("src/content/reference/not-listed.json"),
+    ]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.file).toBe("src/content/reference/not-listed.json");
+  });
+
+  it("FAILS on a stale exception — a listed file that no longer violates", () => {
+    // The ratchet: the register can only shrink. A fixed, renamed or deleted
+    // file that kept its exception would hide the next violation to land in
+    // that file.
+    const stale = findStaleLegacyExceptions([]);
+    expect(stale.length).toBe(KIND_TIER_LEGACY_EXCEPTIONS.length);
+    expect(stale[0]?.message).toMatch(/stale/);
+    expect(stale[0]?.message).toMatch(/KIND_TIER_LEGACY_EXCEPTIONS/);
+  });
+
+  it("reports no stale exception while every listed file still violates", () => {
+    const entries = KIND_TIER_LEGACY_EXCEPTIONS.map((file: string) =>
+      violating(file)
+    );
+    expect(findStaleLegacyExceptions(entries)).toEqual([]);
+  });
 });
 
 describe("auditCitations", () => {

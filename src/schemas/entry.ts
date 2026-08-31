@@ -161,12 +161,39 @@ export const isoDateSchema = () =>
  * the kinds merely read strongest-to-weakest as a reading aid.
  *
  * A source kind is an **evidence class**, not a confidence tier. The two stay
- * separate fields and this schema deliberately does not map one onto the
- * other, but the kinds exist so a reader can judge whether the tier an entry
- * claims is plausible for the documents it actually cites:
+ * separate fields, and *this schema* still does not map one onto the other —
+ * but as of T207 the relationship is no longer unconstrained.
  *
- * - `fsm` — the Factory Service Manual. Supports `fsm-confirmed`.
- * - `tsb` — a Technical Service Bulletin. Supports `tsb`.
+ * ## The kind→tier coherence rule (T207, 2026-08-30) — NORMATIVE
+ *
+ * The documentary tiers ({@link CITATION_REQUIRED_TIERS}: `fsm-confirmed`,
+ * `tsb`) require at least one source of a documentary kind
+ * ({@link FACTORY_DOCUMENTED_KINDS}: `fsm`, `tsb`, `manufacturer`). It
+ * restates AGENTS.md's own definition — "`fsm-confirmed` means
+ * **factory-documented**: the FSM, official spec sheets, factory brochures and
+ * catalogues — manufacturer primary literature (owner ruling 2026-08-28)" — so
+ * an `fsm-confirmed` entry cited only by a forum thread is not a strong claim
+ * weakly supported, it is a false label.
+ *
+ * The rule is enforced by `scripts/check-citations.mjs`, **not here**, for the
+ * reason recorded on the tier/source invariant that landed the same way:
+ * whether the documents an entry cites are good enough for the tier it claims
+ * is content policy, and this module's refinements are reserved for structural
+ * contradictions a shape can see (a tier that claims a document exists while
+ * `sources` is empty). Kind is only visible to a schema as a string in an
+ * array; "is this evidence strong enough" is not.
+ *
+ * The per-kind notes below say which tiers each kind can support. The
+ * `fsm`/`tsb`/`manufacturer` line is the normative rule above. **Everything
+ * the weaker kinds say is reader guidance, and nothing enforces it** — a
+ * `community-consensus` entry cited only by a `vendor` catalogue is legal, and
+ * whether it should be is a question for review, not for a gate that cannot
+ * read the document.
+ *
+ * - `fsm` — the Factory Service Manual. Supports `fsm-confirmed`. *(normative)*
+ * - `tsb` — a Technical Service Bulletin. Supports `tsb`, and `fsm-confirmed`
+ *   for a figure the bulletin itself states — a TSB is factory primary
+ *   literature. *(normative)*
  * - `manufacturer` — factory literature that is not the FSM: spec sheets,
  *   brochures, catalogues, official Mitsubishi pages. Added with the owner's
  *   "factory-documented" ruling (AGENTS.md, 2026-08-28), which widened the top
@@ -174,11 +201,12 @@ export const isoDateSchema = () =>
  *   kind can support `fsm-confirmed`. Before it existed, a factory brochure
  *   had to file as `vendor`, which reads as "a shop that sells the part" and
  *   lost the fact that the manufacturer itself published the figure.
+ *   *(normative)*
  * - `forum` — an enthusiast thread or club post. Supports
- *   `community-consensus` at best, and only in aggregate.
- * - `video` — a build or repair video. Same standing as `forum`.
+ *   `community-consensus` at best, and only in aggregate. *(guidance)*
+ * - `video` — a build or repair video. Same standing as `forum`. *(guidance)*
  * - `vendor` — a parts seller's catalogue or fitment guide. Good for part
- *   numbers and supersession, not for factory figures.
+ *   numbers and supersession, not for factory figures. *(guidance)*
  * - `reference` — tertiary or institutional reference: dictionaries (DLE,
  *   Diccionario de americanismos), encyclopedias, and government or official
  *   pages (gov.uk MOT, COSEVI RTV). Added alongside `manufacturer`. It is the
@@ -188,8 +216,10 @@ export const isoDateSchema = () =>
  *   rule is, but neither is factory evidence about a truck. **Wikipedia
  *   belongs here**, not under `forum`, where it was previously filed for lack
  *   of anywhere better — an encyclopedia is not an enthusiast thread, and the
- *   mis-filing understated otherwise-citable entries.
+ *   mis-filing understated otherwise-citable entries. *(guidance)*
  * - `first-hand` — the owner's own truck. Supports `first-hand`, never more.
+ *   *(guidance — but note that a `first-hand` source can never satisfy the
+ *   normative rule above, so it cannot carry a documentary tier)*
  */
 export const SOURCE_KINDS = [
   "fsm",
@@ -203,6 +233,28 @@ export const SOURCE_KINDS = [
 ] as const;
 
 export type SourceKind = (typeof SOURCE_KINDS)[number];
+
+/**
+ * The kinds that can support a documentary tier — the T207 kind→tier
+ * coherence rule's right-hand side (see the `SOURCE_KINDS` docstring above).
+ *
+ * These are AGENTS.md's "factory-documented" set, verbatim: the FSM, the
+ * bulletins, and manufacturer primary literature. Everything else is somebody
+ * reporting what a document said, which is a different thing from the
+ * document.
+ *
+ * Declared here and consumed by `scripts/check-citations.mjs` (through the
+ * plain-Node mirror in `scripts/lib/content-entries.mjs`, which
+ * `tests/lib/content-entries.test.ts` pins against this export). The rule is
+ * *enforced* there rather than in this module — see the docstring above for
+ * why a kind/tier judgment is a check-script rule and not a schema
+ * refinement.
+ */
+export const FACTORY_DOCUMENTED_KINDS = [
+  "fsm",
+  "tsb",
+  "manufacturer",
+] as const satisfies readonly SourceKind[];
 
 /**
  * Every field is required, `archiveUrl` included: AGENTS.md says archive the

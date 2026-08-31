@@ -25,6 +25,7 @@ import { z } from "astro/zod";
 import { defineEntrySchema } from "./schemas/entry";
 import { communitySchema } from "./schemas/community";
 import { glossaryEntrySchema } from "./schemas/glossary";
+import { referenceEntrySchema } from "./schemas/reference";
 import { vehiclesEntrySchema } from "./schemas/vehicles";
 
 /**
@@ -85,8 +86,15 @@ export const collections = {
    * merge-blocking check and deserves its own module and its own tests. T205.
    */
   glossary: entryCollection("glossary", glossaryEntrySchema),
-  /** REF-01, REF-02 — FSM index, fluids, torque master table, capacities. */
-  reference: entryCollection("reference", baseEntrySchema()),
+  /**
+   * REF-01, REF-02 — FSM index, fluids, torque master table, capacities.
+   *
+   * Assembled in `src/schemas/reference.ts` (still through
+   * `defineEntrySchema`): every figure is a `{ value, unit }` quantity in
+   * shared data, which is what puts it in `check:citations`' scan. T207
+   * (schema half). VIN/option-code decoder data is T208's kind to add.
+   */
+  reference: entryCollection("reference", referenceEntrySchema(baseProse)),
   /** GAR-01…05 — the build log for the truck. */
   garage: entryCollection("garage", baseEntrySchema()),
   /** PRB-01…06 — the symptom-driven problem finder. */
