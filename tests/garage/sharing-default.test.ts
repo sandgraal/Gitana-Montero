@@ -65,13 +65,13 @@ const FLAGS = SHARE_FLAG_COLUMNS.map(
  * ====================================================================== */
 
 describe("every visibility flag is declared private-by-default", () => {
-  it.fails.each(FLAGS)("%s.%s exists (%s)", (table, column) => {
+  it.each(FLAGS)("%s.%s exists (%s)", (table, column) => {
     const body = createTableBody(migrationSql(), table);
 
     expect(columnDefinition(body ?? "", column)).not.toBeNull();
   });
 
-  it.fails.each(FLAGS)("%s.%s is boolean (%s)", (table, column) => {
+  it.each(FLAGS)("%s.%s is boolean (%s)", (table, column) => {
     const body = createTableBody(migrationSql(), table);
 
     expect(columnDefinition(body ?? "", column)?.definition ?? "").toMatch(
@@ -79,13 +79,13 @@ describe("every visibility flag is declared private-by-default", () => {
     );
   });
 
-  it.fails.each(FLAGS)("%s.%s is not null (%s)", (table, column) => {
+  it.each(FLAGS)("%s.%s is not null (%s)", (table, column) => {
     // A nullable visibility flag has three states, and only two of them are
     // answers. The third one is whatever the next `coalesce` decides.
     expect(isNotNullFor(migrationSql(), table, column)).toBe(true);
   });
 
-  it.fails.each(FLAGS)(
+  it.each(FLAGS)(
     "%s.%s DEFAULTS TO FALSE — the whole of SHR-01 (%s)",
     (table, column) => {
       const body = createTableBody(migrationSql(), table);
@@ -95,7 +95,7 @@ describe("every visibility flag is declared private-by-default", () => {
     }
   );
 
-  it.fails("declares no visibility flag defaulting to true, anywhere", () => {
+  it("declares no visibility flag defaulting to true, anywhere", () => {
     // The negative sweep: catches a *fifth* flag added later that this file's
     // table does not know about. A grader that only iterates a known list can
     // never see the column nobody told it about.
@@ -117,134 +117,112 @@ describe("every visibility flag is declared private-by-default", () => {
 describe.skipIf(!live.available)(
   liveTitle("the default survives a real insert", live),
   () => {
-    it.fails(
-      "a vehicle created without mentioning visibility is private",
-      async () => {
-        // The insert deliberately says nothing about sharing — exactly what a
-        // script, an import job, or a hand-written request would do.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const response = await insertRow(
-            scenario,
-            scenario.ownerA,
-            "vehicles",
-            {
-              owner_id: scenario.ownerA.userId,
-              display_name: testVehicleName("a"),
-              ...TEST_TAXONOMY_IDENTITY,
-            }
-          );
+    it("a vehicle created without mentioning visibility is private", async () => {
+      // The insert deliberately says nothing about sharing — exactly what a
+      // script, an import job, or a hand-written request would do.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const response = await insertRow(
+          scenario,
+          scenario.ownerA,
+          "vehicles",
+          {
+            owner_id: scenario.ownerA.userId,
+            display_name: testVehicleName("a"),
+            ...TEST_TAXONOMY_IDENTITY,
+          }
+        );
 
-          const rows = Array.isArray(response.body) ? response.body : [];
-          const vehicle = rows[0] as Record<string, unknown> | undefined;
+        const rows = Array.isArray(response.body) ? response.body : [];
+        const vehicle = rows[0] as Record<string, unknown> | undefined;
 
-          expect(vehicle?.is_showcase_public).toBe(false);
-          expect(vehicle?.is_worklog_public).toBe(false);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(vehicle?.is_showcase_public).toBe(false);
+        expect(vehicle?.is_worklog_public).toBe(false);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails(
-      "a record created without mentioning visibility is private",
-      async () => {
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const owned = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
+    it("a record created without mentioning visibility is private", async () => {
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const owned = await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
 
-          const response = await insertRow(
-            scenario,
-            scenario.ownerA,
-            "records",
-            {
-              vehicle_id: owned.vehicleId,
-              occurred_on: "2026-08-30",
-              kind: "work",
-            }
-          );
+        const response = await insertRow(scenario, scenario.ownerA, "records", {
+          vehicle_id: owned.vehicleId,
+          occurred_on: "2026-08-30",
+          kind: "work",
+        });
 
-          const rows = Array.isArray(response.body) ? response.body : [];
-          const record = rows[0] as Record<string, unknown> | undefined;
+        const rows = Array.isArray(response.body) ? response.body : [];
+        const record = rows[0] as Record<string, unknown> | undefined;
 
-          expect(record?.is_public).toBe(false);
-          expect(record?.is_cost_public).toBe(false);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(record?.is_public).toBe(false);
+        expect(record?.is_cost_public).toBe(false);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails(
-      "cost visibility is its own decision, not the record's",
-      async () => {
-        // SHR-03: publishing a work-log entry must not publish what it cost.
-        // Two columns, two defaults, and opening one must leave the other shut.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const owned = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
+    it("cost visibility is its own decision, not the record's", async () => {
+      // SHR-03: publishing a work-log entry must not publish what it cost.
+      // Two columns, two defaults, and opening one must leave the other shut.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const owned = await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
 
-          const response = await insertRow(
-            scenario,
-            scenario.ownerA,
-            "records",
-            {
-              vehicle_id: owned.vehicleId,
-              occurred_on: "2026-08-30",
-              kind: "work",
-              cost_amount: 45000,
-              cost_currency: "CRC",
-              is_public: true,
-            }
-          );
+        const response = await insertRow(scenario, scenario.ownerA, "records", {
+          vehicle_id: owned.vehicleId,
+          occurred_on: "2026-08-30",
+          kind: "work",
+          cost_amount: 45000,
+          cost_currency: "CRC",
+          is_public: true,
+        });
 
-          const rows = Array.isArray(response.body) ? response.body : [];
-          const record = rows[0] as Record<string, unknown> | undefined;
+        const rows = Array.isArray(response.body) ? response.body : [];
+        const record = rows[0] as Record<string, unknown> | undefined;
 
-          expect(record?.is_public).toBe(true);
-          expect(record?.is_cost_public).toBe(false);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(record?.is_public).toBe(true);
+        expect(record?.is_cost_public).toBe(false);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails(
-      "POSITIVE CONTROL: the owner can still choose to publish",
-      async () => {
-        // Private-by-default is not private-by-force. SHR-02 is a feature, and
-        // a schema that refused to flip the flag would satisfy every grader
-        // above while shipping a garage nobody can share.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const response = await insertRow(
-            scenario,
-            scenario.ownerA,
-            "vehicles",
-            {
-              owner_id: scenario.ownerA.userId,
-              display_name: testVehicleName("a"),
-              ...TEST_TAXONOMY_IDENTITY,
-              is_showcase_public: true,
-            }
-          );
+    it("POSITIVE CONTROL: the owner can still choose to publish", async () => {
+      // Private-by-default is not private-by-force. SHR-02 is a feature, and
+      // a schema that refused to flip the flag would satisfy every grader
+      // above while shipping a garage nobody can share.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const response = await insertRow(
+          scenario,
+          scenario.ownerA,
+          "vehicles",
+          {
+            owner_id: scenario.ownerA.userId,
+            display_name: testVehicleName("a"),
+            ...TEST_TAXONOMY_IDENTITY,
+            is_showcase_public: true,
+          }
+        );
 
-          const rows = Array.isArray(response.body) ? response.body : [];
-          expect(
-            (rows[0] as Record<string, unknown> | undefined)?.is_showcase_public
-          ).toBe(true);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        const rows = Array.isArray(response.body) ? response.body : [];
+        expect(
+          (rows[0] as Record<string, unknown> | undefined)?.is_showcase_public
+        ).toBe(true);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
   }
 );

@@ -28,6 +28,7 @@
     "verify": "astro check && eslint . && prettier --check . && vitest run && npm run check:locales && npm run check:citations && npm run check:glossary && npm run check:es-register && astro build && npm run check:hreflang"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
     "astro": "^7.2.9"
   },
   "devDependencies": {

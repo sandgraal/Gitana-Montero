@@ -55,7 +55,7 @@ const live = await detectLiveStack();
  * ====================================================================== */
 
 describe("the receipts bucket is created private", () => {
-  it.fails("creates a private bucket and never flips it public", () => {
+  it("creates a private bucket and never flips it public", () => {
     // The single decision governing whether every receipt in the system has a
     // permanent unauthenticated URL. Three ways to get it wrong, and the
     // first version of this grader caught none of them reliably (T2-201
@@ -71,7 +71,7 @@ describe("the receipts bucket is created private", () => {
     expect(bucketPrivacyIssues(migrationSql(), RECEIPTS_BUCKET)).toEqual([]);
   });
 
-  it.fails("scopes every storage policy to the owner, in `using` too", () => {
+  it("scopes every storage policy to the owner, in `using` too", () => {
     // T2-201 review, F2. The previous grader was satisfied by the `with
     // check` half alone, so
     //   using (bucket_id = 'receipts' and auth.uid() is not null)
@@ -82,7 +82,7 @@ describe("the receipts bucket is created private", () => {
     expect(storagePolicyIssues(migrationSql())).toEqual([]);
   });
 
-  it.fails("grants no storage policy to anon", () => {
+  it("grants no storage policy to anon", () => {
     const leaks = storagePolicyIssues(migrationSql()).filter((issue) =>
       issue.includes("granted to")
     );
@@ -98,7 +98,7 @@ describe("the receipts bucket is created private", () => {
 describe.skipIf(!live.available)(
   liveTitle("a receipt has no public URL", live),
   () => {
-    it.fails("the public object route does not serve a receipt", async () => {
+    it("the public object route does not serve a receipt", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
@@ -114,25 +114,22 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "an unauthenticated direct read does not serve it either",
-      async () => {
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
-          await uploadObject(scenario, scenario.ownerA, path);
+    it("an unauthenticated direct read does not serve it either", async () => {
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
+        await uploadObject(scenario, scenario.ownerA, path);
 
-          const anonRead = await downloadObject(scenario, scenario.anon, path);
+        const anonRead = await downloadObject(scenario, scenario.anon, path);
 
-          expect(anonRead.ok).toBe(false);
-          expect(anonRead.text).not.toContain("TEST-T2-201 synthetic receipt");
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(anonRead.ok).toBe(false);
+        expect(anonRead.text).not.toContain("TEST-T2-201 synthetic receipt");
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails("anon cannot list the bucket", async () => {
+    it("anon cannot list the bucket", async () => {
       // Filenames are `<owner uuid>/…`. A listing hands out both halves of
       // what an attacker needs for the direct route.
       const scenario = await provisionScenario(stackOf(live));
@@ -148,36 +145,29 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "POSITIVE CONTROL: the owner reads their own receipt back",
-      async () => {
-        // Otherwise every assertion above is satisfied by a bucket that does
-        // not exist.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
-          await uploadObject(scenario, scenario.ownerA, path);
+    it("POSITIVE CONTROL: the owner reads their own receipt back", async () => {
+      // Otherwise every assertion above is satisfied by a bucket that does
+      // not exist.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
+        await uploadObject(scenario, scenario.ownerA, path);
 
-          const ownerRead = await downloadObject(
-            scenario,
-            scenario.ownerA,
-            path
-          );
+        const ownerRead = await downloadObject(scenario, scenario.ownerA, path);
 
-          expect(ownerRead.ok).toBe(true);
-          expect(ownerRead.text).toContain("TEST-T2-201 synthetic receipt");
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(ownerRead.ok).toBe(true);
+        expect(ownerRead.text).toContain("TEST-T2-201 synthetic receipt");
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
   }
 );
 
 describe.skipIf(!live.available)(
   liveTitle("signed access is the owner's alone", live),
   () => {
-    it.fails("owner B cannot sign for owner A's object", async () => {
+    it("owner B cannot sign for owner A's object", async () => {
       // The refusal has to happen at signing. A signed URL is a bearer token:
       // once issued, nothing downstream asks who asked for it.
       const scenario = await provisionScenario(stackOf(live));
@@ -194,7 +184,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("anon cannot sign for anyone's object", async () => {
+    it("anon cannot sign for anyone's object", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
@@ -208,7 +198,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("owner B cannot upload into owner A's folder", async () => {
+    it("owner B cannot upload into owner A's folder", async () => {
       // The write side. An attacker who can put a file under someone else's
       // prefix can also replace a receipt with something else entirely.
       const scenario = await provisionScenario(stackOf(live));
@@ -223,31 +213,28 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "POSITIVE CONTROL: the owner's signed URL works without credentials",
-      async () => {
-        // The feature actually has to work: a signed URL that nobody can
-        // follow would satisfy every denial grader above and ship a garage
-        // where no receipt is ever visible.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
-          await uploadObject(scenario, scenario.ownerA, path);
+    it("POSITIVE CONTROL: the owner's signed URL works without credentials", async () => {
+      // The feature actually has to work: a signed URL that nobody can
+      // follow would satisfy every denial grader above and ship a garage
+      // where no receipt is ever visible.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
+        await uploadObject(scenario, scenario.ownerA, path);
 
-          const signed = await signObject(scenario, scenario.ownerA, path);
-          expect(signed.ok).toBe(true);
+        const signed = await signObject(scenario, scenario.ownerA, path);
+        expect(signed.ok).toBe(true);
 
-          const url = (signed.body as { signedURL?: string }).signedURL ?? "";
-          expect(url).toBeTruthy();
+        const url = (signed.body as { signedURL?: string }).signedURL ?? "";
+        expect(url).toBeTruthy();
 
-          const followed = await followSignedUrl(stackOf(live), url);
+        const followed = await followSignedUrl(stackOf(live), url);
 
-          expect(followed.ok).toBe(true);
-          expect(followed.text).toContain("TEST-T2-201 synthetic receipt");
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(followed.ok).toBe(true);
+        expect(followed.text).toContain("TEST-T2-201 synthetic receipt");
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
   }
 );

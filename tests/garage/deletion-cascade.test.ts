@@ -89,7 +89,7 @@ const CASCADE_HOPS = [
 ] as const;
 
 describe("the ownership chain is declared to cascade", () => {
-  it.fails.each(CASCADE_HOPS)(
+  it.each(CASCADE_HOPS)(
     "%s.%s references %s on delete cascade",
     (table, column, target) => {
       // One missing `on delete cascade` anywhere on this chain and ACC-03's
@@ -125,18 +125,15 @@ describe("the ownership chain is declared to cascade", () => {
 });
 
 describe("the 30-day recovery window is real (ACC-03)", () => {
-  it.fails(
-    "marks an account deleted rather than dropping it immediately",
-    () => {
-      // The window needs somewhere to live. Without it, "delete" is
-      // irreversible on the first click and the requirement is unimplementable.
-      const body = createTableBody(migrationSql(), "profiles");
+  it("marks an account deleted rather than dropping it immediately", () => {
+    // The window needs somewhere to live. Without it, "delete" is
+    // irreversible on the first click and the requirement is unimplementable.
+    const body = createTableBody(migrationSql(), "profiles");
 
-      expect(columnDefinition(body ?? "", "deleted_at")).not.toBeNull();
-    }
-  );
+    expect(columnDefinition(body ?? "", "deleted_at")).not.toBeNull();
+  });
 
-  it.fails(`purges only after ${RECOVERY_WINDOW_DAYS} days`, () => {
+  it(`purges only after ${RECOVERY_WINDOW_DAYS} days`, () => {
     const sql = migrationSql();
 
     expect(sql).toMatch(
@@ -146,7 +143,7 @@ describe("the 30-day recovery window is real (ACC-03)", () => {
     );
   });
 
-  it.fails(`ships a callable ${REQUEST_DELETION_FUNCTION} routine`, () => {
+  it(`ships a callable ${REQUEST_DELETION_FUNCTION} routine`, () => {
     expect(migrationSql()).toMatch(
       new RegExp(
         `create (or replace )?function [a-z_.]*${REQUEST_DELETION_FUNCTION}`
@@ -154,47 +151,41 @@ describe("the 30-day recovery window is real (ACC-03)", () => {
     );
   });
 
-  it.fails(
-    `${REQUEST_DELETION_FUNCTION} takes no user id — a victim is unrepresentable`,
-    () => {
-      // The fix for the incoherence the review found (F7). The old contract
-      // wanted one function that both took a target user id *and* proved from
-      // auth.uid() that the caller was that user — which no implementation can
-      // do when the scheduled purge calls it with no session at all.
-      //
-      // Splitting it resolves that, and the split is better security anyway:
-      // a routine with no parameter to put a victim in cannot be aimed at one.
-      const sql = migrationSql();
-      const signature = new RegExp(
-        `create (?:or replace )?function [a-z_.]*${REQUEST_DELETION_FUNCTION}\\s*\\(([^)]*)\\)`
-      ).exec(sql);
+  it(`${REQUEST_DELETION_FUNCTION} takes no user id — a victim is unrepresentable`, () => {
+    // The fix for the incoherence the review found (F7). The old contract
+    // wanted one function that both took a target user id *and* proved from
+    // auth.uid() that the caller was that user — which no implementation can
+    // do when the scheduled purge calls it with no session at all.
+    //
+    // Splitting it resolves that, and the split is better security anyway:
+    // a routine with no parameter to put a victim in cannot be aimed at one.
+    const sql = migrationSql();
+    const signature = new RegExp(
+      `create (?:or replace )?function [a-z_.]*${REQUEST_DELETION_FUNCTION}\\s*\\(([^)]*)\\)`
+    ).exec(sql);
 
-      expect(signature).not.toBeNull();
-      expect((signature?.[1] ?? "x").trim()).toBe("");
-    }
-  );
+    expect(signature).not.toBeNull();
+    expect((signature?.[1] ?? "x").trim()).toBe("");
+  });
 
-  it.fails(
-    `${REQUEST_DELETION_FUNCTION} marks only the caller's own row`,
-    () => {
-      // `security definer` runs with the definer's rights, so without an
-      // auth.uid() scope inside the body it is a one-request account deletion
-      // for any authenticated stranger.
-      const sql = migrationSql();
-      const start = sql.indexOf(REQUEST_DELETION_FUNCTION);
-      const body = start === -1 ? "" : sql.slice(start, start + 4000);
+  it(`${REQUEST_DELETION_FUNCTION} marks only the caller's own row`, () => {
+    // `security definer` runs with the definer's rights, so without an
+    // auth.uid() scope inside the body it is a one-request account deletion
+    // for any authenticated stranger.
+    const sql = migrationSql();
+    const start = sql.indexOf(REQUEST_DELETION_FUNCTION);
+    const body = start === -1 ? "" : sql.slice(start, start + 4000);
 
-      expect(body).toContain("auth.uid()");
-    }
-  );
+    expect(body).toContain("auth.uid()");
+  });
 
-  it.fails(`ships a schedulable ${PURGE_FUNCTION} routine`, () => {
+  it(`ships a schedulable ${PURGE_FUNCTION} routine`, () => {
     expect(migrationSql()).toMatch(
       new RegExp(`create (or replace )?function [a-z_.]*${PURGE_FUNCTION}`)
     );
   });
 
-  it.fails(`${PURGE_FUNCTION} is not callable by ordinary users`, () => {
+  it(`${PURGE_FUNCTION} is not callable by ordinary users`, () => {
     // The counterpart to the rule above. The purge legitimately runs with no
     // session, so it cannot defend itself with auth.uid() — which means the
     // grant is the entire defence, and it has to be revoked explicitly.
@@ -217,7 +208,7 @@ describe("the 30-day recovery window is real (ACC-03)", () => {
 describe.skipIf(!live.available)(
   liveTitle("the purge reaches rows AND files", live),
   () => {
-    it.fails("leaves no vehicle, record, or receipt row behind", async () => {
+    it("leaves no vehicle, record, or receipt row behind", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
@@ -238,7 +229,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("leaves no readable receipt file behind", async () => {
+    it("leaves no readable receipt file behind", async () => {
       // The clause the row cascade cannot satisfy on its own. If this is the
       // only grader in the file that stays red, the implementation deleted the
       // database and kept the PDFs.
@@ -258,7 +249,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("leaves no listable receipt file behind", async () => {
+    it("leaves no listable receipt file behind", async () => {
       // Separate from "not readable": an object can 403 on read and still
       // appear in a listing, and a listing of a deleted account's filenames is
       // itself data that should be gone.
@@ -281,7 +272,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("leaves no signable receipt file behind", async () => {
+    it("leaves no signable receipt file behind", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
@@ -297,7 +288,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("does not touch the other owner's data", async () => {
+    it("does not touch the other owner's data", async () => {
       // A purge that over-reaches is the same defect wearing the opposite
       // coat, and it is much harder to notice in production.
       const scenario = await provisionScenario(stackOf(live));
@@ -332,69 +323,63 @@ describe.skipIf(!live.available)(
 describe.skipIf(!live.available)(
   liveTitle("deleting the auth user is terminal, whatever the route", live),
   () => {
-    it.fails(
-      "removing the auth.users row removes every dependent row",
-      async () => {
-        // The purge function is one route. This is the other: whatever deletes
-        // the account — an admin action, a GDPR request, a Supabase dashboard
-        // click — must not be able to leave a garage behind with no owner.
-        // This grader names no function, so it survives any rename.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
+    it("removing the auth.users row removes every dependent row", async () => {
+      // The purge function is one route. This is the other: whatever deletes
+      // the account — an admin action, a GDPR request, a Supabase dashboard
+      // click — must not be able to leave a garage behind with no owner.
+      // This grader names no function, so it survives any rename.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
 
-          const deleted = await deleteAuthUser(
-            scenario,
-            scenario.ownerA.userId ?? ""
-          );
-          expect(deleted.ok).toBe(true);
+        const deleted = await deleteAuthUser(
+          scenario,
+          scenario.ownerA.userId ?? ""
+        );
+        expect(deleted.ok).toBe(true);
 
-          // Read back as the service role: an owner-scoped read after the
-          // owner is gone returns nothing whether the rows survived or not,
-          // so it could never tell these two cases apart.
-          const remaining = await selectRows(
-            scenario,
-            { ...scenario.ownerA, token: scenario.serviceToken },
-            "vehicles",
-            `owner_id=eq.${scenario.ownerA.userId}`
-          );
+        // Read back as the service role: an owner-scoped read after the
+        // owner is gone returns nothing whether the rows survived or not,
+        // so it could never tell these two cases apart.
+        const remaining = await selectRows(
+          scenario,
+          { ...scenario.ownerA, token: scenario.serviceToken },
+          "vehicles",
+          `owner_id=eq.${scenario.ownerA.userId}`
+        );
 
-          expect(rowCount(remaining)).toBe(0);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(rowCount(remaining)).toBe(0);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails(
-      "POSITIVE CONTROL: the rows are there until the account goes",
-      async () => {
-        // Without this, the grader above passes against a schema where the
-        // insert never worked in the first place.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
+    it("POSITIVE CONTROL: the rows are there until the account goes", async () => {
+      // Without this, the grader above passes against a schema where the
+      // insert never worked in the first place.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
 
-          const before = await selectRows(
-            scenario,
-            { ...scenario.ownerA, token: scenario.serviceToken },
-            "vehicles",
-            `owner_id=eq.${scenario.ownerA.userId}`
-          );
+        const before = await selectRows(
+          scenario,
+          { ...scenario.ownerA, token: scenario.serviceToken },
+          "vehicles",
+          `owner_id=eq.${scenario.ownerA.userId}`
+        );
 
-          expect(rowCount(before)).toBe(1);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(rowCount(before)).toBe(1);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
   }
 );

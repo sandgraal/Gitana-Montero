@@ -58,6 +58,7 @@ import {
   splitTopLevel,
   storagePolicyIssues,
   stripSubqueries,
+  subqueryTables,
   userTablePolicyIssues,
 } from "./rules.ts";
 import {
@@ -188,6 +189,48 @@ const N12_MENTION_IN_FUNCTION = sql(`
     using (coalesce(auth.uid(), owner_id) is not null and model_year > 1982);
 `);
 
+/**
+ * N13 — the reviewer's **P1**: an uncorrelated `exists` wearing a self-join.
+ *
+ * The shared-name hole T2-201 recorded and T2-202 closed. `isCorrelated`
+ * accepts the unqualified back-reference spelling by matching the outer
+ * table's column *names*; `records` and `vehicles` share `{id, odometer_km}`,
+ * so a bare `id` inside a subquery over `vehicles` used to read as a
+ * back-reference to `records.id` when Postgres resolves it inward to
+ * `v.id` — `id = id` is a self-join on the inner table and correlates with
+ * nothing.
+ *
+ * Everything else about this policy is impeccable: real equality, real
+ * `auth.uid()`, no tautology, not storage. Only the correlation rule can
+ * reject it, and only the *tightened* one can.
+ */
+const N13_SHARED_NAME_SELF_JOIN = sql(`
+  create policy "records are owner-only" on public.records
+    for all to authenticated
+    using (exists (
+      select 1 from public.vehicles v where id = id and v.owner_id = auth.uid()
+    ));
+`);
+
+/**
+ * N14 — the reviewer's **P2**: the same hole through an ordinary predicate.
+ *
+ * `odometer_km` is the other name the two tables share. Bare, inside a
+ * subquery over `vehicles`, it resolves to `v.odometer_km` and never to the
+ * record's — so "own any truck with an odometer reading, read everyone's
+ * records". Kept separate from N13 because it is a *plausible* predicate
+ * rather than an obvious tell: nobody writes `id = id` by accident, and
+ * plenty of people write a range filter.
+ */
+const N14_SHARED_NAME_PREDICATE = sql(`
+  create policy "records are owner-only" on public.records
+    for all to authenticated
+    using (exists (
+      select 1 from public.vehicles v
+      where odometer_km > 0 and v.owner_id = auth.uid()
+    ));
+`);
+
 describe("WIDE-OPEN: schemas that leak must be rejected", () => {
   it("P1 rejects a wide-open `using` behind a correct `with check`", () => {
     const issues = userTablePolicyIssues(P1_USING_ANY_LOGGED_IN, ["records"]);
@@ -299,6 +342,67 @@ describe("WIDE-OPEN: schemas that leak must be rejected", () => {
     ).toContain("not owner-scoped");
   });
 
+  it("N13 rejects a self-join on a column name both tables declare", () => {
+    expect(
+      userTablePolicyIssues(N13_SHARED_NAME_SELF_JOIN, ["records"]).join(" | ")
+    ).toContain("not owner-scoped");
+  });
+
+  it("N14 rejects a shared-name predicate that resolves inward", () => {
+    expect(
+      userTablePolicyIssues(N14_SHARED_NAME_PREDICATE, ["records"]).join(" | ")
+    ).toContain("not owner-scoped");
+  });
+
+  it("N13/N14 are rejected for CORRELATION, not for something else", () => {
+    // Each fixture has to fail for the reason it was written. If one of them
+    // ever starts failing on the equality rule or the tautology list instead,
+    // the corpus would still be green while the correlation fix rotted.
+    for (const [name, fixture] of [
+      ["N13", N13_SHARED_NAME_SELF_JOIN],
+      ["N14", N14_SHARED_NAME_PREDICATE],
+    ] as const) {
+      const [policy] = policies(fixture);
+      const { subqueries } = stripSubqueries(policy.usingExpr ?? "");
+
+      expect(subqueries, name).toHaveLength(1);
+      // A real equality against a row term is present…
+      expect(authUidComparands(subqueries[0]), name).toContain("v.owner_id");
+      // …and the predicate is not a tautology…
+      expect(isTautological(policy.usingExpr ?? ""), name).toBe(false);
+      // …so correlation is the only thing left to reject it.
+      expect(
+        isCorrelated(subqueries[0], {
+          outerTable: "records",
+          outerColumns: ["id", "vehicle_id", "odometer_km", "kind"],
+        }),
+        name
+      ).toBe(false);
+    }
+  });
+
+  it("the tightened rule still accepts the unqualified spelling it exists for", () => {
+    // The whole reason `isCorrelated` looks at bare names is that
+    // `where v.id = vehicle_id` is legal, correct Postgres. Subtracting the
+    // inner table's columns must not have taken that with it — `vehicle_id`
+    // is a `records` column and `vehicles` has no such column, so it survives
+    // the subtraction and still counts as the back-reference it is.
+    expect(
+      isCorrelated("select 1 from public.vehicles v where v.id = vehicle_id", {
+        outerTable: "records",
+        outerColumns: ["id", "vehicle_id", "odometer_km"],
+      })
+    ).toBe(true);
+  });
+
+  it("subqueryTables reads the from/join list the subtraction needs", () => {
+    expect(
+      subqueryTables(
+        "select 1 from public.records r join public.vehicles v on v.id = r.vehicle_id"
+      )
+    ).toEqual(["records", "vehicles"]);
+  });
+
   it("every wide-open probe produces at least one finding", () => {
     // The sweep. A rule refactor that quietly stopped detecting one of these
     // would otherwise only show up as one silent green test.
@@ -337,6 +441,14 @@ describe("WIDE-OPEN: schemas that leak must be rejected", () => {
       [
         "N12 mention-in-function",
         userTablePolicyIssues(N12_MENTION_IN_FUNCTION, ["vehicles"]),
+      ],
+      [
+        "N13 shared-name self-join",
+        userTablePolicyIssues(N13_SHARED_NAME_SELF_JOIN, ["records"]),
+      ],
+      [
+        "N14 shared-name predicate",
+        userTablePolicyIssues(N14_SHARED_NAME_PREDICATE, ["records"]),
       ],
     ];
 

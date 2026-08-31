@@ -71,7 +71,7 @@ const RECORD_KINDS = ["work", "receipt", "note", "plan"] as const;
  * ====================================================================== */
 
 describe("every user-data table exists", () => {
-  it.fails.each(USER_TABLES.map((table) => [table.name, table.requirement]))(
+  it.each(USER_TABLES.map((table) => [table.name, table.requirement]))(
     "public.%s is created (%s)",
     (table) => {
       expect(createTableBody(migrationSql(), table)).not.toBeNull();
@@ -86,13 +86,13 @@ describe("every column a requirement asks for is declared", () => {
     )
   );
 
-  it.fails.each(rows)("%s.%s exists (%s)", (table, column) => {
+  it.each(rows)("%s.%s exists (%s)", (table, column) => {
     const body = createTableBody(migrationSql(), table);
     expect(body).not.toBeNull();
     expect(columnDefinition(body ?? "", column)).not.toBeNull();
   });
 
-  it.fails.each(rows.filter(([, , , column]) => column.type !== undefined))(
+  it.each(rows.filter(([, , , column]) => column.type !== undefined))(
     "%s.%s has the type the requirement implies (%s)",
     (table, column, _requirement, contract) => {
       const body = createTableBody(migrationSql(), table);
@@ -103,7 +103,7 @@ describe("every column a requirement asks for is declared", () => {
     }
   );
 
-  it.fails.each(rows.filter(([, , , column]) => column.notNull === true))(
+  it.each(rows.filter(([, , , column]) => column.notNull === true))(
     "%s.%s cannot be null (%s)",
     (table, column) => {
       // `primary key` implies NOT NULL — in Postgres that is not an extra
@@ -143,7 +143,7 @@ describe("optional columns stay optional — a record is allowed to be sparse", 
       )
   );
 
-  it.fails.each(optional)(
+  it.each(optional)(
     "%s.%s is optional",
     (table, column, absenceDefaultAllowed) => {
       expect(
@@ -154,7 +154,7 @@ describe("optional columns stay optional — a record is allowed to be sparse", 
 });
 
 describe("a record's kind is a closed set (GAR-02′)", () => {
-  it.fails("constrains records.kind to exactly the four named kinds", () => {
+  it("constrains records.kind to exactly the four named kinds", () => {
     // Free-text `kind` means the derived views of GAR-03′ — the current-state
     // sheet and the planned queue — are computed off strings nobody
     // validates, and "plan" vs "planned" silently empties a page.
@@ -174,27 +174,24 @@ describe("a record's kind is a closed set (GAR-02′)", () => {
 });
 
 describe("taxonomy identity points at 001's vehicle collection (GAR-01′)", () => {
-  it.fails(
-    "stores generation, market, year, and engine as separate columns",
-    () => {
-      // Not one denormalised "spec" string: the 001 fitment engine answers
-      // "does entry E apply to vehicle V" against these four ids, and a joined
-      // string cannot be asked that question.
-      const body = createTableBody(migrationSql(), "vehicles");
+  it("stores generation, market, year, and engine as separate columns", () => {
+    // Not one denormalised "spec" string: the 001 fitment engine answers
+    // "does entry E apply to vehicle V" against these four ids, and a joined
+    // string cannot be asked that question.
+    const body = createTableBody(migrationSql(), "vehicles");
 
-      for (const column of Object.keys(TEST_TAXONOMY_IDENTITY)) {
-        expect(columnDefinition(body ?? "", column), column).not.toBeNull();
-      }
+    for (const column of Object.keys(TEST_TAXONOMY_IDENTITY)) {
+      expect(columnDefinition(body ?? "", column), column).not.toBeNull();
     }
-  );
+  });
 
-  it.fails("requires a generation — GAR-01′'s identity is not optional", () => {
+  it("requires a generation — GAR-01′'s identity is not optional", () => {
     expect(isNotNullFor(migrationSql(), "vehicles", "generation_id")).toBe(
       true
     );
   });
 
-  it.fails("gives a vehicle somewhere to keep photos", () => {
+  it("gives a vehicle somewhere to keep photos", () => {
     // GAR-01′ names photos in the same breath as the display name. Whether
     // they are an array column or their own table is T2-202's call; that
     // there is nowhere to put them is not.
@@ -211,29 +208,26 @@ describe("taxonomy identity points at 001's vehicle collection (GAR-01′)", () 
 describe.skipIf(!live.available)(
   liveTitle("the shapes behave as declared", live),
   () => {
-    it.fails(
-      "POSITIVE CONTROL: an owner can create vehicle → record → receipt",
-      async () => {
-        // The whole GAR′ chain, through the API, as the owner, with policies
-        // on. Every denial grader in this directory is worthless without it.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const owned = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
+    it("POSITIVE CONTROL: an owner can create vehicle → record → receipt", async () => {
+      // The whole GAR′ chain, through the API, as the owner, with policies
+      // on. Every denial grader in this directory is worthless without it.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const owned = await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
 
-          expect(owned.vehicleId).toBeTruthy();
-          expect(owned.recordId).toBeTruthy();
-          expect(owned.receiptId).toBeTruthy();
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(owned.vehicleId).toBeTruthy();
+        expect(owned.recordId).toBeTruthy();
+        expect(owned.receiptId).toBeTruthy();
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails.each(RECORD_KINDS.map((kind) => [kind]))(
+    it.each(RECORD_KINDS.map((kind) => [kind]))(
       "a record of kind %s is accepted",
       async (kind) => {
         const scenario = await provisionScenario(stackOf(live));
@@ -262,7 +256,7 @@ describe.skipIf(!live.available)(
       }
     );
 
-    it.fails("a record of an unnamed kind is rejected", async () => {
+    it("a record of an unnamed kind is rejected", async () => {
       // The negative half of the enumeration. Without it, the four graders
       // above are satisfied by a plain `text` column.
       const scenario = await provisionScenario(stackOf(live));
@@ -285,7 +279,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("a record must be dated (GAR-02′)", async () => {
+    it("a record must be dated (GAR-02′)", async () => {
       // "Dated" is what makes GAR-03′'s chronology and the work-log page
       // possible at all. An undated record is a note nobody can place.
       const scenario = await provisionScenario(stackOf(live));
@@ -307,37 +301,29 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "a record with no cost, time, or odometer is accepted",
-      async () => {
-        // The positive control for the sparse-record rule above.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const owned = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
+    it("a record with no cost, time, or odometer is accepted", async () => {
+      // The positive control for the sparse-record rule above.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const owned = await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
 
-          const response = await insertRow(
-            scenario,
-            scenario.ownerA,
-            "records",
-            {
-              vehicle_id: owned.vehicleId,
-              occurred_on: "2026-08-30",
-              kind: "note",
-            }
-          );
+        const response = await insertRow(scenario, scenario.ownerA, "records", {
+          vehicle_id: owned.vehicleId,
+          occurred_on: "2026-08-30",
+          kind: "note",
+        });
 
-          expect(response.ok).toBe(true);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(response.ok).toBe(true);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails("a vehicle must carry a display name (GAR-01′)", async () => {
+    it("a vehicle must carry a display name (GAR-01′)", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const response = await insertRow(
@@ -356,47 +342,39 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "a record cannot be attached to a vehicle the writer does not own",
-      async () => {
-        // The FK exists to keep records on vehicles; the policy exists to keep
-        // them on *your* vehicles. This grader is the seam between them, and
-        // it is the one a correct FK plus a lazy policy fails.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const ownedByA = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
+    it("a record cannot be attached to a vehicle the writer does not own", async () => {
+      // The FK exists to keep records on vehicles; the policy exists to keep
+      // them on *your* vehicles. This grader is the seam between them, and
+      // it is the one a correct FK plus a lazy policy fails.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const ownedByA = await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
 
-          const response = await insertRow(
-            scenario,
-            scenario.ownerB,
-            "records",
-            {
-              vehicle_id: ownedByA.vehicleId,
-              occurred_on: "2026-08-30",
-              kind: "work",
-            }
-          );
+        const response = await insertRow(scenario, scenario.ownerB, "records", {
+          vehicle_id: ownedByA.vehicleId,
+          occurred_on: "2026-08-30",
+          kind: "work",
+        });
 
-          expect(response.ok).toBe(false);
+        expect(response.ok).toBe(false);
 
-          const asOwnerA = await selectRows(
-            scenario,
-            scenario.ownerA,
-            "records",
-            `vehicle_id=eq.${ownedByA.vehicleId}`
-          );
-          expect(rowCount(asOwnerA)).toBe(1);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        const asOwnerA = await selectRows(
+          scenario,
+          scenario.ownerA,
+          "records",
+          `vehicle_id=eq.${ownedByA.vehicleId}`
+        );
+        expect(rowCount(asOwnerA)).toBe(1);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails("a vehicle's display name round-trips unchanged", async () => {
+    it("a vehicle's display name round-trips unchanged", async () => {
       // Cheap, and it catches the encoding class of bug that would mangle
       // "Gitana Blanca" the moment a name carries an accent.
       const scenario = await provisionScenario(stackOf(live));

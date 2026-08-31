@@ -281,18 +281,17 @@ export function stripSubqueries(expr: string): {
  * outer table's declared columns, ignoring any that arrive with an alias
  * prefix.
  *
- * ## KNOWN GAP: a shared column name false-satisfies this check
+ * ## CLOSED IN T2-202: the shared-column-name gap
  *
- * Accepting the unqualified spelling costs something, and the cost is not
- * hypothetical. This matches column *names*; it does not resolve them against
- * the subquery's own `from` list. **So when the inner table declares a column
- * of the same name as an outer one, a bare mention of that name is read as a
- * back-reference to the outer row when it is nothing of the kind — and the
- * uncorrelated subquery D1 exists to catch is waved through.**
+ * Accepting the unqualified spelling used to cost something. The bare-name
+ * test matched column *names* and did not resolve them against the subquery's
+ * own `from` list, so when the inner table declared a column of the same name
+ * as an outer one, a bare mention was read as a back-reference to the outer
+ * row when it was nothing of the kind — and the uncorrelated subquery D1
+ * exists to catch was waved through.
  *
- * It is reachable with this contract's own columns: `records` and `vehicles`
- * share exactly `{id, odometer_km}`. Two shapes to watch, both verified
- * against the live rule:
+ * It was reachable with this contract's own columns: `records` and `vehicles`
+ * share exactly `{id, odometer_km}`. Two shapes, both of which used to pass:
  *
  * ```sql
  * -- `id = id` is a self-join on the INNER table. Reads as correlation. Is not.
@@ -302,28 +301,52 @@ export function stripSubqueries(expr: string): {
  * exists (select 1 from vehicles v where odometer_km > 0 and v.owner_id = auth.uid())
  * ```
  *
- * Both return `true` here. Neither correlates. The failure is **open**, not
- * closed: it lets a wide-open policy through rather than failing a correct
- * one, which is the worse direction for a security grader — so it is written
- * down rather than left for someone to rediscover.
+ * The fix, recorded on T2-201's handoff and landed with T2-202's first real
+ * policy: read the subquery's own `from`/`join` list and **subtract those
+ * tables' declared columns from `outerColumns` before the bare-name test**. A
+ * name the inner table also declares cannot be evidence of an outward
+ * reference, because Postgres resolves it inward. Both shapes above now
+ * produce a finding, and both are pinned end-to-end as N13/N14 in
+ * `reviewer-probes.test.ts` — the reviewer's P1/P2 — the same way N4 pins the
+ * rule they are a hole in.
  *
- * **The fix is small and belongs to T2-202**, once a real policy exists to
- * test it against: this module already imports `USER_TABLES`, so subtracting
- * the *inner* table's declared columns from `outerColumns` before the bare-name
- * test closes both shapes above. Deferred rather than done here because a rule
- * tightened against no real DDL is a rule tuned to its own fixtures. The
- * handoff is recorded on the T2-202 line in
- * `specs/002-montero-garage/tasks.md`, along with the probe fixtures to add
- * when it lands.
+ * Deliberately unchanged, because it is the safe half: the *qualified*
+ * spelling (`records.vehicle_id`) still short-circuits to `true`, and a
+ * subquery whose only candidate names have all been subtracted is judged
+ * uncorrelated rather than unknown. This rule fails **closed** now — it can
+ * reject a policy that correlates through something this module cannot see
+ * (a view, a CTE, a table outside `USER_TABLES`), and rejecting a correct
+ * policy is the direction a security grader should err in.
  */
 export function isCorrelated(subquery: string, options: ScopeOptions): boolean {
   // With no table context there is nothing to correlate against, so this
   // cannot judge and must not invent a finding.
   if (!options.outerTable) return true;
   if (subquery.includes(`${options.outerTable}.`)) return true;
-  return (options.outerColumns ?? []).some((column) =>
-    new RegExp(`(^|[^.a-z0-9_])${column}\\b`).test(subquery)
+
+  // A bare name the subquery's OWN tables declare resolves inward, so it says
+  // nothing about the outer row.
+  const inner = new Set(
+    subqueryTables(subquery).flatMap((table) => columnsOf(table))
   );
+  return (options.outerColumns ?? [])
+    .filter((column) => !inner.has(column))
+    .some((column) => new RegExp(`(^|[^.a-z0-9_])${column}\\b`).test(subquery));
+}
+
+/**
+ * The tables a subquery reads from, unqualified — the `from` and `join` list.
+ *
+ * Deliberately shallow: it collects names, it does not resolve aliases or
+ * nesting. It only has to be right about which *declared* columns could
+ * resolve inward, and a name it misses simply leaves that column in the
+ * candidate set, which is the direction the old bug ran in — so a miss here
+ * cannot be worse than not having the check at all.
+ */
+export function subqueryTables(subquery: string): string[] {
+  return [
+    ...subquery.matchAll(/\b(?:from|join)\s+(?:[a-z0-9_]+\.)?([a-z0-9_]+)/g),
+  ].map((match) => match[1]);
 }
 
 /**
