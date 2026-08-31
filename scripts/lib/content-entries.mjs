@@ -174,22 +174,30 @@ export const FACTORY_DOCUMENTED_KINDS = ["fsm", "tsb", "manufacturer"];
  * kind against.
  *
  * **Pass 2 (fact-checker delta, same date).** A full-text search of the PDF's
- * decompressed streams found the artifact's real publisher mark: "©Mitsubishi
- * Motors Australia Limited ABN 53 007 870 395 SEP'03 MMAL1624" — a copyright
- * line naming the manufacturer entity, its ABN, and a dated publication code,
- * i.e. exactly the kind of self-identifying mark a `manufacturer`-kind
- * citation should be able to point to. The fact-checker's ruling, adopted
- * here: **kind-by-document is the policy, conditional on the artifact
- * carrying its own provenance marks, named in the citation.** A reproduction
- * hosted by a third party (`xr793.com`, an enthusiast PDF-brochure archive,
- * "Dezo's Garage") is `manufacturer` when its citation states the
- * manufacturer's own copyright/publication mark found in the document, and
- * stays `vendor` when it does not — the difference is not who hosts the file,
- * it is whether the citation lets a reader verify the document is what it
- * claims to be. All 14 `xr793.com` citations in this collection were
- * re-kinded to `manufacturer` and their titles corrected to name the mark
- * ("©MMAL ABN 53 007 870 395, publication code SEP03 MMAL1624"), which
- * cleared `combos-gen3-au.json` and emptied the register.
+ * decompressed streams found a second publisher mark: "©Mitsubishi Motors
+ * Australia Limited ABN 53 007 870 395 SEP'03 MMAL1624" — a copyright line
+ * naming the manufacturer entity, its ABN, and a dated publication code, i.e.
+ * exactly the kind of self-identifying mark a `manufacturer`-kind citation
+ * should be able to point to. The fact-checker's ruling, adopted here:
+ * **kind-by-document is the policy, conditional on the artifact carrying its
+ * own provenance marks, named in the citation.** A reproduction hosted by a
+ * third party (`xr793.com`, an enthusiast PDF-brochure archive, "Dezo's
+ * Garage") is `manufacturer` when its citation states the manufacturer's own
+ * copyright/publication mark(s) found in the document, and stays `vendor`
+ * when it does not — the difference is not who hosts the file, it is whether
+ * the citation lets a reader verify the document is what it claims to be.
+ *
+ * Pass 2's first attempt at applying this dropped `PAJERONP0309` from the
+ * title on the theory that it was not a genuine mark (a page-34 print/job
+ * code, not the copyright line). That was wrong: PDF `/Differences` mapping
+ * confirms the apostrophe glyph at codepoint `0x90` decodes as `quoteright`
+ * (i.e. the mark reads `SEP'03`, not `SEP03`), and re-verified,
+ * `PAJERONP0309` is itself a genuine Mitsubishi Motors Australia publication
+ * code printed on the brochure, not a fabrication — both marks belong in the
+ * citation. All 14 `xr793.com` citations in this collection are `manufacturer`
+ * with titles naming both marks ("©MMAL ABN 53 007 870 395, publication codes
+ * PAJERONP0309 / SEP'03 MMAL1624"), which cleared `combos-gen3-au.json` and
+ * emptied the register.
  *
  * **Pass 2 also extended the mechanical re-kind** to every other citation of
  * an already-adjudicated URL that Pass 1 missed outside the original 19-file
@@ -198,11 +206,26 @@ export const FACTORY_DOCUMENTED_KINDS = ["fsm", "tsb", "manufacturer"];
  * 31 files total between the two passes, all mechanical re-filings of a URL
  * already ruled on — no new judgment calls. `gazoo.com` was left `vendor`
  * throughout (prior ruling, GAZOO is Toyota's media site, not the
- * manufacturer). `www.mitsubishi-motors.com/en/newsroom/newsrelease/...`
- * citations (4 files) were left `vendor` and are **not** covered by this
- * register's history — that specific URL was never adjudicated (only the
- * showroom spec PDF and the 5-door model page were), and re-kinding it would
- * be a new judgment call outside a mechanical sweep's authority.
+ * manufacturer).
+ *
+ * **Pass 3 (fact-checker delta).** `www.mitsubishi-motors.com/en/newsroom/
+ * newsrelease/...` citations (4 files: `combos-gen1-us.json`,
+ * `easy-select.json`, `gen1.json`, `gen4.json`) were re-kinded `vendor` ->
+ * `manufacturer` — a Mitsubishi Motors press release is published by the
+ * manufacturer, and kind answers "who published this", so it takes the
+ * `manufacturer` kind on the same basis as every other mitsubishi-motors.com
+ * citation in this register's history. **Caveat for future fact-checkers,
+ * ratified 2026-08-31, deliberately recorded here and not enforced by any
+ * script:** a manufacturer press release is `manufacturer` *kind*, but it is
+ * marketing copy, not spec literature — an entry resting only on a press
+ * release should not claim `fsm-confirmed` (a press release rarely states a
+ * torque figure or capacity the way a spec sheet or brochure does). All four
+ * entries above sit at `community-consensus` today, so this re-kind moves
+ * nothing across the `FACTORY_DOCUMENTED_KINDS` gate; the caveat exists so
+ * that if one of them (or a new entry) is later raised to `fsm-confirmed` on
+ * the strength of a press release alone, that is flagged as a content
+ * decision to question, not treated as automatically licensed by this kind
+ * change.
  *
  * Should any future rule find a new violation, list it here the same way and
  * repeat the ratchet — the register is a live mechanism, not a one-time list.
