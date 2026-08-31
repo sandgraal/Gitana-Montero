@@ -41,12 +41,25 @@
  *
  * ## No JavaScript
  *
- * Every page renders its full listing server-side and the selector chrome
- * ships `hidden`, revealed only by the enhancement script. A visitor with no
- * JavaScript therefore sees every entry and no dead control — the same
- * progressive-enhancement contract the glossary and community filters already
- * hold to. Filtering is an *enhancement over* a complete page, never a
- * precondition for reading one.
+ * Every page renders its full listing server-side, and the selector chrome is
+ * laid out **by CSS only when scripting is available**: `BaseLayout` adds a
+ * `js` class to `<html>` from a two-statement inline script before first
+ * paint, and `.vs` is `display: none` until that class is present. A visitor
+ * with no JavaScript therefore sees every entry and no dead control, and a
+ * visitor with it gets the bar in the first layout rather than watching the
+ * page jump when a module script reveals it.
+ *
+ * (An earlier draft shipped the bar with the `hidden` attribute and removed it
+ * from the script. That is the usual pattern and it is wrong *here*, because
+ * this control sits above the page content: revealing it after hydration
+ * pushed everything down — measured at 0.345 CLS on the community page, well
+ * past SCF-06's budget. The same fix was applied to the glossary and community
+ * filter toolbars, which had the mirror-image bug: an author `display: flex`
+ * silently overrode the user-agent `[hidden]` rule, so their controls were
+ * visible and inert with scripting off.)
+ *
+ * Filtering is an *enhancement over* a complete page, never a precondition for
+ * reading one.
  *
  * refs specs/001-foundation (FIT-01, FIT-03, I18N-01)
  */

@@ -24,12 +24,22 @@
  * hold to, and the one FIT-01 requires: nothing outside `src/lib/fitment/`
  * interprets a fitment query.
  *
- * ## Progressive enhancement
+ * ## Progressive enhancement, and why it is CSS rather than `hidden`
  *
- * The whole bar ships `hidden` and is revealed by the script below. Without
- * JavaScript there is no selector and no dead control, and every listing
- * renders complete and unfiltered — filtering is an enhancement over a whole
- * page, never a precondition for reading one.
+ * The bar is `display: none` until `<html>` carries the `js` class that
+ * `BaseLayout`'s inline head script adds before first paint. Without
+ * JavaScript there is no selector and no dead control; with it, the bar is in
+ * the very first layout.
+ *
+ * The obvious alternative — ship `hidden`, drop it from the script — is what
+ * this component did first, and it is wrong for a control that sits *above*
+ * the page content: revealing it after the module script loads pushes every
+ * row down, which measured 0.345 CLS on the community page. The script still
+ * sets `hidden` in exactly one case, an unreadable payload, and a companion
+ * CSS rule makes that attribute win.
+ *
+ * Every listing renders complete and unfiltered either way — filtering is an
+ * enhancement over a whole page, never a precondition for reading one.
  *
  * ## The taxonomy travels with the page
  *
@@ -728,12 +738,25 @@ const payloadJson = JSON.stringify(payload).replaceAll("<", "\\u003c");
     font-size: 0.8125rem;
   }
 
+  /*
+   * 2.75rem = 44px, the design handoff's "mobile tap targets >= 44px" and
+   * WCAG 2.5.5's target size — the same floor every other control in this
+   * component uses. It was 1.75rem, which looked right next to a 13px chip and
+   * was the smallest, most-easily-mis-hit control on the page; the one that
+   * throws away the reader's selection is the last place to shave a target
+   * down (T204 review, F6).
+   *
+   * The `x` glyph stays 14px. The button grows around it, and the negative
+   * margins keep the chip's own height unchanged so the bar does not get
+   * taller to buy the hit area.
+   */
   .vs__chip-clear {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 1.75rem;
-    min-height: 1.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    margin: -0.5rem -0.25rem -0.5rem 0;
     padding: 0;
     border: none;
     border-radius: 4px;

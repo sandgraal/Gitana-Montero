@@ -167,8 +167,20 @@ jobs:
       # required status check is required by display name, and a new job would
       # not be in `main`'s required contexts — so it would be advisory at best
       # and would hang PRs at worst. This job already has the two things the
-      # suite needs and the `verify` job does not: a built `dist/` and a real
-      # Chrome at `CHROME_PATH`.
+      # suite needs and the `verify` job does not: a built `dist/` and an
+      # installed Chrome.
+      #
+      # Which Chrome, precisely, because the two environments differ and the
+      # T204 review asked for this to be written down rather than implied:
+      # `playwright.config.ts` calls `resolveChromePath()`, the same resolver
+      # the two audits above use. In *this* workflow it returns the
+      # workflow-level `env.CHROME_PATH` set near the top of the file
+      # (`/usr/bin/google-chrome`, the path the ubuntu runner image ships). On
+      # a developer machine nothing sets that variable and the resolver's
+      # candidate list finds the locally installed browser instead — including
+      # the macOS `/Applications/Google Chrome.app` path. Either way nothing
+      # downloads a browser: Playwright's own bundled build is never installed,
+      # for the same reason `.puppeteerrc.cjs` turns Puppeteer's download off.
       #
       # `playwright test` rather than `npm run test:e2e`, which would rebuild
       # `dist/` a second time in this job for nothing — the same reasoning as

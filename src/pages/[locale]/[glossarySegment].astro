@@ -78,8 +78,10 @@ import {
   type Locale,
 } from "../../i18n/routing";
 import { collectionRouteParams, collectionRoutePaths } from "../../i18n/routes";
+import VehicleFitSummary from "../../components/VehicleFitSummary.astro";
 import { glossarySystemLabel, t } from "../../i18n/ui";
 import { formatCount } from "../../lib/glossary-filter";
+import { buildFitmentTable } from "../../lib/vehicle-listing";
 import {
   GLOSSARY_SYSTEMS,
   canonicalTermOf,
@@ -118,7 +120,7 @@ const entries = await getCollection("glossary");
  */
 const terms = entries
   .map((entry) => {
-    const { system, aliases, relatedTerms, prose } = entry.data;
+    const { system, aliases, relatedTerms, prose, fitment } = entry.data;
     const termByLocale = Object.fromEntries(
       LOCALES.map((each) => [each, canonicalTermOf(entry.data, each)])
     ) as Record<Locale, string>;
@@ -128,6 +130,8 @@ const terms = entries
       /** `/` appears in ids derived from nested files; it is not id-safe. */
       domId: `term-${entry.id.replace(/\//g, "--")}`,
       system: system as GlossarySystem,
+      /** Read by the vehicle filter; never interpreted on this page (FIT-01). */
+      fitment,
       aliases,
       relatedTerms,
       termByLocale,
@@ -139,6 +143,13 @@ const terms = entries
   .sort((a, b) =>
     collator.compare(a.termByLocale[locale], b.termByLocale[locale])
   );
+
+/**
+ * One entry per *distinct* fitment. 142 of the 154 terms declare the identical
+ * all-generations fitment, so this is the difference between ~19 kB of escaped
+ * JSON attributes and one small table (T204 review, F3).
+ */
+const fitmentTable = buildFitmentTable(terms.map((term) => term.fitment));
 
 /** Canonical term per entry id, for rendering `relatedTerms` as real words. */
 const termById = new Map(terms.map((term) => [term.id, term]));
@@ -228,9 +239,16 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
             )}
           </p>
 
+          <VehicleFitSummary locale={locale} fitments={fitmentTable.table} />
+
           <ul class="glossary__list" data-glossary-list>
             {terms.map((term) => (
-              <li class="term" id={term.domId} data-system={term.system}>
+              <li
+                class="term"
+                id={term.domId}
+                data-system={term.system}
+                data-fitment={fitmentTable.indexOf(term.fitment)}
+              >
                 <div class="term__head">
                   <h2 class="term__title">
                     <span class="term__canonical" lang={LOCALE_BCP47[locale]}>
@@ -318,16 +336,26 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     formatCount,
     matchesFilter,
   } from "../../lib/glossary-filter";
+  import { buildTaxonomy } from "../../lib/fitment";
+  import { readSelectorPayload } from "../../lib/vehicle-taxonomy";
+  import { createVehicleListingView } from "../../lib/vehicle-listing";
+  import {
+    onVehicleSelectionChange,
+    readVehicleSelection,
+    type StoredVehicleSelection,
+  } from "../../lib/vehicle-selection";
 
   /**
-   * Client-side filtering (GLO-04). Enhancement only: the toolbar ships
-   * `hidden` and is revealed here, so a visitor with no JavaScript sees the
-   * whole glossary and never a control that does nothing.
+   * Client-side filtering (GLO-04) and the vehicle filter (T204, FIT-03).
+   * Enhancement only: the toolbar is laid out only when the document is
+   * marked script-capable, so a visitor with no JavaScript sees the whole
+   * glossary and never a control that does nothing.
    *
    * Only DOM wiring lives here — which elements to read, what to toggle. The
    * decisions (does this card match? what does the counter say? what counts
-   * as its searchable text?) are pure functions in
-   * `src/lib/glossary-filter.ts`, unit-tested without a browser.
+   * as its searchable text? does this term apply to the reader's truck?) are
+   * pure functions in `src/lib/glossary-filter.ts` and
+   * `src/lib/vehicle-listing.ts`, unit-tested without a browser.
    */
   function enhance(root: HTMLElement): void {
     const toolbar = root.querySelector<HTMLElement>("[data-glossary-toolbar]");
@@ -358,6 +386,23 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     ];
     let system = "";
 
+    /*
+     * The vehicle filter (FIT-03: "any collection listing"). Same module and
+     * therefore the same semantics as the community directory — dim, tag,
+     * never hide — reading the taxonomy the selector already inlined.
+     * `buildTaxonomy([])` keeps this harmless on a page with no selector.
+     */
+    const vehicle = createVehicleListingView({
+      root,
+      cards: cards.map((card) => card.element),
+      taxonomy: buildTaxonomy(readSelectorPayload(document)?.nodes ?? []),
+      lang: document.documentElement.lang,
+    });
+
+    function applyVehicle(selection: StoredVehicleSelection | null): void {
+      vehicle?.apply(selection);
+    }
+
     function apply(): void {
       const state = { system, query: search!.value };
       let shown = 0;
@@ -370,6 +415,7 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
 
       count!.textContent = formatCount(template, shown, total);
       none!.hidden = shown > 0;
+      applyVehicle(readVehicleSelection(window));
     }
 
     for (const button of buttons) {
@@ -386,6 +432,9 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
     }
 
     search.addEventListener("input", apply);
+    // The selector lives in the site chrome and knows nothing about this page;
+    // it announces, and the listing re-marks itself (FIT-03).
+    onVehicleSelectionChange(window, (selection) => applyVehicle(selection));
     apply();
   }
 
@@ -445,6 +494,8 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
   .glossary {
     --paper: #f7f4ee;
     --panel: #ffffff;
+    /* HANDOFF-DESIGN: "de-emphasized cards (planned work, filtered-out rows)". */
+    --panel-soft: #fbf9f4;
     --ink: #2b2620;
     --muted: #6e6559;
     --muted-strong: #55493c;
@@ -603,6 +654,18 @@ const systemsInUse = GLOSSARY_SYSTEMS.filter((system) =>
 
   .glossary .term[hidden] {
     display: none;
+  }
+
+  /*
+   * The Selector artboard's third state, applied to a term card (T204):
+   * a word that does not apply to the reader's truck is de-emphasized, not
+   * removed. `src/lib/vehicle-listing.ts` adds the "filtered" tag that says
+   * so in words, because opacity is not information to a reader who cannot
+   * see it.
+   */
+  .glossary .term[data-fits="false"] {
+    background: var(--panel-soft);
+    opacity: 0.55;
   }
 
   .glossary .term__head {

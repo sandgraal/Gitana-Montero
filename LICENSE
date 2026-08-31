@@ -23,3 +23,10 @@ Content (src/content/): CC BY-SA 4.0
 <https://creativecommons.org/licenses/by-sa/4.0/>
 Attribution required; derivative works must share alike. Cited sources
 remain the property of their respective owners.
+
+Bundled fonts (src/styles/fonts/*.woff2): SIL Open Font License 1.1
+The Archivo and IBM Plex Mono font files vendored into this repository are
+neither MIT-licensed site code nor CC BY-SA content: they are third-party
+works redistributed under the OFL, which carries its own conditions
+(including Reserved Font Names). Their copyright notices and the full
+licence text are in src/styles/fonts/OFL.txt.

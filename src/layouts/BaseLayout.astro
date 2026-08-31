@@ -30,6 +30,7 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import VehicleSelector from "../components/VehicleSelector.astro";
 import "../styles/fonts.css";
+import "../styles/vehicle-fit.css";
 import archivoLatin from "../styles/fonts/archivo-400-800-latin.woff2?url";
 import plexMonoLatin from "../styles/fonts/ibm-plex-mono-400-latin.woff2?url";
 import {
@@ -135,11 +136,24 @@ const strings = t(locale);
     <slot name="head" />
   </head>
   <body>
-    <a class="skip-link" href="#main">{strings.skipToContent}</a>
+    {
+      /*
+       * The skip link targets the *content*, not the `<main>` landmark, because
+       * T204 put the vehicle selector inside `main` (T204 review, F7). Landing
+       * on `#main` would drop a keyboard or screen-reader user at the top of a
+       * filter control they have just chosen to skip past — which is precisely
+       * the navigation the link exists to bypass. `<main>` stays the landmark;
+       * only the anchor moves. `tabindex="-1"` makes the target focusable so
+       * the jump actually moves focus rather than only the scroll position.
+       */
+    }
+    <a class="skip-link" href="#content">{strings.skipToContent}</a>
     <SiteHeader locale={locale} routePath={route} routePathByLocale={routes} />
-    <main id="main">
+    <main>
       <VehicleSelector locale={locale} />
-      <slot />
+      <div id="content" tabindex="-1">
+        <slot />
+      </div>
     </main>
     <SiteFooter locale={locale} />
   </body>
@@ -155,5 +169,15 @@ const strings = t(locale);
     position: static;
     display: inline-block;
     padding: 0.5rem;
+  }
+
+  /*
+   * The skip target is programmatically focusable (`tabindex="-1"`) so the
+   * jump moves focus and not just the scroll position. It is not a control, so
+   * the focus ring it would otherwise draw around the entire page content is
+   * noise; the reader knows where they are because the page just moved.
+   */
+  #content:focus {
+    outline: none;
   }
 </style>

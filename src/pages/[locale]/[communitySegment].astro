@@ -104,22 +104,19 @@ import {
   type Locale,
 } from "../../i18n/routing";
 import { collectionRouteParams, collectionRoutePaths } from "../../i18n/routes";
+import VehicleFitSummary from "../../components/VehicleFitSummary.astro";
 import {
   communityActivityLabel,
   communityLinkKindLabel,
   communityTypeLabel,
   confidenceTierLabel,
-  fitmentFacetLabel,
   generationLabel,
   t,
 } from "../../i18n/ui";
 import { formatCount } from "../../lib/glossary-filter";
 import { needsConfidenceCaveat } from "../../lib/confidence";
-import {
-  OPTIONAL_SELECTION_FACETS,
-  buildTaxonomy,
-  expandGenerations,
-} from "../../lib/fitment";
+import { buildTaxonomy, expandGenerations } from "../../lib/fitment";
+import { buildFitmentTable } from "../../lib/vehicle-listing";
 import { selectorTaxonomyData } from "../../lib/vehicle-taxonomy";
 import {
   ACTIVITY_LEVELS,
@@ -302,12 +299,12 @@ const generationOptions = GENERATION_IDS.filter((id) =>
   communities.some((community) => community.coveredGens.includes(id))
 ).map((id) => ({ code: id, label: generationLabel(strings, id) }));
 
-/** `fitmentFacet.*` in the page locale, for the client's provisional detail. */
-const facetLabels = Object.fromEntries(
-  OPTIONAL_SELECTION_FACETS.map((facet) => [
-    facet,
-    fitmentFacetLabel(strings, facet),
-  ])
+/**
+ * One entry per *distinct* fitment, so a listing whose rows mostly share one
+ * does not repeat it in every card's attribute (T204 review, F3).
+ */
+const fitmentTable = buildFitmentTable(
+  communities.map((community) => community.fitment)
 );
 
 /** Most-active-first, per `ACTIVITY_LEVELS`' own order. */
@@ -472,28 +469,7 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
             )}
           </p>
 
-          {/*
-           * The vehicle-filter readout (FIT-03). Ships `hidden` and stays
-           * hidden until a selection exists: with no truck chosen there is no
-           * fit count to report and no provisional matching to warn about.
-           */}
-          <div
-            class="community__vehicle"
-            data-community-vehicle
-            data-fit-template={strings.vehicleFitCountTemplate}
-            data-provisional-template={strings.vehicleProvisionalDetailTemplate}
-            data-facet-labels={JSON.stringify(facetLabels)}
-            hidden
-          >
-            <p class="community__fit" data-community-fit aria-live="polite" />
-            <p
-              class="community__provisional-note"
-              data-community-provisional-note
-              hidden
-            >
-              {strings.vehicleProvisionalNote}
-            </p>
-          </div>
+          <VehicleFitSummary locale={locale} fitments={fitmentTable.table} />
 
           <ul class="community__list" data-community-list>
             {communities.map((community) => (
@@ -504,33 +480,12 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
                 data-languages={community.languages.join(" ")}
                 data-gens={community.gens.join(" ")}
                 data-activity={community.activity}
-                data-fitment={JSON.stringify(community.fitment)}
+                data-fitment={fitmentTable.indexOf(community.fitment)}
               >
                 <div class="entry__head">
                   <h2 class="entry__title">{community.title}</h2>
                   <span class="entry__type">{community.typeLabel}</span>
                 </div>
-
-                {/*
-                 * The two vehicle-filter states, both shipped hidden and both
-                 * turned on by the script. Rendered here — directly under the
-                 * title, above everything a reader would act on — rather than
-                 * at the foot of the card, because "this does not fit your
-                 * truck" and "this match is provisional" are qualifications on
-                 * everything below them.
-                 */}
-                <p class="entry__fit" data-entry-fit hidden>
-                  <span class="entry__fit-tag">
-                    {strings.vehicleFilteredTag}
-                  </span>
-                  <span>{strings.vehicleDoesNotFitLabel}</span>
-                </p>
-                <p class="entry__provisional" data-entry-provisional hidden>
-                  <span class="entry__provisional-tag">
-                    {strings.vehicleProvisionalLabel}
-                  </span>
-                  <span data-entry-provisional-detail />
-                </p>
 
                 <p class="entry__summary">{community.summary}</p>
 
@@ -659,13 +614,9 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
     type CommunityFilterState,
   } from "../../lib/community-filter";
   import { formatCount } from "../../lib/glossary-filter";
-  import {
-    buildTaxonomy,
-    matchesVehicle,
-    provisionalMatchFacets,
-    type OptionalSelectionFacet,
-  } from "../../lib/fitment";
+  import { buildTaxonomy } from "../../lib/fitment";
   import { readSelectorPayload } from "../../lib/vehicle-taxonomy";
+  import { createVehicleListingView } from "../../lib/vehicle-listing";
   import {
     onVehicleSelectionChange,
     readVehicleSelection,
@@ -674,23 +625,17 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
 
   /**
    * Client-side filtering (T703a) and vehicle fitment (T204). Enhancement
-   * only — see the glossary page's identical rationale: the toolbar ships
-   * `hidden` and is revealed here, so a visitor with no JavaScript sees the
-   * whole directory. DOM wiring only; `matchesCommunityFilter`
-   * (`src/lib/community-filter.ts`) owns the facet rule and
+   * only — see the glossary page's identical rationale: the toolbar is laid
+   * out only when the document is marked script-capable, so a visitor with no
+   * JavaScript sees the whole directory and no dead control. DOM wiring only;
+   * `matchesCommunityFilter` (`src/lib/community-filter.ts`) owns the facet
+   * rule, `src/lib/vehicle-listing.ts` owns the vehicle filter, and
    * `src/lib/fitment/` owns every fitment answer.
    */
   function enhance(root: HTMLElement): void {
     const toolbar = root.querySelector<HTMLElement>("[data-community-toolbar]");
     const count = root.querySelector<HTMLElement>("[data-community-count]");
     const none = root.querySelector<HTMLElement>("[data-community-none]");
-    const vehicleBox = root.querySelector<HTMLElement>(
-      "[data-community-vehicle]"
-    );
-    const fitLine = root.querySelector<HTMLElement>("[data-community-fit]");
-    const provisionalNote = root.querySelector<HTMLElement>(
-      "[data-community-provisional-note]"
-    );
     const cards = [...root.querySelectorAll<HTMLElement>(".entry")];
     if (!toolbar || !count || !none) return;
 
@@ -705,109 +650,22 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
     // "no expansion" reading rather than throwing.
     const taxonomy = buildTaxonomy(payload?.nodes ?? []);
 
-    const facetLabels: Record<string, string> = parseFacetLabels(
-      vehicleBox?.dataset.facetLabels
-    );
-    const listFormat = new Intl.ListFormat(document.documentElement.lang, {
-      style: "long",
-      type: "conjunction",
+    /*
+     * The vehicle filter itself is `src/lib/vehicle-listing.ts`, shared with
+     * the glossary and unit-tested against JSDOM — including the provisional
+     * marker's text in both locales, which no real content entry currently
+     * exercises (T204 review, F1). This page supplies the cards and the
+     * taxonomy; it decides nothing about fitment.
+     */
+    const vehicle = createVehicleListingView({
+      root,
+      cards,
+      taxonomy,
+      lang: document.documentElement.lang,
     });
 
-    function parseFacetLabels(raw: string | undefined): Record<string, string> {
-      if (raw === undefined) return {};
-      try {
-        const parsed: unknown = JSON.parse(raw);
-        return typeof parsed === "object" && parsed !== null
-          ? (parsed as Record<string, string>)
-          : {};
-      } catch {
-        return {};
-      }
-    }
-
-    function fitmentOf(card: HTMLElement): unknown {
-      const raw = card.dataset.fitment;
-      if (raw === undefined) return null;
-      try {
-        return JSON.parse(raw);
-      } catch {
-        return null;
-      }
-    }
-
-    /**
-     * Paint one card's fitment state.
-     *
-     * Nothing is hidden here: a row that does not fit stays on the page,
-     * dimmed and tagged, per the Selector artboard's "never hidden silently".
-     * Returns whether the row fits, so the caller can count.
-     */
-    function paintFitment(
-      card: HTMLElement,
-      selection: StoredVehicleSelection | null
-    ): { fits: boolean; provisional: boolean } {
-      const fitLabel = card.querySelector<HTMLElement>("[data-entry-fit]");
-      const provisional = card.querySelector<HTMLElement>(
-        "[data-entry-provisional]"
-      );
-      const detail = card.querySelector<HTMLElement>(
-        "[data-entry-provisional-detail]"
-      );
-
-      if (selection === null) {
-        card.removeAttribute("data-fits");
-        if (fitLabel !== null) fitLabel.hidden = true;
-        if (provisional !== null) provisional.hidden = true;
-        return { fits: true, provisional: false };
-      }
-
-      const fitment = fitmentOf(card);
-      const fits = matchesVehicle(fitment, selection, taxonomy);
-      const facets = provisionalMatchFacets(fitment, selection, taxonomy);
-
-      card.setAttribute("data-fits", String(fits));
-      if (fitLabel !== null) fitLabel.hidden = fits;
-      if (provisional !== null)
-        provisional.hidden = !fits || facets.length === 0;
-      if (detail !== null && fits && facets.length > 0) {
-        detail.textContent = (
-          vehicleBox?.dataset.provisionalTemplate ?? ""
-        ).replace(
-          "{facets}",
-          listFormat.format(
-            facets.map(
-              (facet: OptionalSelectionFacet) => facetLabels[facet] ?? facet
-            )
-          )
-        );
-      }
-
-      return { fits, provisional: fits && facets.length > 0 };
-    }
-
     function applyVehicle(selection: StoredVehicleSelection | null): void {
-      let fitting = 0;
-      let visible = 0;
-      let anyProvisional = false;
-
-      for (const card of cards) {
-        const painted = paintFitment(card, selection);
-        if (card.hidden) continue;
-        visible += 1;
-        if (painted.fits) fitting += 1;
-        if (painted.provisional) anyProvisional = true;
-      }
-
-      if (vehicleBox === null || fitLine === null) return;
-      vehicleBox.hidden = selection === null;
-      if (selection === null) return;
-
-      fitLine.textContent = formatCount(
-        vehicleBox.dataset.fitTemplate ?? "",
-        fitting,
-        visible
-      );
-      if (provisionalNote !== null) provisionalNote.hidden = !anyProvisional;
+      vehicle?.apply(selection);
     }
 
     function apply(): void {
@@ -1043,84 +901,12 @@ const activityOptions = ACTIVITY_LEVELS.filter((level) =>
     opacity: 0.55;
   }
 
-  .entry__fit,
-  .entry__provisional {
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.5rem;
-    font-size: 0.8125rem;
-    color: var(--muted-strong);
-  }
-
-  .entry__fit[hidden],
-  .entry__provisional[hidden] {
-    display: none;
-  }
-
-  .entry__fit-tag,
-  .entry__provisional-tag {
-    flex: 0 0 auto;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    border-radius: 4px;
-    padding: 0.1875rem 0.5rem;
-  }
-
-  .entry__fit-tag {
-    color: var(--muted);
-    background: var(--chip);
-  }
-
   /*
-   * The confidence-chip token from HANDOFF-DESIGN.md, reused deliberately: a
-   * provisional match is a statement about how much the site knows, which is
-   * the same kind of claim a confidence chip makes. It is *not* the
-   * safety/amber palette — those are reserved for triage and safety so that
-   * warnings never compete with chrome, and "we matched on four facets" is
-   * not a warning about the truck.
+   * The marker rows and the summary block are styled by
+   * `src/styles/vehicle-fit.css` and `VehicleFitSummary.astro`, so the two
+   * listings that use them cannot drift apart on what "filtered" looks like.
+   * Only the dimming lives here, because it is a change to *this page's* card.
    */
-  .entry__provisional-tag {
-    color: #4a5568;
-    background: var(--confidence-bg);
-    border: 1px solid var(--confidence-border);
-  }
-
-  .community__vehicle {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-  }
-
-  .community__vehicle[hidden] {
-    display: none;
-  }
-
-  .community__fit {
-    margin: 0;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--green);
-  }
-
-  .community__provisional-note {
-    margin: 0;
-    font-size: 0.8125rem;
-    line-height: 1.5;
-    color: var(--caveat-text);
-    background: var(--caveat-bg);
-    border: 1.5px dashed var(--caveat-border);
-    border-radius: 8px;
-    padding: 0.625rem 0.875rem;
-    max-width: 78ch;
-  }
-
-  .community__provisional-note[hidden] {
-    display: none;
-  }
 
   .entry__head {
     display: flex;
