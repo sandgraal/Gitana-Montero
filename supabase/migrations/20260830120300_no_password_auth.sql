@@ -30,12 +30,25 @@
 -- password is *correct*. There is no password anywhere in this project that
 -- opens a session.
 --
--- ## What is left open, and why it is not closed here
+-- ## What is left open, and why the owner ruled it acceptable
 --
 -- `POST /auth/v1/signup` with a password still returns 200 and still creates an
 -- account. The credential it stores is inert — the hook refuses it forever —
 -- but the request is not refused, and nothing in GoTrue can refuse it without
 -- also refusing magic-link sign-up.
+--
+-- **Owner ruling, 2026-08-30:** "no passwords" means no password can ever
+-- *authenticate*. Sessions come only from a magic link or from Google; an
+-- account merely *carrying* a password is not a finding. The stricter reading
+-- was rejected as unachievable for the reason in the next paragraph, and
+-- `tests/garage/auth-surface.test.ts` was amended to pin the ratified one.
+--
+-- The other half of what makes this safe is **not** in this file:
+-- `[auth.email] enable_confirmations = true` in `supabase/config.toml`. With
+-- confirmations off, that same signup request answers with an access token AND
+-- a refresh token — a password handing back a session, and a pre-claim attack
+-- on an address the caller does not own (T2-202 review, F1). On, it answers
+-- with a bare unconfirmed user. Do not turn it off.
 --
 -- A trigger on `auth.users` rejecting a non-empty `encrypted_password` was
 -- built and **removed**, because it rejects every account: GoTrue writes a
@@ -47,9 +60,9 @@
 -- OTP sign-up are byte-identical apart from ids and timestamps. Both were
 -- checked against a running stack rather than reasoned about.
 --
--- This is recorded as a T2-202 finding for the conductor rather than papered
--- over: `tests/garage/auth-surface.test.ts`'s "refuses to create an account
--- with a password" asserts a behaviour GoTrue cannot be configured into.
+-- What the graders pin, after the ruling, is the guarantee that survives all of
+-- this: sign up with a password, get no token back, and present that same
+-- correct password afterwards to get no session either.
 
 -- ---------------------------------------------------------------------------
 -- Refuse every password sign-in attempt (auth hook)

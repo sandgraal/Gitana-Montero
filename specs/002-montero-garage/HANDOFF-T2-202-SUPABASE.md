@@ -232,6 +232,14 @@ its own graders.
 
 > **ACC-01** … email magic link and Google OAuth, **and no password flow.**
 
+**Your ruling, 2026-08-30: "no passwords" means no password can ever
+_authenticate_.** Sessions come only from a magic link or from Google. The
+stricter reading — that no account may *carry* a password — was rejected as
+unachievable on Supabase Auth, for the reasons below. Creating an account that
+has a password is therefore not a defect; getting a session out of one is. The
+graders were amended to that reading before this branch landed, and the suite is
+green against it.
+
 **GoTrue exposes no setting that disables password authentication.** This was
 established against a running stack, not assumed. Every password-related knob in
 CLI 2.114 / GoTrue 2.195 makes passwords *stronger* and none makes them
@@ -258,23 +266,34 @@ POST /auth/v1/token?grant_type=password
 
 There is no password anywhere in this project that opens a session.
 
-**What is left open:** `POST /auth/v1/signup` with a password still returns 200
-and still creates an account. The credential it stores is inert — the hook
-refuses it forever — but the *request* is not refused, and nothing in GoTrue can
-refuse it without also refusing magic-link sign-up. A trigger on `auth.users`
-was built to close this and **removed**: GoTrue stores a bcrypt hash for
-passwordless accounts too (of a random secret, not of the empty string), so the
-stored row cannot tell a chosen password from a generated one. The
-`before_user_created` hook cannot either — its payload for a password sign-up
-and for an OTP sign-up are byte-identical apart from ids and timestamps. Both
-were checked against a running stack.
+**Why the stricter reading was not achievable.** A trigger on `auth.users`
+rejecting a stored password was built and **removed**: GoTrue writes a bcrypt
+hash for passwordless accounts too — of a random secret, not of the empty string
+(`crypt('', encrypted_password) = encrypted_password` is false for an account
+created with no password at all) — so the stored row cannot tell a chosen
+password from a generated one, and the trigger rejected every account including
+magic-link ones. The `before_user_created` hook cannot tell them apart either:
+its payload for a password sign-up and for an OTP sign-up are byte-identical
+apart from ids and timestamps. Both were checked against a running stack, not
+reasoned about.
 
-This is why `tests/garage/auth-surface.test.ts`'s "refuses to create an account
-with a password" is the one behavioural grader that does not pass. It is left
-red and untouched rather than weakened, and it needs a ruling: either the
-requirement means "no password can authenticate" (satisfied today) or it means
-"no account may carry a password" (not achievable on Supabase Auth as it
-ships).
+**What that leaves, and why it is safe.** `POST /auth/v1/signup` with a password
+returns 200 and creates an account. Two things make that harmless, and the
+second one is why `enable_confirmations` is not optional:
+
+1. The credential is inert — the hook refuses it forever, then and later.
+2. **No session comes back.** With `Confirm email` on (Step 3b), the response is
+   a bare unconfirmed user: no access token, no refresh token. With it *off* —
+   which is the Supabase CLI's default and what this branch originally shipped —
+   that same request returned both, so the one request in the system carrying a
+   password handed back a working session, and anyone could pre-claim an address
+   they did not own and still be inside it when the real owner later signed in
+   by magic link. Found by review, against a running stack. **If you ever turn
+   `Confirm email` off, you reopen exactly that.**
+
+`tests/garage/auth-surface.test.ts` pins both halves along the path a stranger
+would actually take: sign up with a password, assert no token comes back, then
+assert the same correct password still yields no session.
 
 ---
 
