@@ -972,9 +972,12 @@ function collectUnknownIds(
  *   another market's may legitimately differ.
  * - **`production.to: null` never makes a window disjoint** — an open span is
  *   open, and reading it as an end year would invent one.
- * - **A generation with no recorded span is skipped**, not treated as empty:
- *   absence of data is not evidence of absence, the same reading VEH-03 rule 3
- *   takes.
+ * - **The check abstains only when *no* named generation has a recorded span**
+ *   — absence of data is not evidence of absence, the same reading VEH-03
+ *   rule 3 takes. Note this is all-or-nothing, not per-generation: a fitment
+ *   naming one generation with a span and one without is still measured
+ *   against the span it does have. Unreachable through real content either
+ *   way, since `production` is required on every generation entry.
  */
 function checkYearWindow(
   entryId: string,
@@ -1028,6 +1031,14 @@ function describeSpan(span: YearSpan): string {
  * `gens` are expanded to choose *which* scopes to ask (a `gens: ["gen2"]`
  * fitment genuinely names `gen2-5` trucks), but no scope ever answers on
  * another's behalf. Decision (b) in the module docstring.
+ *
+ * **Coverage warning (T203 review, F3):** all seven combination entries in
+ * today's content are honestly `coverage: "partial"`, so nothing in the real
+ * corpus can produce an `impossible-combination` — this gate's positive
+ * controls are entirely fixture-based (`validation.test.ts`,
+ * `combination-scoping.test.ts`). A green build is therefore *not* evidence
+ * that this check fires. The first sourced `complete` entry to land is the
+ * moment to re-prove it against real data.
  */
 function checkCombination(
   entryId: string,

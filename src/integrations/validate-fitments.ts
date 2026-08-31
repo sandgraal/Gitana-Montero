@@ -91,13 +91,22 @@ function withFileIndex(error: unknown, entries: readonly LoadedEntry[]): Error {
  * `astro.config.mjs`. Exported as a plain function rather than as an
  * `AstroIntegration` factory so the config can reach it through one lazy
  * `await import()` — see the module docstring.
+ *
+ * `contentRoot` defaults to the real `src/content/` and exists so the graders
+ * in `tests/lib/fitment/build-path.test.ts` can run this exact function over a
+ * deliberately broken corpus. Without it the only reachable outcome would be
+ * "today's content passes", which is a test that cannot fail: `withFileIndex`
+ * and the throw path would have no coverage at all.
  */
-export async function runFitmentBuildCheck({
-  logger,
-}: {
-  logger: Pick<AstroIntegrationLogger, "info">;
-}): Promise<void> {
-  const { entries, taxonomyEntries } = await loadContent();
+export async function runFitmentBuildCheck(
+  {
+    logger,
+  }: {
+    logger: Pick<AstroIntegrationLogger, "info">;
+  },
+  contentRoot?: string
+): Promise<void> {
+  const { entries, taxonomyEntries } = await loadContent(contentRoot);
   const taxonomy = buildTaxonomy(taxonomyEntries);
 
   try {
