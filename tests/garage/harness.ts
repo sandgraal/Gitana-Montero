@@ -83,7 +83,10 @@
  */
 import { createHmac, randomUUID } from "node:crypto";
 import {
+  PURGE_FUNCTION,
   RECEIPTS_BUCKET,
+  RECOVERY_WINDOW_DAYS,
+  REQUEST_DELETION_FUNCTION,
   TEST_TAXONOMY_IDENTITY,
   testEmail,
   testVehicleName,
@@ -696,6 +699,62 @@ export function authSettings(stack: LiveStack): Promise<ApiResponse> {
   });
 }
 
+/**
+ * Create a user through the admin API, optionally with a password.
+ *
+ * The password half exists for finding F3: the original password-grant grader
+ * probed an account that did not exist, and GoTrue answers `400 invalid_grant`
+ * for an unknown account whether the grant is enabled or not. The grader could
+ * not fail — a stub handing out real password sessions passed it. To ask the
+ * question properly there has to be a real account with a real password to ask
+ * about.
+ */
+export function adminCreateUser(
+  stack: LiveStack,
+  body: Record<string, unknown>
+): Promise<ApiResponse> {
+  return request(stack, "/auth/v1/admin/users", {
+    method: "POST",
+    token: mintJwt({ role: "service_role" }, stack.jwtSecret),
+    body,
+  });
+}
+
+/** Remove a user created by `adminCreateUser`. Best-effort. */
+export async function adminDeleteUser(
+  stack: LiveStack,
+  userId: string
+): Promise<void> {
+  try {
+    await request(stack, `/auth/v1/admin/users/${userId}`, {
+      method: "DELETE",
+      token: mintJwt({ role: "service_role" }, stack.jwtSecret),
+    });
+  } catch {
+    /* best effort */
+  }
+}
+
+/**
+ * Ask GoTrue for a magic link (OTP) for `email`.
+ *
+ * ACC-01's *positive* half. Finding F4: the only magic-link control here used
+ * to be `GET /auth/v1/settings` returning 200, which a stack that refuses
+ * every sign-in also does. This exercises the flow the requirement actually
+ * mandates.
+ */
+export function requestMagicLink(
+  stack: LiveStack,
+  email: string,
+  createUser = false
+): Promise<ApiResponse> {
+  return request(stack, "/auth/v1/otp", {
+    method: "POST",
+    token: mintJwt({ role: "anon" }, stack.jwtSecret),
+    body: { email, create_user: createUser },
+  });
+}
+
 /** Try to sign up with a password. ACC-01 requires this to be refused. */
 export function passwordSignUp(
   stack: LiveStack,
@@ -721,6 +780,41 @@ export function passwordGrant(
     body: { email, password },
   });
 }
+
+/**
+ * Run ACC-03 end to end: the user asks, then the window closes.
+ *
+ * Two calls because it is two events with two different callers, and pinning
+ * them as one function was incoherent (T2-201 review, F7). `actor` requests
+ * their *own* deletion — the routine takes no user id, so it cannot be aimed
+ * at anyone else — and the scheduled purge then runs as the service role with
+ * `p_now` set past the recovery window, which is how a grader reaches "thirty
+ * days later" without waiting for it.
+ *
+ * Returns both responses so a grader can tell which half failed.
+ */
+export async function runAccountPurge(
+  scenario: Scenario,
+  actor: Actor
+): Promise<{ readonly request: ApiResponse; readonly purge: ApiResponse }> {
+  const request = await rpc(scenario, actor, REQUEST_DELETION_FUNCTION, {});
+  const purge = await rpc(
+    scenario,
+    { token: scenario.serviceToken },
+    PURGE_FUNCTION,
+    { p_now: PAST_THE_WINDOW }
+  );
+  return { request, purge };
+}
+
+/**
+ * A timestamp comfortably past any 30-day window measured from "now". Written
+ * as an offset rather than a fixed date so the graders do not quietly stop
+ * exercising the purge in 2027.
+ */
+const PAST_THE_WINDOW = new Date(
+  Date.now() + (RECOVERY_WINDOW_DAYS + 1) * 24 * 60 * 60 * 1000
+).toISOString();
 
 /** Delete an `auth.users` row — ACC-03's terminal event. */
 export function deleteAuthUser(

@@ -406,6 +406,23 @@ describe("policies", () => {
     });
   });
 
+  it("reads `using` and `with check` as SEPARATE expressions", () => {
+    // The parser change behind finding F1. While these were one string, a
+    // correct `with check` could cover for a wide-open `using` and every
+    // predicate grader in the suite was reading the concatenation.
+    expect(found[0].usingExpr).toBe("owner_id = auth.uid()");
+    expect(found[0].withCheckExpr).toBe("owner_id = auth.uid()");
+  });
+
+  it("reports a missing `with check` as null, not as the using clause", () => {
+    expect(found[1].usingExpr).toBe("true");
+    expect(found[1].withCheckExpr).toBeNull();
+  });
+
+  it("marks a policy permissive unless it says restrictive", () => {
+    expect(found.every((policy) => policy.permissive)).toBe(true);
+  });
+
   it("reads a multi-role grant — the anon leak this exists to catch", () => {
     expect(found[1]).toMatchObject({ table: "receipts", command: "select" });
     expect(found[1].roles).toEqual(["anon", "authenticated"]);
@@ -434,6 +451,12 @@ describe("foreignKey", () => {
     expect(
       foreignKey("uuid references vehicles (id) on delete cascade")
     ).toEqual({ target: "vehicles", cascades: true });
+  });
+
+  it("reads a reference with NO column list — valid Postgres (F6)", () => {
+    expect(
+      foreignKey("uuid not null references auth.users on delete cascade")
+    ).toEqual({ target: "auth.users", cascades: true });
   });
 
   it("returns null when there is no reference", () => {

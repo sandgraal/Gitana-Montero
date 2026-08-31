@@ -52,10 +52,12 @@ import {
   stackOf,
   teardownScenario,
 } from "./harness.ts";
+import { isOptionalColumn } from "./rules.ts";
 import {
   columnDefinition,
   createTableBody,
   defaultExpression,
+  isNotNullFor,
   migrationSql,
 } from "./sql.ts";
 
@@ -102,12 +104,14 @@ describe("every column a requirement asks for is declared", () => {
   );
 
   it.fails.each(rows.filter(([, , , column]) => column.notNull === true))(
-    "%s.%s is not null (%s)",
+    "%s.%s cannot be null (%s)",
     (table, column) => {
-      const body = createTableBody(migrationSql(), table);
-      const definition = columnDefinition(body ?? "", column);
-
-      expect(definition?.definition ?? "").toMatch(/\bnot null\b/);
+      // `primary key` implies NOT NULL — in Postgres that is not an extra
+      // constraint you might also want, it is part of what a primary key is.
+      // Demanding the literal `not null` rejected `id uuid primary key`,
+      // which is the spelling this harness's own sample DDL uses (T2-201
+      // review, F6).
+      expect(isNotNullFor(migrationSql(), table, column)).toBe(true);
     }
   );
 });
@@ -117,19 +121,36 @@ describe("optional columns stay optional — a record is allowed to be sparse", 
   // *optional*. A `not null` on any of them turns "I changed the oil" into a
   // form the user cannot submit without inventing numbers — and inventing
   // numbers is the one thing this project refuses to do anywhere else.
+  //
+  // But optionality has two correct spellings, and the first version of this
+  // grader knew only one (T2-201 review, F8): `problem_ids text[] not null
+  // default '{}'` says "no references" at least as well as a nullable array,
+  // and arguably better, since it removes the null-versus-empty ambiguity
+  // every consumer would otherwise have to handle. Columns that may spell
+  // absence that way are flagged in contract.ts; a scalar like `cost_amount`
+  // is not one of them, because `not null default 0` is not an empty value,
+  // it is a claim that the job was free.
   const optional = USER_TABLES.flatMap((table) =>
     table.columns
       .filter((column) => !column.notNull && column.defaultsTo === undefined)
-      .map((column) => [table.name, column.name] as const)
+      .map(
+        (column) =>
+          [
+            table.name,
+            column.name,
+            column.absenceDefaultAllowed === true,
+          ] as const
+      )
   );
 
-  it.fails.each(optional)("%s.%s is nullable", (table, column) => {
-    const body = createTableBody(migrationSql(), table);
-    const definition = columnDefinition(body ?? "", column);
-
-    expect(definition).not.toBeNull();
-    expect(definition?.definition ?? "").not.toMatch(/\bnot null\b/);
-  });
+  it.fails.each(optional)(
+    "%s.%s is optional",
+    (table, column, absenceDefaultAllowed) => {
+      expect(
+        isOptionalColumn(migrationSql(), table, column, absenceDefaultAllowed)
+      ).toBe(true);
+    }
+  );
 });
 
 describe("a record's kind is a closed set (GAR-02′)", () => {
@@ -143,7 +164,12 @@ describe("a record's kind is a closed set (GAR-02′)", () => {
     );
 
     expect(constrained).toBe(true);
-    expect(sql).toMatch(/check \([^)]*kind[^)]*\)|create type [a-z_]*kind/);
+    // `create type public.record_kind` is a schema-qualified enum and just as
+    // correct as an unqualified one; the first version of this pattern could
+    // not see the dot (T2-201 review, F6).
+    expect(sql).toMatch(
+      /check \([^)]*kind[^)]*\)|create (?:type|domain) (?:[a-z_]+\.)?[a-z_]*kind\b/
+    );
   });
 });
 
@@ -163,10 +189,8 @@ describe("taxonomy identity points at 001's vehicle collection (GAR-01′)", () 
   );
 
   it.fails("requires a generation — GAR-01′'s identity is not optional", () => {
-    const body = createTableBody(migrationSql(), "vehicles");
-
-    expect(columnDefinition(body ?? "", "generation_id")?.definition).toMatch(
-      /\bnot null\b/
+    expect(isNotNullFor(migrationSql(), "vehicles", "generation_id")).toBe(
+      true
     );
   });
 

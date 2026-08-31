@@ -50,6 +50,7 @@ import {
   columnDefinition,
   createTableBody,
   defaultExpression,
+  isNotNullFor,
   migrationSql,
 } from "./sql.ts";
 
@@ -81,11 +82,7 @@ describe("every visibility flag is declared private-by-default", () => {
   it.fails.each(FLAGS)("%s.%s is not null (%s)", (table, column) => {
     // A nullable visibility flag has three states, and only two of them are
     // answers. The third one is whatever the next `coalesce` decides.
-    const body = createTableBody(migrationSql(), table);
-
-    expect(columnDefinition(body ?? "", column)?.definition ?? "").toMatch(
-      /\bnot null\b/
-    );
+    expect(isNotNullFor(migrationSql(), table, column)).toBe(true);
   });
 
   it.fails.each(FLAGS)(

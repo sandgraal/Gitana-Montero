@@ -22,10 +22,18 @@
  * ## The recovery window
  *
  * ACC-03 has two events, not one: the user asks, and thirty days later the
- * data goes. A grader cannot wait thirty days, so the purge is invoked
- * directly — `contract.ts`'s `HARD_DELETE_FUNCTION`, the one piece of
- * T2-202's internals these graders name. The window itself is graded from the
- * DDL.
+ * data goes. They have different callers, and the first version of this file
+ * pinned them as a single function in a way no implementation could satisfy —
+ * the declaration grader demanded `auth.uid()` in the body while the
+ * behavioural grader called it as the service role, where `auth.uid()` is
+ * null (T2-201 review, F7). Neither tier could run, so nobody noticed the
+ * graders were describing two different functions.
+ *
+ * They are two functions now, and `contract.ts` says why:
+ * `request_account_deletion()` takes no argument and marks the caller's own
+ * account; `purge_expired_accounts(p_now)` is the scheduled job, service-role
+ * only, and takes the clock as a parameter so a grader can reach "thirty days
+ * later" without waiting. `runAccountPurge` runs both in order.
  *
  * ## Expected-failure convention
  *
@@ -36,21 +44,22 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-  HARD_DELETE_FUNCTION,
+  PURGE_FUNCTION,
   RECOVERY_WINDOW_DAYS,
+  REQUEST_DELETION_FUNCTION,
   USER_TABLES,
   testReceiptPath,
 } from "./contract.ts";
 import {
+  createOwnedFixture,
   deleteAuthUser,
   detectLiveStack,
   downloadObject,
   listObjects,
   liveTitle,
-  createOwnedFixture,
   provisionScenario,
   rowCount,
-  rpc,
+  runAccountPurge,
   selectRows,
   signObject,
   stackOf,
@@ -60,8 +69,9 @@ import {
 import {
   columnDefinition,
   createTableBody,
-  foreignKey,
+  foreignKeyFor,
   migrationSql,
+  statements,
 } from "./sql.ts";
 
 const live = await detectLiveStack();
@@ -85,11 +95,15 @@ describe("the ownership chain is declared to cascade", () => {
       // One missing `on delete cascade` anywhere on this chain and ACC-03's
       // hard delete either fails on a constraint or leaves an orphan behind —
       // an orphaned receipt row still names a vendor, a date, and an amount.
-      const body = createTableBody(migrationSql(), table);
-      const definition = columnDefinition(body ?? "", column);
+      //
+      // `foreignKeyFor` finds the constraint in all three places Postgres
+      // accepts it: inline on the column, as a table-level constraint, or
+      // added later by `alter table … add constraint`, which is what pg_dump
+      // emits. The first version looked only inline and only with an explicit
+      // column list, so it failed three correct spellings (T2-201 review, F6).
+      const fk = foreignKeyFor(migrationSql(), table, column);
 
-      expect(definition, `${table}.${column}`).not.toBeNull();
-      const fk = foreignKey(definition?.definition ?? "");
+      expect(fk, `${table}.${column} has no foreign key`).not.toBeNull();
       expect(fk?.target).toContain(target.replace("auth.users", "users"));
       expect(fk?.cascades).toBe(true);
     }
@@ -132,23 +146,67 @@ describe("the 30-day recovery window is real (ACC-03)", () => {
     );
   });
 
-  it.fails(`ships a callable ${HARD_DELETE_FUNCTION} routine`, () => {
+  it.fails(`ships a callable ${REQUEST_DELETION_FUNCTION} routine`, () => {
     expect(migrationSql()).toMatch(
       new RegExp(
-        `create (or replace )?function [a-z_.]*${HARD_DELETE_FUNCTION}`
+        `create (or replace )?function [a-z_.]*${REQUEST_DELETION_FUNCTION}`
       )
     );
   });
 
-  it.fails("does not let a user purge somebody else's account", () => {
-    // A purge routine is the most dangerous callable surface in the schema.
-    // `security definer` without an `auth.uid()` check inside it is a
-    // one-request account deletion for any authenticated stranger.
-    const sql = migrationSql();
-    const start = sql.indexOf(HARD_DELETE_FUNCTION);
-    const body = start === -1 ? "" : sql.slice(start, start + 4000);
+  it.fails(
+    `${REQUEST_DELETION_FUNCTION} takes no user id — a victim is unrepresentable`,
+    () => {
+      // The fix for the incoherence the review found (F7). The old contract
+      // wanted one function that both took a target user id *and* proved from
+      // auth.uid() that the caller was that user — which no implementation can
+      // do when the scheduled purge calls it with no session at all.
+      //
+      // Splitting it resolves that, and the split is better security anyway:
+      // a routine with no parameter to put a victim in cannot be aimed at one.
+      const sql = migrationSql();
+      const signature = new RegExp(
+        `create (?:or replace )?function [a-z_.]*${REQUEST_DELETION_FUNCTION}\\s*\\(([^)]*)\\)`
+      ).exec(sql);
 
-    expect(body).toContain("auth.uid()");
+      expect(signature).not.toBeNull();
+      expect((signature?.[1] ?? "x").trim()).toBe("");
+    }
+  );
+
+  it.fails(
+    `${REQUEST_DELETION_FUNCTION} marks only the caller's own row`,
+    () => {
+      // `security definer` runs with the definer's rights, so without an
+      // auth.uid() scope inside the body it is a one-request account deletion
+      // for any authenticated stranger.
+      const sql = migrationSql();
+      const start = sql.indexOf(REQUEST_DELETION_FUNCTION);
+      const body = start === -1 ? "" : sql.slice(start, start + 4000);
+
+      expect(body).toContain("auth.uid()");
+    }
+  );
+
+  it.fails(`ships a schedulable ${PURGE_FUNCTION} routine`, () => {
+    expect(migrationSql()).toMatch(
+      new RegExp(`create (or replace )?function [a-z_.]*${PURGE_FUNCTION}`)
+    );
+  });
+
+  it.fails(`${PURGE_FUNCTION} is not callable by ordinary users`, () => {
+    // The counterpart to the rule above. The purge legitimately runs with no
+    // session, so it cannot defend itself with auth.uid() — which means the
+    // grant is the entire defence, and it has to be revoked explicitly.
+    const sql = migrationSql();
+    const revokes = statements(sql).filter(
+      (statement) =>
+        statement.startsWith("revoke") &&
+        statement.includes(PURGE_FUNCTION) &&
+        /\b(authenticated|anon|public)\b/.test(statement)
+    );
+
+    expect(revokes.length).toBeGreaterThan(0);
   });
 });
 
@@ -165,12 +223,7 @@ describe.skipIf(!live.available)(
         const path = testReceiptPath(scenario.ownerA.userId ?? "", "1");
         await createOwnedFixture(scenario, scenario.ownerA, path);
 
-        await rpc(
-          scenario,
-          { token: scenario.serviceToken },
-          HARD_DELETE_FUNCTION,
-          { p_user_id: scenario.ownerA.userId }
-        );
+        await runAccountPurge(scenario, scenario.ownerA);
 
         for (const table of ["vehicles", "records", "receipts"]) {
           const remaining = await selectRows(
@@ -195,12 +248,7 @@ describe.skipIf(!live.available)(
         await uploadObject(scenario, scenario.ownerA, path);
         await createOwnedFixture(scenario, scenario.ownerA, path);
 
-        await rpc(
-          scenario,
-          { token: scenario.serviceToken },
-          HARD_DELETE_FUNCTION,
-          { p_user_id: scenario.ownerA.userId }
-        );
+        await runAccountPurge(scenario, scenario.ownerA);
 
         const read = await downloadObject(scenario, scenario.ownerA, path);
         expect(read.ok).toBe(false);
@@ -220,12 +268,7 @@ describe.skipIf(!live.available)(
         await uploadObject(scenario, scenario.ownerA, path);
         await createOwnedFixture(scenario, scenario.ownerA, path);
 
-        await rpc(
-          scenario,
-          { token: scenario.serviceToken },
-          HARD_DELETE_FUNCTION,
-          { p_user_id: scenario.ownerA.userId }
-        );
+        await runAccountPurge(scenario, scenario.ownerA);
 
         const listing = await listObjects(
           scenario,
@@ -245,12 +288,7 @@ describe.skipIf(!live.available)(
         await uploadObject(scenario, scenario.ownerA, path);
         await createOwnedFixture(scenario, scenario.ownerA, path);
 
-        await rpc(
-          scenario,
-          { token: scenario.serviceToken },
-          HARD_DELETE_FUNCTION,
-          { p_user_id: scenario.ownerA.userId }
-        );
+        await runAccountPurge(scenario, scenario.ownerA);
 
         const signed = await signObject(scenario, scenario.ownerA, path);
         expect(signed.ok).toBe(false);
@@ -273,12 +311,7 @@ describe.skipIf(!live.available)(
         await uploadObject(scenario, scenario.ownerB, pathB);
         await createOwnedFixture(scenario, scenario.ownerB, pathB);
 
-        await rpc(
-          scenario,
-          { token: scenario.serviceToken },
-          HARD_DELETE_FUNCTION,
-          { p_user_id: scenario.ownerA.userId }
-        );
+        await runAccountPurge(scenario, scenario.ownerA);
 
         const remaining = await selectRows(
           scenario,

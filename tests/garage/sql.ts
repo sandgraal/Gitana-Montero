@@ -310,6 +310,30 @@ export function defaultExpression(definition: string): string | null {
     .trim();
 }
 
+/**
+ * The balanced-paren expression introduced by `keyword`, or `null`.
+ *
+ * `using (a = (b))` must yield `a = (b)` and not `a = (b`, which is why this
+ * counts depth instead of reaching for the next `)`.
+ */
+export function parenExpression(
+  statement: string,
+  keyword: "using" | "with check"
+): string | null {
+  const opener = new RegExp(`\\b${keyword}\\s*\\(`).exec(statement);
+  if (!opener) return null;
+  const open = opener.index + opener[0].length - 1;
+  let depth = 0;
+  for (let index = open; index < statement.length; index += 1) {
+    if (statement[index] === "(") depth += 1;
+    else if (statement[index] === ")") {
+      depth -= 1;
+      if (depth === 0) return statement.slice(open + 1, index).trim();
+    }
+  }
+  return null;
+}
+
 /** One `create policy` statement, decomposed. */
 export interface PolicyDefinition {
   readonly name: string;
@@ -318,6 +342,21 @@ export interface PolicyDefinition {
   readonly command: string;
   /** The roles named in `to …`; empty means the SQL default, `public`. */
   readonly roles: readonly string[];
+  /**
+   * The `using (…)` predicate, or `null`. Governs which rows are **visible**
+   * — reads, and which rows an update or delete may touch.
+   *
+   * Kept apart from `withCheckExpr` because the T2-201 review found that
+   * grading their concatenation grades nothing: a policy reading
+   * `using (auth.uid() is not null) with check (owner_id = auth.uid())` has a
+   * correct-looking string and hands every logged-in user everybody's rows.
+   * The two clauses answer different questions and each has to be asked.
+   */
+  readonly usingExpr: string | null;
+  /** The `with check (…)` predicate — which *new* rows are allowed. */
+  readonly withCheckExpr: string | null;
+  /** `false` for `as restrictive`. Restrictive policies filter, never grant. */
+  readonly permissive: boolean;
   readonly statement: string;
 }
 
@@ -347,17 +386,31 @@ export function policies(normalized: string): PolicyDefinition[] {
               .map((role) => role.trim())
               .filter(Boolean)
           : [],
+        usingExpr: parenExpression(statement, "using"),
+        withCheckExpr: parenExpression(statement, "with check"),
+        permissive: !/\bas restrictive\b/.test(statement),
         statement,
       };
     });
 }
 
+/**
+ * `alter table [ if exists ] [ only ] [public.]<table>` — the full spelling
+ * Postgres accepts.
+ *
+ * `only` matters because `pg_dump` writes `ALTER TABLE ONLY`, so a schema
+ * round-tripped through a dump would have failed the RLS graders while being
+ * completely correct (T2-201 review, F6).
+ */
+function alterTablePrefix(table: string): string {
+  return `alter table (?:if exists )?(?:only )?(?:public\\.)?${table}\\b`;
+}
+
 /** `true` when the SQL enables RLS on `table`. */
 export function enablesRls(normalized: string, table: string): boolean {
-  const pattern = new RegExp(
-    `alter table (?:if exists )?(?:public\\.)?${table} enable row level security`
-  );
-  return pattern.test(normalized);
+  return new RegExp(
+    `${alterTablePrefix(table)} enable row level security`
+  ).test(normalized);
 }
 
 /**
@@ -369,27 +422,131 @@ export function enablesRls(normalized: string, table: string): boolean {
  * missed, which is why it is graded separately from `enable`.
  */
 export function forcesRls(normalized: string, table: string): boolean {
-  const pattern = new RegExp(
-    `alter table (?:if exists )?(?:public\\.)?${table} force row level security`
+  return new RegExp(`${alterTablePrefix(table)} force row level security`).test(
+    normalized
   );
-  return pattern.test(normalized);
 }
 
 /**
- * The referenced table of a column's `references …` clause, plus whether the
- * reference is declared `on delete cascade`.
+ * The referenced table of a `references …` clause, plus whether the reference
+ * is declared `on delete cascade`.
+ *
+ * The referenced column list is **optional**: `references auth.users on delete
+ * cascade` is valid Postgres — it targets the primary key — and rejecting it
+ * failed a correct schema (T2-201 review, F6).
  */
 export function foreignKey(
   definition: string
 ): { readonly target: string; readonly cascades: boolean } | null {
   const match =
-    /references\s+(?:([a-z0-9_]+)\.)?([a-z0-9_]+)\s*\(([^)]*)\)([\s\S]*)$/.exec(
+    /references\s+(?:([a-z0-9_]+)\.)?([a-z0-9_]+)\s*(?:\(([^)]*)\))?([\s\S]*)$/.exec(
       definition
     );
   if (!match) return null;
   const schema = match[1] ? `${match[1]}.` : "";
   return {
     target: `${schema}${match[2]}`,
-    cascades: /on delete cascade/.test(match[4]),
+    cascades: /on delete cascade/.test(match[4] ?? ""),
   };
+}
+
+/** The table-level constraint items of a `create table` body. */
+export function tableConstraints(body: string): string[] {
+  return tableItems(body).filter((item) =>
+    TABLE_CONSTRAINT_KEYWORDS.some((keyword) => item.startsWith(keyword))
+  );
+}
+
+/**
+ * The foreign key on `table.column`, wherever it is declared.
+ *
+ * Postgres accepts three spellings and a schema is no less correct for
+ * choosing one of the latter two, so all three are searched (T2-201 review,
+ * F6): inline on the column, as a table-level `constraint … foreign key (…)`
+ * inside `create table`, or bolted on afterwards with `alter table … add
+ * constraint … foreign key (…)`, which is what `pg_dump` emits.
+ */
+export function foreignKeyFor(
+  normalized: string,
+  table: string,
+  column: string
+): { readonly target: string; readonly cascades: boolean } | null {
+  const body = createTableBody(normalized, table);
+  if (body) {
+    const inline = columnDefinition(body, column);
+    const fromColumn = inline ? foreignKey(inline.definition) : null;
+    if (fromColumn) return fromColumn;
+
+    for (const constraint of tableConstraints(body)) {
+      const match = /foreign key\s*\(([^)]*)\)([\s\S]*)$/.exec(constraint);
+      if (!match) continue;
+      const columns = match[1].split(",").map((name) => name.trim());
+      if (columns.includes(column)) return foreignKey(match[2]);
+    }
+  }
+
+  for (const statement of statements(normalized)) {
+    if (!new RegExp(`^${alterTablePrefix(table)}`).test(statement)) continue;
+    const match = /foreign key\s*\(([^)]*)\)([\s\S]*)$/.exec(statement);
+    if (!match) continue;
+    const columns = match[1].split(",").map((name) => name.trim());
+    if (columns.includes(column)) return foreignKey(match[2]);
+  }
+  return null;
+}
+
+/**
+ * `true` when `table.column` cannot be null.
+ *
+ * **`primary key` implies `NOT NULL`** — in Postgres it is not an extra
+ * constraint you may also want, it is part of what a primary key *is*. The
+ * first version of this harness demanded the literal `not null` and therefore
+ * failed a column spelled `id uuid primary key`, which is the spelling used in
+ * its own sample DDL (T2-201 review, F6).
+ */
+export function isNotNullFor(
+  normalized: string,
+  table: string,
+  column: string
+): boolean {
+  const body = createTableBody(normalized, table);
+  if (!body) return false;
+  const definition = columnDefinition(body, column);
+  if (!definition) return false;
+  if (/\bnot null\b/.test(definition.definition)) return true;
+  if (/\bprimary key\b/.test(definition.definition)) return true;
+
+  for (const constraint of tableConstraints(body)) {
+    const match = /primary key\s*\(([^)]*)\)/.exec(constraint);
+    if (!match) continue;
+    if (
+      match[1]
+        .split(",")
+        .map((name) => name.trim())
+        .includes(column)
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * `true` when a default expression means "nothing here yet".
+ *
+ * GAR-02′ makes a record's reference arrays optional, and
+ * `problem_ids text[] not null default '{}'` says exactly that — an empty
+ * array is the absence of references, and it is a *better* modelling choice
+ * than a nullable array because it removes the null/empty ambiguity. The
+ * optionality grader has to accept it (T2-201 review, F8).
+ */
+export function representsAbsence(defaultExpr: string | null): boolean {
+  if (defaultExpr === null) return false;
+  const expr = defaultExpr.replace(/::[a-z_ \][]+$/, "").trim();
+  return (
+    /^'\{\s*\}'$/.test(expr) ||
+    /^array\s*\[\s*\]$/.test(expr) ||
+    /^'\[\s*\]'$/.test(expr) ||
+    /^'\{\s*\}'::/.test(expr)
+  );
 }

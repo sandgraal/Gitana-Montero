@@ -20,8 +20,25 @@
  *    T2-202 writes one, and the only grader here that CI can enforce.
  * 2. **The configuration** (declaration tier): `supabase/config.toml` enables
  *    Google, and every other provider it knows about is off.
- * 3. **The behaviour** (live tier): the running stack refuses both password
- *    sign-up and the password grant.
+ * 3. **The behaviour** (live tier): the running stack refuses the password
+ *    grant **for an account that really has a password**, and still lets a
+ *    real account request a magic link.
+ *
+ * ## Two of these graders used to be unfalsifiable
+ *
+ * The T2-201 review found that a stub handing out real password sessions
+ * passed all four ACC-01 graders (F3): the password-grant probe asked about an
+ * account that had never been created, and GoTrue answers `400 invalid_grant`
+ * for an unknown account whether the grant is on or off. A test whose
+ * assertion holds regardless of the thing it is testing is not a weak test,
+ * it is decoration. It now provisions a real password-bearing account first.
+ *
+ * The same review found the magic-link positive control was satisfied by a
+ * stack that refuses every sign-in (F4), because it only checked that
+ * `/auth/v1/settings` answered — so the "refuses passwords" side had no
+ * counterweight at all, and a config change that killed email sign-in
+ * altogether would have looked like success. It now requests an actual OTP for
+ * an actual account.
  *
  * ## Expected-failure convention
  *
@@ -37,18 +54,29 @@ import { describe, expect, it } from "vitest";
 import {
   ALLOWED_AUTH_PROVIDERS,
   KNOWN_EXTERNAL_PROVIDERS,
+  testEmail,
 } from "./contract.ts";
 import {
+  adminCreateUser,
+  adminDeleteUser,
   authSettings,
   detectLiveStack,
   liveTitle,
   passwordGrant,
   passwordSignUp,
+  requestMagicLink,
   stackOf,
 } from "./harness.ts";
 import { readSupabaseConfig } from "./sql.ts";
 
 const live = await detectLiveStack();
+
+/**
+ * Obviously synthetic, obviously not a credential, and never valid anywhere:
+ * the accounts it belongs to are created and destroyed inside a single grader
+ * against a loopback stack.
+ */
+const PROBE_PASSWORD = "TEST-T2-201-not-a-real-password";
 
 const SRC_DIR = fileURLToPath(new URL("../../src/", import.meta.url));
 
@@ -147,15 +175,46 @@ describe("the local stack is configured for exactly two ways in", () => {
     expect(section).toMatch(/enabled\s*=\s*false/);
   });
 
-  it.fails("turns off password sign-up in the email provider", () => {
-    // The provider ACC-01 *does* want, configured for the half of it ACC-01
-    // wants. Magic link and password live in the same `[auth.email]` block.
+  it.fails("configures the email provider ACC-01 requires", () => {
+    // **This grader used to demand `enable_signup = false`, and that was
+    // wrong** (T2-201 review, F4). In the Supabase CLI that knob gates *all*
+    // new accounts, not the password half — turning it off would break the
+    // magic-link sign-up ACC-01 mandates while leaving password sign-in for
+    // existing accounts exactly where it was. A grader that forces the
+    // implementation to break a requirement in order to pass is worse than no
+    // grader.
+    //
+    // So the config tier now pins only what it can honestly pin — that the
+    // email provider exists and is enabled — and the *deny* half of ACC-01
+    // moved to where it can actually be proved: the behavioural graders
+    // below, which provision a real password-bearing account and demand that
+    // no session comes out of it.
+    //
+    // Whether GoTrue exposes a knob that disables passwords alone is a T2-202
+    // finding. If one exists, tighten this grader onto it. If none exists,
+    // that is a stop-and-ask, not a reason to quietly weaken the requirement.
     const config = readSupabaseConfig();
     const section = config.slice(config.indexOf("[auth.email]")).slice(0, 800);
 
     expect(config).toContain("[auth.email]");
-    expect(section).toMatch(/enable_signup\s*=\s*false/);
+    expect(section).toMatch(/enable_signup\s*=\s*true/);
   });
+
+  it.fails(
+    "allows no OAuth redirect target outside the site's own origins",
+    () => {
+      // F9, acknowledged rather than left silent: GoTrue's redirect allow-list
+      // (`site_url` + `additional_redirect_urls`) is what stops an open
+      // redirect from turning a Google sign-in into a token handoff to someone
+      // else's host. Pinned loosely on purpose — the exact preview-deployment
+      // origins Vercel needs are T2-202's to determine — but pinned, so the
+      // list cannot be left as the CLI's wide-open default.
+      const config = readSupabaseConfig();
+
+      expect(config).toMatch(/site_url\s*=/);
+      expect(config).not.toMatch(/additional_redirect_urls\s*=\s*\[\s*"\*"/);
+    }
+  );
 
   it.fails("does not weaken the boundary with an analytics or ads key", () => {
     // ACC-04 / AGENTS.md: "no third-party analytics or ad SDK with the auth
@@ -180,28 +239,58 @@ describe.skipIf(!live.available)(
 
       const response = await passwordSignUp(
         stack,
-        "test-t2-201-password@t2-201.invalid",
-        "TEST-T2-201-not-a-real-password"
+        testEmail("password", "signup"),
+        PROBE_PASSWORD
       );
 
       expect(response.ok).toBe(false);
+      expect(response.body).not.toHaveProperty("access_token");
     });
 
-    it.fails("refuses the password grant", async () => {
-      // The other door: even if no account can be created with a password,
-      // an account that acquired one some other way must not be able to
-      // exchange it for a session.
-      const stack = stackOf(live);
+    it.fails(
+      "refuses the password grant FOR AN ACCOUNT THAT REALLY HAS ONE",
+      async () => {
+        // **The grader that could not fail** (T2-201 review, F3). It used to
+        // ask for a session on an account that had never been created, and
+        // GoTrue answers `400 invalid_grant` for an unknown account whether
+        // the password grant is enabled or disabled. The refusal proved
+        // nothing about the configuration — a stub handing out real password
+        // sessions passed it, along with all three of its neighbours.
+        //
+        // To ask the question properly the account has to exist and the
+        // password has to be right, so this one provisions both through the
+        // admin API first. Now a stack with passwords enabled returns a
+        // session here and the grader goes red, which is the whole point.
+        const stack = stackOf(live);
+        const email = testEmail("password", "grant");
+        const created = await adminCreateUser(stack, {
+          email,
+          password: PROBE_PASSWORD,
+          email_confirm: true,
+        });
+        const userId = (created.body as { id?: string }).id;
 
-      const response = await passwordGrant(
-        stack,
-        "test-t2-201-password@t2-201.invalid",
-        "TEST-T2-201-not-a-real-password"
-      );
+        try {
+          if (!created.ok) {
+            // Refusing to mint a password-bearing account at all satisfies
+            // ACC-01 by a stronger route. Asserted explicitly so this branch
+            // is a verdict rather than a silent skip.
+            expect(created.status).toBeGreaterThanOrEqual(400);
+            return;
+          }
 
-      expect(response.ok).toBe(false);
-      expect(response.status).toBeGreaterThanOrEqual(400);
-    });
+          const response = await passwordGrant(stack, email, PROBE_PASSWORD);
+
+          expect(response.ok).toBe(false);
+          expect(response.body).not.toHaveProperty("access_token");
+          // And not merely because the account was unknown — the failure
+          // mode that made the original grader vacuous.
+          expect(JSON.stringify(response.body)).not.toContain("invalid_grant");
+        } finally {
+          if (userId) await adminDeleteUser(stack, userId);
+        }
+      }
+    );
 
     it.fails("advertises Google and no other external provider", async () => {
       const stack = stackOf(live);
@@ -224,17 +313,51 @@ describe.skipIf(!live.available)(
     });
 
     it.fails(
-      "POSITIVE CONTROL: the magic-link route is reachable",
+      "POSITIVE CONTROL: an existing account can request a magic link",
       async () => {
-        // Every refusal above is satisfied by an auth service that is simply
-        // down. ACC-01 requires one way in to work, not zero.
+        // **The control that was satisfied by an auth service refusing
+        // everything** (T2-201 review, F4). It used to assert that
+        // `GET /auth/v1/settings` returned 200, which a stack that turns away
+        // every sign-in also does — so the "refuses passwords" graders above
+        // had no counterweight at all.
+        //
+        // This exercises the flow ACC-01 actually requires, for an account
+        // that actually exists: if magic link is broken, or if some later
+        // attempt to shut off passwords takes email sign-in down with it, this
+        // goes red.
         const stack = stackOf(live);
+        const email = testEmail("magiclink", "positive");
+        const created = await adminCreateUser(stack, {
+          email,
+          email_confirm: true,
+        });
+        const userId = (created.body as { id?: string }).id;
 
-        const response = await authSettings(stack);
+        try {
+          expect(created.ok).toBe(true);
 
-        expect(response.ok).toBe(true);
-        expect(response.body).toHaveProperty("external");
+          const response = await requestMagicLink(stack, email);
+
+          expect(response.ok).toBe(true);
+        } finally {
+          if (userId) await adminDeleteUser(stack, userId);
+        }
       }
     );
+
+    it.fails("POSITIVE CONTROL: Google is a live sign-in option", async () => {
+      // The other half of ACC-01's allow-list. Authorising against Google
+      // needs a browser, so what is checkable here is that the provider is
+      // configured and advertised rather than merely written in a file.
+      const stack = stackOf(live);
+
+      const response = await authSettings(stack);
+      const external =
+        (response.body as { external?: Record<string, boolean> }).external ??
+        {};
+
+      expect(response.ok).toBe(true);
+      expect(external.google).toBe(true);
+    });
   }
 );

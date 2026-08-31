@@ -53,6 +53,17 @@ export interface ColumnContract {
    * privacy of a user's data is a schema default, not an application habit.
    */
   readonly defaultsTo?: string;
+  /**
+   * `true` when `not null default '{}'` is an acceptable way to spell
+   * "optional" for this column.
+   *
+   * Only for collection-valued columns, where an empty array genuinely *is*
+   * the absence of a value — and a better model than nullable, because it
+   * removes the null-versus-empty ambiguity. Never for a scalar: `cost_amount
+   * numeric not null default 0` is not an empty cost, it is a claim that the
+   * job was free (T2-201 review, F8).
+   */
+  readonly absenceDefaultAllowed?: boolean;
 }
 
 /** One table T2-202's DDL must create, with the ownership path RLS uses. */
@@ -75,8 +86,18 @@ export interface TableContract {
 
 /**
  * The four user-data tables. `profiles` exists because a user needs a row of
- * their own that is not `auth.users` (which no client may read) — SHR-02's
- * public handle hangs off it later.
+ * their own that is not `auth.users` (which no client may read).
+ *
+ * **Not graded here, and deliberately: SHR-02's public handle.** "a stable
+ * public URL under their handle" implies a unique, immutable-ish,
+ * reserved-word-screened identifier, and every one of those properties is a
+ * grader of its own — uniqueness under concurrent signup, case folding,
+ * whether `admin` and `api` are takeable, what happens to a published URL when
+ * a handle changes. None of that is in T2-201's scope (ACC-01, ACC-03,
+ * SHR-01, GAR-05′), and half-pinning it would be worse than leaving it open:
+ * T2-202 would build to a contract that stops short of the hard parts.
+ * **It belongs to T2-401 [TEST], with T2-402's public pages.** Named here so
+ * nobody reads this file's silence as "handles are unconstrained".
  */
 export const USER_TABLES: readonly TableContract[] = [
   {
@@ -173,9 +194,18 @@ export const USER_TABLES: readonly TableContract[] = [
       {
         name: "problem_ids",
         requirement: "GAR-02′ (typed refs into 001 collections)",
+        absenceDefaultAllowed: true,
       },
-      { name: "part_ids", requirement: "GAR-02′" },
-      { name: "procedure_ids", requirement: "GAR-02′" },
+      {
+        name: "part_ids",
+        requirement: "GAR-02′",
+        absenceDefaultAllowed: true,
+      },
+      {
+        name: "procedure_ids",
+        requirement: "GAR-02′",
+        absenceDefaultAllowed: true,
+      },
       {
         name: "is_public",
         requirement: "SHR-01 (per-record visibility, off by default)",
@@ -304,16 +334,37 @@ export const KNOWN_EXTERNAL_PROVIDERS = [
  * > recovery window, all vehicles, records, and stored files SHALL be
  * > hard-deleted.
  *
- * Two observable events, graded separately:
+ * ## Why this is two functions and not one
  *
- * 1. **The purge routine.** A named SQL function is the only thing a grader
- *    can call to make "30 days later" happen now. This name is the one piece
- *    of T2-202's internals this file reaches into, and it is here rather than
- *    inline for the rename reason above.
- * 2. **The terminal event.** Deleting the `auth.users` row must leave nothing
- *    behind, whatever route got us there. That grader names nothing.
+ * The first version pinned a single `hard_delete_account(p_user_id uuid)` and
+ * pinned it **inconsistently** (T2-201 review, F7): the declaration grader
+ * demanded `auth.uid()` inside the body — so a stranger could not name a
+ * victim — while the behavioural grader invoked it with a service token,
+ * where `auth.uid()` is null. No single implementation could satisfy both.
+ * The graders described two different functions and nobody noticed because
+ * neither tier could run.
+ *
+ * They really are two different functions, so ACC-03's two events now get one
+ * each:
+ *
+ * 1. **The user asks.** `request_account_deletion()` takes **no argument** and
+ *    marks the caller's own account, using `auth.uid()`. Taking no user id is
+ *    what makes "delete someone else's account" unrepresentable rather than
+ *    merely forbidden — there is no parameter to put a victim in.
+ * 2. **Thirty days pass.** `purge_expired_accounts(p_now timestamptz)` is the
+ *    scheduled job: service-role only, no user argument, and it hard-deletes
+ *    every account whose window has closed. It takes `p_now` so a grader can
+ *    make "thirty days later" happen without waiting — the window stays real,
+ *    and it stays testable.
+ *
+ * 3. **The terminal event.** Deleting the `auth.users` row must leave nothing
+ *    behind, whatever route got us there. That grader names nothing at all
+ *    and survives any rename of either function above.
  */
-export const HARD_DELETE_FUNCTION = "hard_delete_account";
+export const REQUEST_DELETION_FUNCTION = "request_account_deletion";
+
+/** The scheduled purge. Service-role only; `p_now` makes the window testable. */
+export const PURGE_FUNCTION = "purge_expired_accounts";
 
 /** The recovery window, in days, that the purge must honour. */
 export const RECOVERY_WINDOW_DAYS = 30;

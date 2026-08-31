@@ -45,7 +45,8 @@ import {
   teardownScenario,
   uploadObject,
 } from "./harness.ts";
-import { migrationSql, policies } from "./sql.ts";
+import { bucketPrivacyIssues, storagePolicyIssues } from "./rules.ts";
+import { migrationSql } from "./sql.ts";
 
 const live = await detectLiveStack();
 
@@ -54,67 +55,40 @@ const live = await detectLiveStack();
  * ====================================================================== */
 
 describe("the receipts bucket is created private", () => {
-  it.fails("creates a bucket named for receipts", () => {
-    expect(migrationSql()).toMatch(
-      new RegExp(`storage\\.buckets[\\s\\S]*'${RECEIPTS_BUCKET}'`)
-    );
+  it.fails("creates a private bucket and never flips it public", () => {
+    // The single decision governing whether every receipt in the system has a
+    // permanent unauthenticated URL. Three ways to get it wrong, and the
+    // first version of this grader caught none of them reliably (T2-201
+    // review, F5): create it public; create it private and flip it in a later
+    // migration; put the value before the name so a positional regex misses
+    // it. Worse, the old "public = false" check sliced the SQL from the first
+    // mention of storage.buckets to the end of the file, so any stray "false"
+    // anywhere downstream satisfied it — it contributed nothing.
+    //
+    // bucketPrivacyIssues reads the statements that actually touch
+    // storage.buckets, and is graded against both leaking variants in
+    // reviewer-probes.test.ts.
+    expect(bucketPrivacyIssues(migrationSql(), RECEIPTS_BUCKET)).toEqual([]);
   });
 
-  it.fails("creates it with public = false", () => {
-    // The single line that decides whether every receipt in the system has a
-    // permanent unauthenticated URL. Graded on the literal, because
-    // `public` defaulting to false is a Supabase implementation detail and
-    // this requirement is not one to leave to a default.
-    const sql = migrationSql();
-    const insert = sql.slice(sql.indexOf("storage.buckets"));
-
-    expect(insert).toMatch(/false/);
-    expect(insert).not.toMatch(
-      new RegExp(`'${RECEIPTS_BUCKET}'[^;]*\\btrue\\b`)
-    );
-  });
-
-  it.fails("writes storage.objects policies scoped to the owner", () => {
-    const storagePolicies = policies(migrationSql()).filter(
-      (policy) => policy.table === "objects"
-    );
-
-    expect(storagePolicies.length).toBeGreaterThan(0);
-    for (const policy of storagePolicies) {
-      expect(policy.statement, policy.name).toContain("auth.uid()");
-    }
+  it.fails("scopes every storage policy to the owner, in `using` too", () => {
+    // T2-201 review, F2. The previous grader was satisfied by the `with
+    // check` half alone, so
+    //   using (bucket_id = 'receipts' and auth.uid() is not null)
+    // passed while every authenticated user could download everybody else's
+    // receipts. A storage row says whose it is in exactly one place — the
+    // first segment of its path — so the read predicate has to go and look
+    // there. "Right bucket, and somebody is logged in" is not that.
+    expect(storagePolicyIssues(migrationSql())).toEqual([]);
   });
 
   it.fails("grants no storage policy to anon", () => {
-    const leaks = policies(migrationSql())
-      .filter((policy) => policy.table === "objects")
-      .filter(
-        (policy) =>
-          policy.roles.length === 0 ||
-          policy.roles.some((role) => role === "anon" || role === "public")
-      );
+    const leaks = storagePolicyIssues(migrationSql()).filter((issue) =>
+      issue.includes("granted to")
+    );
 
-    expect(leaks.map((policy) => policy.name)).toEqual([]);
+    expect(leaks).toEqual([]);
   });
-
-  it.fails(
-    "keys the storage policy off the object's first path segment",
-    () => {
-      // The convention the fixtures are written against: `<owner uuid>/<file>`.
-      // A policy that does not read the path prefix has no way to tell whose
-      // object it is looking at.
-      const storagePolicies = policies(migrationSql()).filter(
-        (policy) => policy.table === "objects"
-      );
-
-      expect(storagePolicies.length).toBeGreaterThan(0);
-      for (const policy of storagePolicies) {
-        expect(policy.statement, policy.name).toMatch(
-          /storage\.foldername|split_part|string_to_array/
-        );
-      }
-    }
-  );
 });
 
 /* =========================================================================

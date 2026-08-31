@@ -64,13 +64,8 @@ import {
   teardownScenario,
   updateRows,
 } from "./harness.ts";
-import {
-  enablesRls,
-  forcesRls,
-  migrationSql,
-  policies,
-  statements,
-} from "./sql.ts";
+import { coveredCommands, userTablePolicyIssues } from "./rules.ts";
+import { enablesRls, forcesRls, migrationSql, statements } from "./sql.ts";
 
 const live = await detectLiveStack();
 
@@ -97,43 +92,35 @@ describe("RLS is declared on every user table", () => {
     }
   );
 
-  it.fails("grants no policy to anon or public on any user table", () => {
-    const leaks = policies(migrationSql())
-      .filter((policy) => USER_TABLE_NAMES.includes(policy.table))
-      .filter(
-        (policy) =>
-          policy.roles.length === 0 ||
-          policy.roles.some((role) => role === "anon" || role === "public")
-      );
-
-    // `roles.length === 0` counts as a leak on purpose: a `create policy`
-    // with no `to` clause defaults to `public`, which includes `anon`.
-    expect(leaks.map((policy) => `${policy.table}: ${policy.name}`)).toEqual(
-      []
-    );
-  });
-
-  it.fails("writes every user-table policy against auth.uid()", () => {
-    // A policy on a user table that never mentions auth.uid() is either
-    // unconditional or keyed off something the client can influence —
-    // SHR-01's "no client-trusted checks".
-    const unscoped = policies(migrationSql())
-      .filter((policy) => USER_TABLE_NAMES.includes(policy.table))
-      .filter((policy) => !policy.statement.includes("auth.uid()"));
-
-    expect(unscoped.map((policy) => policy.name)).toEqual([]);
-  });
-
-  it.fails(
-    "declares no user-table policy whose predicate is simply true",
-    () => {
-      const unconditional = policies(migrationSql())
-        .filter((policy) => USER_TABLE_NAMES.includes(policy.table))
-        .filter((policy) => /using \(\s*true\s*\)/.test(policy.statement));
-
-      expect(unconditional.map((policy) => policy.name)).toEqual([]);
+  it.fails.each(USER_TABLE_NAMES.map((table) => [table]))(
+    "every %s policy is owner-scoped in BOTH `using` and `with check`",
+    (table) => {
+      // The finding that rebuilt this file (T2-201 review, F1). The previous
+      // version asked whether the policy *statement* contained the characters
+      // `auth.uid()`, which a policy reading
+      //   using (auth.uid() is not null) with check (owner_id = auth.uid())
+      // satisfies while handing every logged-in user everybody's rows.
+      //
+      // `using` decides what you can see; `with check` decides what you can
+      // write. They are graded separately, each must tie the row to the
+      // caller by equality (not by mention), and every top-level `or` branch
+      // must do so — because `or` is how a scoped predicate gets widened.
+      //
+      // The rule lives in rules.ts and is itself graded, against the review's
+      // own leaking schemas, in reviewer-probes.test.ts.
+      expect(userTablePolicyIssues(migrationSql(), [table])).toEqual([]);
     }
   );
+
+  it.fails("grants no policy to anon or public on any user table", () => {
+    // `roles.length === 0` counts as a leak on purpose: a `create policy`
+    // with no `to` clause defaults to `public`, which includes `anon`.
+    const leaks = userTablePolicyIssues(migrationSql(), [
+      ...USER_TABLE_NAMES,
+    ]).filter((issue) => issue.includes("granted to"));
+
+    expect(leaks).toEqual([]);
+  });
 
   it.fails(
     "covers select, insert, update, and delete on every user table",
@@ -142,20 +129,11 @@ describe("RLS is declared on every user table", () => {
       // and not writable by its owner either. More to the point, one with
       // select and update but no delete makes ACC-03's "a user SHALL be able
       // to delete their account" impossible to perform as the user.
-      const found = policies(migrationSql());
       const missing: string[] = [];
       for (const table of USER_TABLE_NAMES) {
-        const commands = new Set(
-          found
-            .filter((policy) => policy.table === table)
-            .flatMap((policy) =>
-              policy.command === "all"
-                ? ["select", "insert", "update", "delete"]
-                : [policy.command]
-            )
-        );
+        const covered = coveredCommands(migrationSql(), table);
         for (const command of ["select", "insert", "update", "delete"]) {
-          if (!commands.has(command)) missing.push(`${table}.${command}`);
+          if (!covered.has(command)) missing.push(`${table}.${command}`);
         }
       }
 
