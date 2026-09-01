@@ -18,14 +18,24 @@ Two jobs, equally weighted:
 
 1. **The garage.** Each user's vehicles, records, and receipts — a first-class
    storehouse with real costs, real times, and what actually happened;
-   showcase and work-log pages the user can choose to publish.
+   showcase and work-log pages the user can choose to publish, and typed share
+   grants that let a named person in without letting the world in.
 2. **Reference.** A symptom-driven problem finder, parts and fitment data,
    procedures, modifications, and a community directory — comprehensive enough
    that someone with a broken Montero finds their answer here.
 
+**Two actor classes, not one** (owner sign-off 2026-08-31, 003 §7.4): vehicle
+**owners**, and the **shops** that work on their trucks. A shop is a named
+business with member accounts; a mechanic is simply an account holding a grant
+on someone else's vehicle, not a separate login. The two are asymmetric on
+purpose — owners are free forever and their data is theirs; shops are where the
+platform earns.
+
 Specs of record: `specs/001-foundation/spec.md` (reference platform),
 `specs/002-montero-garage/spec.md` (multi-user pivot, owner-approved
-2026-08-28).
+2026-08-28; §10 adds typed share grants, owner-approved 2026-08-31),
+`specs/003-shop-tools/spec.md` (the mechanic and shop surface, owner-approved
+2026-08-31).
 
 ## Stack (decided, do not re-litigate)
 
@@ -117,7 +127,11 @@ Specs of record: `specs/001-foundation/spec.md` (reference platform),
 - **The agent that writes content never fact-checks it.**
 - **User-entered garage records are the user's own testimony.** They render
   as such — attributed to their vehicle, never presented as site-verified
-  reference facts, and never fact-checked by the site.
+  reference facts, and never fact-checked by the site. **A record created by
+  accepting a mechanic's proposal is no different** (003 PRO-05): it carries
+  its provenance — who proposed it, under which grant, when it was accepted —
+  and it remains the owner's own record, never presented as a site-verified
+  reference fact. A second author does not make it a second kind of fact.
 - **Cite what you actually read.** A source you did not open is not a source.
   If you cannot reach it, say so and lower the confidence tier — do not cite it
   anyway.
@@ -150,8 +164,25 @@ Stop and ask before any of these:
   anything beyond that scope — comments, messaging, any user-to-user writable
   surface — is stop-and-ask. Contributions to *reference* content still
   arrive only through GitHub issues and PRs.
+  **One carve-out, and only one (owner sign-off 2026-08-31, 003 §7.1):**
+  propose-and-accept per `specs/003-shop-tools` PRO-01..06. A holder of a live
+  share grant may submit a *proposal*, which is inert until the vehicle's owner
+  accepts it — the owner's acceptance is the write. A proposal is never written
+  into `records` in a pending state. Comments, messaging, and any direct write
+  into another user's records remain stop-and-ask.
 - Adding a third-party analytics or ad SDK.
-- Adding affiliate or monetization mechanics of any kind.
+- Monetization is bounded, not banned (owner sign-off 2026-08-31, 003 §7.2).
+  Shop-side subscription per `specs/003-shop-tools` MON-01..08 is permitted.
+  Everything outside it is still stop-and-ask, and these five hold without
+  exception: **vehicle owners are free forever** — no feature that stores,
+  reads, exports, or shares an owner's own data is ever gated by payment;
+  **revocation of a share grant is never gated**, nor is expiry, account
+  deletion, or an owner's export of their own data; a lapsed shop loses tools,
+  never its read of a live grant a customer issued it; no sale, brokerage, or
+  licensing of user data, aggregate and anonymized included; no paid placement,
+  paid ranking, or paid inclusion in the community directory. **"No affiliate
+  links without visible disclosure in both languages"** under *Safety and
+  legal* above, and 002 ACC-04's ads/analytics ban, both survive untouched.
 - User data never leaves Supabase; every user table ships with row-level
   security proven by graders before content flows. Writing *reference* data
   to Supabase from anything other than the CI sync job.
