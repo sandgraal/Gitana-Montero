@@ -309,6 +309,16 @@ const hasReferences = Object.values(referenceCatalogue).some(
     data-string-receipt-issue-date={strings.garageReceiptIssueDate}
     data-string-receipt-untitled={strings.garageReceiptUntitled}
     data-string-receipt-counts-unavailable={strings.garageReceiptCountsUnavailable}
+    data-string-current-odometer-unknown={strings.garageCurrentOdometerUnknown}
+    data-string-current-odometer-on={strings.garageCurrentOdometerOnTemplate}
+    data-string-service-last={strings.garageCurrentServiceLastTemplate}
+    data-string-service-since={strings.garageCurrentServiceSinceTemplate}
+    data-string-service-since-unknown={strings.garageCurrentServiceSinceUnknown}
+    data-string-open-overdue={strings.garageCurrentOpenOverdueTemplate}
+    data-string-open-upcoming={strings.garageCurrentOpenUpcomingTemplate}
+    data-string-estimate-time={strings.garagePlannedEstimateTimeLabel}
+    data-string-estimate-cost={strings.garagePlannedEstimateCostLabel}
+    data-string-estimate-coverage={strings.garagePlannedEstimateCoverageTemplate}
     data-locale={LOCALE_BCP47[locale]}
   >
     <div class="garage__intro">
@@ -415,6 +425,31 @@ const hasReferences = Object.values(referenceCatalogue).some(
                 aria-live="polite"
               />
 
+              {/*
+               * Whatever went wrong loading this vehicle's history.
+               *
+               * It sat inside the timeline panel until T2-303 and had to move,
+               * because all three tabs are now drawn from the same one array
+               * of records. A reader on Current state or Planned work after a
+               * failed request saw a panel with nothing in it and no
+               * explanation anywhere on screen — the PR #68 defect exactly,
+               * one tab over, and worse there because a derived sheet with
+               * nothing in it reads as a *finding* about the truck.
+               *
+               * Above the tablist rather than duplicated into each panel: one
+               * live region announces once, where three would talk over each
+               * other, and this one is visible whichever tab is open. Kept in
+               * the layout always, empty or not — a live region that is
+               * `display: none` when empty is not in the accessibility tree,
+               * so its first message is the one nobody hears.
+               */}
+              <p
+                class="garage__message"
+                data-garage-records-message
+                role="status"
+                aria-live="polite"
+              />
+
               <div
                 class="garage__tabs"
                 role="tablist"
@@ -478,23 +513,6 @@ const hasReferences = Object.values(referenceCatalogue).some(
                   </button>
                 </div>
 
-                {/*
-                 * Whatever went wrong loading this vehicle's history, said
-                 * here rather than in the app-level line at the foot of the
-                 * page: it belongs beside the rail it is about, which is also
-                 * where a missing receipts chip would otherwise be read as
-                 * "no receipts". Kept in the layout always, empty or not — a
-                 * live region that is `display: none` when empty is not in
-                 * the accessibility tree, so its first message is the one
-                 * nobody hears.
-                 */}
-                <p
-                  class="garage__message"
-                  data-garage-records-message
-                  role="status"
-                  aria-live="polite"
-                />
-
                 <p class="garage__empty-note" data-garage-timeline-empty>
                   {strings.garageTimelineEmpty}
                 </p>
@@ -509,7 +527,76 @@ const hasReferences = Object.values(referenceCatalogue).some(
                 data-garage-panel="current"
                 hidden
               >
-                <p class="garage__empty-note">{strings.garageCurrentEmpty}</p>
+                {/*
+                 * The current-state sheet (GAR-03′ / 001 GAR-02), computed by
+                 * `currentState` in `src/lib/garage/derived.ts` from this
+                 * vehicle's records and nothing else. Every element below is
+                 * a slot the script fills or hides; none of it is a figure
+                 * anybody types or maintains.
+                 *
+                 * Three states, and the markup keeps them apart on purpose:
+                 * `[data-garage-current-unavailable]` (the records did not
+                 * arrive — the sheet is unknown), `[data-garage-current-empty]`
+                 * (nothing recorded yet), and the sheet itself. Collapsing
+                 * the first two would turn a failed request into a finding
+                 * about somebody's truck.
+                 */}
+                <p
+                  class="garage__message"
+                  data-garage-current-unavailable
+                  hidden
+                >
+                  {strings.garageDerivedUnavailable}
+                </p>
+                <p class="garage__empty-note" data-garage-current-empty>
+                  {strings.garageCurrentEmpty}
+                </p>
+
+                <div class="garage__sheet" data-garage-current-sheet hidden>
+                  <section class="garage__sheet-block">
+                    <h3>{strings.garageCurrentOdometerHeading}</h3>
+                    <p
+                      class="garage__sheet-figure"
+                      data-garage-current-odometer
+                    />
+                    <p
+                      class="garage__fineprint"
+                      data-garage-current-odometer-on
+                    />
+                    <p
+                      class="garage__fineprint"
+                      data-garage-current-odometer-warning
+                      hidden
+                    >
+                      {strings.garageCurrentOdometerContradiction}
+                    </p>
+                  </section>
+
+                  <section class="garage__sheet-block">
+                    <h3>{strings.garageCurrentServiceHeading}</h3>
+                    <p class="garage__fineprint">
+                      {strings.garageCurrentServiceHint}
+                    </p>
+                    <p
+                      class="garage__empty-note"
+                      data-garage-current-service-empty
+                    >
+                      {strings.garageCurrentServiceEmpty}
+                    </p>
+                    <ul
+                      class="garage__sheet-list"
+                      data-garage-current-services
+                    />
+                  </section>
+
+                  <section class="garage__sheet-block">
+                    <h3>{strings.garageCurrentOpenHeading}</h3>
+                    <ul class="garage__sheet-list">
+                      <li data-garage-current-open-overdue />
+                      <li data-garage-current-open-upcoming />
+                    </ul>
+                  </section>
+                </div>
               </div>
               <div
                 class="garage__tabpanel"
@@ -521,17 +608,82 @@ const hasReferences = Object.values(referenceCatalogue).some(
                 hidden
               >
                 {/*
-                 * The plan records, straight — no grouping, no priority, no
-                 * derivation. GAR-03′'s computed planned *queue* is T2-303's,
-                 * and this is not it: it is the same cards the timeline draws,
-                 * filtered to `kind = 'plan'`, because a panel that said
-                 * "nothing is planned" while a planned card sat on the
-                 * timeline beside it would be the page lying to its owner.
+                 * GAR-03′'s computed queue (001 GAR-03, "ordered by
+                 * priority"), from `plannedQueue` in
+                 * `src/lib/garage/derived.ts`. T2-302 deliberately left this
+                 * panel as the timeline's cards filtered to `kind = 'plan'`;
+                 * what makes it a *queue* is the ordering, the two groups and
+                 * the estimate below, all derived and none of them stored.
+                 *
+                 * The cards themselves are still the timeline's template, so
+                 * a plan looks the same wherever it is drawn and the two rails
+                 * cannot drift apart.
                  */}
+                <p
+                  class="garage__message"
+                  data-garage-planned-unavailable
+                  hidden
+                >
+                  {strings.garageDerivedUnavailable}
+                </p>
                 <p class="garage__empty-note" data-garage-planned-empty>
                   {strings.garagePlannedEmpty}
                 </p>
-                <ol class="garage__timeline" data-garage-planned />
+
+                <div data-garage-planned-queue hidden>
+                  <p class="garage__fineprint">
+                    {strings.garagePlannedQueueNote}
+                  </p>
+
+                  <section
+                    class="garage__sheet-block"
+                    data-garage-planned-overdue-block
+                    hidden
+                  >
+                    <h3>{strings.garagePlannedOverdueHeading}</h3>
+                    <ol class="garage__timeline" data-garage-planned-overdue />
+                  </section>
+
+                  <section
+                    class="garage__sheet-block"
+                    data-garage-planned-upcoming-block
+                    hidden
+                  >
+                    <h3>{strings.garagePlannedUpcomingHeading}</h3>
+                    <ol class="garage__timeline" data-garage-planned-upcoming />
+                  </section>
+
+                  <section class="garage__sheet-block">
+                    <h3>{strings.garagePlannedEstimateHeading}</h3>
+                    <p
+                      class="garage__empty-note"
+                      data-garage-planned-estimate-none
+                    >
+                      {strings.garagePlannedEstimateNone}
+                    </p>
+                    <ul
+                      class="garage__sheet-list"
+                      data-garage-planned-estimate
+                    />
+                    <p
+                      class="garage__fineprint"
+                      data-garage-planned-estimate-coverage
+                    />
+                    {/*
+                     * Said in the layout and not only in a comment: the
+                     * amounts are totalled per currency and never converted,
+                     * so a reader who sees two lines knows why there are two
+                     * rather than wondering which rate produced one.
+                     */}
+                    <p
+                      class="garage__fineprint"
+                      data-garage-planned-estimate-currency-note
+                      hidden
+                    >
+                      {strings.garagePlannedEstimateCurrencyNote}
+                    </p>
+                  </section>
+                </div>
               </div>
 
               {/* -------------------------------------------------------- */}
@@ -1214,6 +1366,28 @@ const hasReferences = Object.values(referenceCatalogue).some(
               <li class="garage__minichip" data-link />
             </template>
 
+            {/*
+             * One line of the derived current-state sheet: what was serviced,
+             * and when it was last done. The name reuses the same
+             * `problem:`/`part:`/`procedure:` templates the timeline's chips
+             * use, so one reference entry is named the same way wherever the
+             * page mentions it.
+             */}
+            <template data-garage-service-template>
+              <li class="garage__sheet-line">
+                <span class="garage__sheet-line-name" data-service-name />
+                <span class="garage__sheet-line-meta" data-service-meta />
+              </li>
+            </template>
+
+            {/* One totalled figure on the planned queue: its label, then it. */}
+            <template data-garage-estimate-template>
+              <li class="garage__sheet-line">
+                <span class="garage__sheet-line-name" data-estimate-label />
+                <span class="garage__sheet-line-meta" data-estimate-value />
+              </li>
+            </template>
+
             <template data-garage-receipt-template>
               <li class="garage__receipt">
                 <span class="garage__receipt-text" data-receipt-label />
@@ -1295,7 +1469,6 @@ const hasReferences = Object.values(referenceCatalogue).some(
     formatDuration,
     formatRecordDate,
     isPlanned,
-    plannedRecords,
     readCurrency,
     recordCounts,
     recordDraftFromRow,
@@ -1311,6 +1484,15 @@ const hasReferences = Object.values(referenceCatalogue).some(
     type ReferenceCatalogue,
     type TimeUnit,
   } from "../../lib/garage/record";
+  import {
+    currentState,
+    plannedEstimate,
+    plannedGroup,
+    plannedQueue,
+    type CurrentState,
+    type PlannedItem,
+    type ServiceLine,
+  } from "../../lib/garage/derived";
   import {
     EMPTY_RECEIPT_DRAFT,
     receiptCountsByRecord,
@@ -1435,8 +1617,64 @@ const hasReferences = Object.values(referenceCatalogue).some(
       timeline: query<HTMLOListElement>("[data-garage-timeline]"),
       timelineEmpty: query<HTMLElement>("[data-garage-timeline-empty]"),
       recordsMessage: query<HTMLElement>("[data-garage-records-message]"),
-      plannedList: query<HTMLOListElement>("[data-garage-planned]"),
       plannedEmpty: query<HTMLElement>("[data-garage-planned-empty]"),
+      /* The derived views (T2-303, GAR-03′). */
+      currentUnavailable: query<HTMLElement>(
+        "[data-garage-current-unavailable]"
+      ),
+      currentEmpty: query<HTMLElement>("[data-garage-current-empty]"),
+      currentSheet: query<HTMLElement>("[data-garage-current-sheet]"),
+      currentOdometer: query<HTMLElement>("[data-garage-current-odometer]"),
+      currentOdometerOn: query<HTMLElement>(
+        "[data-garage-current-odometer-on]"
+      ),
+      currentOdometerWarning: query<HTMLElement>(
+        "[data-garage-current-odometer-warning]"
+      ),
+      currentServices: query<HTMLUListElement>(
+        "[data-garage-current-services]"
+      ),
+      currentServicesEmpty: query<HTMLElement>(
+        "[data-garage-current-service-empty]"
+      ),
+      currentOpenOverdue: query<HTMLElement>(
+        "[data-garage-current-open-overdue]"
+      ),
+      currentOpenUpcoming: query<HTMLElement>(
+        "[data-garage-current-open-upcoming]"
+      ),
+      plannedUnavailable: query<HTMLElement>(
+        "[data-garage-planned-unavailable]"
+      ),
+      plannedQueueView: query<HTMLElement>("[data-garage-planned-queue]"),
+      plannedOverdueBlock: query<HTMLElement>(
+        "[data-garage-planned-overdue-block]"
+      ),
+      plannedOverdue: query<HTMLOListElement>("[data-garage-planned-overdue]"),
+      plannedUpcomingBlock: query<HTMLElement>(
+        "[data-garage-planned-upcoming-block]"
+      ),
+      plannedUpcoming: query<HTMLOListElement>(
+        "[data-garage-planned-upcoming]"
+      ),
+      plannedEstimate: query<HTMLUListElement>(
+        "[data-garage-planned-estimate]"
+      ),
+      plannedEstimateNone: query<HTMLElement>(
+        "[data-garage-planned-estimate-none]"
+      ),
+      plannedEstimateCoverage: query<HTMLElement>(
+        "[data-garage-planned-estimate-coverage]"
+      ),
+      plannedEstimateCurrencyNote: query<HTMLElement>(
+        "[data-garage-planned-estimate-currency-note]"
+      ),
+      serviceTemplate: query<HTMLTemplateElement>(
+        "[data-garage-service-template]"
+      ),
+      estimateTemplate: query<HTMLTemplateElement>(
+        "[data-garage-estimate-template]"
+      ),
       recordAdd: query<HTMLButtonElement>("[data-garage-record-add]"),
       recordForm: query<HTMLFormElement>("[data-garage-record-form]"),
       recordHeading: query<HTMLElement>("[data-garage-record-heading]"),
@@ -1522,7 +1760,20 @@ const hasReferences = Object.values(referenceCatalogue).some(
     let editing: VehicleRow | null = null;
     let opened: VehicleRow | null = null;
     let unit: OdometerUnit = readOdometerUnit(window);
-    let records: RecordRow[] = [];
+    /*
+     * This vehicle's records, or `null` for "not known".
+     *
+     * `null` and `[]` are different answers and the type says so (PR #68,
+     * generalized by T2-303). `[]` means the owner has recorded nothing;
+     * `null` means the request has not landed or did not succeed. Three tabs
+     * are now drawn from this one array — the timeline, the derived
+     * current-state sheet and the derived planned queue — and the two derived
+     * ones state *conclusions about the truck*. "No odometer reading",
+     * "nothing serviced", "nothing planned" are all wrong answers when the
+     * truth is "the records did not arrive", so the failure is carried in the
+     * type rather than flattened into an empty array at the fetch site.
+     */
+    let records: RecordRow[] | null = null;
     let editingRecord: RecordRow | null = null;
     let receipts: ReceiptRow[] = [];
     let currency = readCurrency(window, locale);
@@ -1842,9 +2093,14 @@ const hasReferences = Object.values(referenceCatalogue).some(
           ? (text.stringUnrecorded ?? "")
           : formatOdometer(row.odometer_km, unit, locale)
       );
-      // Zero until the records arrive, rather than the previous vehicle's
-      // figures sitting under the new vehicle's name for a beat.
-      records = [];
+      /*
+       * Unknown until the records arrive, rather than the previous vehicle's
+       * figures sitting under the new vehicle's name for a beat — and
+       * `null` rather than `[]`, because for the beat before the request
+       * lands the honest answer really is "not known yet". `[]` here would
+       * flash "nothing has ever been done to this truck" on every open.
+       */
+      records = null;
       paintRecords(new Map());
       say(els.browseNote, "");
       if (els.browse) {
@@ -1932,12 +2188,19 @@ const hasReferences = Object.values(referenceCatalogue).some(
     function paintEntries(
       target: HTMLOListElement | null,
       empty: HTMLElement | null,
-      rows: readonly RecordRow[],
+      rows: readonly RecordRow[] | null,
       countsByRecord: ReadonlyMap<string, number> | null
     ): void {
       if (!target) return;
       target.replaceChildren();
-      if (empty) empty.hidden = rows.length > 0;
+      /*
+       * `rows === null` is "not known", and the one thing it must not do is
+       * reveal the empty note: "nothing has been recorded on this vehicle" is
+       * a claim about the truck, and a failed request has not earned it. The
+       * live region above the tablist is what says what actually happened.
+       */
+      if (empty) empty.hidden = rows === null || rows.length > 0;
+      if (rows === null) return;
 
       for (const row of rows) {
         const item = els.entryTemplate?.content.firstElementChild?.cloneNode(
@@ -2060,14 +2323,221 @@ const hasReferences = Object.values(referenceCatalogue).some(
       }
     }
 
+    /** A whole number in the reader's locale. */
+    function count(value: number): string {
+      return new Intl.NumberFormat(locale).format(value);
+    }
+
+    /** The reader's name for one reference entry, or the id when unresolved. */
+    function referenceName(line: ServiceLine): string {
+      const templates: Record<string, string | undefined> = {
+        problem: text.stringRefProblem,
+        part: text.stringRefPart,
+        procedure: text.stringRefProcedure,
+      };
+      return (templates[line.kind] ?? "{name}").replace(
+        "{name}",
+        line.title ?? line.id
+      );
+    }
+
     /**
-     * Both rails and the two counts, from one array of records.
+     * The current-state sheet (GAR-03′), from `currentState`.
+     *
+     * `sheet === null` is the records request having failed; the three states
+     * are mutually exclusive here and the markup keeps them in three separate
+     * elements so they cannot half-overlap.
+     */
+    function paintCurrentState(sheet: CurrentState | null): void {
+      const empty = sheet !== null && sheet.recordsConsidered === 0;
+      if (els.currentUnavailable)
+        els.currentUnavailable.hidden = sheet !== null;
+      if (els.currentEmpty) els.currentEmpty.hidden = !empty;
+      if (els.currentSheet) els.currentSheet.hidden = sheet === null || empty;
+      if (sheet === null || empty) return;
+
+      const reading = sheet.odometer;
+      say(
+        els.currentOdometer,
+        reading === null
+          ? (text.stringCurrentOdometerUnknown ?? "")
+          : formatOdometer(reading.km, unit, locale)
+      );
+      // The date only exists when the reading does; an empty line rather than
+      // a sentence with a hole in it where `{date}` was.
+      say(
+        els.currentOdometerOn,
+        reading === null
+          ? ""
+          : (text.stringCurrentOdometerOn ?? "").replace(
+              "{date}",
+              formatRecordDate(reading.occurredOn, locale)
+            )
+      );
+      if (els.currentOdometerWarning) {
+        els.currentOdometerWarning.hidden = !reading?.contradicted;
+      }
+
+      if (els.currentServices) {
+        els.currentServices.replaceChildren();
+        for (const line of sheet.services) {
+          const item =
+            els.serviceTemplate?.content.firstElementChild?.cloneNode(
+              true
+            ) as HTMLElement | null;
+          if (!item) continue;
+          const name = item.querySelector<HTMLElement>("[data-service-name]");
+          say(name, referenceName(line));
+          if (line.title === null && name !== null) {
+            // The same treatment the timeline's chips give a retired entry:
+            // kept, marked, never dropped.
+            name.classList.add("garage__sheet-line-name--unresolved");
+            name.title = text.stringRefUnresolved ?? "";
+          }
+          const since =
+            line.sinceKm === null
+              ? (text.stringServiceSinceUnknown ?? "")
+              : (text.stringServiceSince ?? "").replace(
+                  "{distance}",
+                  formatOdometer(line.sinceKm, unit, locale)
+                );
+          say(
+            item.querySelector<HTMLElement>("[data-service-meta]"),
+            `${(text.stringServiceLast ?? "").replace(
+              "{date}",
+              formatRecordDate(line.lastDoneOn, locale)
+            )} · ${since}`
+          );
+          els.currentServices.append(item);
+        }
+      }
+      if (els.currentServicesEmpty) {
+        els.currentServicesEmpty.hidden = sheet.services.length > 0;
+      }
+
+      say(
+        els.currentOpenOverdue,
+        (text.stringOpenOverdue ?? "").replace(
+          "{count}",
+          count(sheet.open.overdue)
+        )
+      );
+      say(
+        els.currentOpenUpcoming,
+        (text.stringOpenUpcoming ?? "").replace(
+          "{count}",
+          count(sheet.open.upcoming)
+        )
+      );
+    }
+
+    /**
+     * The planned-work queue (GAR-03′ / 001 GAR-03), from `plannedQueue`.
+     *
+     * The two rails are the queue's own two groups in the queue's own order,
+     * so reading down the panel reads the queue in priority order.
+     */
+    function paintPlannedQueue(
+      queue: readonly PlannedItem[] | null,
+      countsByRecord: ReadonlyMap<string, number> | null
+    ): void {
+      const empty = queue !== null && queue.length === 0;
+      if (els.plannedUnavailable)
+        els.plannedUnavailable.hidden = queue !== null;
+      if (els.plannedEmpty) els.plannedEmpty.hidden = !empty;
+      if (els.plannedQueueView) {
+        els.plannedQueueView.hidden = queue === null || empty;
+      }
+      if (queue === null || empty) {
+        // Both rails cleared. The panel's own note — unknown or empty — is
+        // what speaks; the rails must not keep the last vehicle's plans.
+        const cleared = queue === null ? null : [];
+        paintEntries(els.plannedOverdue, null, cleared, countsByRecord);
+        paintEntries(els.plannedUpcoming, null, cleared, countsByRecord);
+        return;
+      }
+
+      const overdue = plannedGroup(queue, "overdue");
+      const upcoming = plannedGroup(queue, "upcoming");
+      // A group with nothing in it is hidden rather than shown with an empty
+      // rail: an "Past their date" heading over nothing invites the reader to
+      // look for what is not there.
+      if (els.plannedOverdueBlock) {
+        els.plannedOverdueBlock.hidden = overdue.length === 0;
+      }
+      if (els.plannedUpcomingBlock) {
+        els.plannedUpcomingBlock.hidden = upcoming.length === 0;
+      }
+      paintEntries(els.plannedOverdue, null, overdue, countsByRecord);
+      paintEntries(els.plannedUpcoming, null, upcoming, countsByRecord);
+
+      const estimate = plannedEstimate(queue);
+      const rows: HTMLElement[] = [];
+      if (estimate.minutes !== null) {
+        const row = estimateRow(
+          text.stringEstimateTime ?? "",
+          formatDuration(estimate.minutes, locale)
+        );
+        if (row) rows.push(row);
+      }
+      /*
+       * One line per currency, never one line of everything added together.
+       * `plannedEstimate` returns a map precisely so this loop is the only
+       * shape the data can be rendered in — there is no single total in the
+       * result to accidentally print (`src/lib/garage/derived.ts`).
+       */
+      for (const [code, amount] of estimate.byCurrency) {
+        const row = estimateRow(
+          text.stringEstimateCost ?? "",
+          formatCost(amount, code, locale)
+        );
+        if (row) rows.push(row);
+      }
+      els.plannedEstimate?.replaceChildren(...rows);
+
+      const counted = Math.max(estimate.itemsWithTime, estimate.itemsWithCost);
+      if (els.plannedEstimateNone) {
+        els.plannedEstimateNone.hidden = rows.length > 0;
+      }
+      // A total is a lie without its coverage: six hours over a queue of seven
+      // where two carry an estimate is six hours of the two, not of the queue.
+      say(
+        els.plannedEstimateCoverage,
+        rows.length === 0
+          ? ""
+          : (text.stringEstimateCoverage ?? "")
+              .replace("{counted}", count(counted))
+              .replace("{total}", count(estimate.totalItems))
+      );
+      if (els.plannedEstimateCurrencyNote) {
+        els.plannedEstimateCurrencyNote.hidden = estimate.byCurrency.size < 2;
+      }
+    }
+
+    /** One totalled figure on the planned queue. */
+    function estimateRow(label: string, value: string): HTMLElement | null {
+      const item = els.estimateTemplate?.content.firstElementChild?.cloneNode(
+        true
+      ) as HTMLElement | null;
+      if (!item) return null;
+      say(item.querySelector<HTMLElement>("[data-estimate-label]"), label);
+      say(item.querySelector<HTMLElement>("[data-estimate-value]"), value);
+      return item;
+    }
+
+    /**
+     * All three tabs and the two stats, from one array of records.
      *
      * `countsByRecord === null` means the receipts request failed, and the
      * cards say so above the rail rather than drawing every record as though
      * it had no receipts (PR #68). Painting the notice here and not at the
-     * call site is deliberate: every path that renders the rails goes through
+     * call site is deliberate: every path that renders the tabs goes through
      * this function, so none of them can render the ambiguous state silently.
+     *
+     * `records === null` is the larger version of the same idea and is why
+     * every function called below takes a nullable list: the timeline, the
+     * derived sheet and the derived queue each have their own way of saying
+     * "not known", and none of them may say "nothing" instead.
      */
     function paintRecords(
       countsByRecord: ReadonlyMap<string, number> | null
@@ -2081,23 +2551,23 @@ const hasReferences = Object.values(referenceCatalogue).some(
       paintEntries(
         els.timeline,
         els.timelineEmpty,
-        timelineOrder(records),
+        records === null ? null : timelineOrder(records),
         countsByRecord
       );
-      paintEntries(
-        els.plannedList,
-        els.plannedEmpty,
-        plannedRecords(records),
-        countsByRecord
-      );
-      const counts = recordCounts(records);
+      paintCurrentState(currentState(records, catalogue, todayLocal()));
+      paintPlannedQueue(plannedQueue(records, todayLocal()), countsByRecord);
+
+      // The stat row is the vehicle's own summary and has the same two
+      // answers: a figure when the records are known, the "not recorded"
+      // dash when they are not — never a confident zero.
+      const counts = records === null ? null : recordCounts(records);
       say(
         els.statEntries,
-        new Intl.NumberFormat(locale).format(counts.entries)
+        counts === null ? (text.stringUnrecorded ?? "") : count(counts.entries)
       );
       say(
         els.statPlanned,
-        new Intl.NumberFormat(locale).format(counts.planned)
+        counts === null ? (text.stringUnrecorded ?? "") : count(counts.planned)
       );
     }
 
@@ -2129,15 +2599,20 @@ const hasReferences = Object.values(referenceCatalogue).some(
     async function loadRecords(vehicle: VehicleRow): Promise<void> {
       const result = await listRecords(vehicle.id);
       if (!result.ok) {
-        records = [];
+        // `null`, not `[]`. This is the whole point of the nullable type: the
+        // three tabs are drawn from this one value, and two of them state
+        // conclusions about the truck. `[]` here published three of them —
+        // no history, no mileage, nothing planned — off a failed request.
+        records = null;
         paintRecords(new Map());
         say(els.recordsMessage, text.stringError ?? "");
         return;
       }
       if (opened?.id !== vehicle.id) return;
-      records = result.value;
+      const loaded = result.value;
+      records = loaded;
 
-      const attached = await listReceipts(records.map((row) => row.id));
+      const attached = await listReceipts(loaded.map((row) => row.id));
       if (opened?.id !== vehicle.id) return;
       paintRecords(receiptCountsByRecord(attached.ok ? attached.value : null));
     }
@@ -3112,6 +3587,93 @@ const hasReferences = Object.values(referenceCatalogue).some(
     font-size: 0.9375rem;
     line-height: 1.6;
     color: var(--muted-strong);
+  }
+
+  /* ---------------------------------------------------------------------
+   * The derived sheets (T2-303, GAR-03′)
+   *
+   * Deliberately plainer than the timeline. The rail is the artboard's
+   * signature and it earns its ink by being the thing a reader scrolls; the
+   * current-state sheet and the planned queue's summary are reference
+   * material read once, so they are set as quiet stacked blocks rather than
+   * competing with it. The queue's cards are the timeline's own template, so
+   * the one thing that *is* the artboard's design stays the artboard's.
+   * ------------------------------------------------------------------ */
+
+  .garage__sheet {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .garage__sheet-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .garage__sheet-block > h3 {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-strong);
+  }
+
+  .garage__sheet-figure {
+    margin: 0;
+    font-size: 1.375rem;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .garage__sheet-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .garage__sheet-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    justify-content: space-between;
+    padding-bottom: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .garage__sheet-line:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .garage__sheet-line-name {
+    color: var(--ink);
+  }
+
+  /*
+   * A reference entry the site can no longer resolve, named by its own id.
+   * Marked rather than dropped — a retired entry must not silently delete a
+   * line of somebody's service history — and marked with an underline here
+   * rather than the chips' dashed border, because this element has no border
+   * for a border-style to show up on.
+   */
+  .garage__sheet-line-name--unresolved {
+    color: var(--muted);
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+  }
+
+  .garage__sheet-line-meta {
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
   }
 
   /* ---------------------------------------------------------------------

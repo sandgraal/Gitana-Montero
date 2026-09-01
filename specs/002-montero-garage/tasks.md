@@ -338,8 +338,73 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   the account purge (which is prefix-by-owner and does cover them, ACC-03). A
   belt would be a `before delete` trigger collecting paths through the join —
   a migration, which this task did not authorise. Flagged for T2-303/T2-401.
-- [ ] **T2-303 [PLATFORM]** Derived views per vehicle: current-state sheet +
+- [x] **T2-303 [PLATFORM]** Derived views per vehicle: current-state sheet +
   planned queue, computed. Depends: T2-302. *(GAR-03′)*
+  <br>**Everything is in `src/lib/garage/derived.ts`, pure and graded** (37
+  unit graders; 18 hand-written mutants run against them, 0 survivors — the
+  ones worth naming: latest-reading-as-`Math.max`, plans counted as work done,
+  `sinceKm` unknown becoming `0`, a failed request read as an empty queue, and
+  two currencies summed into one figure). It opens **no request**: all three
+  tabs are computed from the one `records` array the page already fetched, so
+  the per-vehicle fan-out warning inherited from T2-302 (F3) adds nothing here.
+  `listRecords` is still deliberately unbounded and **must stay that way for
+  these views** — a `.limit()` would silently truncate the array the sheet
+  derives from, and a truncated record set does not produce a smaller answer,
+  it produces a *wrong* one (the wrong latest odometer, a service line that
+  claims a job was last done years before it was). Bounding it needs a
+  windowing design where the derived figures are computed server-side; flagged,
+  not invented here.
+  <br>**Three things the spec demanded that the schema cannot answer, resolved
+  without touching it.** (a) 001 GAR-03 says the queue is "ordered by
+  priority" and there is no priority column; adding one is a schema change this
+  task did not authorise, so **priority is the date the owner already gave the
+  plan**, and the only non-arbitrary cut in a calendar is today — hence exactly
+  two groups, `overdue` and `upcoming`, and no "soon" bucket, because a horizon
+  is a judgement about somebody else's truck. (b) "Fluids/consumables state"
+  would need the site to know some entry *is* engine oil; there is no consumable
+  taxonomy on `parts`/`procedures`. So a service line is **one row per
+  reference id the owner linked**, which reads correctly for fluids without
+  claiming a classification the site does not have — and renders nothing at all
+  today, because `parts`/`procedures`/`problems` ship empty until T4xx/T5xx.
+  (c) **Nothing says "due."** A due date needs a service interval, and the only
+  intervals in the repo (`serviceIntervalSchema`) live on `reference` entries,
+  which GAR-02′ records cannot point at. The sheet reports *elapsed* — last
+  done, and how far the truck has gone since.
+  <br>**PR #68's lesson, generalized — and it had already leaked.** The page's
+  `records` was `RecordRow[]`, set to `[]` on a failed `listRecords`, and the
+  error line lived *inside the timeline panel*. So a reader on Current state or
+  Planned work after a failed request got a panel with nothing in it and no
+  explanation anywhere on screen. That is worse than the receipts case it
+  mirrors: an empty derived sheet reads as a *finding* — no mileage on record,
+  nothing ever serviced, nothing planned — three wrong statements about a truck,
+  published off a dropped request. `records` is now `RecordRow[] | null`,
+  `currentState`/`plannedQueue` take and return the nullable, `paintEntries`
+  refuses to reveal its empty note for `null`, the stat row falls back to "not
+  recorded" instead of a confident `0`, and the live region moved **above the
+  tablist** so one announcement covers all three tabs (three copies would talk
+  over each other).
+  <br>**The odometer is derived, and it is not the profile's figure.**
+  `vehicles.odometer_km` is hand-maintained, so GAR-03′ excludes it: the sheet
+  shows the latest reading *written against a job*, labelled as such, while the
+  stat row keeps showing the profile figure. Latest-by-date, not highest —
+  `Math.max` makes one transposed digit the truck's mileage forever — and plans
+  are excluded, because a plan is dated in the future by design and its
+  odometer is a target, not a reading. When an earlier record reads higher the
+  sheet **says so** rather than picking a winner; both are the owner's
+  testimony. Same-day pairs are not flagged (their order is the arbitrary id
+  tie-break).
+  <br>**Money is totalled per currency and there is no field to put a
+  cross-currency total in.** `PlannedEstimate.byCurrency` is a map, so the type
+  itself makes the wrong answer unavailable. Summed in integer cents — decimal
+  addition leaves a total that does not equal the visible parts. Every total
+  carries its coverage ("from 3 of 7 planned items"), because six hours over a
+  queue of seven where two are estimated is six hours of the two.
+  <br>**Not done, deliberately:** the current-state sheet reports open items as
+  two counts and sends the reader to the Planned tab rather than drawing the
+  queue twice; there is no reminder, notification or due-date surface anywhere
+  (the copy says so in both locales). `/en/garage/` performance is 92 against
+  the 90 budget — passing with two points, unchanged in kind by this task but
+  worth knowing before the next thing lands on this page.
 - [ ] **T2-304 [CONTENT+DESIGN]** Gitana Blanca seed — user page #1: owner
   interview (001 T303's content) entered as real records with receipts;
   conductor+owner refine the garage views against it before generalization.
