@@ -60,9 +60,9 @@ Specs of record: `specs/001-foundation/spec.md` (reference platform),
 - `npm run check` — `astro check` (types + content schema validation)
 - `npm run lint` / `npm run format:check`
 - `npm test` — Vitest unit tests
-- `npm run test:e2e` — Playwright (not yet implemented — arrives with T204, the
-  first browser-level UI task; until then the container-API dist tests carry
-  the markup contracts)
+- `npm run test:e2e` — Playwright browser tests in `tests/e2e/` (landed with
+  T204). CI runs `npx playwright test` inside the Links + a11y job rather than
+  this script, so the build is not repeated.
 - `npm run check:locales` — every entry has both `en` and `es` prose
 - `npm run check:citations` — every numeric spec carries a source
 - `npm run check:glossary` — translated prose uses canonical glossary terms
