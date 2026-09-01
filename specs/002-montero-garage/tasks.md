@@ -592,10 +592,15 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   real: `SHARE_READER_FUNCTIONS`' argument for three entry points over one JSON
   reader rests entirely on the projection rule. Before round 2 that rule caught
   only a literal `*`, so a single `to_jsonb(r)` reader would have satisfied
-  every grader while defeating the argument for splitting them. If T2-404
-  proposes one reader returning `jsonb`, the projection rule needs re-deriving
-  first — `select *` inside a `jsonb_build_object` of named keys is invisible to
-  it, and that is the shape such a proposal would take.
+  every grader while defeating the argument for splitting them.
+  <br>— **The limit of the projection rule, stated correctly.** It catches
+  whole-row projection in every spelling tested, including inside a builder and
+  inside a nested subquery. What it cannot do is enforce SHR-06's *capability
+  scoping*: a fully-named `jsonb_build_object` that includes the cost columns is
+  textually indistinguishable from legitimate projection. Where a grant does not
+  open costs, that guarantee is carried by the capability check in the reader's
+  body, not by any grader in this file — **T2-404's reviewer must verify it by
+  reading.**
 
 - [ ] **T2-401 [TEST]** Sharing graders: private-by-default proofs at the URL
   level, per-record cost masking on public work-logs, showcase toggle
@@ -656,6 +661,31 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   grader that writes a deliberately mis-joined policy and proves owner B still
   reads nothing. If that ever stops being true, the declaration tier will not
   notice.
+  <br>**Two defects in T2-401a's own projection rule, found in its round-2
+  review and recorded here rather than fixed there (doc-only pass). The first
+  is a live miss, not a theoretical one.**
+  <br>*(c) `rowAliases` under-binds, so whole-row projection escapes.* It
+  matches only relations introduced by `from`/`join`, and its optional
+  alias group can swallow a following `join` keyword. Two confirmed
+  consequences, both verified against the shipped rule:
+  <br>— **comma joins:** `from public.records r, public.shares s` binds only
+  `r`, so `select to_jsonb(s)` — a whole-row leak of the grants table —
+  produces **zero findings**;
+  <br>— **an unaliased first relation:** `from public.records join public.shares s
+  on …` binds only `records`, because the alias group consumes the word `join`
+  and the second relation is never matched at all.
+  <br>Fix is small and known: split the `from` clause on top-level commas, and
+  add a lookahead so the alias group cannot match a keyword. Needs a probe per
+  shape, mutation-verified like the rest of the corpus. **Until it lands, the
+  projection rule's guarantee holds only for single-relation and
+  aliased-`join` bodies** — which is what T2-404's readers are expected to look
+  like, but "expected" is not "enforced".
+  <br>*(d) No accept-case control on the `setof` rule.* `returns setof
+  <user table>` is rejected and pinned, but nothing asserts that
+  `returns setof <non-user-table>` — a composite type, a view, a domain — is
+  *accepted*. The rule could become over-strict and reject a legitimate return
+  shape with no test noticing, which is the direction that gets a security rule
+  deleted rather than fixed. One fixture closes it.
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*
