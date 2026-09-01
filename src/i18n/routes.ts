@@ -56,6 +56,18 @@ export const COLLECTION_ROUTE_SEGMENTS = {
    * *usual* caller rather than the only permitted one.
    */
   signIn: { en: "sign-in", es: "ingresar" },
+  /**
+   * T2-301 — the garage: a user's vehicles and their profiles (002 GAR-01′).
+   *
+   * The ES segment is **`taller`**, not `garaje`. That is the glossary's
+   * ruling, not a preference: `all-general-taller` is the canonical term and
+   * lists `garaje` as an alias tagged `ES`/`MX` — Spain and Mexico — which is
+   * exactly the kind of regional variant AGENTS.md keeps out of prose and out
+   * of URLs. In Costa Rica the place where the work happens is the taller, and
+   * the ES sign-in page has been saying "Ingrese a su taller" since T2-202. A
+   * `/es/garaje/` would have been the English word wearing a Spanish accent.
+   */
+  garage: { en: "garage", es: "taller" },
 } as const satisfies Readonly<Record<string, Readonly<Record<Locale, string>>>>;
 
 export type CollectionRouteId = keyof typeof COLLECTION_ROUTE_SEGMENTS;

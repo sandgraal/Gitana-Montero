@@ -36,6 +36,15 @@ const navItems = [
     label: strings.navCommunity,
   },
   /**
+   * 002 T2-301 — the garage. A signed-out visitor who follows it gets the
+   * bilingual sign-in prompt rather than an error, which is the point: the
+   * door has to be visible before anyone knows there is a room.
+   */
+  {
+    href: collectionRoutePath("garage", locale),
+    label: strings.navGarage,
+  },
+  /**
    * 002 T2-202 — the account surface has to be reachable from the chrome, in
    * both locales, or ACC-02's "fully bilingual account surface" is a page with
    * no door. It is last on purpose: this is a reference site first.

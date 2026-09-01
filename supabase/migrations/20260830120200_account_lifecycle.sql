@@ -1,6 +1,18 @@
 -- T2-202 — account creation and ACC-03's two-step deletion.
 -- refs specs/002-montero-garage (ACC-01, ACC-03, GAR-05', MIG-03)
 --
+-- **Amended by T2-301 (2026-08-31), one line:** the purge's storage deletion
+-- listed `receipts` because receipts were the only bucket. `vehicle-photos`
+-- makes that silently incomplete — ACC-03 says "all vehicles, records, and
+-- stored files", and a photo is a stored file — so the list is now both
+-- buckets. Amended here rather than in a later `create or replace` because a
+-- routine with two definitions in one directory has two places to read and one
+-- of them is wrong; this file is the definition. Nothing has been applied to a
+-- hosted project yet (the Supabase project is still an owner action — see
+-- HANDOFF-T2-202-SUPABASE.md), so editing it is a change to a plan, not to
+-- history. If that is ever no longer true, the amendment has to become a new
+-- migration instead.
+--
 -- > **ACC-03** A user SHALL be able to delete their account; after a 30-day
 -- > recovery window, all vehicles, records, and stored files SHALL be
 -- > hard-deleted.
@@ -141,8 +153,12 @@ begin
 
   perform set_config('storage.allow_delete_query', 'true', true);
 
+  -- Every bucket this project stores user files in (T2-301). Adding one
+  -- without adding it here is how ACC-03 stops being true with nothing going
+  -- red: the count this function returns is deleted *accounts*, so a purge
+  -- that leaves a whole bucket behind looks exactly like a healthy one.
   delete from storage.objects o
-   where o.bucket_id = 'receipts'
+   where o.bucket_id in ('receipts', 'vehicle-photos')
      and (storage.foldername(o.name))[1] = any (v_expired_text);
 
   delete from auth.users u
