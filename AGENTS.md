@@ -130,7 +130,7 @@ Specs of record: `specs/001-foundation/spec.md` (reference platform),
   reference facts, and never fact-checked by the site. **A record created by
   accepting a mechanic's proposal is no different** (003 PRO-05): it carries
   its provenance — who proposed it, under which grant, when it was accepted —
-  remains the owner's own record, and is never presented as a site-verified
+  and it remains the owner's own record, never presented as a site-verified
   reference fact. A second author does not make it a second kind of fact.
 - **Cite what you actually read.** A source you did not open is not a source.
   If you cannot reach it, say so and lower the confidence tier — do not cite it
@@ -180,9 +180,9 @@ Stop and ask before any of these:
   deletion, or an owner's export of their own data; a lapsed shop loses tools,
   never its read of a live grant a customer issued it; no sale, brokerage, or
   licensing of user data, aggregate and anonymized included; no paid placement,
-  paid ranking, or paid inclusion in the community directory. The
-  affiliate-disclosure rule above and 002 ACC-04's ads/analytics ban both
-  survive untouched.
+  paid ranking, or paid inclusion in the community directory. **"No affiliate
+  links without visible disclosure in both languages"** under *Safety and
+  legal* above, and 002 ACC-04's ads/analytics ban, both survive untouched.
 - User data never leaves Supabase; every user table ships with row-level
   security proven by graders before content flows. Writing *reference* data
   to Supabase from anything other than the CI sync job.
