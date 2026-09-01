@@ -256,6 +256,14 @@ export interface UiStrings
   readonly garageSignInLink: string;
   readonly garageLoading: string;
   readonly garageError: string;
+  /**
+   * Shown when the garage's own JavaScript could not finish loading — a
+   * deploy rotated the chunk hash under an open tab, the network dropped, or
+   * an extension or CSP blocked it. Distinct from `garageError`, which is a
+   * request that failed: this one is "the page itself did not arrive", and
+   * the only action that helps is reloading.
+   */
+  readonly garageUnreachable: string;
   readonly garageVehiclesHeading: string;
   readonly garageEmptyHeading: string;
   readonly garageEmptyBody: string;
@@ -503,6 +511,8 @@ const en: UiStrings = {
   garageLoading: "Opening your garage…",
   garageError:
     "That did not go through. Try again in a moment; nothing was changed.",
+  garageUnreachable:
+    "Your garage could not be opened — the connection dropped, or something in this browser blocked part of the page. Reload to try again; nothing you have saved is affected.",
   garageVehiclesHeading: "Your vehicles",
   garageEmptyHeading: "No vehicles yet",
   garageEmptyBody: `Add your Montero, Pajero or Shogun and give it a name. The truck this site was built around is called ${TRUCK_NAME}.`,
@@ -758,6 +768,8 @@ const es: UiStrings = {
   garageLoading: "Abriendo su taller…",
   garageError:
     "No se pudo completar. Inténtelo de nuevo en un momento; no se cambió nada.",
+  garageUnreachable:
+    "No se pudo abrir su taller: se cayó la conexión, o algo en este navegador bloqueó una parte de la página. Recargue para volver a intentarlo; nada de lo que usted haya guardado se ve afectado.",
   garageVehiclesHeading: "Sus carros",
   garageEmptyHeading: "Todavía no hay carros",
   garageEmptyBody: `Agregue su Montero, Pajero o Shogun y póngale nombre. Al carro alrededor del cual se armó este sitio se le dice ${TRUCK_NAME}.`,

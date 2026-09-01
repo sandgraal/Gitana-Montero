@@ -137,6 +137,7 @@ const generationOptions = GENERATION_IDS.map((id) => ({
     data-garage
     data-garage-state="boot"
     data-string-error={strings.garageError}
+    data-string-unreachable={strings.garageUnreachable}
     data-string-saving={strings.garageSaving}
     data-string-saved={strings.garageSaved}
     data-string-deleting={strings.garageDeleting}
@@ -758,6 +759,31 @@ const generationOptions = GENERATION_IDS.map((id) => ({
       if (node) node.textContent = value;
     }
 
+    /**
+     * The last resort: a promise in this file rejected.
+     *
+     * Every request here already returns an outcome rather than throwing, so
+     * a rejection means the *code* did not arrive — `getSupabaseClient()`
+     * dynamically imports the client, and that import fails when a deploy
+     * rotates the chunk hash under an open tab, when the network drops
+     * mid-fetch, or when an extension or a CSP blocks it.
+     *
+     * Without this the page had a much worse failure than an error message:
+     * the boot promise never settled, so `data-garage-state` stayed `boot`
+     * forever and a returning signed-in owner sat on the opening line with no
+     * garage, no prompt, and nothing to click, in both locales (T2-301 review
+     * F1, reproduced with puppeteer).
+     *
+     * So it says what happened and leaves the sign-in prompt up: reloading is
+     * the only thing that helps, and if the session did expire, signing in is
+     * the action that fixes it. Never silent — a caught rejection that
+     * displays nothing is the same stall wearing a `catch`.
+     */
+    function unreachable(node: HTMLElement | null = els.message): void {
+      settle(true);
+      say(node, text.stringUnreachable ?? "");
+    }
+
     /* ------------------------------------------------------------ options */
 
     function option(value: string, label: string): HTMLOptionElement {
@@ -1026,7 +1052,7 @@ const generationOptions = GENERATION_IDS.map((id) => ({
         }
       }
       show("detail");
-      void paintPhotos(row);
+      void paintPhotos(row).catch(() => unreachable(els.photoMessage));
     }
 
     async function paintPhotos(row: VehicleRow): Promise<void> {
@@ -1061,7 +1087,9 @@ const generationOptions = GENERATION_IDS.map((id) => ({
             row.display_name
           );
         }
-        drop?.addEventListener("click", () => void dropPhoto(row, path));
+        drop?.addEventListener("click", () => {
+          void dropPhoto(row, path).catch(() => unreachable(els.photoMessage));
+        });
         els.gallery.append(item);
       }
     }
@@ -1204,21 +1232,23 @@ const generationOptions = GENERATION_IDS.map((id) => ({
       }
       const target = opened;
       say(els.photoMessage, text.stringUploading ?? "");
-      void uploadVehiclePhoto(target, file).then(async (result) => {
-        if (els.photoInput) els.photoInput.value = "";
-        if (!result.ok) {
-          say(
-            els.photoMessage,
-            (result.reason === "rejected"
-              ? text.stringPhotoType
-              : text.stringError) ?? ""
-          );
-          return;
-        }
-        say(els.photoMessage, "");
-        replace(result.value);
-        await paintPhotos(result.value);
-      });
+      void uploadVehiclePhoto(target, file)
+        .then(async (result) => {
+          if (els.photoInput) els.photoInput.value = "";
+          if (!result.ok) {
+            say(
+              els.photoMessage,
+              (result.reason === "rejected"
+                ? text.stringPhotoType
+                : text.stringError) ?? ""
+            );
+            return;
+          }
+          say(els.photoMessage, "");
+          replace(result.value);
+          await paintPhotos(result.value);
+        })
+        .catch(() => unreachable(els.photoMessage));
     });
 
     els.remove?.addEventListener("click", () => {
@@ -1229,17 +1259,19 @@ const generationOptions = GENERATION_IDS.map((id) => ({
       );
       if (!confirmed) return;
       say(els.formMessage, text.stringDeleting ?? "");
-      void deleteVehicle(target.id).then((result) => {
-        if (!result.ok) {
-          say(els.formMessage, text.stringError ?? "");
-          return;
-        }
-        vehicles = vehicles.filter((entry) => entry.id !== target.id);
-        editing = null;
-        opened = null;
-        paintList();
-        show("list");
-      });
+      void deleteVehicle(target.id)
+        .then((result) => {
+          if (!result.ok) {
+            say(els.formMessage, text.stringError ?? "");
+            return;
+          }
+          vehicles = vehicles.filter((entry) => entry.id !== target.id);
+          editing = null;
+          opened = null;
+          paintList();
+          show("list");
+        })
+        .catch(() => unreachable(els.formMessage));
     });
 
     els.form.addEventListener("submit", (event) => {
@@ -1276,6 +1308,7 @@ const generationOptions = GENERATION_IDS.map((id) => ({
           openDetail(result.value);
           editing = null;
         })
+        .catch(() => unreachable(els.formMessage))
         .finally(() => {
           if (els.save) {
             els.save.disabled = false;
@@ -1286,13 +1319,15 @@ const generationOptions = GENERATION_IDS.map((id) => ({
 
     /* --------------------------------------------------------------- boot */
 
-    void currentUserIdIfAny(window).then((userId) => {
-      if (userId === null) {
-        settle(true);
-        return;
-      }
-      void load();
-    });
+    void currentUserIdIfAny(window)
+      .then((userId) => {
+        if (userId === null) {
+          settle(true);
+          return;
+        }
+        return load();
+      })
+      .catch(() => unreachable());
   }
 
   const root = document.querySelector<HTMLElement>("[data-garage]");

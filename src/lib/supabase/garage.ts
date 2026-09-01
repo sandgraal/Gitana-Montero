@@ -181,12 +181,27 @@ export function carriesAuthResponse(href: string): boolean {
 /**
  * The signed-in account's id, without paying for the client to find out there
  * is nobody. `null` means "show the sign-in prompt".
+ *
+ * The two conditions are an `or`, and the second one is the load-bearing half:
+ * dropping it leaves a browser arriving from a magic link — grant in the URL,
+ * nothing in storage yet — being told to sign in again, which is a loop with
+ * no exit. That mutant survived the first version of these graders because
+ * only `hasStoredSession` and `carriesAuthResponse` were tested, never their
+ * composition (T2-301 review, M10).
+ *
+ * `ask` exists so the composition *is* observable: both branches return `null`
+ * when nothing is configured, so a test that only reads the return value
+ * cannot tell "asked and got nobody" from "never asked". Injecting the ask
+ * makes the difference a fact instead of an inference.
  */
-export async function currentUserIdIfAny(win: Window): Promise<string | null> {
+export async function currentUserIdIfAny(
+  win: Window,
+  ask: () => Promise<string | null> = currentUserId
+): Promise<string | null> {
   if (!hasStoredSession(win) && !carriesAuthResponse(win.location.href)) {
     return null;
   }
-  return currentUserId();
+  return ask();
 }
 
 /* -------------------------------------------------------------------------
