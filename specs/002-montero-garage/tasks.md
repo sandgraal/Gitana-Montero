@@ -209,6 +209,42 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
 - [ ] **T2-301 [PLATFORM]** Vehicle profile: create/edit, display name,
   taxonomy identity via the 001 fitment engine, photos, odometer. Garage
   dashboard per HANDOFF-DESIGN.md's timeline direction. Depends: T2-202, 001-T203. *(GAR-01′)*
+  <br>**The photos storage contract is graded ahead of you in
+  `tests/garage/vehicle-photos.test.ts` (T2-301a, merged first).** 18 `it.fails`
+  markers — 7 declaration, 11 live — activated by deleting exactly the `.fails`
+  on each. Contract decisions, all argued in `tests/garage/contract.ts`: bucket
+  id **`vehicle-photos`** (not `photos`, so the generic name stays free for a
+  future avatar/banner surface with different ownership rules); path
+  **`<owner uuid>/<vehicle id>/<file>`** — the owner stays in
+  `(storage.foldername(name))[1]` so the photos policies are the receipts
+  policies with one bucket id changed, and the vehicle segment makes
+  per-vehicle cleanup a prefix match instead of a reconciliation against
+  `photo_paths`; and `vehicles.photo_paths text[] not null default '{}'`, which
+  T2-202 already ships and which is now pinned as a column contract rather than
+  a `/photo/` regex.
+  <br>**Three of those markers are not "receipts again" and will not fall out
+  of copying that migration.** (a) `purge_expired_accounts` filters
+  `bucket_id = 'receipts'` — correct when receipts were the only bucket, and
+  silently incomplete now; a purged account would keep every photo row, which
+  ACC-03 forbids. Generalise or extend it. (b) Deleting **one vehicle** must
+  reach its objects, and no foreign key can do that — a storage object is not a
+  row in `public`, so this needs a delete trigger on `vehicles`; two graders
+  cover it (the trigger exists; the cleanup actually targets the photos
+  bucket). (c) The bucket needs `allowed_mime_types` restricted to images: an
+  untyped private bucket is a general-purpose file host attached to a truck.
+  <br>Verified live against a stack with T2-202's four migrations applied: all
+  11 live markers fail with `NoSuchBucket` and nothing else. The fixture writes
+  the row half **before** the upload — vehicle insert, then `photo_paths`, then
+  the object — so every live run exercises the column and the only thing left
+  to fail is the missing bucket. (Review caught that the original ordering put
+  the upload first, which meant the update never ran and the "the row half
+  already fits" claim, though true, had no evidence behind it. Reordering makes
+  it true by construction.)
+  <br>**Deliberately left open, and yours only if you want it early:** SHR-02's
+  showcase page is public and cannot render an object from a private bucket
+  without a signed URL, which expires. Long-lived signatures, a render-time
+  proxy, or an opt-in public bucket are all sharing decisions — they belong to
+  T2-401/T2-402, and pinning one here would have been inventing the answer.
 - [ ] **T2-302 [PLATFORM]** Records + receipts: dated typed records, cost/time/
   odometer, attachment upload to private storage, vendor/date/amount fields,
   typed references into reference collections. Depends: T2-301. *(GAR-02′, GAR-05′)*

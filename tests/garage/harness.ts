@@ -85,6 +85,7 @@ import { createHmac, randomUUID } from "node:crypto";
 import {
   PURGE_FUNCTION,
   RECEIPTS_BUCKET,
+  VEHICLE_PHOTOS_BUCKET,
   RECOVERY_WINDOW_DAYS,
   REQUEST_DELETION_FUNCTION,
   TEST_TAXONOMY_IDENTITY,
@@ -589,36 +590,111 @@ export async function createOwnedFixture(
  * Storage
  * ---------------------------------------------------------------------- */
 
-/** Upload bytes into the private receipts bucket as `actor`. */
+/**
+ * How an upload differs from the default receipt.
+ *
+ * `bucket` defaults to receipts so every T2-201 call site reads unchanged;
+ * T2-301a's photo graders pass it explicitly. The alternative — a required
+ * argument — would have meant touching two dozen assertions that are already
+ * proved, to say the thing they already said.
+ */
+export interface UploadOptions {
+  readonly bucket?: string;
+  readonly bytes?: Buffer;
+  readonly contentType?: string;
+}
+
+/**
+ * A string that appears in the *bytes* of a synthetic photo.
+ *
+ * Distinct from the marker in a photo's filename, which is a different claim
+ * about a different thing: a listing leaking a name is not a bucket leaking
+ * content, and an assertion should say which one it means.
+ */
+export const PHOTO_BODY_MARKER = "TEST-T2-301-PHOTO-BYTES";
+
+/**
+ * A genuine 1×1 JPEG: `FFD8` … `FFD9`, 631 bytes, decodable.
+ *
+ * The first version of this constant was not actually a JPEG — it had no
+ * end-of-image marker, and the coherence guard in `vehicle-photos.test.ts`
+ * caught that the moment the guard existed. It had never mattered because
+ * Supabase's bucket filter reads the declared content type rather than
+ * sniffing the bytes, which is exactly the kind of "works for a reason
+ * unrelated to the claim" the graders here are meant to refuse.
+ */
+const JPEG_ONE_PIXEL = Buffer.from(
+  "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoM" +
+    "DAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsN" +
+    "FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAAR" +
+    "CAABAAEDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAA" +
+    "AgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2Jyggk" +
+    "KFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIW" +
+    "Gh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+T" +
+    "l5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtRE" +
+    "AAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChY" +
+    "kNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goO" +
+    "EhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uP" +
+    "k5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigD//2Q==",
+  "base64"
+);
+
+/**
+ * The photo fixture: a real JPEG with `PHOTO_BODY_MARKER` appended **after**
+ * the end-of-image marker.
+ *
+ * The trailing text is why it is here rather than a bare JPEG. A grader
+ * asserting `not.toContain(marker)` on a response body is worthless if the
+ * bytes never contained the marker under any circumstance — it passes whether
+ * the bucket leaked or not, which is precisely the vacuous-grader failure this
+ * directory exists to catch, shipped inside the file that advertises catching
+ * it (T2-301a review, F3).
+ *
+ * Safe on both sides: JPEG decoders stop at `FFD9` and ignore what follows, and
+ * Supabase's bucket MIME filter reads the declared content type and the header,
+ * not the tail. So the object is still a valid image *and* the leak assertions
+ * can now fail.
+ */
+export const SYNTHETIC_JPEG = Buffer.concat([
+  JPEG_ONE_PIXEL,
+  Buffer.from(`\n${PHOTO_BODY_MARKER}\n`, "utf8"),
+]);
+
+/** Upload bytes into a private bucket as `actor`. */
 export function uploadObject(
   scenario: Scenario,
   actor: Actor,
   path: string,
-  bytes: Buffer = Buffer.from("%PDF-1.4 TEST-T2-201 synthetic receipt\n")
+  options: UploadOptions = {}
 ): Promise<ApiResponse> {
-  return request(
-    scenario.stack,
-    `/storage/v1/object/${RECEIPTS_BUCKET}/${path}`,
-    {
-      method: "POST",
-      token: actor.token,
-      rawBody: bytes,
-      headers: { "content-type": "application/pdf" },
-    }
-  );
+  const bucket = options.bucket ?? RECEIPTS_BUCKET;
+  const isPhotos = bucket === VEHICLE_PHOTOS_BUCKET;
+  const bytes =
+    options.bytes ??
+    (isPhotos
+      ? SYNTHETIC_JPEG
+      : Buffer.from("%PDF-1.4 TEST-T2-201 synthetic receipt\n"));
+  return request(scenario.stack, `/storage/v1/object/${bucket}/${path}`, {
+    method: "POST",
+    token: actor.token,
+    rawBody: bytes,
+    headers: {
+      "content-type":
+        options.contentType ?? (isPhotos ? "image/jpeg" : "application/pdf"),
+    },
+  });
 }
 
 /** Fetch an object as `actor` — the authenticated read path. */
 export function downloadObject(
   scenario: Scenario,
   actor: Actor,
-  path: string
+  path: string,
+  bucket: string = RECEIPTS_BUCKET
 ): Promise<ApiResponse> {
-  return request(
-    scenario.stack,
-    `/storage/v1/object/${RECEIPTS_BUCKET}/${path}`,
-    { token: actor.token }
-  );
+  return request(scenario.stack, `/storage/v1/object/${bucket}/${path}`, {
+    token: actor.token,
+  });
 }
 
 /**
@@ -627,11 +703,12 @@ export function downloadObject(
  */
 export async function fetchPublicObject(
   scenario: Scenario,
-  path: string
+  path: string,
+  bucket: string = RECEIPTS_BUCKET
 ): Promise<ApiResponse> {
   assertLocalTarget(scenario.stack.url);
   const response = await fetch(
-    `${scenario.stack.url}/storage/v1/object/public/${RECEIPTS_BUCKET}/${path}`,
+    `${scenario.stack.url}/storage/v1/object/public/${bucket}/${path}`,
     { signal: AbortSignal.timeout(10_000) }
   );
   return {
@@ -647,13 +724,14 @@ export function signObject(
   scenario: Scenario,
   actor: Actor,
   path: string,
+  bucket: string = RECEIPTS_BUCKET,
   expiresIn = 60
 ): Promise<ApiResponse> {
-  return request(
-    scenario.stack,
-    `/storage/v1/object/sign/${RECEIPTS_BUCKET}/${path}`,
-    { method: "POST", token: actor.token, body: { expiresIn } }
-  );
+  return request(scenario.stack, `/storage/v1/object/sign/${bucket}/${path}`, {
+    method: "POST",
+    token: actor.token,
+    body: { expiresIn },
+  });
 }
 
 /** Follow a signed URL with no credentials at all. */
@@ -679,9 +757,10 @@ export async function followSignedUrl(
 export function listObjects(
   scenario: Scenario,
   actor: Actor,
-  prefix = ""
+  prefix = "",
+  bucket: string = RECEIPTS_BUCKET
 ): Promise<ApiResponse> {
-  return request(scenario.stack, `/storage/v1/object/list/${RECEIPTS_BUCKET}`, {
+  return request(scenario.stack, `/storage/v1/object/list/${bucket}`, {
     method: "POST",
     token: actor.token,
     body: { prefix, limit: 100, offset: 0 },
