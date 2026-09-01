@@ -529,6 +529,26 @@ export type OptionCodeSet = (typeof OPTION_CODE_SETS)[number];
  *
  * The pattern subsumes {@link nonBlankString}: it requires at least one
  * alphanumeric, so `""` and `" "` are rejected, as is any code with a space.
+ *
+ * ## The hyphen is admitted here and refused for VIN codes (PR #63, Copilot)
+ *
+ * This is the widest shape any decoder code takes, because it is **one schema
+ * object shared by `vin-code` and `option-code`** — that identity is what the
+ * flatten guard requires of two kinds declaring the same field name, so
+ * narrowing it for one kind by splitting it in two is the exact collision
+ * {@link assertNoFieldCollisions} exists to refuse.
+ *
+ * A VIN, though, is strictly alphanumeric: `MB-000001` is a stamped part or
+ * option code, never seventeen characters off a door jamb. And the hyphen was
+ * not merely cosmetic — `code.length` counts it, so `Z-Z` "fills" a
+ * three-position range while standing for two real VIN characters, letting a
+ * structurally impossible VIN satisfy the position-fill rule.
+ *
+ * So the narrowing lives one layer up, in `checkVinCode`, beside the other
+ * rules that are true of a VIN code and not of a code in general (the I/O/Q
+ * exclusion, the width fill). The field schema stays shared and stays wide;
+ * the kind says what it additionally requires. That is the same division this
+ * module already uses for `fsm-section`'s summary cap.
  */
 export const CODE_PATTERN = /^[0-9A-Z]+(?:-[0-9A-Z]+)*$/;
 
@@ -1133,13 +1153,22 @@ function checkCodeSetMeaning(
  * A VIN code is spelled in the alphabet a VIN actually uses, and it occupies
  * exactly the characters it claims.
  *
- * Both are within-entry structural contradictions, which is the line this
- * module draws for what a refinement may enforce (see
+ * All three rules — the excluded letters, the alphanumeric-only rule, the
+ * position fill — are within-entry structural contradictions, which is the line
+ * this module draws for what a refinement may enforce (see
  * `checkFsmSectionCitesManual`): a five-position range holding a one-character
  * code is not a weak claim, it is two fields that cannot both be right, and a
  * code containing `O` is not a code the chart could have printed.
  *
- * Neither is a check "against the source" — this module cannot read the chart.
+ * They live here rather than in the field schema because {@link CODE_PATTERN}
+ * is shared with `option-code` by object identity — the flatten guard's
+ * requirement — so this is where a rule true of VIN codes and false of stamped
+ * option codes can be stated at all. The hyphen rule is ordered before the fill
+ * rule on purpose: a hyphen inflates `code.length`, so without it a hyphenated
+ * code could pass the fill check while standing for fewer real VIN characters
+ * than its `positions` claim (PR #63, Copilot).
+ *
+ * None is a check "against the source" — this module cannot read the chart.
  * They catch the transcription mistakes that a reviewer reading a table of
  * eighty single letters is least likely to catch.
  */
@@ -1163,6 +1192,24 @@ function checkVinCode(
         `and \`0\` on a stamped plate), so \`${code}\` is a transcription of ` +
         `something else — most likely a digit. If the code is genuinely not in ` +
         `the VIN, it is an \`option-code\`. refs specs/001-foundation (REF-01)`,
+    });
+  }
+
+  if (code.includes("-")) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["code"],
+      message:
+        `a VIN is strictly alphanumeric — every one of its 17 characters is a ` +
+        `letter or a digit (ISO 3779), so \`${code}\` cannot be read out of ` +
+        `one. Hyphens belong to stamped option codes (\`MB-000001\`), which is ` +
+        `why the shared \`code\` field admits them and this kind does not. ` +
+        `The hyphen also counts toward the length, so a hyphenated code can ` +
+        `*satisfy* the position-fill rule below while standing for fewer real ` +
+        `VIN characters than its \`positions\` claim (PR #63, Copilot) — the ` +
+        `rule is here, at the kind, because splitting the field schema in two ` +
+        `is the collision \`assertNoFieldCollisions\` exists to refuse. ` +
+        `refs specs/001-foundation (REF-01)`,
     });
   }
 

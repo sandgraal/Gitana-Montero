@@ -824,6 +824,54 @@ describe("VIN code rows (`vin-code`)", () => {
     }
   });
 
+  /**
+   * PR #63, Copilot — the finding two review rounds missed.
+   *
+   * `code` is one schema object shared with `option-code` (the flatten guard
+   * requires that identity), and it admits hyphens because stamped option
+   * codes have them. A VIN does not: every one of its seventeen characters is
+   * a letter or a digit. Worse, the hyphen *counts toward `code.length`*, so
+   * before this rule a hyphenated code could satisfy the position-fill check
+   * while standing for fewer real VIN characters than its range claimed — a
+   * structurally impossible VIN that validated.
+   */
+  it("REJECTS a hyphen in a VIN code — a VIN is strictly alphanumeric", () => {
+    const outcome = schema.safeParse(
+      vinCodeEntry({ positions: { from: 4, to: 5 }, code: "Z-" })
+    );
+    expect(issuePaths(outcome)).toContain("code");
+    expect(JSON.stringify(outcome)).toMatch(/strictly alphanumeric/);
+  });
+
+  it("REJECTS the gamed case: a hyphenated code whose length matches its width", () => {
+    // `Z-Z` is three characters for a three-position range, so the fill rule
+    // is satisfied and says nothing — yet the code stands for two real VIN
+    // characters at positions 4–6. This is the case that used to pass, and it
+    // is why the hyphen rule cannot be left to the width check.
+    const entry = vinCodeEntry({ positions: { from: 4, to: 6 }, code: "Z-Z" });
+    const outcome = schema.safeParse(entry);
+    expect(outcome.success).toBe(false);
+    expect(issuePaths(outcome)).toContain("code");
+    expect(JSON.stringify(outcome)).toMatch(/strictly alphanumeric/);
+    // Proof that the width rule really is silent here, so the assertion above
+    // is the hyphen rule doing the work and not a second opinion.
+    expect(JSON.stringify(outcome)).not.toMatch(/fills exactly the positions/);
+  });
+
+  it("keeps accepting the same code shape on an option-code", () => {
+    // The other direction: the shared field schema is unchanged and stays
+    // wide. `MB-000001` is a stamped code, not a VIN, and remains legal.
+    expect(
+      schema.safeParse(
+        optionCodeEntry({ codeSet: "equipment", code: "MB-000001" })
+      ).success
+    ).toBe(true);
+    expect(
+      schema.safeParse(optionCodeEntry({ codeSet: "equipment", code: "Z-Z" }))
+        .success
+    ).toBe(true);
+  });
+
   it("needs no length cap of its own — the positions are the cap", () => {
     // A vin-code's length is bounded from both sides by its position range,
     // and the range is bounded by VIN_LENGTH: 17 characters is the ceiling and
