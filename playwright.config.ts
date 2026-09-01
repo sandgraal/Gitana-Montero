@@ -52,6 +52,17 @@ import { resolveChromePath } from "./scripts/lib/audit-targets.mjs";
 const PORT = Number(process.env["E2E_PORT"] ?? 4322);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
+/**
+ * Which `dist` directory (`dist/` or `dist-configured/`) this run serves.
+ * Defaults to the plain, env-less build every other e2e spec here has always
+ * run against. `tests/e2e/garage-unreachable.spec.ts` needs the *configured*
+ * build instead — see that file's header for why the garage page only
+ * renders its real app, and only then fetches its Supabase client chunk, once
+ * `PUBLIC_SUPABASE_URL`/`PUBLIC_SUPABASE_ANON_KEY` were set at build time.
+ * `ci.yml` points this at `dist-configured/` for that one spec.
+ */
+const DIST_DIR = process.env["E2E_DIST"] ?? "dist";
+
 export default defineConfig({
   testDir: "./tests/e2e",
   /*
@@ -90,12 +101,12 @@ export default defineConfig({
 
   /*
    * The same static server the a11y and Lighthouse gates use, so all three
-   * grade the identical artifact: `dist/` mounted at the site's configured
+   * grade the identical artifact: `DIST_DIR` mounted at the site's configured
    * `base`. `npm run test:e2e` builds first, so the server always has
    * something to serve.
    */
   webServer: {
-    command: `node scripts/serve-dist.mjs --port ${PORT}`,
+    command: `node scripts/serve-dist.mjs --port ${PORT} --dist ${DIST_DIR}`,
     url: `${BASE_URL}/en/`,
     reuseExistingServer: !process.env["CI"],
     timeout: 60_000,

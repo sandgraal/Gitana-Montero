@@ -11,5 +11,5 @@
     "tests/**/*",
     "*.config.*"
   ],
-  "exclude": ["dist"]
+  "exclude": ["dist", "dist-configured"]
 }

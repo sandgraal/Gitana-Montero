@@ -156,11 +156,56 @@ jobs:
       - name: Build site for audits
         run: npx astro build
 
+      # 002 MIG-03 review finding: CI's only build was always the env-less one
+      # above — `PUBLIC_SUPABASE_URL`/`PUBLIC_SUPABASE_ANON_KEY` unset — because
+      # no project exists to hand it real credentials (`src/lib/supabase/config.ts`'s
+      # "absent is a supported state" note). Vercel's production and preview
+      # builds are *not* env-less; they carry the real project's credentials, so
+      # what ships is the configured page: the garage app, the sign-in form, the
+      # whole `SUPABASE_BROWSER_CONFIG !== null` branch of every page that
+      # branches on it. A gate that only ever audits the degraded "accounts are
+      # not switched on here" notice audits ~0% of that surface — which is
+      # exactly the gap that let the boot-stall regression this same review found
+      # (`tests/e2e/garage-unreachable.spec.ts`) reach review instead of CI.
+      #
+      # So this build gets real-shaped, throwaway credentials: a syntactically
+      # valid JWT (decodes to `{"role":"anon",…}`, so `isSecretKey()` accepts it)
+      # and an `https://` URL in Supabase's own project-subdomain shape. Neither
+      # is a secret — the anon key is *designed* to be public (row-level
+      # security is what protects data, not keeping this key hidden;
+      # `config.ts`'s own doc comment), and `example.supabase.co` resolves to
+      # nothing. They live here in the open on purpose, not in a repository or
+      # environment secret, because they are not one.
+      - name: Build site for audits (configured — dummy Supabase credentials)
+        env:
+          PUBLIC_SUPABASE_URL: https://example.supabase.co
+          # A throwaway, syntactically-valid anon-shaped JWT. Not a real key —
+          # `example.supabase.co` does not exist — and not a secret-key shape
+          # either: `readSupabaseConfig()` (`src/lib/supabase/config.ts`) throws
+          # the build if it ever is, so this is also a passing assertion that
+          # the guard accepts a legitimate anon key rather than rejecting every
+          # key regardless of shape.
+          PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlLWRlbW8iLCJyZWYiOiJleGFtcGxlIiwiZXhwIjoyMDAwMDAwMDAwfQ.dummy-signature-not-a-real-key-do-not-use
+        run: npx astro build --outDir dist-configured
+
       - name: Accessibility (Pa11y, WCAG2AA)
         run: npm run test:a11y
 
+      - name: Accessibility, configured build (Pa11y, WCAG2AA)
+        run: npm run test:a11y -- --dist dist-configured
+
       - name: Lighthouse budgets (a11y ≥ 95, performance ≥ 90)
         run: npm run test:lighthouse
+
+      # SCF-06's budget on the pages that only exist once a project is
+      # configured — the garage and sign-in pages score 94/90 and 100/95-100
+      # respectively as of this writing (see the PR that added this step for
+      # the exact numbers this CI runner measured). If a runner ever lands
+      # under budget here, that is a real regression or a slower runner to
+      # investigate — never a reason to lower `BUDGETS` in
+      # `scripts/check-lighthouse.mjs`.
+      - name: Lighthouse budgets, configured build (a11y ≥ 95, performance ≥ 90)
+        run: npm run test:lighthouse -- --dist dist-configured
 
       # T204 fills the constitution's e2e slot. It runs *here* rather than in a
       # job of its own for the reason spelled out at the top of this file: a
@@ -187,6 +232,29 @@ jobs:
       # the `npx astro build` above.
       - name: End-to-end (Playwright, vehicle selector + locale switcher)
         run: npx playwright test
+
+      # `tests/e2e/garage-unreachable.spec.ts` needs the *configured* build:
+      # `[garageSegment].astro`'s closing script is a no-op when
+      # `SUPABASE_BROWSER_CONFIG` is `null`
+      # (`if (root && SUPABASE_BROWSER_CONFIG) enhance(root)`), so on an
+      # unconfigured build the garage app never renders and its Supabase
+      # client chunk is never fetched — nothing for the spec to abort, and the
+      # page's `data-garage-state` never leaves "boot" either way. That spec
+      # would be green against plain `dist/` whether or not the fix it grades
+      # (T2-301 review F1's boot `.catch`) existed, so it needs the configured
+      # build for real (see the spec's own header for why chunk *existence* is
+      # not what tells the two builds apart). The step above already ran every
+      # other spec against plain `dist/`; this one points
+      # `playwright.config.ts`'s `E2E_DIST`/`E2E_PORT` at `dist-configured/`
+      # and a different port, and runs only the one spec that needs it. (The
+      # spec skips itself — rather than failing — if it is ever run against an
+      # unconfigured build, so it stays harmless in the step above and in
+      # `npm run test:e2e` locally.)
+      - name: End-to-end (Playwright, garage unreachable — configured build)
+        env:
+          E2E_DIST: dist-configured
+          E2E_PORT: 4323
+        run: npx playwright test tests/e2e/garage-unreachable.spec.ts
   # ── Where the deploy job went (T2-102, 002 MIG-02) ──────────────────────
   #
   # A `deploy` job used to live here: on a push to `main`, after all three
