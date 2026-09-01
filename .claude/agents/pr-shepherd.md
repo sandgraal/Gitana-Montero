@@ -43,7 +43,7 @@ Poll every ~5 minutes. Block on CI, then:
 
 ```
 gh pr view <n> --json mergeStateStatus,mergeable,reviewDecision,statusCheckRollup
-gh api graphql -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100){nodes{id isResolved isOutdated path line comments(first:20){nodes{author{login} body url}}}}}}}' -f o=sandgraal -f r=Gitana-Montero -F n=<n>
+gh api graphql -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100){nodes{id isResolved isOutdated path line comments(first:20){nodes{author{login} body url}}}}}}}' -f o=sandgraal -f r=monterogarage -F n=<n>
 ```
 
 Handle, in this order:
@@ -67,15 +67,36 @@ Handle, in this order:
   and never lease over commits you have not fetched and read.
 - **`mergeStateStatus: BEHIND`** → `gh pr update-branch <n>` or rebase as
   above; wait for CI again.
-- **`BLOCKED` with green checks** → almost always unresolved threads; go
-  back to the thread step. A protection rule you cannot satisfy →
-  `BLOCKED:`.
+- **`BLOCKED` with green checks** → almost always unresolved threads, and
+  they are often *newer than your last look* — a bot re-reviews on each
+  push, so your own fix or rebase can summon the thread that blocks you.
+  Re-query threads before concluding anything; go back to the thread step.
+  Only call it a protection rule you cannot satisfy (`BLOCKED:`) after a
+  fresh thread query comes back empty and the required contexts on the
+  head SHA are all SUCCESS.
 
 ## 3. Merge
 
 Only when: `mergeStateStatus == CLEAN`, all required checks SUCCESS on the
 head SHA, zero unresolved threads, and the conductor told you every
 required independent pass is clean.
+
+**Re-query the threads immediately before merging, in the same breath as
+the head SHA.** A thread count from earlier in the watch loop is not
+evidence about now, and neither is the count in your handoff. Bot
+reviewers re-review on every new commit, so the push that *cleared* the
+last round of threads is itself what summons the next one — the PR goes
+green, you verify zero threads, your own force-push after a rebase wakes
+the bot, and `required_conversation_resolution` flips the PR to `BLOCKED`
+in the gap before your merge call. Twice now: PR #52 (threads arrived
+after a human APPROVE and green CI) and PR #59 (two threads arrived after
+a rebase force-push, on a PR verified clean minutes earlier). Nothing
+announces this — `mergeStateStatus` is the only tell, and it reads
+`BLOCKED` with every required check still SUCCESS.
+
+This is the same argument the SHA gets below, for the same reason: the
+question is what is true at the instant of the call, not what was true
+when you looked.
 
 Merge via the API, with the head SHA pinned so a race merges nothing you
 did not verify. Get that SHA fresh, immediately before the call — not a
