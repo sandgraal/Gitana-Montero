@@ -31,7 +31,7 @@
     },
     "es": {
       "title": "Número de chasis de exportación: carrocería de tres puertas",
-      "summary": "El valor de tipo de carrocería que el manual da para la de tres puertas. Leído junto con los caracteres de línea, es el par que resuelve cuáles paneles, vidrios y piezas de interior puede aportar un vehículo donante."
+      "summary": "El valor de tipo de carrocería que el manual da para la carrocería corta de tres puertas. Leído junto con los caracteres de línea, es el par que resuelve cuáles paneles, vidrios y piezas de interior puede aportar un vehículo donante."
     }
   }
 }

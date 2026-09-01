@@ -28,11 +28,11 @@
   "prose": {
     "en": {
       "title": "Export chassis number: short-wheelbase Montero",
-      "summary": "The line value the manual reads as the short-wheelbase Montero. It is the development-order field, so it names the vehicle project itself rather than a trim or a market."
+      "summary": "The line value the manual decodes as MITSUBISHI PAJERO short wheelbase — the export name for the truck this site calls the Montero. It is the development-order field, so it names the vehicle project itself rather than a trim or a market."
     },
     "es": {
       "title": "Número de chasis de exportación: Montero de distancia entre ejes corta",
-      "summary": "El valor de línea que el manual lee como el Montero de distancia entre ejes corta. Es el campo de orden de desarrollo, así que nombra el proyecto del vehículo y no un acabado ni un mercado."
+      "summary": "El valor de línea que el manual decodifica como «MITSUBISHI PAJERO short wheelbase», el nombre de exportación del carro que este sitio llama Montero. Es el campo de orden de desarrollo, así que nombra el proyecto del vehículo y no un acabado ni un mercado."
     }
   }
 }

@@ -30,7 +30,7 @@
       "summary": "The value the manual files under sort and decodes as a station wagon. Note where it sits: on the export scheme this character is not a check digit. The check digit belongs to the North American rule, and a general-export chassis number does not carry one — so a check-digit calculator will disagree with a perfectly genuine export number."
     },
     "es": {
-      "title": "Número de chasis de exportación: carrocería tipo station wagon",
+      "title": "Número de chasis de exportación: carrocería station wagon",
       "summary": "El valor que el manual clasifica como tipo y decodifica como station wagon. Vale fijarse en dónde queda: en el esquema de exportación este carácter no es un dígito verificador. El dígito verificador pertenece a la norma norteamericana y un número de chasis de exportación general no lleva ninguno, así que una calculadora de dígito verificador va a rechazar un número de exportación perfectamente legítimo."
     }
   }

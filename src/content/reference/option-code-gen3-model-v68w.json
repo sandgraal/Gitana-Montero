@@ -29,11 +29,11 @@
   "prose": {
     "en": {
       "title": "Model code V68W",
-      "summary": "The build-plate model code for the short-wheelbase Montero with the 4M41 turbodiesel, as the workshop manual's model tables print it. The table pairs it with both a manual and an automatic. A model code is not a VIN and has no VIN positions: it is stamped on the vehicle information code plate riveted to the toeboard inside the engine bay, and it is the first thing a parts counter asks for."
+      "summary": "The build-plate model code for the short-wheelbase Montero with the 4M41 turbodiesel, as the workshop manual's model tables print it. The table pairs it with both a manual and an automatic. A model code is not a VIN and has no VIN positions: it is stamped on the vehicle information code plate, which the manual places on the toeboard — the panel that closes off the engine compartment from the cabin floor — and it is the first thing a parts counter asks for."
     },
     "es": {
       "title": "Código de modelo V68W",
-      "summary": "El código de modelo de la placa de códigos para el Montero de distancia entre ejes corta con el turbodiésel 4M41, tal como lo imprimen las tablas de modelos del manual de taller. La tabla lo combina tanto con una manual como con una automática. Un código de modelo no es un VIN y no tiene posiciones de VIN: va estampado en la placa de códigos remachada en el mamparo, dentro del compartimiento del motor, y es lo primero que pide una repuestera."
+      "summary": "El código de modelo de la placa de códigos para el Montero de distancia entre ejes corta con el turbodiésel 4M41, tal como lo imprimen las tablas de modelos del manual de taller. La tabla lo combina tanto con una manual como con una automática. Un código de modelo no es un VIN y no tiene posiciones de VIN: va estampado en la placa de códigos, que el manual ubica en el toeboard —la lámina que cierra el compartimiento del motor contra el piso de la cabina—, y es lo primero que pide una repuestera."
     }
   }
 }

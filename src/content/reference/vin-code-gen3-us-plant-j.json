@@ -34,11 +34,11 @@
   "prose": {
     "en": {
       "title": "North American VIN: assembly plant",
-      "summary": "The plant character. Both North American manuals print the same single value, decoded to the Mitsubishi assembly company the chart names. The export chart prints the same letter for a plant it names differently, so the two tables must not be read across each other."
+      "summary": "The plant character. Both North American manuals print the same single value and decode it to Pajero Manufacturing Co., Ltd. The export chart prints the same letter for a plant it names differently, so the two tables must not be read across each other."
     },
     "es": {
       "title": "VIN norteamericano: planta de ensamblaje",
-      "summary": "El carácter de planta. Los dos manuales norteamericanos imprimen el mismo valor único, decodificado a la ensambladora de Mitsubishi que nombra la tabla. La tabla de exportación imprime esa misma letra para una planta a la que llama de otra forma, así que las dos tablas no se deben leer cruzadas."
+      "summary": "El carácter de planta. Los dos manuales norteamericanos imprimen el mismo valor único y lo decodifican como Pajero Manufacturing Co., Ltd. La tabla de exportación imprime esa misma letra para una planta a la que llama de otra forma, así que las dos tablas no se deben leer cruzadas."
     }
   }
 }
