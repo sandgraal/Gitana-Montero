@@ -1,0 +1,229 @@
+---
+/**
+ * The drivability triage banner (PRB-05) — the first thing a reader sees and
+ * the only thing some of them will read.
+ *
+ * > **PRB-05** THE drivability triage SHALL be one of: `drive-normally`,
+ * > `drive-gently-repair-soon`, `do-not-drive`, `tow-only` — rendered
+ * > prominently in both locales.
+ *
+ * ## Both locales, always, on one page
+ *
+ * This is the one surface on this site where the spec requires **both**
+ * languages on the same page regardless of which locale the page is — page
+ * locale large, the other locale small underneath, exactly as the Main and
+ * ProblemaES artboards draw it. The reason is not symmetry, it is the reader:
+ * a Costa Rican reading an English page, or a US owner reading a Spanish one
+ * because that is where the answer was, must not have to guess whether the
+ * truck is safe to drive home. Everything else on a problem page renders in one
+ * language; this does not.
+ *
+ * Each half carries its own `lang`, so a screen reader switches voice and the
+ * browser's translate feature leaves the other half alone.
+ *
+ * ## Colour is not the message
+ *
+ * The four bands are the design handoff's validated triage colours
+ * (green `#3E7B4F`, amber `#8A5E14`, red `#A32C2C`, dark red `#5A1F1F`, white
+ * text throughout — measured at 5.06:1, 5.69:1, 7.11:1 and 12.72:1, all past
+ * WCAG AA). But the state is carried by the *words*, in both languages, and by
+ * the icon shape; a reader who cannot tell the green band from the amber one
+ * loses nothing, which is the SC 1.4.1 rule and also just correct for a
+ * safety-critical control.
+ *
+ * refs specs/001-foundation (PRB-05, I18N-08),
+ * specs/001-foundation/design/HANDOFF-DESIGN.md
+ */
+import { LOCALES, LOCALE_BCP47, type Locale } from "../i18n/routing";
+import { drivabilityLabel, t } from "../i18n/ui";
+import type { DrivabilityState } from "../schemas/problems";
+
+interface Props {
+  /** The page's locale — its label leads. */
+  locale: Locale;
+  state: DrivabilityState;
+}
+
+const { locale, state } = Astro.props;
+
+/** Page locale first, then the other — the handoff's rule for both-locale bands. */
+const readingOrder: Locale[] = [
+  locale,
+  ...LOCALES.filter((candidate) => candidate !== locale),
+];
+
+/** One state, said twice — once in each locale's own words. */
+const labels = readingOrder.map((each) => ({
+  locale: each,
+  label: drivabilityLabel(t(each), state),
+}));
+---
+
+{
+  /*
+   * A named region rather than a section with a visually-hidden heading. Both
+   * give a screen reader the name ("Can you drive it?"); `aria-label` does it
+   * without putting absolutely-positioned text on the page, which Pa11y flags
+   * as an unresolvable-background contrast advisory (`G145.Abs`) — noise on the
+   * one element that must never look like it has a problem.
+   */
+}
+<section
+  class="triage"
+  data-triage={state}
+  aria-label={t(locale).problemTriageLabel}
+>
+  <span class="triage__icon" aria-hidden="true">
+    {
+      state === "drive-normally" && (
+        <svg
+          width="30"
+          height="30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          focusable="false"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="m8 12 3 3 5-6" />
+        </svg>
+      )
+    }
+    {
+      state === "drive-gently-repair-soon" && (
+        <svg
+          width="30"
+          height="30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          focusable="false"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v6l4 2" />
+        </svg>
+      )
+    }
+    {
+      state === "do-not-drive" && (
+        <svg
+          width="30"
+          height="30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          focusable="false"
+        >
+          <path d="M12 3 2 21h20L12 3z" />
+          <path d="M12 10v5" />
+          <path d="M12 18h.01" />
+        </svg>
+      )
+    }
+    {
+      state === "tow-only" && (
+        <svg
+          width="30"
+          height="30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          focusable="false"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="m6 6 12 12" />
+        </svg>
+      )
+    }
+  </span>
+  <p class="triage__labels">
+    {
+      labels.map((entry, index) => (
+        <span
+          class:list={[
+            "triage__label",
+            index === 0 ? "triage__label--primary" : "triage__label--secondary",
+          ]}
+          lang={LOCALE_BCP47[entry.locale]}
+        >
+          {entry.label}
+        </span>
+      ))
+    }
+  </p>
+</section>
+
+<style>
+  .triage {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    color: #fff;
+  }
+
+  .triage__icon {
+    display: flex;
+    flex: 0 0 auto;
+  }
+
+  .triage__labels {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin: 0;
+  }
+
+  .triage__label--primary {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+
+  .triage__label--secondary {
+    font-size: 0.8125rem;
+  }
+
+  /* HANDOFF-DESIGN's validated triage table. */
+  .triage[data-triage="drive-normally"] {
+    background: #3e7b4f;
+  }
+
+  .triage[data-triage="drive-gently-repair-soon"] {
+    background: #8a5e14;
+  }
+
+  .triage[data-triage="drive-gently-repair-soon"] .triage__icon,
+  .triage[data-triage="drive-gently-repair-soon"] .triage__label--secondary {
+    /* 4.80:1 on the amber band — the handoff's own secondary token. */
+    color: #ffe9c4;
+  }
+
+  .triage[data-triage="do-not-drive"] {
+    background: #a32c2c;
+  }
+
+  .triage[data-triage="tow-only"] {
+    background: #5a1f1f;
+  }
+
+  @media (max-width: 40rem) {
+    .triage__label--primary {
+      font-size: 0.9375rem;
+    }
+  }
+</style>

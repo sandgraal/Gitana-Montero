@@ -23,7 +23,12 @@ import type {
   CommunityType,
   LinkKind,
 } from "../schemas/community";
-import type { ConfidenceTier } from "../schemas/entry";
+import type { ConfidenceTier, SourceKind } from "../schemas/entry";
+import type {
+  CostBand,
+  DrivabilityState,
+  ProblemSeverity,
+} from "../schemas/problems";
 import type { DriveType, GenerationId } from "../schemas/vehicles";
 import type { OptionalSelectionFacet } from "../lib/fitment";
 import {
@@ -122,6 +127,41 @@ export type ConfidenceTierStrings = {
   readonly [Tier in ConfidenceTier as `confidenceTier.${Tier}`]: string;
 };
 
+/**
+ * One flat key per `SOURCE_KINDS` value — the kind marker beside each numbered
+ * source on a problem page (T401, the Main artboard's "· first-hand"). Derived
+ * from the constant, so adding an evidence class without naming it in both
+ * locales is a type error rather than an untranslated chip.
+ */
+export type SourceKindStrings = {
+  readonly [Kind in SourceKind as `sourceKind.${Kind}`]: string;
+};
+
+/**
+ * One flat key per `PROBLEM_SEVERITIES` value — T401's severity chip.
+ */
+export type ProblemSeverityStrings = {
+  readonly [Severity in ProblemSeverity as `severity.${Severity}`]: string;
+};
+
+/**
+ * One flat key per `DRIVABILITY_STATES` value (PRB-05).
+ *
+ * These four are the highest-consequence strings in this module: the triage
+ * banner renders **both** locales' version on every problem page regardless of
+ * which locale the page is, so a reader who only reads one of the two languages
+ * still gets the answer to "can I drive it?". Derived from the constant so a
+ * fifth state could not reach that banner untranslated.
+ */
+export type DrivabilityStrings = {
+  readonly [State in DrivabilityState as `drivability.${State}`]: string;
+};
+
+/** One flat key per `COST_BANDS` value — the `$` chip's accessible name. */
+export type CostBandStrings = {
+  readonly [Band in CostBand as `costBand.${Band}`]: string;
+};
+
 export interface UiStrings
   extends
     GlossarySystemStrings,
@@ -131,7 +171,11 @@ export interface UiStrings
     GenerationStrings,
     DriveStrings,
     FitmentFacetStrings,
-    ConfidenceTierStrings {
+    ConfidenceTierStrings,
+    SourceKindStrings,
+    ProblemSeverityStrings,
+    DrivabilityStrings,
+    CostBandStrings {
   readonly siteTagline: string;
   readonly skipToContent: string;
   readonly navHome: string;
@@ -454,6 +498,64 @@ export interface UiStrings
   readonly vehicleProvisionalNote: string;
   /** `{facets}` is an `Intl.ListFormat` list of `fitmentFacet.*` labels. */
   readonly vehicleProvisionalDetailTemplate: string;
+  /* Problem finder — T401, PRB-01…PRB-05 */
+  readonly navProblems: string;
+  readonly problemsHeading: string;
+  readonly problemsIntro: string;
+  readonly problemsEmpty: string;
+  /** `{shown}` / `{total}`, computed and interpolated — see `glossaryCountTemplate`. */
+  readonly problemsCountTemplate: string;
+  readonly problemBreadcrumbLabel: string;
+  readonly problemSymptomsHeading: string;
+  readonly problemDiagnosticsHeading: string;
+  readonly problemCausesHeading: string;
+  readonly problemFixPathsHeading: string;
+  readonly problemSourcesHeading: string;
+  /** Prefixes the causes a diagnostic result implicates. */
+  readonly problemRulesInLabel: string;
+  /** Prefixes the causes the same result eliminates. */
+  readonly problemRulesOutLabel: string;
+  readonly problemNoCauses: string;
+  readonly problemNoDiagnostics: string;
+  /**
+   * Said out loud rather than left as an empty section: PRB-06 makes the gaps
+   * report list a problem with no fix path, and a reader looking at one
+   * deserves to know the site knows.
+   */
+  readonly problemNoFixPaths: string;
+  /**
+   * `{value}` / `{max}` are `difficulty` and `DIFFICULTY_MAX`, both figures
+   * from shared data interpolated at render time — never typed into a locale
+   * (AGENTS.md).
+   */
+  readonly problemDifficultyTemplate: string;
+  readonly problemCostLabel: string;
+  readonly problemPartsLabel: string;
+  readonly problemProceduresLabel: string;
+  /** The archived-copy link beside each numbered source. */
+  readonly problemSourceArchiveLabel: string;
+  /** Names the triage region for a screen reader; the banner itself is a chip. */
+  readonly problemTriageLabel: string;
+  /** `{system}` is a `glossarySystem.*` label. */
+  readonly problemSafetyNoticeTemplate: string;
+  /**
+   * AGENTS.md's "never present the site as a substitute for a qualified
+   * mechanic", as the standing notice PRB-03 requires. Rendered in **both**
+   * languages in one band, page locale first.
+   */
+  readonly problemSafetyNoticeBody: string;
+  /**
+   * PRB-04's visible caveat, rendered in both locales below `tsb`. `{tier}` is
+   * filled with `confidenceTier.<tier>` at render time.
+   */
+  readonly problemConfidenceCaveatTemplate: string;
+  /**
+   * The provisional-match warning in its **safety-critical** form (T204's
+   * binding note on T203 decision (a)): on a page where showing something that
+   * does not actually fit the reader's truck is the expensive failure, the
+   * standing `vehicleProvisionalNote` is not prominent enough.
+   */
+  readonly problemProvisionalSafetyNote: string;
 }
 
 const en: UiStrings = {
@@ -797,6 +899,58 @@ const en: UiStrings = {
   "fitmentFacet.transferCase": "transfer case",
   "fitmentFacet.trim": "trim",
   "fitmentFacet.drive": "drive",
+  navProblems: "Problems",
+  problemsHeading: "Problems",
+  problemsIntro:
+    "Start from what the truck is doing. Every entry says what is safe to do about it right now, what to check, what usually causes it, and what fixing it takes.",
+  problemsEmpty: "No problems have been written up yet.",
+  problemsCountTemplate: "{shown} of {total} problems",
+  problemBreadcrumbLabel: "Breadcrumb",
+  problemSymptomsHeading: "Symptoms",
+  problemDiagnosticsHeading: "Diagnostic steps",
+  problemCausesHeading: "Likely causes",
+  problemFixPathsHeading: "Fix paths",
+  problemSourcesHeading: "Sources",
+  problemRulesInLabel: "Points to",
+  problemRulesOutLabel: "Rules out",
+  problemNoCauses: "No root cause has been established for this one yet.",
+  problemNoDiagnostics: "No diagnostic procedure has been written up yet.",
+  problemNoFixPaths:
+    "No fix path has been written up for this problem yet. It is on the backlog.",
+  problemDifficultyTemplate: "Difficulty {value}/{max}",
+  problemCostLabel: "Cost",
+  problemPartsLabel: "Parts",
+  problemProceduresLabel: "Procedures",
+  problemSourceArchiveLabel: "archived copy",
+  problemTriageLabel: "Can you drive it?",
+  problemSafetyNoticeTemplate: "Safety notice — {system}.",
+  problemSafetyNoticeBody:
+    "This affects a safety-critical system. Reference material only: for safety-critical work, consult a qualified mechanic.",
+  problemConfidenceCaveatTemplate:
+    "{tier}. This entry is not backed by factory documentation — treat its values and steps as a starting point, not as manual authority.",
+  problemProvisionalSafetyNote:
+    "This is safety-critical, and the match to your truck is only provisional: it was made on generation, market, year and engine alone. Narrow your selection, and confirm against your own vehicle, before acting on anything here.",
+  "sourceKind.fsm": "Factory Service Manual",
+  "sourceKind.tsb": "Service bulletin",
+  "sourceKind.manufacturer": "Manufacturer literature",
+  "sourceKind.forum": "Owner forum",
+  "sourceKind.video": "Repair or build video",
+  "sourceKind.vendor": "Vendor catalogue",
+  "sourceKind.reference": "Reference work",
+  "sourceKind.first-hand": "First-hand",
+  "severity.safety-critical": "Safety-critical",
+  "severity.damaging": "Damages other parts",
+  "severity.stranding": "Can strand you",
+  "severity.degrading": "Works worse",
+  "severity.cosmetic": "Cosmetic",
+  "drivability.drive-normally": "Drive normally",
+  "drivability.drive-gently-repair-soon": "Drive gently — repair soon",
+  "drivability.do-not-drive": "Do not drive",
+  "drivability.tow-only": "Tow only",
+  "costBand.minimal": "Cheapest class of repair",
+  "costBand.moderate": "A normal parts-and-an-afternoon job",
+  "costBand.significant": "A major component or a shop bill",
+  "costBand.major": "A big share of what the truck is worth",
 };
 
 const es: UiStrings = {
@@ -1147,6 +1301,59 @@ const es: UiStrings = {
   "fitmentFacet.transferCase": "la caja de transferencia",
   "fitmentFacet.trim": "el nivel de equipamiento",
   "fitmentFacet.drive": "la tracción",
+  navProblems: "Problemas",
+  problemsHeading: "Problemas",
+  problemsIntro:
+    "Empiece por lo que está haciendo el carro. Cada ficha dice qué se puede hacer con seguridad en este momento, qué revisar, cuál suele ser la causa y qué implica la reparación.",
+  problemsEmpty: "Todavía no hay problemas documentados.",
+  problemsCountTemplate: "{shown} de {total} problemas",
+  problemBreadcrumbLabel: "Ruta de navegación",
+  problemSymptomsHeading: "Síntomas",
+  problemDiagnosticsHeading: "Pasos de diagnóstico",
+  problemCausesHeading: "Causas probables",
+  problemFixPathsHeading: "Rutas de reparación",
+  problemSourcesHeading: "Fuentes",
+  problemRulesInLabel: "Apunta a",
+  problemRulesOutLabel: "Descarta",
+  problemNoCauses: "Todavía no se ha establecido la causa de fondo.",
+  problemNoDiagnostics:
+    "Todavía no hay un procedimiento de diagnóstico escrito.",
+  problemNoFixPaths:
+    "Todavía no hay una ruta de reparación documentada para este problema. Queda pendiente.",
+  problemDifficultyTemplate: "Dificultad {value}/{max}",
+  problemCostLabel: "Costo",
+  problemPartsLabel: "Repuestos",
+  problemProceduresLabel: "Procedimientos",
+  problemSourceArchiveLabel: "copia archivada",
+  problemTriageLabel: "¿Puede manejarlo?",
+  problemSafetyNoticeTemplate: "Aviso de seguridad — {system}.",
+  problemSafetyNoticeBody:
+    "Esto afecta un sistema crítico para la seguridad. Material de referencia únicamente: en trabajos críticos para la seguridad, consulte a un mecánico calificado.",
+  problemConfidenceCaveatTemplate:
+    "{tier}. Esta ficha no se apoya en documentación de fábrica — tome sus valores y sus pasos como punto de partida, no como autoridad del manual.",
+  problemProvisionalSafetyNote:
+    "Esto es crítico para la seguridad y la coincidencia con su carro es apenas provisional: se hizo solo con generación, mercado, año y motor. Afine su selección, y confirme contra su propio vehículo, antes de actuar con base en esta página.",
+  "sourceKind.fsm": "Manual de servicio de fábrica",
+  "sourceKind.tsb": "Boletín de servicio",
+  "sourceKind.manufacturer": "Literatura de fábrica",
+  "sourceKind.forum": "Foro de dueños",
+  "sourceKind.video": "Video de reparación o armado",
+  "sourceKind.vendor": "Catálogo de proveedor",
+  "sourceKind.reference": "Obra de referencia",
+  "sourceKind.first-hand": "De primera mano",
+  "severity.safety-critical": "Crítico para la seguridad",
+  "severity.damaging": "Daña otras piezas",
+  "severity.stranding": "Lo puede dejar varado",
+  "severity.degrading": "Funciona peor",
+  "severity.cosmetic": "Cosmético",
+  "drivability.drive-normally": "Maneje normalmente",
+  "drivability.drive-gently-repair-soon": "Maneje con cuidado — repare pronto",
+  "drivability.do-not-drive": "No lo maneje",
+  "drivability.tow-only": "Solo en grúa",
+  "costBand.minimal": "La reparación más barata",
+  "costBand.moderate": "Repuestos y una tarde de trabajo",
+  "costBand.significant": "Una pieza mayor o una factura de taller",
+  "costBand.major": "Buena parte de lo que vale el carro",
 };
 
 export const ui: Record<Locale, UiStrings> = { en, es };
@@ -1212,6 +1419,38 @@ export function fitmentFacetLabel(
   facet: OptionalSelectionFacet
 ): string {
   return strings[`fitmentFacet.${facet}`];
+}
+
+/** The label for a source kind id — the only supported way to read one. */
+export function sourceKindLabel(strings: UiStrings, kind: SourceKind): string {
+  return strings[`sourceKind.${kind}`];
+}
+
+/** The label for a `PROBLEM_SEVERITIES` value (T401's severity chip). */
+export function problemSeverityLabel(
+  strings: UiStrings,
+  severity: ProblemSeverity
+): string {
+  return strings[`severity.${severity}`];
+}
+
+/**
+ * The label for a `DRIVABILITY_STATES` value (PRB-05).
+ *
+ * Read once per locale on every problem page, not once for the page locale:
+ * the triage banner is the one surface the spec requires in **both** languages
+ * regardless of which page a reader is on.
+ */
+export function drivabilityLabel(
+  strings: UiStrings,
+  state: DrivabilityState
+): string {
+  return strings[`drivability.${state}`];
+}
+
+/** The accessible name of a cost band, beside its `$` glyphs. */
+export function costBandLabel(strings: UiStrings, band: CostBand): string {
+  return strings[`costBand.${band}`];
 }
 
 /** The label for a confidence tier id. */

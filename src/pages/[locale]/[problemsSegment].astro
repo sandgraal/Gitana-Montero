@@ -1,0 +1,418 @@
+---
+/**
+ * The problems index (PRB-01…PRB-05) — the way into the problem finder.
+ *
+ * ## Scope: this is the listing, not the navigation
+ *
+ * T402 owns symptom-first navigation (PRB-02) — the searchable bilingual
+ * symptom index. This page is what that search lands on and what a reader
+ * browsing the section sees: every problem, worst triage first, filtered
+ * through the vehicle selector. It ships with T401 rather than with T402
+ * because the selector obligation the task carries — dim-not-hide plus a
+ * prominent provisional indicator — is a *listing* behaviour, and because a
+ * detail page whose breadcrumb pointed at a 404 would be a broken template.
+ *
+ * ## Ordering is triage, not the alphabet
+ *
+ * `compareProblems` in `src/lib/problems.ts`: drivability first, then severity,
+ * then the reader's own collation. A list of problems is read by someone
+ * deciding whether to drive; "tow only" belongs above "safety-critical but
+ * drives normally", and both belong above a rattle.
+ *
+ * ## The vehicle filter (FIT-03, T204)
+ *
+ * Identical semantics to the glossary and the community directory, from the
+ * same module: a row that does not fit the reader's truck **stays**, at 55%
+ * opacity, carrying a "filtered" tag — the site offering its opinion rather
+ * than enforcing it. A row whose match leaned on a facet the reader has not
+ * answered carries the provisional mark (T203 review, F8), and on this page
+ * the mark is drawn in the safety-critical chip token for rows that are
+ * safety-critical, per T204's "especially prominent on safety surfaces".
+ *
+ * Nothing here interprets a fitment: `matchesVehicle` and
+ * `provisionalMatchFacets` do, through `src/lib/vehicle-listing.ts` (FIT-01).
+ *
+ * refs specs/001-foundation (PRB-01, PRB-05, FIT-03, I18N-01, I18N-04, I18N-08),
+ * specs/001-foundation/design/HANDOFF-DESIGN.md
+ */
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import VehicleFitSummary from "../../components/VehicleFitSummary.astro";
+import {
+  LOCALE_BCP47,
+  isLocale,
+  localeHref,
+  type Locale,
+} from "../../i18n/routing";
+import {
+  COLLECTION_ROUTE_SEGMENTS,
+  collectionRouteParams,
+  collectionRoutePaths,
+} from "../../i18n/routes";
+import {
+  drivabilityLabel,
+  glossarySystemLabel,
+  problemSeverityLabel,
+  t,
+} from "../../i18n/ui";
+import { formatCount } from "../../lib/glossary-filter";
+import { isSafetyCritical } from "../../lib/safety";
+import { buildFitmentTable } from "../../lib/vehicle-listing";
+import { compareProblems, problemRoutePath } from "../../lib/problems";
+
+export function getStaticPaths() {
+  return collectionRouteParams("problems", "problemsSegment");
+}
+
+const { locale: param } = Astro.params;
+if (!isLocale(param)) {
+  throw new Error(`Unknown locale segment: ${String(param)}`);
+}
+const locale: Locale = param;
+const strings = t(locale);
+const routes = collectionRoutePaths("problems");
+const segment = COLLECTION_ROUTE_SEGMENTS.problems[locale];
+
+const collator = new Intl.Collator(LOCALE_BCP47[locale], {
+  sensitivity: "base",
+});
+
+const entries = await getCollection("problems");
+
+const problems = entries
+  .map((entry) => {
+    const { data } = entry;
+    const prose = data.prose[locale];
+    return {
+      id: entry.id,
+      href: problemRoutePath(segment, prose.slug),
+      title: prose.title,
+      summary: prose.summary,
+      system: data.system,
+      severity: data.severity,
+      drivability: data.drivability,
+      safetyCritical: isSafetyCritical(data),
+      /** Read by the vehicle filter; never interpreted here (FIT-01). */
+      fitment: data.fitment,
+      symptoms: data.symptoms.map((id) => prose.symptoms[id] ?? id),
+    };
+  })
+  .sort((a, b) => compareProblems(a, b, collator));
+
+const fitmentTable = buildFitmentTable(
+  problems.map((problem) => problem.fitment)
+);
+---
+
+<BaseLayout
+  locale={locale}
+  routePathByLocale={routes}
+  title={`${strings.problemsHeading} — ${strings.siteTagline}`}
+  description={strings.problemsIntro}
+>
+  <section class="problems" data-problems>
+    <div class="problems__intro">
+      <h1>{strings.problemsHeading}</h1>
+      <p>{strings.problemsIntro}</p>
+    </div>
+
+    {
+      problems.length === 0 ? (
+        <p class="problems__empty">{strings.problemsEmpty}</p>
+      ) : (
+        <>
+          <p class="problems__count" aria-live="polite">
+            {formatCount(
+              strings.problemsCountTemplate,
+              problems.length,
+              problems.length
+            )}
+          </p>
+
+          <VehicleFitSummary locale={locale} fitments={fitmentTable.table} />
+
+          <ul class="problems__list">
+            {problems.map((problem) => (
+              <li
+                class="problem-card"
+                data-fitment={fitmentTable.indexOf(problem.fitment)}
+                data-safety-critical={String(problem.safetyCritical)}
+              >
+                <p
+                  class="problem-card__triage"
+                  data-triage={problem.drivability}
+                >
+                  {drivabilityLabel(strings, problem.drivability)}
+                </p>
+                <h2 class="problem-card__title">
+                  <a href={localeHref(locale, problem.href)}>{problem.title}</a>
+                </h2>
+                <p class="problem-card__summary">{problem.summary}</p>
+                <p class="problem-card__chips">
+                  <span class="chip chip--system">
+                    {glossarySystemLabel(strings, problem.system)}
+                  </span>
+                  <span
+                    class="chip chip--severity"
+                    data-severity={problem.severity}
+                  >
+                    {problemSeverityLabel(strings, problem.severity)}
+                  </span>
+                  {/*
+                   * One chip, not two (review F6): the safety chip is
+                   * suppressed when the severity chip beside it already says
+                   * the same word. It still appears on its own when the
+                   * *system* is what makes the card safety-critical.
+                   */}
+                  {problem.safetyCritical &&
+                    problem.severity !== "safety-critical" && (
+                      <span class="chip chip--safety">
+                        {problemSeverityLabel(strings, "safety-critical")}
+                      </span>
+                    )}
+                </p>
+                {problem.symptoms.length > 0 && (
+                  <ul class="problem-card__symptoms">
+                    {problem.symptoms.map((symptom) => (
+                      <li>{symptom}</li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<script>
+  import { buildTaxonomy } from "../../lib/fitment";
+  import { readSelectorPayload } from "../../lib/vehicle-taxonomy";
+  import { createVehicleListingView } from "../../lib/vehicle-listing";
+  import {
+    onVehicleSelectionChange,
+    readVehicleSelection,
+  } from "../../lib/vehicle-selection";
+
+  /**
+   * The vehicle filter, and only that (FIT-03). Search and symptom facets are
+   * T402's. DOM wiring only: what fits, and whether the fit leaned on silence,
+   * is `src/lib/vehicle-listing.ts` over `src/lib/fitment/`.
+   */
+  function enhance(root: HTMLElement): void {
+    const cards = [...root.querySelectorAll<HTMLElement>(".problem-card")];
+    if (cards.length === 0) return;
+
+    const view = createVehicleListingView({
+      root,
+      cards,
+      taxonomy: buildTaxonomy(readSelectorPayload(document)?.nodes ?? []),
+      lang: document.documentElement.lang,
+    });
+    if (view === null) return;
+
+    view.apply(readVehicleSelection(window));
+    onVehicleSelectionChange(window, (selection) => view.apply(selection));
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>(
+    "[data-problems]"
+  )) {
+    enhance(root);
+  }
+</script>
+
+<style is:global>
+  /*
+   * T204's "especially prominent on safety-critical surfaces". The provisional
+   * marker is built in the browser by `src/lib/vehicle-listing.ts`, so it
+   * cannot carry Astro's scoped-style attribute and its override has to be
+   * global — scoped to this page's own card class, which nothing else uses.
+   *
+   * The upgrade is the safety-critical chip token (#7A2E2E on #F6E3D8, 7.48:1)
+   * instead of the quiet confidence-chip one: on a row a reader might act on
+   * with a wrench, "this matched partly because you did not say" is a warning,
+   * not a footnote.
+   */
+  .problem-card[data-safety-critical="true"] .vehicle-fit__tag--provisional {
+    color: #7a2e2e;
+    background: #f6e3d8;
+  }
+
+  .problem-card[data-safety-critical="true"] .vehicle-fit {
+    color: #55493c;
+    font-weight: 500;
+  }
+</style>
+
+<style>
+  /*
+   * Palette and card anatomy from HANDOFF-DESIGN.md, scoped to this page. As on
+   * the detail template, `faint` (#A99C88) is never used for text — 2.69:1 on
+   * a panel — and links on tinted backgrounds use `rust-deep`.
+   */
+  .problems {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 72rem;
+  }
+
+  .problems__intro h1 {
+    margin: 0 0 0.5rem;
+    font-size: 1.875rem;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #2b2620;
+  }
+
+  .problems__intro p {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: #55493c;
+    max-width: 72ch;
+  }
+
+  .problems__count {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #6e6559;
+  }
+
+  .problems__empty {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: #6e6559;
+  }
+
+  .problems__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .problem-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    background: #fff;
+    border: 1px solid #e4ddd1;
+    border-radius: 8px;
+    padding: 1.125rem 1.25rem;
+  }
+
+  /*
+   * FIT-03's dim-and-tag: never hidden, and the opacity is never the only
+   * signal — `src/lib/vehicle-listing.ts` adds the row of words that says the
+   * same thing.
+   */
+  .problem-card[data-fits="false"] {
+    opacity: 0.55;
+    background: #fbf9f4;
+  }
+
+  .problem-card__triage {
+    margin: 0;
+    align-self: flex-start;
+    border-radius: 4px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  /* HANDOFF-DESIGN's validated triage table, as a compact card chip. */
+  .problem-card__triage[data-triage="drive-normally"] {
+    background: #3e7b4f;
+  }
+
+  .problem-card__triage[data-triage="drive-gently-repair-soon"] {
+    background: #8a5e14;
+  }
+
+  .problem-card__triage[data-triage="do-not-drive"] {
+    background: #a32c2c;
+  }
+
+  .problem-card__triage[data-triage="tow-only"] {
+    background: #5a1f1f;
+  }
+
+  .problem-card__title {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .problem-card__title a {
+    color: #93441f;
+    text-decoration: none;
+  }
+
+  .problem-card__title a:hover,
+  .problem-card__title a:focus {
+    text-decoration: underline;
+  }
+
+  .problem-card__summary {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: #55493c;
+  }
+
+  .problem-card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 4px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .chip--system,
+  .chip--severity {
+    color: #55493c;
+    background: #efe9dd;
+    border: 1px solid #e4ddd1;
+  }
+
+  .chip--severity[data-severity="safety-critical"],
+  .chip--safety {
+    font-weight: 700;
+    color: #7a2e2e;
+    background: #f6e3d8;
+    border: 1px solid #e4c4b0;
+  }
+
+  .problem-card__symptoms {
+    margin: 0;
+    padding-left: 1.125rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #2b2620;
+  }
+
+  @media (max-width: 52rem) {
+    .problems__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

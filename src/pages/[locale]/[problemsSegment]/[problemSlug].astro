@@ -1,0 +1,702 @@
+---
+/**
+ * One problem (PRB-01, PRB-03, PRB-04, PRB-05) — the flagship designed template
+ * and the highest-stakes page on this site.
+ *
+ * > Reference. A symptom-driven problem finder … comprehensive enough that
+ * > someone with a broken Montero finds their answer here. — AGENTS.md
+ *
+ * ## The order is the design, and the design is a safety decision
+ *
+ * The Main / ProblemaES artboards fix the order and it is not arbitrary: a
+ * reader arrives mid-problem, often on a phone, sometimes at the roadside, and
+ * the page answers their questions in the order they will ask them.
+ *
+ *  1. **Title and chips** — is this even my truck? (fitment, confidence,
+ *     safety-critical.)
+ *  2. **Triage banner** — can I drive it? **In both languages, always**
+ *     (PRB-05). This is the only surface on the site that carries both locales
+ *     unconditionally; see `TriageBanner.astro`.
+ *  3. **Safety notice** — both languages in one band, page locale first
+ *     (PRB-03), when `src/lib/safety.ts` says so.
+ *  4. **Confidence caveat** — dashed, below `tsb` only (PRB-04).
+ *  5. **Symptoms / causes**, then **diagnostic steps**, then **fix paths**,
+ *     then **numbered sources**.
+ *
+ * ### One deliberate departure from the artboard, and why
+ *
+ * The artboard's two-up is *symptoms / diagnostics*. Here it is **symptoms /
+ * likely causes**, with diagnostics full-width underneath. The artboard's
+ * sample entry had no `causes` section to place, and the schema makes each
+ * diagnostic step render what it *points to* and *rules out* by naming causes —
+ * so a reader meets the causes before the steps that reference them, and the
+ * steps get the width their cross-reference chips need. Everything else
+ * (order, tokens, type scale, chip anatomy) follows the artboard.
+ *
+ * ## Where the vehicle selector shows up
+ *
+ * `EntryFitNotice.astro`, directly under the triage banner: on a detail page
+ * there is no list to dim, so FIT-03's "never hide, always say" becomes words.
+ * On a safety-critical entry the provisional-match indicator is rendered in the
+ * safety notice's own amber band with the stronger sentence — T204's binding
+ * note on T203's decision (a), which makes the indicator especially prominent
+ * exactly where showing a page that does not fit the reader's truck is the
+ * expensive failure.
+ *
+ * ## Numbers
+ *
+ * Every figure on this page — difficulty, time, years, position in an ordered
+ * list — comes from shared `data` and is formatted by `Intl` or by
+ * `src/lib/problems.ts` at render time. Nothing numeric is typed into either
+ * locale (AGENTS.md; `defineEntrySchema` throws at define time if it is), and
+ * every figure renders in IBM Plex Mono per the handoff's "if a value comes
+ * from shared `data`, it renders in Plex Mono".
+ *
+ * refs specs/001-foundation (PRB-01, PRB-03, PRB-04, PRB-05, I18N-01, I18N-04,
+ * I18N-05, I18N-08), specs/001-foundation/design/HANDOFF-DESIGN.md
+ */
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import TriageBanner from "../../../components/TriageBanner.astro";
+import SafetyNotice from "../../../components/SafetyNotice.astro";
+import ConfidenceCaveat from "../../../components/ConfidenceCaveat.astro";
+import EntryFitNotice from "../../../components/EntryFitNotice.astro";
+import {
+  LOCALES,
+  LOCALE_BCP47,
+  isLocale,
+  localeHref,
+  type Locale,
+  type LocalizedRoutePaths,
+} from "../../../i18n/routing";
+import {
+  COLLECTION_ROUTE_SEGMENTS,
+  collectionRoutePath,
+} from "../../../i18n/routes";
+import {
+  confidenceTierLabel,
+  costBandLabel,
+  generationLabel,
+  glossarySystemLabel,
+  problemSeverityLabel,
+  sourceKindLabel,
+  t,
+} from "../../../i18n/ui";
+import { needsConfidenceCaveat } from "../../../lib/confidence";
+import { isSafetyCritical } from "../../../lib/safety";
+import {
+  assertProblemSlugs,
+  causeConfidence,
+  causeConfidenceDiffers,
+  costBandAccessibleName,
+  costBandGlyphs,
+  fitmentYearsLabel,
+  fixTimeLabel,
+  problemRoutePath,
+} from "../../../lib/problems";
+import { DIFFICULTY_MAX } from "../../../schemas/problems";
+import {
+  GENERATION_IDS,
+  type GenerationId,
+} from "../../../schemas/vehicle-vocabulary";
+
+/**
+ * One page per entry per locale, at that locale's own segment and that
+ * entry's own slug (I18N-01, I18N-05).
+ *
+ * `assertProblemSlugs` runs here rather than in a check script because this is
+ * the moment the URLs are minted: two entries claiming one address is a build
+ * error naming both, not a page that silently overwrote another.
+ */
+export async function getStaticPaths() {
+  const entries = await getCollection("problems");
+  assertProblemSlugs(entries);
+
+  return entries.flatMap((entry) =>
+    LOCALES.map((locale) => ({
+      params: {
+        locale,
+        problemsSegment: COLLECTION_ROUTE_SEGMENTS.problems[locale],
+        problemSlug: entry.data.prose[locale].slug,
+      },
+      props: { entry },
+    }))
+  );
+}
+
+const { locale: param } = Astro.params;
+if (!isLocale(param)) {
+  throw new Error(`Unknown locale segment: ${String(param)}`);
+}
+const locale: Locale = param;
+const strings = t(locale);
+
+const { entry } = Astro.props;
+const { data } = entry;
+const prose = data.prose[locale];
+
+/**
+ * This entry's URL in every locale, so `BaseLayout` emits a symmetric hreflang
+ * pair and the locale switcher crosses to a page that was actually built
+ * (I18N-04, I18N-05).
+ */
+const routes = Object.fromEntries(
+  LOCALES.map((each) => [
+    each,
+    problemRoutePath(
+      COLLECTION_ROUTE_SEGMENTS.problems[each],
+      data.prose[each].slug
+    ),
+  ])
+) as LocalizedRoutePaths;
+
+const safetyCritical = isSafetyCritical(data);
+const showCaveat = needsConfidenceCaveat(data.confidence);
+
+/** `Gen 3`, `1999–2006`, `us · cr` — the artboard's Plex Mono chip row. */
+const generationChips = data.fitment.gens.map((gen) =>
+  (GENERATION_IDS as readonly string[]).includes(gen)
+    ? generationLabel(strings, gen as GenerationId)
+    : gen
+);
+const yearsChip = fitmentYearsLabel(data.fitment.years);
+const marketChip =
+  data.fitment.markets === undefined
+    ? null
+    : data.fitment.markets.map((market) => market.toUpperCase()).join(" · ");
+
+/** Cause phrases, for the diagnostic steps' cross-references. */
+const causePhrase = new Map(
+  data.causes.map((cause) => [cause.id, prose.causes[cause.id] ?? cause.id])
+);
+---
+
+<BaseLayout
+  locale={locale}
+  routePathByLocale={routes}
+  title={`${prose.title} — ${strings.problemsHeading}`}
+  description={prose.summary}
+>
+  <article class="problem">
+    <nav
+      class="problem__breadcrumb"
+      aria-label={strings.problemBreadcrumbLabel}
+    >
+      <a href={localeHref(locale, collectionRoutePath("problems", locale))}>
+        {strings.problemsHeading}
+      </a>
+      <span aria-hidden="true">/</span>
+      <span>{glossarySystemLabel(strings, data.system)}</span>
+    </nav>
+
+    <header class="problem__head">
+      <h1>{prose.title}</h1>
+      <p class="problem__summary">{prose.summary}</p>
+      <p class="problem__chips">
+        {
+          generationChips.map((chip) => (
+            <span class="chip chip--data">{chip}</span>
+          ))
+        }
+        {yearsChip !== null && <span class="chip chip--data">{yearsChip}</span>}
+        {
+          marketChip !== null && (
+            <span class="chip chip--data">{marketChip}</span>
+          )
+        }
+        <span class="chip chip--severity" data-severity={data.severity}>
+          {problemSeverityLabel(strings, data.severity)}
+        </span>
+        <span class="chip chip--confidence">
+          {confidenceTierLabel(strings, data.confidence)}
+        </span>
+        {
+          /*
+           * The safety chip only when the severity chip is not already saying
+           * the same word (review F6). `severity: safety-critical` rendered
+           * both, so the entry that most needs a reader's attention showed the
+           * same phrase twice and read as a rendering bug. The chip still
+           * appears on its own when the *system* is what makes the entry
+           * safety-critical — a `cosmetic` problem on the brakes shows
+           * "Cosmetic" and "Safety-critical", which are two different, true
+           * things.
+           */
+        }
+        {
+          safetyCritical && data.severity !== "safety-critical" && (
+            <span class="chip chip--safety">
+              {problemSeverityLabel(strings, "safety-critical")}
+            </span>
+          )
+        }
+      </p>
+    </header>
+
+    <TriageBanner locale={locale} state={data.drivability} />
+
+    <EntryFitNotice
+      locale={locale}
+      fitment={data.fitment}
+      safetyCritical={safetyCritical}
+    />
+
+    {safetyCritical && <SafetyNotice locale={locale} system={data.system} />}
+
+    {showCaveat && <ConfidenceCaveat locale={locale} tier={data.confidence} />}
+
+    <div class="problem__two-up">
+      <section class="panel">
+        <h2 class="panel__title">{strings.problemSymptomsHeading}</h2>
+        <ul class="panel__list">
+          {data.symptoms.map((id) => <li>{prose.symptoms[id] ?? id}</li>)}
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel__title">{strings.problemCausesHeading}</h2>
+        {
+          data.causes.length === 0 ? (
+            <p class="panel__empty">{strings.problemNoCauses}</p>
+          ) : (
+            <ol class="panel__list">
+              {data.causes.map((cause) => (
+                <li>
+                  {prose.causes[cause.id] ?? cause.id}
+                  {causeConfidenceDiffers(
+                    data.confidence,
+                    cause.confidence
+                  ) && (
+                    <span class="chip chip--confidence chip--inline">
+                      {confidenceTierLabel(
+                        strings,
+                        causeConfidence(data.confidence, cause.confidence)
+                      )}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          )
+        }
+      </section>
+    </div>
+
+    <section class="panel">
+      <h2 class="panel__title">{strings.problemDiagnosticsHeading}</h2>
+      {
+        data.diagnosticSteps.length === 0 ? (
+          <p class="panel__empty">{strings.problemNoDiagnostics}</p>
+        ) : (
+          <ol class="panel__list panel__list--steps">
+            {data.diagnosticSteps.map((step) => (
+              <li>
+                <span class="step__action">
+                  {prose.diagnosticSteps[step.id] ?? step.id}
+                </span>
+                {step.rulesIn.length > 0 && (
+                  <span class="step__rule">
+                    <span class="step__rule-label">
+                      {strings.problemRulesInLabel}
+                    </span>
+                    <span>
+                      {step.rulesIn
+                        .map((id) => causePhrase.get(id) ?? id)
+                        .join(" · ")}
+                    </span>
+                  </span>
+                )}
+                {step.rulesOut.length > 0 && (
+                  <span class="step__rule">
+                    <span class="step__rule-label">
+                      {strings.problemRulesOutLabel}
+                    </span>
+                    <span>
+                      {step.rulesOut
+                        .map((id) => causePhrase.get(id) ?? id)
+                        .join(" · ")}
+                    </span>
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        )
+      }
+    </section>
+
+    <section class="panel">
+      <h2 class="panel__title">{strings.problemFixPathsHeading}</h2>
+      {
+        data.fixPaths.length === 0 ? (
+          <p class="panel__empty">{strings.problemNoFixPaths}</p>
+        ) : (
+          <div class="fixes">
+            {data.fixPaths.map((fix) => (
+              <div class="fix">
+                <h3 class="fix__title">
+                  {prose.fixPaths[fix.id]?.title ?? fix.id}
+                </h3>
+                <p class="fix__chips">
+                  {fix.time !== undefined && (
+                    <span class="chip chip--data">
+                      {fixTimeLabel(fix.time, LOCALE_BCP47[locale])}
+                    </span>
+                  )}
+                  {/*
+                   * `role="img"` + `aria-label`, not a visually-hidden span:
+                   * `$–$$` is a pictogram, and this is the pattern that gives
+                   * it a name without putting absolutely-positioned text on
+                   * the page (which Pa11y flags as an unresolvable-background
+                   * contrast advisory). The words come from `costBand.<id>`
+                   * in both locales, and `costBandAccessibleName` names BOTH
+                   * ends of a range — announcing only `from` hid the upper half
+                   * of the estimate from exactly the readers who cannot see the
+                   * glyphs (review F2).
+                   */}
+                  <span
+                    class="chip chip--data"
+                    role="img"
+                    aria-label={`${strings.problemCostLabel}: ${costBandAccessibleName(
+                      fix.cost,
+                      (band) => costBandLabel(strings, band)
+                    )}`}
+                  >
+                    {costBandGlyphs(fix.cost)}
+                  </span>
+                  <span class="chip chip--data">
+                    {strings.problemDifficultyTemplate
+                      .replace("{value}", String(fix.difficulty))
+                      .replace("{max}", String(DIFFICULTY_MAX))}
+                  </span>
+                </p>
+                {prose.fixPaths[fix.id]?.detail !== undefined && (
+                  <p class="fix__detail">{prose.fixPaths[fix.id]?.detail}</p>
+                )}
+                {fix.parts.length > 0 && (
+                  <p class="fix__refs">
+                    <span class="fix__refs-label">
+                      {strings.problemPartsLabel}
+                    </span>
+                    {fix.parts.map((part) => (
+                      <span class="chip chip--ref">{part}</span>
+                    ))}
+                  </p>
+                )}
+                {fix.procedures.length > 0 && (
+                  <p class="fix__refs">
+                    <span class="fix__refs-label">
+                      {strings.problemProceduresLabel}
+                    </span>
+                    {fix.procedures.map((procedure) => (
+                      <span class="chip chip--ref">{procedure}</span>
+                    ))}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )
+      }
+    </section>
+
+    {
+      data.sources.length > 0 && (
+        <section class="sources">
+          <h2 class="panel__title">{strings.problemSourcesHeading}</h2>
+          <ol class="sources__list">
+            {data.sources.map((source) => (
+              <li>
+                <a href={source.url} rel="nofollow noopener">
+                  {source.title}
+                </a>
+                <span class="sources__meta">
+                  {sourceKindLabel(strings, source.kind)}
+                </span>
+                <a
+                  class="sources__archive"
+                  href={source.archiveUrl}
+                  rel="nofollow noopener"
+                >
+                  {strings.problemSourceArchiveLabel}
+                </a>
+                <time datetime={source.accessed}>{source.accessed}</time>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  /*
+   * Palette, type scale and card anatomy from
+   * specs/001-foundation/design/HANDOFF-DESIGN.md and the Main / ProblemaES
+   * artboards, scoped to this page. Two departures, both forced by constraints
+   * the handoff itself lists:
+   *
+   * 1. `faint` (#A99C88) is never used for text — 2.69:1 on a panel against a
+   *    4.5:1 requirement. Secondary text is `muted` (#6E6559, 5.72:1) and
+   *    source metadata is `muted-strong` (#55493C, 8.9:1). Same departure
+   *    `[glossarySegment].astro` documents.
+   * 2. Links on the `chip` background use `rust-deep` (#93441F, 5.6:1) rather
+   *    than `rust` (4.22:1 there).
+   */
+  .problem {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 72rem;
+  }
+
+  .problem__breadcrumb {
+    display: flex;
+    gap: 0.5rem;
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.8125rem;
+    color: #6e6559;
+  }
+
+  .problem__breadcrumb a {
+    color: #93441f;
+  }
+
+  .problem__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .problem__head h1 {
+    margin: 0;
+    font-size: 2.125rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.3px;
+    color: #2b2620;
+  }
+
+  .problem__summary {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #55493c;
+    max-width: 72ch;
+  }
+
+  .problem__chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* "If a value comes from shared `data`, it renders in Plex Mono." */
+  .chip--data {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    background: #efe9dd;
+    border: 1px solid #e4ddd1;
+    /* 7.22:1. */
+    color: #55493c;
+  }
+
+  .chip--confidence {
+    font-weight: 600;
+    /* 6.39:1. */
+    color: #4a5568;
+    background: #e8edf2;
+    border: 1px solid #d2dae3;
+    padding: 0.25rem 0.625rem;
+  }
+
+  .chip--severity {
+    font-weight: 600;
+    color: #55493c;
+    background: #efe9dd;
+    border: 1px solid #e4ddd1;
+    padding: 0.25rem 0.625rem;
+  }
+
+  .chip--severity[data-severity="safety-critical"],
+  .chip--safety {
+    font-weight: 700;
+    /* 7.48:1. */
+    color: #7a2e2e;
+    background: #f6e3d8;
+    border: 1px solid #e4c4b0;
+    padding: 0.25rem 0.625rem;
+  }
+
+  .chip--inline {
+    margin-left: 0.5rem;
+  }
+
+  .chip--ref {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    background: #fbf9f4;
+    border: 1px solid #e4ddd1;
+    color: #55493c;
+  }
+
+  .problem__two-up {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: #fff;
+    border: 1px solid #e4ddd1;
+    border-radius: 8px;
+    padding: 1.375rem 1.5rem;
+  }
+
+  .panel__title {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    /* 5.72:1 on white. */
+    color: #6e6559;
+  }
+
+  .panel__list {
+    margin: 0;
+    padding-left: 1.125rem;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: #2b2620;
+  }
+
+  .panel__list--steps > li {
+    margin-bottom: 0.625rem;
+  }
+
+  .panel__empty {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: #6e6559;
+  }
+
+  .step__action {
+    display: block;
+  }
+
+  .step__rule {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: #55493c;
+  }
+
+  .step__rule-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #6e6559;
+  }
+
+  .fixes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .fix {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    border: 1px solid #e4ddd1;
+    border-radius: 8px;
+    padding: 1rem 1.125rem;
+  }
+
+  .fix__title {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #2b2620;
+  }
+
+  .fix__chips,
+  .fix__refs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+  }
+
+  .fix__refs-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #6e6559;
+  }
+
+  .fix__detail {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #55493c;
+  }
+
+  .sources {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    border-top: 1px solid #e4ddd1;
+    padding-top: 1.125rem;
+  }
+
+  .sources__list {
+    margin: 0;
+    padding-left: 1.5rem;
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.9;
+    /* 8.9:1 on paper — `muted-strong`, never the handoff's `faint`. */
+    color: #55493c;
+  }
+
+  .sources__list a {
+    color: #93441f;
+  }
+
+  .sources__meta,
+  .sources__archive,
+  .sources time {
+    margin-left: 0.5rem;
+  }
+
+  @media (max-width: 52rem) {
+    .problem__two-up,
+    .fixes {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .problem__head h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>

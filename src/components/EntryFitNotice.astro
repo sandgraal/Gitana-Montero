@@ -1,0 +1,255 @@
+---
+/**
+ * One entry's fit against the reader's selected vehicle, on a *detail* page
+ * (FIT-03, and T204's binding provisional-indicator obligation).
+ *
+ * `VehicleFitSummary.astro` + `src/lib/vehicle-listing.ts` answer this for a
+ * *listing* — many rows, dim-not-hide, a count line. A detail page is one row
+ * and no count, and the two things it has to be able to say are different:
+ *
+ *  1. **"this does not fit the truck you chose"** — said, never acted on. The
+ *     page is not hidden, redirected or greyed out: a reader who arrived here
+ *     from a search may well know better than the fitment, and FIT-03's
+ *     dim-and-tag rule is the site offering its opinion rather than enforcing
+ *     it. On a one-entry page there is nothing to dim, so the words carry it
+ *     all.
+ *  2. **"this matched only provisionally"** — the condition T203's permissive
+ *     matching was accepted under (T203 review, F8): a fitment facet the
+ *     visitor has not answered is treated as unrestricted, so a page can match
+ *     a truck it would not match if the visitor had said more. T204's task line
+ *     makes rendering that indicator binding, and **especially prominent on
+ *     safety surfaces** — "showing a procedure that does not actually fit the
+ *     reader's truck is the expensive failure".
+ *
+ * That second point is why `safetyCritical` is a prop. On a safety-critical
+ * entry the provisional row is drawn in the safety notice's own amber band
+ * rather than the quiet dashed one, and it uses the stronger sentence
+ * (`problemProvisionalSafetyNote`), which names the risk and tells the reader
+ * what to do about it instead of merely noting the mark.
+ *
+ * ## What decides
+ *
+ * `matchesVehicle` and `provisionalMatchFacets`, and nothing else (FIT-01).
+ * This component reads DOM attributes and toggles `hidden`; it never interprets
+ * a fitment. With no JavaScript, no selector or no selection there is nothing
+ * to say, and the block stays hidden — which is correct, not degraded: an
+ * unfiltered page is the complete page.
+ *
+ * The block is server-rendered hidden rather than built at runtime (the trick
+ * `src/lib/vehicle-listing.ts` uses for listings), because that trade-off was
+ * about *per-row* weight across 154 cards. Here it is one block on one page.
+ *
+ * refs specs/001-foundation (FIT-01, FIT-03, I18N-08, PRB-03)
+ */
+import { OPTIONAL_SELECTION_FACETS } from "../lib/fitment";
+import { fitmentFacetLabel, t } from "../i18n/ui";
+import type { Locale } from "../i18n/routing";
+
+interface Props {
+  locale: Locale;
+  /** The entry's own fitment, passed straight through — never re-derived. */
+  fitment: unknown;
+  /** Drives the prominent variant; `src/lib/safety.ts` is what computes it. */
+  safetyCritical?: boolean;
+}
+
+const { locale, fitment, safetyCritical = false } = Astro.props;
+const strings = t(locale);
+
+const facetLabels = Object.fromEntries(
+  OPTIONAL_SELECTION_FACETS.map((facet) => [
+    facet,
+    fitmentFacetLabel(strings, facet),
+  ])
+);
+---
+
+<div
+  class="entry-fit"
+  data-entry-fit-notice
+  data-fitment={JSON.stringify(fitment ?? null)}
+  data-safety-critical={String(safetyCritical)}
+  data-facet-labels={JSON.stringify(facetLabels)}
+  data-provisional-template={strings.vehicleProvisionalDetailTemplate}
+  hidden
+>
+  <p class="entry-fit__row entry-fit__row--miss" data-entry-fit-miss hidden>
+    <span class="entry-fit__tag">{strings.vehicleFilteredTag}</span>
+    <span>{strings.vehicleDoesNotFitLabel}</span>
+  </p>
+  <p
+    class:list={[
+      "entry-fit__row",
+      "entry-fit__row--provisional",
+      safetyCritical && "entry-fit__row--urgent",
+    ]}
+    data-entry-fit-provisional
+    hidden
+  >
+    <span class="entry-fit__tag entry-fit__tag--provisional">
+      {strings.vehicleProvisionalLabel}
+    </span>
+    <span>
+      {
+        safetyCritical
+          ? strings.problemProvisionalSafetyNote
+          : strings.vehicleProvisionalNote
+      }
+      <span data-entry-fit-facets></span>
+    </span>
+  </p>
+</div>
+
+<script>
+  import { buildTaxonomy } from "../lib/fitment";
+  import {
+    matchesVehicle,
+    provisionalMatchFacets,
+  } from "../lib/fitment/index.ts";
+  import { readSelectorPayload } from "../lib/vehicle-taxonomy";
+  import { readFacetLabels } from "../lib/vehicle-listing";
+  import {
+    onVehicleSelectionChange,
+    readVehicleSelection,
+    type StoredVehicleSelection,
+  } from "../lib/vehicle-selection";
+
+  /**
+   * DOM wiring only. Every question about the fitment is asked of
+   * `src/lib/fitment/` (FIT-01), which is unit-tested without a browser.
+   */
+  function enhance(root: HTMLElement): void {
+    const miss = root.querySelector<HTMLElement>("[data-entry-fit-miss]");
+    const provisional = root.querySelector<HTMLElement>(
+      "[data-entry-fit-provisional]"
+    );
+    const facetSlot = root.querySelector<HTMLElement>(
+      "[data-entry-fit-facets]"
+    );
+    if (miss === null || provisional === null) return;
+
+    let fitment: unknown = null;
+    try {
+      fitment = JSON.parse(root.dataset.fitment ?? "null");
+    } catch {
+      // A page bug, not a truck that does not fit: say nothing rather than
+      // accuse the entry of not fitting (the `vehicle-listing.ts` rule).
+      return;
+    }
+    if (fitment === null) return;
+
+    const taxonomy = buildTaxonomy(readSelectorPayload(document)?.nodes ?? []);
+    const facetLabels = readFacetLabels(root.dataset.facetLabels);
+    const template = root.dataset.provisionalTemplate ?? "";
+    const listFormat = new Intl.ListFormat(document.documentElement.lang, {
+      style: "long",
+      type: "conjunction",
+    });
+
+    function apply(selection: StoredVehicleSelection | null): void {
+      if (selection === null) {
+        root.hidden = true;
+        miss!.hidden = true;
+        provisional!.hidden = true;
+        return;
+      }
+
+      const fits = matchesVehicle(fitment, selection, taxonomy);
+      const facets = provisionalMatchFacets(fitment, selection, taxonomy);
+      const isProvisional = fits && facets.length > 0;
+
+      miss!.hidden = fits;
+      provisional!.hidden = !isProvisional;
+      root.hidden = fits && !isProvisional;
+
+      if (facetSlot !== null) {
+        facetSlot.textContent = isProvisional
+          ? ` ${template.replace(
+              "{facets}",
+              listFormat.format(
+                facets.map((facet) => facetLabels[facet] ?? facet)
+              )
+            )}`
+          : "";
+      }
+    }
+
+    apply(readVehicleSelection(window));
+    onVehicleSelectionChange(window, apply);
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>(
+    "[data-entry-fit-notice]"
+  )) {
+    enhance(root);
+  }
+</script>
+
+<style>
+  .entry-fit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .entry-fit[hidden],
+  .entry-fit__row[hidden] {
+    display: none;
+  }
+
+  .entry-fit__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    max-width: 78ch;
+    /* 7.28:1 on both backgrounds below. */
+    color: #55493c;
+    background: #efeae0;
+    border: 1.5px dashed #a99c88;
+  }
+
+  .entry-fit__tag {
+    flex: 0 0 auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 0.1875rem 0.5rem;
+    color: #6e6559;
+    background: #efe9dd;
+  }
+
+  /* The confidence-chip token: a provisional match is a statement about how
+     much the site knows, which is the same kind of claim. */
+  .entry-fit__tag--provisional {
+    color: #4a5568;
+    background: #e8edf2;
+  }
+
+  /*
+   * The prominent variant (T204's "especially prominent on safety-critical
+   * surfaces"): the safety notice's own solid amber band, so a provisional
+   * match on a safety-critical entry looks like the warning it is instead of
+   * like the quiet footnote it is everywhere else.
+   */
+  .entry-fit__row--urgent {
+    background: #fdf3e4;
+    border: 1.5px solid #b07a1f;
+    /* 7.95:1. */
+    color: #55493c;
+    font-size: 0.875rem;
+  }
+
+  .entry-fit__row--urgent .entry-fit__tag--provisional {
+    /* 7.48:1 on its own chip — the safety-critical chip token. */
+    color: #7a2e2e;
+    background: #f6e3d8;
+  }
+</style>

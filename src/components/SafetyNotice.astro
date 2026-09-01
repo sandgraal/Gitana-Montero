@@ -1,0 +1,168 @@
+---
+/**
+ * The standing bilingual safety notice (PRB-03, PRC-02).
+ *
+ * > **PRB-03** WHEN a problem's severity is `safety-critical`, THE page SHALL
+ * > render the standing bilingual safety notice and the "see a qualified
+ * > mechanic" framing per AGENTS.md.
+ *
+ * AGENTS.md is the source of the rule, and it is unconditional: safety-critical
+ * systems "get … a standing bilingual safety notice on the page", and the site
+ * is "never presented as a substitute for a qualified mechanic". Both halves are
+ * here — the heading names the system, the body says the sentence.
+ *
+ * ## Whether it renders is not decided here
+ *
+ * `src/lib/safety.ts`'s `isSafetyCritical` decides, from the entry's `system`
+ * plus the upward-only `safetyCritical` flag, and the `problems` schema keeps
+ * PRB-03's severity route from disagreeing with it. This component only draws
+ * the band — a page that renders it conditionally on something it derived
+ * itself would be a second answer to a safety question.
+ *
+ * ## The heading id is derived from the system, not a constant
+ *
+ * `aria-labelledby` needs an id, and the id has to be unique in the document.
+ * The first version defaulted it to the literal `"safety-heading"`, which was
+ * correct only for as long as this component had exactly one consumer: a second
+ * one on the same page (T502's procedures template is already planned, and
+ * PRC-02 routes it straight here) would emit two elements with one id, and
+ * `aria-labelledby` resolves to the *first* — so one of the two notices would
+ * silently announce the other's system (PR #72, Copilot).
+ *
+ * Deriving it from `system` fixes that for every case worth having: a page
+ * showing notices for the brakes and for the fuel system gets two distinct ids,
+ * with no burden on the call site and no id that changes between builds. A
+ * generated counter would also be unique, but it would depend on render order
+ * and make the built HTML churn between builds for no gain. The remaining
+ * collision — two notices for the *same* system on one page, which is a
+ * rendering mistake rather than a use case — is what the optional prop is for.
+ *
+ * ## Both languages, in one band, page locale first
+ *
+ * "Bilingual" is the requirement's own word, so like the triage banner this is
+ * one of the surfaces that carries both locales regardless of the page's own,
+ * with each half in its own `lang`. The artboards draw exactly this: the page
+ * locale's sentence at full weight, the other locale's underneath in `muted`.
+ *
+ * refs specs/001-foundation (PRB-03, PRC-02, I18N-08),
+ * specs/001-foundation/design/HANDOFF-DESIGN.md
+ */
+import { LOCALES, LOCALE_BCP47, type Locale } from "../i18n/routing";
+import { glossarySystemLabel, t } from "../i18n/ui";
+import type { GlossarySystem } from "../schemas/glossary";
+
+interface Props {
+  locale: Locale;
+  /** Named in the heading, in each locale's own vocabulary. */
+  system: GlossarySystem;
+  /**
+   * Overrides the derived id. Only needed for the one case the default cannot
+   * cover — two notices for the *same* system on one page.
+   */
+  headingId?: string;
+}
+
+const { locale, system, headingId = `safety-notice-${system}` } = Astro.props;
+
+const readingOrder: Locale[] = [
+  locale,
+  ...LOCALES.filter((candidate) => candidate !== locale),
+];
+
+const lines = readingOrder.map((each) => {
+  const strings = t(each);
+  return {
+    locale: each,
+    heading: strings.problemSafetyNoticeTemplate.replace(
+      "{system}",
+      glossarySystemLabel(strings, system)
+    ),
+    body: strings.problemSafetyNoticeBody,
+  };
+});
+---
+
+<section class="safety" aria-labelledby={headingId}>
+  <span class="safety__icon" aria-hidden="true">
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      focusable="false"
+    >
+      <path d="M12 3 2 21h20L12 3z"></path>
+      <path d="M12 10v5"></path>
+      <path d="M12 18h.01"></path>
+    </svg>
+  </span>
+  <div class="safety__body">
+    <h2 class="safety__title" id={headingId} lang={LOCALE_BCP47[locale]}>
+      {lines[0]?.heading}
+    </h2>
+    {
+      lines.map((line, index) => (
+        <p
+          class:list={["safety__line", index > 0 && "safety__line--secondary"]}
+          lang={LOCALE_BCP47[line.locale]}
+        >
+          {line.body}
+        </p>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  /* HANDOFF-DESIGN "safety notice": bg #FDF3E4, 1.5px #B07A1F, icon #8A5E14. */
+  .safety {
+    display: flex;
+    gap: 1rem;
+    background: #fdf3e4;
+    border: 1.5px solid #b07a1f;
+    border-radius: 8px;
+    padding: 1.125rem 1.25rem;
+  }
+
+  .safety__icon {
+    flex: 0 0 auto;
+    margin-top: 0.125rem;
+    /* 5.18:1 on the notice background — a graphic, but it reads as text. */
+    color: #8a5e14;
+  }
+
+  .safety__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .safety__title {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    /* 13.65:1. */
+    color: #2b2620;
+  }
+
+  .safety__line {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #2b2620;
+    max-width: 78ch;
+  }
+
+  /*
+   * The other locale's copy. The artboard uses `muted` (#6E6559) here, which
+   * measures 5.21:1 on this background — past AA, and deliberately not `faint`
+   * (#A99C88, 2.45:1), the same departure `[glossarySegment].astro` documents.
+   */
+  .safety__line--secondary {
+    color: #6e6559;
+  }
+</style>

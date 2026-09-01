@@ -1,0 +1,126 @@
+---
+/**
+ * The visible confidence caveat (PRB-04, AGENTS.md "Facts").
+ *
+ * > **PRB-04** WHEN a problem entry's confidence tier is `community-consensus`
+ * > or lower, THE page SHALL render the visible caveat in both locales.
+ *
+ * Whether it renders is `src/lib/confidence.ts`'s `needsConfidenceCaveat`, not
+ * a comparison written here — "anything below `tsb`" is one rule and it lives
+ * in one place, so a tier inserted into `CONFIDENCE_TIERS` is picked up with no
+ * edit. This component draws the dashed band the handoff specifies and nothing
+ * else.
+ *
+ * Both locales, page locale first, each in its own `lang`: the requirement's
+ * own words are "in both locales", and a Spanish reader on an English page has
+ * exactly as much need to know the entry is not factory-documented.
+ *
+ * refs specs/001-foundation (PRB-04, I18N-08),
+ * specs/001-foundation/design/HANDOFF-DESIGN.md
+ */
+import { LOCALES, LOCALE_BCP47, type Locale } from "../i18n/routing";
+import { confidenceTierLabel, t } from "../i18n/ui";
+import type { ConfidenceTier } from "../schemas/entry";
+
+interface Props {
+  locale: Locale;
+  tier: ConfidenceTier;
+}
+
+const { locale, tier } = Astro.props;
+
+const readingOrder: Locale[] = [
+  locale,
+  ...LOCALES.filter((candidate) => candidate !== locale),
+];
+
+const lines = readingOrder.map((each) => {
+  const strings = t(each);
+  return {
+    locale: each,
+    text: strings.problemConfidenceCaveatTemplate.replace(
+      "{tier}",
+      confidenceTierLabel(strings, tier)
+    ),
+  };
+});
+---
+
+{
+  /*
+   * A `div`, not an `aside`: an `aside` inside the article's own landmark is
+   * a complementary landmark nested in another one, which axe flags
+   * (`landmark-complementary-is-top-level`). The caveat is part of the entry it
+   * qualifies, not a sibling aside to the page.
+   */
+}
+<div class="caveat" data-confidence={tier}>
+  <span class="caveat__icon" aria-hidden="true">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      focusable="false"
+    >
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 8h.01M12 11v5"></path>
+    </svg>
+  </span>
+  <div class="caveat__body">
+    {
+      lines.map((line, index) => (
+        <p
+          class:list={["caveat__line", index > 0 && "caveat__line--secondary"]}
+          lang={LOCALE_BCP47[line.locale]}
+        >
+          {line.text}
+        </p>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  /* HANDOFF-DESIGN "confidence caveat": #EFEAE0, 1.5px dashed #A99C88. */
+  .caveat {
+    display: flex;
+    gap: 0.875rem;
+    background: #efeae0;
+    border: 1.5px dashed #a99c88;
+    border-radius: 8px;
+    padding: 0.875rem 1.125rem;
+  }
+
+  .caveat__icon {
+    flex: 0 0 auto;
+    margin-top: 0.0625rem;
+    color: #55493c;
+  }
+
+  .caveat__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .caveat__line {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    /* 7.28:1 on the caveat background. */
+    color: #55493c;
+    max-width: 78ch;
+  }
+
+  /*
+   * The other locale, still past AA (4.77:1) — the handoff's `muted`, not its
+   * `faint`, for the reason `[glossarySegment].astro` records.
+   */
+  .caveat__line--secondary {
+    color: #6e6559;
+  }
+</style>
