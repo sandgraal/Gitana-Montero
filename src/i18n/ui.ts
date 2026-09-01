@@ -325,6 +325,98 @@ export interface UiStrings
   readonly garageUseForBrowsing: string;
   readonly garageUsedForBrowsing: string;
   readonly garageIdentityIncomplete: string;
+  /* Records and receipts — T2-302, GAR-02′ / GAR-05′ */
+  /**
+   * The line that frames every record on the page as the owner's own account
+   * of their own truck. AGENTS.md: user-entered garage records are the user's
+   * own testimony, never presented as site-verified reference facts.
+   */
+  readonly garageRecordsTestimonyNote: string;
+  readonly garageRecordAdd: string;
+  readonly garageRecordEdit: string;
+  readonly garageRecordNewHeading: string;
+  readonly garageRecordEditHeading: string;
+  readonly garageRecordSave: string;
+  readonly garageRecordDelete: string;
+  /** `{title}` is the record's own heading — the user's words. */
+  readonly garageRecordDeleteConfirmTemplate: string;
+  readonly garageRecordDateLabel: string;
+  readonly garageRecordKindLabel: string;
+  readonly garageRecordKindWork: string;
+  readonly garageRecordKindReceipt: string;
+  readonly garageRecordKindNote: string;
+  readonly garageRecordKindPlan: string;
+  readonly garageRecordTitleLabel: string;
+  readonly garageRecordTitleHint: string;
+  readonly garageRecordNotesLabel: string;
+  readonly garageRecordNotesHint: string;
+  readonly garageRecordCostLabel: string;
+  readonly garageRecordCurrencyLabel: string;
+  readonly garageRecordTimeLabel: string;
+  readonly garageRecordTimeUnitLabel: string;
+  readonly garageUnitHours: string;
+  readonly garageUnitMinutes: string;
+  readonly garageRecordOdometerLabel: string;
+  readonly garageRecordOdometerHint: string;
+  readonly garageStatusDone: string;
+  readonly garageStatusPlanned: string;
+  /**
+   * The word beside a data chip's figure — real text, rendered off-screen, so
+   * a chip is never a bare "1.2 hr" to anyone not reading the layout.
+   */
+  readonly garageChipTimeLabel: string;
+  readonly garageChipCostLabel: string;
+  readonly garageChipOdometerLabel: string;
+  readonly garageChipReceiptsLabel: string;
+  readonly garageReferencesLegend: string;
+  readonly garageReferencesHint: string;
+  readonly garageReferencesEmpty: string;
+  readonly garageReferenceProblemsLabel: string;
+  readonly garageReferencePartsLabel: string;
+  readonly garageReferenceProceduresLabel: string;
+  /** `{name}` is the reference entry's own title, in the reader's locale. */
+  readonly garageReferenceProblemTemplate: string;
+  readonly garageReferencePartTemplate: string;
+  readonly garageReferenceProcedureTemplate: string;
+  readonly garageReferenceUnresolved: string;
+  readonly garageRecordIssueDate: string;
+  readonly garageRecordIssueDateRange: string;
+  readonly garageRecordIssueKind: string;
+  readonly garageRecordIssueTitleRequired: string;
+  /** `{max}` is a character count, interpolated from the module constant. */
+  readonly garageRecordIssueTitleLongTemplate: string;
+  readonly garageRecordIssueNotesLongTemplate: string;
+  readonly garageRecordIssueCost: string;
+  readonly garageRecordIssueCostSeparator: string;
+  readonly garageRecordIssueCostLarge: string;
+  readonly garageRecordIssueTime: string;
+  readonly garageRecordIssueTimeLarge: string;
+  readonly garageRecordIssueReferences: string;
+  /**
+   * Shown on the timeline when the records loaded but their receipt counts did
+   * not. Without it a card with no chip reads as "no receipts attached", which
+   * on a record of what happened is a wrong answer rather than a missing one.
+   */
+  readonly garageReceiptCountsUnavailable: string;
+  readonly garageReceiptsHeading: string;
+  readonly garageReceiptsEmpty: string;
+  readonly garageReceiptsPrivateNote: string;
+  readonly garageReceiptsNeedRecord: string;
+  readonly garageReceiptFileLabel: string;
+  readonly garageReceiptVendorLabel: string;
+  readonly garageReceiptDateLabel: string;
+  readonly garageReceiptAmountLabel: string;
+  readonly garageReceiptAttach: string;
+  readonly garageReceiptUploading: string;
+  readonly garageReceiptOpen: string;
+  readonly garageReceiptRemove: string;
+  readonly garageReceiptRemoveConfirm: string;
+  readonly garageReceiptTypeRejected: string;
+  /** `{size}` is the size limit, formatted by `Intl` in the page. */
+  readonly garageReceiptSizeRejectedTemplate: string;
+  readonly garageReceiptIssueVendorLong: string;
+  readonly garageReceiptIssueDate: string;
+  readonly garageReceiptUntitled: string;
   /* Vehicle selector — T204, FIT-03 */
   readonly vehicleSelectorLabel: string;
   readonly vehicleSelectorIdle: string;
@@ -579,6 +671,99 @@ const en: UiStrings = {
   garageUsedForBrowsing: "The site is filtered to this truck.",
   garageIdentityIncomplete:
     "Name the market, the year and the engine to filter the site with this truck.",
+  garageRecordsTestimonyNote:
+    "These are your own notes about your own truck, kept as you wrote them. The site does not check them and never presents them as reference facts.",
+  garageRecordAdd: "Add a record",
+  garageRecordEdit: "Edit this record",
+  garageRecordNewHeading: "A new record",
+  garageRecordEditHeading: "Edit this record",
+  garageRecordSave: "Save record",
+  garageRecordDelete: "Delete this record",
+  garageRecordDeleteConfirmTemplate:
+    "Delete “{title}”? Its receipts go with it, and that cannot be undone.",
+  garageRecordDateLabel: "Date",
+  garageRecordKindLabel: "Kind of record",
+  garageRecordKindWork: "Work done",
+  garageRecordKindReceipt: "Receipt",
+  garageRecordKindNote: "Note",
+  garageRecordKindPlan: "Planned",
+  garageRecordTitleLabel: "What it was",
+  garageRecordTitleHint:
+    "One line you will recognise later: “Front sway-bar end links replaced”.",
+  garageRecordNotesLabel: "Notes",
+  garageRecordNotesHint:
+    "Anything worth remembering — what you found, what you would do differently. Write it in whichever language you think in.",
+  garageRecordCostLabel: "Cost",
+  garageRecordCurrencyLabel: "Currency",
+  garageRecordTimeLabel: "Time it took",
+  garageRecordTimeUnitLabel: "Time unit",
+  garageUnitHours: "Hours",
+  garageUnitMinutes: "Minutes",
+  garageRecordOdometerLabel: "Odometer that day",
+  garageRecordOdometerHint:
+    "What the odometer read when this happened, if you noted it. It does not change the vehicle's current reading.",
+  garageStatusDone: "done",
+  garageStatusPlanned: "planned",
+  garageChipTimeLabel: "Time",
+  garageChipCostLabel: "Cost",
+  garageChipOdometerLabel: "Odometer",
+  garageChipReceiptsLabel: "Receipts",
+  garageReferencesLegend: "Link it to the reference",
+  garageReferencesHint:
+    "The problem, parts and procedure pages this job used. Linking them is how your record and the reference find each other later.",
+  garageReferencesEmpty:
+    "The reference has no entries to link yet. Records saved now can be linked once it does.",
+  garageReferenceProblemsLabel: "Problems",
+  garageReferencePartsLabel: "Parts",
+  garageReferenceProceduresLabel: "Procedures",
+  garageReferenceProblemTemplate: "problem: {name}",
+  garageReferencePartTemplate: "part: {name}",
+  garageReferenceProcedureTemplate: "procedure: {name}",
+  garageReferenceUnresolved:
+    "This entry is not in the reference. Your record keeps it as you saved it.",
+  garageRecordIssueDate: "Give the date this happened, as year-month-day.",
+  garageRecordIssueDateRange:
+    "That date is outside anything this site accepts.",
+  garageRecordIssueKind: "Choose what kind of record this is.",
+  garageRecordIssueTitleRequired: "Say in one line what this record is.",
+  garageRecordIssueTitleLongTemplate:
+    "That line is longer than {max} characters. The notes field has room for the rest.",
+  garageRecordIssueNotesLongTemplate:
+    "Those notes are longer than {max} characters.",
+  garageRecordIssueCost: "Write the cost in digits, or leave the field empty.",
+  garageRecordIssueCostSeparator:
+    "That figure could be read two ways. Write it without thousands separators — 1500, or 1500.50.",
+  garageRecordIssueCostLarge: "That cost is higher than this site accepts.",
+  garageRecordIssueTime: "Write the time in digits, or leave the field empty.",
+  garageRecordIssueTimeLarge:
+    "That is longer than this site records for one job.",
+  garageRecordIssueReferences:
+    "One of the reference entries chosen is not on this site any more. Unselect it and save again.",
+  garageReceiptCountsUnavailable:
+    "Your records are here, but this page could not check which of them have receipts — so no receipt counts are shown below. Open a record to see its own. Reloading usually fixes it.",
+  garageReceiptsHeading: "Receipts",
+  garageReceiptsEmpty: "No receipts attached to this record.",
+  garageReceiptsPrivateNote:
+    "Receipts are held in private storage. Nobody without your session can open one, and the links this page uses expire on their own.",
+  garageReceiptsNeedRecord:
+    "Save the record first; then you can attach its receipts.",
+  garageReceiptFileLabel: "The file",
+  garageReceiptVendorLabel: "Where it is from",
+  garageReceiptDateLabel: "Date on the receipt",
+  garageReceiptAmountLabel: "Amount",
+  garageReceiptAttach: "Attach receipt",
+  garageReceiptUploading: "Uploading…",
+  garageReceiptOpen: "Open",
+  garageReceiptRemove: "Remove",
+  garageReceiptRemoveConfirm:
+    "Remove this receipt? The file goes with it, and that cannot be undone.",
+  garageReceiptTypeRejected:
+    "That file is not one this site stores. JPEG, PNG, WebP, HEIC and PDF all work.",
+  garageReceiptSizeRejectedTemplate: "That file is larger than {size}.",
+  garageReceiptIssueVendorLong: "That name is too long for the field.",
+  garageReceiptIssueDate:
+    "Give the receipt's date as year-month-day, or leave it empty.",
+  garageReceiptUntitled: "Receipt",
   vehicleSelectorLabel: "Your vehicle",
   vehicleSelectorIdle: "Browsing all vehicles",
   vehicleSelectorOpen: "Select your vehicle",
@@ -836,6 +1021,98 @@ const es: UiStrings = {
   garageUsedForBrowsing: "El sitio está filtrado para este carro.",
   garageIdentityIncomplete:
     "Indique el mercado, el año y el motor para filtrar el sitio con este carro.",
+  garageRecordsTestimonyNote:
+    "Estas son sus propias anotaciones sobre su propio carro, tal como usted las escribió. El sitio no las verifica ni las presenta nunca como datos de referencia.",
+  garageRecordAdd: "Agregar una ficha",
+  garageRecordEdit: "Editar esta ficha",
+  garageRecordNewHeading: "Una ficha nueva",
+  garageRecordEditHeading: "Edite esta ficha",
+  garageRecordSave: "Guardar la ficha",
+  garageRecordDelete: "Eliminar esta ficha",
+  garageRecordDeleteConfirmTemplate:
+    "¿Eliminar «{title}»? Se van con ella sus facturas, y eso no se puede deshacer.",
+  garageRecordDateLabel: "Fecha",
+  garageRecordKindLabel: "Tipo de ficha",
+  garageRecordKindWork: "Trabajo hecho",
+  garageRecordKindReceipt: "Factura",
+  garageRecordKindNote: "Nota",
+  garageRecordKindPlan: "Pendiente",
+  garageRecordTitleLabel: "Qué fue",
+  garageRecordTitleHint:
+    "Una línea que usted reconozca después: «Cambio de bujes de barra estabilizadora».",
+  garageRecordNotesLabel: "Notas",
+  garageRecordNotesHint:
+    "Lo que valga la pena recordar: qué encontró, qué haría distinto. Escríbalo en el idioma en el que usted piensa.",
+  garageRecordCostLabel: "Costo",
+  garageRecordCurrencyLabel: "Moneda",
+  garageRecordTimeLabel: "Cuánto tomó",
+  garageRecordTimeUnitLabel: "Unidad de tiempo",
+  garageUnitHours: "Horas",
+  garageUnitMinutes: "Minutos",
+  garageRecordOdometerLabel: "Kilometraje de ese día",
+  garageRecordOdometerHint:
+    "Lo que marcaba el kilometraje cuando pasó esto, si usted lo anotó. No cambia la lectura actual del carro.",
+  garageStatusDone: "hecho",
+  garageStatusPlanned: "pendiente",
+  garageChipTimeLabel: "Tiempo",
+  garageChipCostLabel: "Costo",
+  garageChipOdometerLabel: "Kilometraje",
+  garageChipReceiptsLabel: "Facturas",
+  garageReferencesLegend: "Enlace la ficha con la referencia",
+  garageReferencesHint:
+    "Las fallas, los repuestos y el procedimiento que ocupó este trabajo. Enlazarlos es lo que después permite que su ficha y la referencia se encuentren.",
+  garageReferencesEmpty:
+    "Todavía no hay entradas de referencia que enlazar. Las fichas que guarde ahora se pueden enlazar cuando las haya.",
+  garageReferenceProblemsLabel: "Fallas",
+  garageReferencePartsLabel: "Repuestos",
+  garageReferenceProceduresLabel: "Procedimientos",
+  garageReferenceProblemTemplate: "falla: {name}",
+  garageReferencePartTemplate: "repuesto: {name}",
+  garageReferenceProcedureTemplate: "procedimiento: {name}",
+  garageReferenceUnresolved:
+    "Esta entrada ya no está en la referencia. Su ficha la conserva tal como usted la guardó.",
+  garageRecordIssueDate: "Indique la fecha en que pasó, en año-mes-día.",
+  garageRecordIssueDateRange:
+    "Esa fecha queda fuera de lo que el sitio acepta.",
+  garageRecordIssueKind: "Escoja qué tipo de ficha es.",
+  garageRecordIssueTitleRequired: "Diga en una línea qué es esta ficha.",
+  garageRecordIssueTitleLongTemplate:
+    "Esa línea pasa de {max} caracteres. El campo de notas tiene espacio para el resto.",
+  garageRecordIssueNotesLongTemplate: "Esas notas pasan de {max} caracteres.",
+  garageRecordIssueCost: "Escriba el costo en dígitos, o deje el campo vacío.",
+  garageRecordIssueCostSeparator:
+    "Esa cifra se puede leer de dos maneras. Escríbala sin separadores de miles: 1500, o 1500,50.",
+  garageRecordIssueCostLarge: "Ese costo pasa de lo que el sitio acepta.",
+  garageRecordIssueTime: "Escriba el tiempo en dígitos, o deje el campo vacío.",
+  garageRecordIssueTimeLarge:
+    "Eso pasa del tiempo que el sitio registra para un solo trabajo.",
+  garageRecordIssueReferences:
+    "Una de las entradas de referencia escogidas ya no está en el sitio. Quítele la selección y guarde de nuevo.",
+  garageReceiptCountsUnavailable:
+    "Sus fichas están aquí, pero la página no pudo revisar cuáles tienen factura, así que abajo no se muestra ningún conteo de facturas. Abra una ficha para ver las suyas. Casi siempre se arregla recargando.",
+  garageReceiptsHeading: "Facturas",
+  garageReceiptsEmpty: "Esta ficha no tiene facturas adjuntas.",
+  garageReceiptsPrivateNote:
+    "Las facturas quedan en almacenamiento privado. Nadie sin su sesión puede abrir una, y los enlaces que usa esta página se vencen solos.",
+  garageReceiptsNeedRecord:
+    "Guarde primero la ficha; después puede adjuntarle sus facturas.",
+  garageReceiptFileLabel: "El archivo",
+  garageReceiptVendorLabel: "De dónde es",
+  garageReceiptDateLabel: "Fecha de la factura",
+  garageReceiptAmountLabel: "Monto",
+  garageReceiptAttach: "Adjuntar la factura",
+  garageReceiptUploading: "Subiendo…",
+  garageReceiptOpen: "Abrir",
+  garageReceiptRemove: "Quitar",
+  garageReceiptRemoveConfirm:
+    "¿Quitar esta factura? El archivo se va con ella, y eso no se puede deshacer.",
+  garageReceiptTypeRejected:
+    "Ese archivo no es de los que el sitio guarda. Sirven JPEG, PNG, WebP, HEIC y PDF.",
+  garageReceiptSizeRejectedTemplate: "Ese archivo pasa de {size}.",
+  garageReceiptIssueVendorLong: "Ese nombre es muy largo para el campo.",
+  garageReceiptIssueDate:
+    "Indique la fecha de la factura en año-mes-día, o déjela vacía.",
+  garageReceiptUntitled: "Factura",
   vehicleSelectorLabel: "Su vehículo",
   vehicleSelectorIdle: "Está viendo todos los vehículos",
   vehicleSelectorOpen: "Elija su vehículo",
