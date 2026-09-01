@@ -561,6 +561,41 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   proven by graders before content flows". Fix with a `createdTables()` sweep
   cross-checked against `USER_TABLES`, with a named-exemption map in the style
   of `check-hreflang.mjs`'s `EXEMPT_PAGES`.
+  <br>**Landed 2026-09-01** across two rounds. Round 2 added, on review: the
+  `security_invoker` rule for views (PG15+ defaults it **off**, so a `public`
+  view without it is the same hole class as a definer function); whole-row
+  projection detection (`to_jsonb(r)`, `row_to_json(r)`, `jsonb_agg(r)`, bare
+  `select r`, `alias.*` in any expression — each was a zero-finding bypass
+  easier to write than the literal `select *` the rule already caught); and
+  probes for the two tri-state halves that had none. 39 mutants, all killed.
+  <br>**Recorded here for the T2-401 and T2-404 briefs — NOT implemented by
+  T2-401a, and each is a deliberate scope hand-off rather than an oversight:**
+  <br>— **(F5) Ban `alter default privileges … grant … to anon|public`.**
+  `grants()` already parses and records every ADP statement, and the graders
+  read the *revoke* half. Nothing yet rejects the grant half, which would hand
+  every future object in `public` to an anonymous caller from one line in one
+  migration — and it is the one privilege change that leaves no trace on any
+  object that exists today, so the created-table and function sweeps cannot see
+  it. One rule over `GrantState.defaultPrivileges`; belongs with T2-404's
+  migration review.
+  <br>— **A Tier A refusal-shape smell-check, alongside T2-401's Tier B
+  SHR-08 proof.** SHR-08 requires unknown, expired, and revoked to be
+  *indistinguishable* — "same status, same body, same shape" — which is
+  genuinely behavioural and needs a running stack. But a weak Tier A proxy
+  catches the likeliest mistake on every PR with no Docker: reject any
+  anon-reachable routine whose body contains more than one distinct `raise`
+  message, or any text matching `expired|revoked|not found`. It cannot prove
+  the property and must not be described as if it does; it detects the
+  mistake, which is a different and still useful job. Pair it with the real
+  behavioural grader, never instead of it.
+  <br>— **The three-reader architecture is endorsed**, but note what makes it
+  real: `SHARE_READER_FUNCTIONS`' argument for three entry points over one JSON
+  reader rests entirely on the projection rule. Before round 2 that rule caught
+  only a literal `*`, so a single `to_jsonb(r)` reader would have satisfied
+  every grader while defeating the argument for splitting them. If T2-404
+  proposes one reader returning `jsonb`, the projection rule needs re-deriving
+  first — `select *` inside a `jsonb_build_object` of named keys is invisible to
+  it, and that is the shape such a proposal would take.
 
 - [ ] **T2-401 [TEST]** Sharing graders: private-by-default proofs at the URL
   level, per-record cost masking on public work-logs, showcase toggle

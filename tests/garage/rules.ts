@@ -952,6 +952,78 @@ export function revocationCheckIssues(routine: FunctionDefinition): string[] {
  * ---------------------------------------------------------------------- */
 
 /**
+ * Words that follow a table name in a `from`/`join` clause and are **not** an
+ * alias. Without this list, `from public.records where …` reads `where` as the
+ * alias and the whole-row rules start hunting for `where.*`.
+ */
+const NOT_AN_ALIAS = new Set([
+  "where",
+  "on",
+  "join",
+  "inner",
+  "left",
+  "right",
+  "full",
+  "outer",
+  "cross",
+  "natural",
+  "lateral",
+  "group",
+  "order",
+  "limit",
+  "offset",
+  "having",
+  "union",
+  "using",
+  "returning",
+  "select",
+  "and",
+  "or",
+  "as",
+  "into",
+  "for",
+  "loop",
+  "with",
+]);
+
+/**
+ * The row aliases a query body binds — `from public.records r` → `r`,
+ * `from public.records` → `records`.
+ *
+ * Needed because whole-row projection is spelled *through* an alias, and the
+ * only way to tell `to_jsonb(r)` (the entire row) from `to_jsonb(payload)` (a
+ * column) is to know which names are rows.
+ */
+export function rowAliases(body: string): string[] {
+  const aliases = new Set<string>();
+  for (const match of body.matchAll(
+    /\b(?:from|join)\s+(?:([a-z0-9_]+)\.)?([a-z0-9_]+)(?:\s+(?:as\s+)?([a-z0-9_]+))?/g
+  )) {
+    const table = match[2];
+    const alias = match[3];
+    if (alias && !NOT_AN_ALIAS.has(alias)) aliases.add(alias);
+    else aliases.add(table);
+  }
+  return [...aliases];
+}
+
+/**
+ * Functions that serialise an entire row into one value.
+ *
+ * Every one of these turns "name your columns" into a formality: the output is
+ * the row, whatever the row happens to contain today.
+ */
+const ROW_SERIALIZERS = [
+  "to_jsonb",
+  "to_json",
+  "row_to_json",
+  "jsonb_agg",
+  "json_agg",
+  "array_agg",
+  "row",
+];
+
+/**
  * An anon-reachable routine must name the columns it returns.
  *
  * > **SHR-06** WHERE a grant does not open costs, THE data returned SHALL omit
@@ -963,17 +1035,64 @@ export function revocationCheckIssues(routine: FunctionDefinition): string[] {
  * from the moment the migration lands, with no diff in the function at all.
  * The rule is about *columns*; RLS and the token checks are about rows, and
  * neither says anything about width.
+ *
+ * ## Why a literal `*` is not the whole rule (round-2 review, F3)
+ *
+ * The first version tested for `*` and nothing else, so **every** whole-row
+ * spelling walked past it and the full `anonSurfaceIssues` sweep returned
+ * zero findings:
+ *
+ * ```sql
+ * select to_jsonb(r) from public.records r …   -- every column, as JSON
+ * select row_to_json(r) …                      -- same
+ * select jsonb_agg(r) …                        -- same, aggregated
+ * select r.* …                                 -- same, spelled out
+ * select r from public.records r …             -- same, as a composite
+ * ```
+ *
+ * That is a bypass *easier to write* than the thing the rule caught — and it
+ * is precisely the single-JSON-reader shape that `contract.ts`'s three-reader
+ * note argues against, which means the architecture argument was resting on a
+ * rule that did not enforce it. So the rule now asks the real question: does
+ * anything here hand back a whole row, however it is spelled.
  */
 export function projectionIssues(routine: FunctionDefinition): string[] {
   const issues: string[] = [];
   const where = routine.identity;
+  const body = routine.body;
+  const explain =
+    `an anon-reachable routine must name its columns, or every column the ` +
+    `table gains later is served with it (SHR-06)`;
 
-  if (/\bselect\s+(?:[a-z0-9_]+\.)?\*/.test(routine.body)) {
-    issues.push(
-      `${where}: selects \`*\` — an anon-reachable routine must name its ` +
-        `columns, or every column the table gains later is served with it (SHR-06)`
-    );
+  if (/\bselect\s+(?:distinct\s+)?(?:[a-z0-9_]+\.)?\*/.test(body)) {
+    issues.push(`${where}: selects \`*\` — ${explain}`);
   }
+
+  for (const alias of rowAliases(body)) {
+    // `r.*` anywhere, not just directly after `select` — it is just as whole
+    // inside `jsonb_build_object('r', r.*)` or a function argument.
+    if (new RegExp(`\\b${alias}\\.\\*`).test(body)) {
+      issues.push(`${where}: references \`${alias}.*\` — ${explain}`);
+    }
+    // A whole-row serialiser applied to the alias.
+    const serializer = new RegExp(
+      `\\b(${ROW_SERIALIZERS.join("|")})\\s*\\(\\s*${alias}(?:\\.\\*)?\\s*\\)`
+    ).exec(body);
+    if (serializer) {
+      issues.push(
+        `${where}: \`${serializer[1]}(${alias})\` serialises the whole row — ${explain}`
+      );
+    }
+    // A bare alias in the select list is the composite row itself.
+    if (
+      new RegExp(
+        `\\bselect\\s+(?:distinct\\s+)?${alias}\\s*(?:,|\\bfrom\\b|$)`
+      ).test(body)
+    ) {
+      issues.push(`${where}: selects the bare row \`${alias}\` — ${explain}`);
+    }
+  }
+
   const setof = /\bsetof\s+(?:public\.)?([a-z0-9_]+)/.exec(
     `${routine.returns} ${routine.header}`
   );
@@ -1106,6 +1225,49 @@ export function tableGrantIssues(
       issues.push(
         `${identity}: authenticated holds ${extra.join(", ")} beyond ` +
           `select/insert/update/delete — RLS does not filter truncate`
+      );
+    }
+  }
+  return issues;
+}
+
+/**
+ * Every view in `public` must be created `with (security_invoker = true)`.
+ *
+ * ## The same hole class as a definer function, one object type over
+ *
+ * A view runs its query as the view's **owner** unless told otherwise, so RLS
+ * on the underlying tables is evaluated against the owner and not against the
+ * caller. A `public` view over `records` without this option is a
+ * `security definer` function with nicer syntax: `force row level security`,
+ * every owner-scoped predicate in this file, and `revoke all … from anon` all
+ * stop applying to the rows it returns.
+ *
+ * **The default is the unsafe direction.** `security_invoker` was added in
+ * PG15 and defaults to `false`, so a view is owner-executing unless somebody
+ * remembered a clause that did not exist a few releases ago. That is exactly
+ * the shape of invariant that needs a grader rather than a habit — the same
+ * argument as `force row level security`, which is the other option whose
+ * default is the wrong one.
+ *
+ * Vacuous today (no migration creates a view) and it starts paying the day one
+ * does. `viewGrantIssues` already covers the privilege half of this surface;
+ * this is the half that matters even when the grants are right, because a view
+ * `authenticated` may legitimately select from still must not hand that caller
+ * another owner's rows.
+ */
+export function viewSecurityInvokerIssues(normalized: string): string[] {
+  const issues: string[] = [];
+  for (const view of createdViews(normalized)) {
+    if (
+      !/\bwith\s*\([^)]*\bsecurity_invoker\s*=\s*(?:true|on)\b/.test(
+        view.statement
+      )
+    ) {
+      issues.push(
+        `${view.identity}: created without \`with (security_invoker = true)\` — ` +
+          `the view runs as its owner, so RLS on the underlying tables is ` +
+          `evaluated against the owner and not the caller`
       );
     }
   }

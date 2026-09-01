@@ -1361,6 +1361,33 @@ export function grants(normalized: string): GrantState {
  * therefore satisfies a question about `anon`, and, crucially, a
  * `revoke … from anon` does **not** take away a privilege `public` still holds.
  */
+/**
+ * `true` when the migration text has emptied `role`'s ACL on this object, so
+ * "no privilege found" can honestly be reported as "no privilege held".
+ *
+ * **Two conditions, and the second is the one that gets forgotten.** Clearing
+ * `anon` is not enough, because `public` is not a role beside `anon` — it is
+ * *every* role. A privilege `public` inherited from Supabase's role setup
+ * reaches `anon` through membership, and `revoke … from anon` does not touch
+ * it. So a directory that revokes only from `anon` has told us nothing about
+ * what `anon` can actually do, and the honest answer is `"unknown"`.
+ *
+ * ## Why this is one function and not two copies
+ *
+ * It used to be inlined in both `privilegeVerdict` and `rolePrivileges`, which
+ * is worse than it sounds: the round-2 review flipped the `&&` to `||` in
+ * *either* copy and all 516 garage tests stayed green. The table graders read
+ * `rolePrivileges` and the allow-list reads `privilegeVerdict`, so neither
+ * mutant alone moved the other's callers, and no probe covered the
+ * revoke-from-anon-only case at all. One definition means one mutation now
+ * moves every caller — and `G12` below is the probe that makes it move.
+ */
+function aclKnownFor(acl: ObjectAcl, role: string): boolean {
+  const knownForRole = role === "public" || acl.cleared.has(role);
+  const knownForPublic = acl.cleared.has("public");
+  return knownForRole && knownForPublic;
+}
+
 export function privilegeVerdict(
   state: GrantState,
   identity: string,
@@ -1376,12 +1403,7 @@ export function privilegeVerdict(
   if (holds(acl.granted.get(role))) return "granted";
   if (role !== "public" && holds(acl.granted.get("public"))) return "granted";
 
-  // The ACL is only *known* for this role once both the role itself and
-  // `public` have been explicitly emptied — a privilege `public` inherited
-  // reaches every role, including this one.
-  const knownForRole = role === "public" || acl.cleared.has(role);
-  const knownForPublic = acl.cleared.has("public");
-  return knownForRole && knownForPublic ? "none" : "unknown";
+  return aclKnownFor(acl, role) ? "none" : "unknown";
 }
 
 /** Every privilege `role` is known to hold on `identity`, with the verdict. */
@@ -1399,9 +1421,10 @@ export function rolePrivileges(
       : (acl.granted.get("public") ?? new Set<string>());
   const privileges = [...new Set([...direct, ...shared])].sort();
   if (privileges.length > 0) return { verdict: "granted", privileges };
-  const knownForRole = role === "public" || acl.cleared.has(role);
+  // Delegates to the same knowledge test `privilegeVerdict` uses, so the two
+  // cannot drift and one mutation moves both.
   return {
-    verdict: knownForRole && acl.cleared.has("public") ? "none" : "unknown",
+    verdict: aclKnownFor(acl, role) ? "none" : "unknown",
     privileges,
   };
 }
@@ -1416,6 +1439,16 @@ export interface CreatedRelation {
   readonly name: string;
   readonly kind: "table" | "view";
   readonly identity: string;
+  /**
+   * The `create` statement that put it there, as normalised.
+   *
+   * Kept because a view's *options* live in the create and nowhere else:
+   * `with (security_invoker = true)` is the difference between a view that
+   * applies the caller's RLS and one that runs as its owner. A rename carries
+   * the original statement forward — the options travel with the relation, not
+   * with the name.
+   */
+  readonly statement: string;
 }
 
 /**
@@ -1451,6 +1484,7 @@ export function createdRelations(normalized: string): CreatedRelation[] {
         name,
         kind: created[1] ? "table" : "view",
         identity,
+        statement,
       });
       continue;
     }

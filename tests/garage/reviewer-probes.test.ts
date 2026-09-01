@@ -65,6 +65,7 @@ import {
   plaintextTokenColumnIssues,
   projectionIssues,
   revocationCheckIssues,
+  rowAliases,
   splitTopLevel,
   storagePolicyIssues,
   stripSubqueries,
@@ -73,6 +74,7 @@ import {
   tokenHashIssues,
   ungradedTableIssues,
   userTablePolicyIssues,
+  viewSecurityInvokerIssues,
 } from "./rules.ts";
 import {
   canonicalArgumentTypes,
@@ -1059,26 +1061,44 @@ describe("the probe fixtures are real DDL, not empty strings", () => {
  *
  * ## Mutation-verified, to this file's own standard
  *
- * Twenty-six mutations were applied to `rules.ts` and `sql.ts` — each rule
- * disabled or inverted in turn — and this suite went red for every one. That
- * matters more here than anywhere else in the file, because these fixtures
- * describe a surface that does not exist yet: a rule that quietly matched
- * nothing would look exactly like a rule that is waiting, and
- * `share-instrument.test.ts`'s `it.fails` markers would go on reporting
- * "expected failure" either way.
+ * Thirty-nine mutations were applied to `rules.ts` and `sql.ts` — each rule
+ * disabled or inverted in turn, each clause of the compound rules separately —
+ * and this suite went red for every one. That matters more here than anywhere
+ * else in the file, because these fixtures describe a surface that does not
+ * exist yet: a rule that quietly matched nothing would look exactly like a
+ * rule that is waiting, and `share-instrument.test.ts`'s `it.fails` markers
+ * would go on reporting "expected failure" either way.
  *
- * Two mutations survived the first pass and the probes were strengthened until
- * they did not, which is the only reason to run the exercise at all:
+ * Seven mutations survived a first pass and the probes were strengthened until
+ * they did not, which is the only reason to run the exercise at all. Each
+ * survivor was a rule the corpus *appeared* to cover:
  *
  * - **`dollarTagAt` matching `$1`.** Relaxing the first character of a tag
  *   name turns every plpgsql positional parameter into a dollar quote and
- *   swallows the rest of the file. No end-to-end probe noticed, because the
- *   damage only shows up in DDL none of them contained. Pinned now as a direct
- *   table on `dollarTagAt`.
+ *   swallows the rest of the file. Pinned now as a direct table.
  * - **`statements()` closing a body on any tag rather than its own.** The
- *   entire reason named tags exist is a body that contains `$$`; without one
- *   in the corpus, the rule was unreachable. Pinned now by a `$function$` body
- *   with a `$$` inside it.
+ *   entire reason named tags exist is a body containing `$$`; without one in
+ *   the corpus the rule was unreachable. Pinned by a `$function$` body with a
+ *   `$$` inside it.
+ * - **The `public` half of the ACL knowledge test** (round-2 F1). Flipping the
+ *   `&&` to `||` left all 516 tests green: every fixture revoked from `anon`
+ *   *and* `public`, so the forgot-`public` case had no probe at all. Pinned by
+ *   G12/G12b — and the test itself de-duplicated into one `aclKnownFor`, since
+ *   two copies meant neither mutant moved the other's callers.
+ * - **Expiry and revocation pinned only against ABSENCE** (round-2 F2). Every
+ *   fixture removed the column outright, so relaxing either comparison to a
+ *   bare-mention test stayed green — and `expiryCheckIssues`' own
+ *   "mentioned but never compared" branch was dead code no probe produced.
+ *   Pinned by G13, a reader returning both columns and testing neither.
+ * - **Whole-row projection** (round-2 F3). The rule caught a literal `*` and
+ *   nothing else, so `to_jsonb(r)`, `row_to_json(r)`, `jsonb_agg(r)`, bare
+ *   `select r`, and `r.*` inside a builder each returned **zero** findings
+ *   from the full sweep — a bypass easier to write than the thing the rule
+ *   caught. Pinned by G14, one probe per spelling, each clause of the widened
+ *   rule separately mutation-verified.
+ * - **`security_invoker` present but `false`.** Testing for the option's
+ *   presence accepts the value that turns it off — the F1 lesson on a view
+ *   option. Pinned by G15c.
  *
  * refs specs/002-montero-garage (SHR-01, SHR-05, SHR-06, SHR-07, SHR-08)
  * ====================================================================== */
@@ -1249,6 +1269,138 @@ const G10_FIFTH_TABLE = sql(`
   alter table public.shares enable row level security;
   create policy "shares readable" on public.shares
     for all to anon using (true);
+`);
+
+/**
+ * G12 — **round-2 F1**: a directory that revokes from `anon` and forgets
+ * `public`.
+ *
+ * The half of the tri-state that had no probe at all. `public` is not a role
+ * beside `anon` — it is every role — so a privilege `public` inherited from
+ * Supabase's role setup still reaches `anon`, and `revoke … from anon` does
+ * not touch it. The end-state ACL here is genuinely **unknown**, and the
+ * review proved the gap by flipping the `&&` in the knowledge test to `||` in
+ * either copy and watching all 516 garage tests stay green.
+ */
+const G12_REVOKE_ANON_ONLY = sql(`
+  revoke all on public.records from anon;
+  grant select, insert, update, delete on public.records to authenticated;
+`);
+
+/** G12b — a definer routine with the same omission. */
+const G12B_FUNCTION_REVOKE_ANON_ONLY = sql(`
+  create function public.share_read_records(p_token text)
+  returns table (id uuid)
+  language sql
+  stable
+  security definer
+  set search_path = ''
+  as $share$
+    select r.id from public.records r
+    join public.shares s on s.vehicle_id = r.vehicle_id
+    where s.token_hash = extensions.digest(p_token, 'sha256')
+      and s.revoked_at is null
+      and s.expires_at > now();
+  $share$;
+
+  revoke all on function public.share_read_records(text) from anon;
+`);
+
+/**
+ * G13 — **round-2 F2**: the columns are *returned* and never *tested*.
+ *
+ * The realistic defect shape, and the one the rules were not pinned against:
+ * every earlier probe removed the column entirely, so relaxing either
+ * comparison regex to a bare-mention test left the suite green. A reader that
+ * selects `expires_at` and `revoked_at` into its output — so a caller can see
+ * them — while filtering on neither is a grant that never expires and cannot
+ * be revoked, and it reads as careful.
+ */
+const G13_MENTIONED_NEVER_COMPARED = sql(`
+  create function public.share_read_records(p_token text)
+  returns table (id uuid, expires_at timestamptz, revoked_at timestamptz)
+  language sql
+  stable
+  security definer
+  set search_path = ''
+  as $share$
+    select r.id, s.expires_at, s.revoked_at
+    from public.records r
+    join public.shares s on s.vehicle_id = r.vehicle_id
+    where s.token_hash = extensions.digest(p_token, 'sha256');
+  $share$;
+
+  revoke all on function public.share_read_records(text) from public;
+  grant execute on function public.share_read_records(text) to anon;
+`);
+
+/**
+ * G14 — **round-2 F3**: whole-row projection, in every spelling that is not a
+ * literal `*`.
+ *
+ * Each of these returns every column of `records`, and every one of them
+ * produced **zero** findings from the full `anonSurfaceIssues` sweep. That is
+ * a bypass easier to write than the thing the rule caught.
+ */
+const G14_WHOLE_ROW_SPELLINGS = [
+  ["to_jsonb", "select to_jsonb(r)"],
+  ["to_jsonb(r.*)", "select to_jsonb(r.*)"],
+  ["row_to_json", "select row_to_json(r)"],
+  ["jsonb_agg", "select jsonb_agg(r)"],
+  ["bare alias", "select r"],
+  ["alias.*", "select r.*"],
+  // `r.*` buried in a builder that is NOT a whole-row serialiser. Its own
+  // entry because it is the only spelling the literal-`*` check and the
+  // serialiser check both miss — mutation-verified: dropping the `alias.*`
+  // rule while every other probe stayed green (round-2 self-check).
+  ["alias.* inside a builder", "select jsonb_build_object('all', r.*)"],
+] as const;
+
+function wholeRowReader(projection: string): string {
+  return sql(`
+    create function public.share_read_records(p_token text)
+    returns jsonb
+    language sql
+    stable
+    security definer
+    set search_path = ''
+    as $share$
+      ${projection}
+      from public.records r
+      join public.shares s on s.vehicle_id = r.vehicle_id
+      where s.token_hash = extensions.digest(p_token, 'sha256')
+        and s.revoked_at is null
+        and s.expires_at > now();
+    $share$;
+
+    revoke all on function public.share_read_records(text) from public;
+    grant execute on function public.share_read_records(text) to anon;
+  `);
+}
+
+/** G15 — a view that runs as its owner, so RLS is evaluated against the owner. */
+const G15_VIEW_WITHOUT_INVOKER = sql(`
+  create view public.vehicle_state as
+    select v.id, v.display_name from public.vehicles v;
+`);
+
+/** G15b — the same view, declared to run as its caller. */
+const G15B_VIEW_WITH_INVOKER = sql(`
+  create view public.vehicle_state with (security_invoker = true) as
+    select v.id, v.display_name from public.vehicles v;
+`);
+
+/**
+ * G15c — the option present and switched **off**.
+ *
+ * Its own fixture because "mentions security_invoker" and "runs as the
+ * caller" are different claims, and only the second one is the guarantee.
+ * Mutation-verified: relaxing the rule to a bare mention of the option
+ * survived G15 and G15b together (round-2 self-check).
+ */
+const G15C_VIEW_INVOKER_FALSE = sql(`
+  create view public.vehicle_state with (security_invoker = false) as
+    select v.id, v.display_name from public.vehicles v;
 `);
 
 /** G11 — the bearer secret stored in the clear. */
@@ -1536,6 +1688,142 @@ describe("WIDE-OPEN: the two recorded grader defects", () => {
     expect(ungradedTableIssues(correct)).toEqual([]);
   });
 
+  it("G12 rejects a revoke that forgets `public` — the ACL is UNKNOWN", () => {
+    // Round-2 F1. Revoking from `anon` alone says nothing about what `anon`
+    // can do, because a privilege `public` holds reaches every role.
+    const state = grants(G12_REVOKE_ANON_ONLY);
+
+    expect(rolePrivileges(state, "public.records", "anon").verdict).toBe(
+      "unknown"
+    );
+    expect(privilegeVerdict(state, "public.records", "anon", "select")).toBe(
+      "unknown"
+    );
+    expect(
+      tableGrantIssues(G12_REVOKE_ANON_ONLY, ["records"]).join(" | ")
+    ).toContain("nothing revokes public's inherited privileges");
+  });
+
+  it("G12: adding the `public` revoke is what makes the answer knowable", () => {
+    // The control. One statement is the entire difference between "unknown"
+    // and "none", and if this pair ever agrees the tri-state has collapsed.
+    const complete = `${G12_REVOKE_ANON_ONLY} revoke all on public.records from public; revoke all on public.records from authenticated;`;
+
+    expect(
+      rolePrivileges(grants(complete), "public.records", "anon").verdict
+    ).toBe("none");
+    expect(tableGrantIssues(complete, ["records"])).toEqual([]);
+  });
+
+  it("G12b: a definer routine revoked from anon only stays anon-reachable", () => {
+    // The same omission on the surface where it costs most. The routine looks
+    // locked down — there is a revoke, and it names `anon` — and `public`
+    // still holds Postgres's default EXECUTE.
+    expect(
+      anonExecutableFunctions(G12B_FUNCTION_REVOKE_ANON_ONLY).map(
+        (routine) => routine.name
+      )
+    ).toEqual(["share_read_records"]);
+    expect(
+      anonFunctionAllowListIssues(
+        G12B_FUNCTION_REVOKE_ANON_ONLY,
+        []
+      ).unexpected.join(" | ")
+    ).toContain("security definer");
+  });
+
+  it("G13 rejects columns that are RETURNED but never TESTED", () => {
+    // Round-2 F2. Every earlier probe removed the column outright, so the
+    // rules were pinned only against absence — relaxing either comparison to
+    // a bare-mention test left the suite green.
+    const routine = readerOf(G13_MENTIONED_NEVER_COMPARED);
+
+    expect(expiryCheckIssues(routine).join(" | ")).toContain(
+      "mentioned but never compared"
+    );
+    expect(revocationCheckIssues(routine).join(" | ")).toContain(
+      "cannot be revoked"
+    );
+  });
+
+  it("G13: the hash check is fine — only the two time rules fire", () => {
+    // Each fixture must fail for the reason it was written. This one hashes
+    // correctly and projects named columns; only expiry and revocation are
+    // missing.
+    const routine = readerOf(G13_MENTIONED_NEVER_COMPARED);
+
+    expect(tokenHashIssues(routine)).toEqual([]);
+    expect(projectionIssues(routine)).toEqual([]);
+  });
+
+  it.each(G14_WHOLE_ROW_SPELLINGS)(
+    "G14 rejects whole-row projection spelled `%s`",
+    (_label, projection) => {
+      // Round-2 F3. Every one of these returns every column of `records` and
+      // every one produced zero findings before the rule was widened.
+      const fixture = wholeRowReader(projection);
+
+      expect(projectionIssues(readerOf(fixture))).not.toEqual([]);
+      // And it is caught by the sweep a reviewer actually reads, not only by
+      // the rule in isolation.
+      expect(anonSurfaceIssues(fixture)).not.toEqual([]);
+    }
+  );
+
+  it("G14: a named-column projection over the same query is accepted", () => {
+    // The control for the widened rule. `r.id, r.occurred_on` names its
+    // columns and must stay clean, or the rule is simply refusing joins.
+    const named = wholeRowReader("select r.id, r.occurred_on");
+
+    expect(projectionIssues(readerOf(named))).toEqual([]);
+    expect(anonSurfaceIssues(named)).toEqual([]);
+  });
+
+  it("G14: rowAliases reads the aliases the whole-row rules depend on", () => {
+    // If this returned nothing, every whole-row check above would be vacuous
+    // and the `it.each` would be asserting that literal `*` is still caught.
+    expect(
+      rowAliases(
+        "select r.id from public.records r join public.shares s on s.vehicle_id = r.vehicle_id"
+      )
+    ).toEqual(["r", "s"]);
+  });
+
+  it("G14: a keyword after a table name is not read as an alias", () => {
+    // `from public.records where …` must not bind `where` as a row alias, or
+    // the rule starts hunting for `where.*` and misses the real one.
+    expect(rowAliases("select id from public.records where id = 1")).toEqual([
+      "records",
+    ]);
+  });
+
+  it("G15 rejects a view created without `security_invoker`", () => {
+    // The option arrived in PG15 and defaults to `false`, so the default is
+    // the unsafe direction: the view runs as its owner and RLS on the
+    // underlying tables is evaluated against the owner, not the caller.
+    expect(
+      viewSecurityInvokerIssues(G15_VIEW_WITHOUT_INVOKER).join(" | ")
+    ).toContain("public.vehicle_state");
+  });
+
+  it("G15b accepts a view that runs as its caller", () => {
+    expect(viewSecurityInvokerIssues(G15B_VIEW_WITH_INVOKER)).toEqual([]);
+  });
+
+  it("G15c rejects `security_invoker = false` — mentioning it is not setting it", () => {
+    // The F1 lesson applied to a view option: a rule that tests for the
+    // presence of the word accepts the value that turns it off.
+    expect(
+      viewSecurityInvokerIssues(G15C_VIEW_INVOKER_FALSE).join(" | ")
+    ).toContain("public.vehicle_state");
+  });
+
+  it("G15: a table is not asked for `security_invoker`", () => {
+    // The rule applies to views only. If it fired on tables, the four real
+    // user tables would light up and someone would delete the rule.
+    expect(viewSecurityInvokerIssues(G10_FIFTH_TABLE)).toEqual([]);
+  });
+
   it("G11 rejects a bearer secret stored in the clear", () => {
     expect(
       plaintextTokenColumnIssues(G11_PLAINTEXT_TOKEN_COLUMN).join(" | ")
@@ -1613,6 +1901,37 @@ describe("CORRECT: the reference share reader must be accepted", () => {
         "G11 plaintext token",
         plaintextTokenColumnIssues(G11_PLAINTEXT_TOKEN_COLUMN),
       ],
+      [
+        "G12 revoke forgets public",
+        tableGrantIssues(G12_REVOKE_ANON_ONLY, ["records"]),
+      ],
+      [
+        "G12b definer revoked from anon only",
+        anonFunctionAllowListIssues(G12B_FUNCTION_REVOKE_ANON_ONLY, [])
+          .unexpected,
+      ],
+      [
+        "G13 expiry mentioned never compared",
+        expiryCheckIssues(readerOf(G13_MENTIONED_NEVER_COMPARED)),
+      ],
+      [
+        "G13 revocation mentioned never compared",
+        revocationCheckIssues(readerOf(G13_MENTIONED_NEVER_COMPARED)),
+      ],
+      ...G14_WHOLE_ROW_SPELLINGS.map(
+        ([label, projection]): [string, string[]] => [
+          `G14 whole row via ${label}`,
+          anonSurfaceIssues(wholeRowReader(projection)),
+        ]
+      ),
+      [
+        "G15 view without security_invoker",
+        viewSecurityInvokerIssues(G15_VIEW_WITHOUT_INVOKER),
+      ],
+      [
+        "G15c view with security_invoker = false",
+        viewSecurityInvokerIssues(G15C_VIEW_INVOKER_FALSE),
+      ],
     ];
 
     expect(
@@ -1627,6 +1946,10 @@ describe("CORRECT: the reference share reader must be accepted", () => {
         definerSearchPathIssues(CORRECT_SHARE_READER),
         tableGrantIssues(G9B_REVOKE_ONLY, ["records"]),
         plaintextTokenColumnIssues(G10_FIFTH_TABLE),
+        // Round-2 additions: the widened projection rule must still accept a
+        // named-column projection, and the view rule a caller-scoped view.
+        anonSurfaceIssues(wholeRowReader("select r.id, r.occurred_on")),
+        viewSecurityInvokerIssues(G15B_VIEW_WITH_INVOKER),
       ].flat()
     ).toEqual([]);
   });

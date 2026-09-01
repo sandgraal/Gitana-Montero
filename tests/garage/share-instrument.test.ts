@@ -88,6 +88,7 @@ import {
   tokenHashIssues,
   ungradedTableIssues,
   viewGrantIssues,
+  viewSecurityInvokerIssues,
 } from "./rules.ts";
 import {
   createdTables,
@@ -300,6 +301,20 @@ describe("privileges are graded at the END of the directory", () => {
     // the derived views land; free until then.
     expect(viewGrantIssues(migrationSql())).toEqual([]);
   });
+
+  it("creates every view `with (security_invoker = true)`", () => {
+    // The other half of the view surface, and the half that matters even when
+    // the grants are right. A view runs as its **owner** unless this option
+    // says otherwise, so RLS on the underlying tables is evaluated against the
+    // owner and not the caller — a `security definer` function with nicer
+    // syntax. `security_invoker` arrived in PG15 and defaults to `false`, so
+    // the default is the unsafe direction: the same shape of invariant as
+    // `force row level security`, and it needs a grader for the same reason.
+    //
+    // Vacuous today — no migration creates a view — and it starts paying the
+    // day one does, which is the point of landing it before that day.
+    expect(viewSecurityInvokerIssues(migrationSql())).toEqual([]);
+  });
 });
 
 /* =========================================================================
@@ -322,18 +337,24 @@ describe("every table that exists is a table some grader knows about", () => {
     expect(ungradedTableIssues(migrationSql())).toEqual([]);
   });
 
-  it("keeps the exemption map honest: every exemption carries a reason", () => {
-    // The `EXEMPT_PAGES` standard from `check-hreflang.mjs`. Empty today and
-    // deliberately so — in particular `shares` is *not* exempt, so when
-    // T2-404 creates it this sweep goes red until T2-401 adds it to
-    // `USER_TABLES`, which is the ordering the task list already encodes.
-    for (const [table, reason] of EXEMPT_PUBLIC_TABLES) {
-      expect(reason.trim(), `exemption for ${table}`).not.toBe("");
-      expect(
-        USER_TABLE_NAMES,
-        `${table} is both exempt and enumerated`
-      ).not.toContain(table);
-    }
+  it("the exemption map is EMPTY — growing it is a deliberate diff", () => {
+    // Round-2 review, F4. This used to iterate the map asserting each entry
+    // carried a reason, which over an empty map is a test that cannot fail —
+    // the exact thing this file's own standard forbids.
+    //
+    // Asserting the size instead does two jobs. It can fail, and it turns
+    // adding an exemption into an edit *here*, in a file called
+    // `share-instrument`, rather than a quiet line in a data table. That
+    // closes the path where T2-404 unblocks its own red build by exempting
+    // `shares` with a plausible-sounding reason: the exemption and the
+    // grader's blessing of it now land in the same diff, where a conductor
+    // reviewing the sharing work will see both.
+    //
+    // The mechanism itself — that a named exemption is honoured and an
+    // unnamed table is not — is graded against a synthetic map in
+    // `reviewer-probes.test.ts` (G10), so keeping this one at zero costs no
+    // coverage.
+    expect(EXEMPT_PUBLIC_TABLES.size).toBe(0);
   });
 
   it("stores no share token in the clear, in any table", () => {
