@@ -439,6 +439,19 @@ export function timeInUnit(minutes: number, unit: TimeUnit): number {
 }
 
 /**
+ * The time field as the form writes it: stored minutes in one unit, or empty.
+ *
+ * One function so {@link recordDraftFromRow} and {@link convertTimeField}
+ * cannot disagree about what "the field, showing the stored figure" looks
+ * like. That agreement is load-bearing — it is the comparison the untouched
+ * guard in {@link recordWriteFromDraft} makes — and when it lived in two
+ * places it was wrong in one of them.
+ */
+export function timeFieldText(minutes: number | null, unit: TimeUnit): string {
+  return minutes === null ? "" : String(timeInUnit(minutes, unit));
+}
+
+/**
  * The text of the time field, re-expressed after the reader changes the unit.
  *
  * The least-surprising thing a unit control can do is convert what is in the
@@ -453,16 +466,35 @@ export function timeInUnit(minutes: number, unit: TimeUnit): number {
  * the reader's, and rewriting it to `0` while they are mid-keystroke is the
  * same class of surprise this function exists to remove.
  *
- * The save path does not depend on this: `recordWriteFromDraft` compares the
- * field against `previous` rendered in the *current* unit, so converting an
- * untouched stored figure here still saves as the stored figure.
+ * ## `previousMinutes`, and why converting the text was not enough
+ *
+ * Round two of the review found F1 again, one level up. A stored 45 minutes
+ * shows as `0.8` in hours; converting *that text* to minutes gives 48, which
+ * is no longer what `recordDraftFromRow` would render, so the untouched guard
+ * stopped recognising it and a title-only save wrote 48. The same walk hits
+ * 1→0, 95→96, 359→360, 1000→1002 — every value that is not a multiple of six.
+ * The h→min direction is the likely one, too, because the form opens in hours.
+ *
+ * So when the field still reads exactly what the stored figure renders as in
+ * the unit being left, the answer comes from **`previousMinutes`, not from the
+ * text**: the display was lossy, the row was not. Anything the reader actually
+ * typed is converted as before, so F4 stays fixed. The two cases are exactly
+ * "is this the stored figure or the reader's?", which is the same question the
+ * save path asks, answered against the same rendering.
  */
 export function convertTimeField(
   raw: string,
   from: TimeUnit,
-  to: TimeUnit
+  to: TimeUnit,
+  previousMinutes: number | null = null
 ): string {
   if (from === to) return raw;
+  if (
+    previousMinutes !== null &&
+    raw === timeFieldText(previousMinutes, from)
+  ) {
+    return timeFieldText(previousMinutes, to);
+  }
   const parsed = parseTime(raw, from);
   if (parsed.issue !== null || parsed.minutes === null) return raw;
   return String(timeInUnit(parsed.minutes, to));
@@ -899,10 +931,7 @@ export function recordDraftFromRow(
     body: row.body ?? "",
     cost: row.cost_amount === null ? "" : String(row.cost_amount),
     currency: row.cost_currency ?? "",
-    time:
-      row.time_minutes === null
-        ? ""
-        : String(timeInUnit(row.time_minutes, units.timeUnit)),
+    time: timeFieldText(row.time_minutes, units.timeUnit),
     timeUnit: units.timeUnit,
     odometer:
       row.odometer_km === null

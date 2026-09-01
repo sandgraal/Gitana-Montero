@@ -744,6 +744,21 @@ export async function uploadReceipt(
  * The other order's cost is a row pointing at bytes that are gone, for as long
  * as it takes to press the button again — visible, retryable, and recoverable.
  * An unreachable object is none of the three.
+ *
+ * ## The object's failure stops the row, and here that is not belt-and-braces
+ *
+ * `deleteRecord` and `deleteVehicle` deliberately ignore a failed object
+ * removal, because a record or a vehicle the user asked to delete has to go
+ * and a trigger or the account purge sweeps up behind them. Neither is true of
+ * one receipt: nothing else ever revisits a single object, so proceeding past
+ * a reported failure would manufacture exactly the unreachable bytes the
+ * ordering above exists to prevent (T2-302 review, round 2). So the error is
+ * checked and the row stays — the receipt is still listed, and pressing remove
+ * again is a retry rather than a dead end.
+ *
+ * An object that is already gone does not take this branch: the Storage API's
+ * `remove` reports no error for a key that is not there, so a row whose bytes
+ * vanished is still deletable.
  */
 export async function removeReceipt(
   receipt: ReceiptRow
@@ -753,7 +768,10 @@ export async function removeReceipt(
   const { client, userId } = open.value;
 
   if (receiptPathBelongsTo(userId, receipt.storage_path)) {
-    await client.storage.from(RECEIPTS_BUCKET).remove([receipt.storage_path]);
+    const removed = await client.storage
+      .from(RECEIPTS_BUCKET)
+      .remove([receipt.storage_path]);
+    if (removed.error) return failed();
   }
 
   const { error } = await client.from("receipts").delete().eq("id", receipt.id);

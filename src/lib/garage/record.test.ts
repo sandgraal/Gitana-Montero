@@ -260,34 +260,91 @@ describe("convertTimeField", () => {
     expect(convertTimeField("-1", "h", "min")).toBe("-1");
   });
 
-  it("keeps a converted stored figure recognisable as untouched", () => {
-    // The join with F1: switching units on an unedited record has to leave
-    // the field equal to what `recordDraftFromRow` would render in the new
-    // unit, or the save path would stop seeing it as untouched and would
-    // write the walked value after all.
+  it.each([
+    ["h", "min"],
+    ["min", "h"],
+  ] as const)(
+    "keeps a stored figure recognisable as untouched across %s → %s",
+    (from, to) => {
+      /*
+       * The join with F1, in BOTH directions — the first version of this
+       * grader ran only min → h, which is the safe one, and was green over a
+       * live defect (T2-302 review, round 2).
+       *
+       * h → min is the direction the form's own default makes likely, and it
+       * was the broken one: 45 minutes displays as `0.8` hours, and converting
+       * that text gives 48. Every value below is one the display cannot
+       * round-trip — only multiples of six survive — so none of these
+       * assertions can pass by accident the way a 72-minute fixture would.
+       */
+      for (const minutes of [1, 45, 100, 359]) {
+        const previous = row({ time_minutes: minutes });
+        const shown = recordDraftFromRow(previous, {
+          odometerUnit: "km",
+          timeUnit: from,
+        }).time;
+
+        const switched = convertTimeField(shown, from, to, minutes);
+
+        // What the reader now sees is what the row renders as in the new unit.
+        expect(switched).toBe(
+          recordDraftFromRow(previous, { odometerUnit: "km", timeUnit: to })
+            .time
+        );
+
+        // …and the untouched guard still recognises it, so a title-only save
+        // writes the stored figure and not the displayed one.
+        const write = recordWriteFromDraft(
+          "v1",
+          {
+            ...recordDraftFromRow(previous, {
+              odometerUnit: "km",
+              timeUnit: to,
+            }),
+            title: "Edited only the title",
+            time: switched,
+          },
+          CATALOGUE,
+          previous
+        );
+        expect(write?.time_minutes).toBe(minutes);
+      }
+    }
+  );
+
+  it("shows the stored minutes, not the walked ones, after h → min", () => {
+    // The compound case spelled out end to end on the value that used to
+    // walk: open in hours, switch to minutes, change only the title, save.
     const previous = row({ time_minutes: 45 });
-    const inMinutes = recordDraftFromRow(previous, {
+    const inHours = recordDraftFromRow(previous, {
       odometerUnit: "km",
-      timeUnit: "min",
-    }).time;
-    const switched = convertTimeField(inMinutes, "min", "h");
-    expect(switched).toBe(
-      recordDraftFromRow(previous, { odometerUnit: "km", timeUnit: "h" }).time
-    );
+      timeUnit: "h",
+    });
+    expect(inHours.time).toBe("0.8");
+
+    const switched = convertTimeField(inHours.time, "h", "min", 45);
+    expect(switched).toBe("45");
+
     const write = recordWriteFromDraft(
       "v1",
       {
         ...recordDraftFromRow(previous, {
           odometerUnit: "km",
-          timeUnit: "h",
+          timeUnit: "min",
         }),
-        title: "Edited only the title",
+        title: "Oil and filter change — full synthetic",
         time: switched,
       },
       CATALOGUE,
       previous
     );
     expect(write?.time_minutes).toBe(45);
+  });
+
+  it("still converts a figure the reader typed (F4 stays fixed)", () => {
+    // `previousMinutes` must not swallow real input: `2` is not what a stored
+    // 45 renders as in hours, so it is the reader's and it converts.
+    expect(convertTimeField("2", "h", "min", 45)).toBe("120");
   });
 });
 

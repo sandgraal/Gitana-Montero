@@ -2597,17 +2597,18 @@ const hasReferences = Object.values(referenceCatalogue).some(
 
     els.recordTimeUnit?.addEventListener("change", () => {
       /*
-       * Convert what is in the field, on every path.
+       * The unit control changes how a figure is written, never which figure
+       * it is — and there are two figures it could be.
        *
-       * Not "re-render from the stored row", which is what this did first: on
-       * an existing record that silently discarded whatever the reader had
-       * typed and not yet saved, and on a *new* record it did nothing at all,
-       * so `2` hours quietly became two minutes (T2-302 review, F4). The unit
-       * control changes how a figure is written, never which figure it is.
+       * If the box still reads the stored value, `convertTimeField` re-renders
+       * it from the row: the display is lossy (45 min shows as `0.8` h) and
+       * converting *that* would write 48 back on the next save, which is F1
+       * recurring one level up (T2-302 review, round 2). If the reader typed
+       * something, it is converted, which is F4's fix and stays.
        *
-       * The save path is unaffected: `recordWriteFromDraft` compares the field
-       * against `previous` rendered in the unit the form is *now* in, so an
-       * untouched stored figure converted here still saves as the stored one.
+       * Both cases are decided inside `convertTimeField`, against the same
+       * rendering of the row that `recordWriteFromDraft`'s untouched guard
+       * compares to — so the two cannot disagree about which figure this is.
        */
       const chosen = (els.recordTimeUnit?.value === "min" ? "min" : "h") as
         "h" | "min";
@@ -2615,7 +2616,8 @@ const hasReferences = Object.values(referenceCatalogue).some(
       els.recordTime.value = convertTimeField(
         els.recordTime.value,
         recordTimeUnit,
-        chosen
+        chosen,
+        editingRecord?.time_minutes ?? null
       );
       recordTimeUnit = chosen;
     });
@@ -3075,10 +3077,11 @@ const hasReferences = Object.values(referenceCatalogue).some(
    * by one class on the `<li>`, set from `kind`.
    *
    * One deliberate departure from the artboard: the `date · odometer` meta
-   * line is `--muted` rather than `--faint`. `#A99C88` on `--paper` measures
-   * 2.69:1, and this site holds itself to WCAG 2.1 AA, where body text needs
-   * 4.5:1. The artboard's *hierarchy* is kept — the meta line is still the
-   * quietest thing in the card — at a colour a reader can actually read.
+   * line is `--muted` rather than `--faint`. `#A99C88` measures **2.45:1** on
+   * `--paper` (`#f7f4ee`), which is the substrate this line actually sits on,
+   * and 2.69:1 even on white; this site holds itself to WCAG 2.1 AA, where
+   * body text needs 4.5:1. The artboard's *hierarchy* is kept — the meta line
+   * is still the quietest thing in the card — at a colour a reader can read.
    * ------------------------------------------------------------------- */
 
   .garage__timeline {

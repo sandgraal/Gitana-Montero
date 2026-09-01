@@ -305,7 +305,15 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   An edit to a record's *title* added three minutes to the job. The suite
   missed it because every fixture used 72 minutes — 1.2 h — one of the few
   values that survives. Both figures now share one rendering of `previous`, and
-  the counterpart grader sweeps 1/45/100/359. Two smaller ones folded in: a
+  the counterpart grader sweeps 1/45/100/359. **It came back once, one level
+  up:** the unit control converted the *displayed* text, so a stored 45 shown
+  as `0.8` h became `48` on the switch to minutes and the untouched guard
+  stopped recognising it — and the first grader for that only ran the safe
+  min→h direction, so it was green over a live defect. `convertTimeField` now
+  takes the stored minutes and re-renders from the row when the box still
+  reads what the row renders as, converting only what a reader actually typed;
+  the grader runs both directions over values the display cannot round-trip
+  (only multiples of six survive). Two smaller ones folded in: a
   receipt's object is now removed **before** its row (the row is the only index
   a receipt has, unlike a photo's `photo_paths`, so row-first could strand
   bytes nothing can name), and the time-unit control now *converts* the typed
