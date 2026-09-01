@@ -16,6 +16,7 @@ import {
   causeConfidence,
   causeConfidenceDiffers,
   compareProblems,
+  costBandAccessibleName,
   costBandGlyphs,
   drivabilityRank,
   fitmentYearsLabel,
@@ -28,6 +29,7 @@ import {
   COST_BANDS,
   DRIVABILITY_STATES,
   PROBLEM_SEVERITIES,
+  type CostBand,
 } from "../../src/schemas/problems.ts";
 
 function routable(id: string, en: string, es: string) {
@@ -180,6 +182,54 @@ describe("cost bands render as glyphs, never as a figure", () => {
     for (const band of COST_BANDS) {
       expect(costBandGlyphs({ from: band })).not.toMatch(/\p{L}/u);
     }
+  });
+});
+
+describe("the spoken form of a cost band says as much as the glyphs (F2)", () => {
+  const label = (band: string) => `LABEL(${band})`;
+
+  it("names the single band", () => {
+    expect(costBandAccessibleName({ from: "moderate" }, label)).toBe(
+      "LABEL(moderate)"
+    );
+  });
+
+  it("names BOTH ends of a range — the review-F2 regression", () => {
+    // `$–$$` announced as "cheapest class of repair" hid the upper half of the
+    // estimate from exactly the readers who cannot see the glyphs.
+    const spoken = costBandAccessibleName(
+      { from: "minimal", to: "moderate" },
+      label
+    );
+    expect(spoken).toContain("LABEL(minimal)");
+    expect(spoken).toContain("LABEL(moderate)");
+  });
+
+  it("collapses a range whose ends are the same band, like the glyphs do", () => {
+    expect(costBandAccessibleName({ from: "major", to: "major" }, label)).toBe(
+      "LABEL(major)"
+    );
+  });
+
+  it("says a band for every glyph, across the whole vocabulary", () => {
+    for (const from of COST_BANDS) {
+      for (const to of COST_BANDS) {
+        if (COST_BANDS.indexOf(to) < COST_BANDS.indexOf(from)) continue;
+        const glyphs = costBandGlyphs({ from, to });
+        const spoken = costBandAccessibleName({ from, to }, label);
+        const ends = glyphs.includes("–") ? 2 : 1;
+        expect(spoken.match(/LABEL\(/g)?.length, `${from}→${to}`).toBe(ends);
+      }
+    }
+  });
+
+  it("invents no connector word — the caller owns every translated string", () => {
+    // With letterless labels the result must stay letterless: anything this
+    // module joined the two ends with would be untranslated English.
+    const digits = (band: CostBand) => String(COST_BANDS.indexOf(band));
+    expect(
+      costBandAccessibleName({ from: "minimal", to: "major" }, digits)
+    ).not.toMatch(/\p{L}/u);
   });
 });
 

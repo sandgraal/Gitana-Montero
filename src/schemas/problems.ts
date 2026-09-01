@@ -298,7 +298,14 @@ export const COST_BANDS = [
 
 export type CostBand = (typeof COST_BANDS)[number];
 
-const costBandSchema = z.enum(COST_BANDS);
+/**
+ * Exported for T501 (review call #8): PRT-01's "typical price band" defers to
+ * this vocabulary rather than minting a second one. A part's price band and a
+ * fix path's cost band are the same claim about the same money — two enums
+ * would render as two different chips for one idea, and would drift the first
+ * time either list gained a step.
+ */
+export const costBandSchema = z.enum(COST_BANDS);
 
 /**
  * A cost band, or a range of them (`$–$$`, the artboard's first fix card).

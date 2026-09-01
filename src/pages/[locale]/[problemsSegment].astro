@@ -158,11 +158,18 @@ const fitmentTable = buildFitmentTable(
                   >
                     {problemSeverityLabel(strings, problem.severity)}
                   </span>
-                  {problem.safetyCritical && (
-                    <span class="chip chip--safety">
-                      {problemSeverityLabel(strings, "safety-critical")}
-                    </span>
-                  )}
+                  {/*
+                   * One chip, not two (review F6): the safety chip is
+                   * suppressed when the severity chip beside it already says
+                   * the same word. It still appears on its own when the
+                   * *system* is what makes the card safety-critical.
+                   */}
+                  {problem.safetyCritical &&
+                    problem.severity !== "safety-critical" && (
+                      <span class="chip chip--safety">
+                        {problemSeverityLabel(strings, "safety-critical")}
+                      </span>
+                    )}
                 </p>
                 {problem.symptoms.length > 0 && (
                   <ul class="problem-card__symptoms">

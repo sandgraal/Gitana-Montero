@@ -213,6 +213,31 @@ export function costBandGlyphs(cost: {
   return `${glyphs(cost.from)}–${glyphs(cost.to)}`;
 }
 
+/**
+ * The spoken form of {@link costBandGlyphs} — what a screen reader announces
+ * where a sighted reader sees `$–$$`.
+ *
+ * Both ends, always, when the range has two (review F2): the first version
+ * named only `from`, so `{ from: minimal, to: moderate }` showed "$–$$" and
+ * announced "Cheapest class of repair" — the upper half of the estimate was
+ * visible to some readers and not to others, which is exactly the failure the
+ * glyphs' `aria-label` exists to prevent.
+ *
+ * `labelOf` is injected rather than imported so this stays a pure function of
+ * the band vocabulary and knows no strings: the caller passes
+ * `costBandLabel(strings, …)` in the page's own locale, and this module keeps
+ * containing no translated text. The en dash matches the glyphs' own
+ * separator, and no connector word is invented — "from X to Y" would need a
+ * grammar this module has no business owning.
+ */
+export function costBandAccessibleName(
+  cost: { readonly from: CostBand; readonly to?: CostBand | undefined },
+  labelOf: (band: CostBand) => string
+): string {
+  if (cost.to === undefined || cost.to === cost.from) return labelOf(cost.from);
+  return `${labelOf(cost.from)} – ${labelOf(cost.to)}`;
+}
+
 /** `FIX_TIME_UNITS` ids → the ECMA-402 unit `Intl.NumberFormat` knows. */
 const INTL_TIME_UNIT: Readonly<Record<FixTimeUnit, string>> = {
   min: "minute",

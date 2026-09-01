@@ -88,6 +88,7 @@ import {
   assertProblemSlugs,
   causeConfidence,
   causeConfidenceDiffers,
+  costBandAccessibleName,
   costBandGlyphs,
   fitmentYearsLabel,
   fixTimeLabel,
@@ -210,7 +211,19 @@ const causePhrase = new Map(
           {confidenceTierLabel(strings, data.confidence)}
         </span>
         {
-          safetyCritical && (
+          /*
+           * The safety chip only when the severity chip is not already saying
+           * the same word (review F6). `severity: safety-critical` rendered
+           * both, so the entry that most needs a reader's attention showed the
+           * same phrase twice and read as a rendering bug. The chip still
+           * appears on its own when the *system* is what makes the entry
+           * safety-critical — a `cosmetic` problem on the brakes shows
+           * "Cosmetic" and "Safety-critical", which are two different, true
+           * things.
+           */
+        }
+        {
+          safetyCritical && data.severity !== "safety-critical" && (
             <span class="chip chip--safety">
               {problemSeverityLabel(strings, "safety-critical")}
             </span>
@@ -335,12 +348,18 @@ const causePhrase = new Map(
                    * it a name without putting absolutely-positioned text on
                    * the page (which Pa11y flags as an unresolvable-background
                    * contrast advisory). The words come from `costBand.<id>`
-                   * in both locales.
+                   * in both locales, and `costBandAccessibleName` names BOTH
+                   * ends of a range — announcing only `from` hid the upper half
+                   * of the estimate from exactly the readers who cannot see the
+                   * glyphs (review F2).
                    */}
                   <span
                     class="chip chip--data"
                     role="img"
-                    aria-label={`${strings.problemCostLabel}: ${costBandLabel(strings, fix.cost.from)}`}
+                    aria-label={`${strings.problemCostLabel}: ${costBandAccessibleName(
+                      fix.cost,
+                      (band) => costBandLabel(strings, band)
+                    )}`}
                   >
                     {costBandGlyphs(fix.cost)}
                   </span>
