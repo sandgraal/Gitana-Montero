@@ -5,9 +5,9 @@
     "implementer": { "model": "sonnet", "effort": "high" },
     "test-writer": { "model": "sonnet", "effort": "high" },
     "content-researcher": { "model": "sonnet", "effort": "high" },
-    "fact-checker": { "model": "opus", "effort": "high" },
-    "bilingual-editor": { "model": "opus", "effort": "high" },
-    "code-reviewer": { "model": "opus", "effort": "high" },
+    "fact-checker": { "model": "sonnet", "effort": "high" },
+    "bilingual-editor": { "model": "sonnet", "effort": "high" },
+    "code-reviewer": { "model": "sonnet", "effort": "high" },
     "pr-shepherd": { "model": "haiku", "effort": "medium" }
   },
   "hardOpusTriggers": [
