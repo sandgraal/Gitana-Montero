@@ -319,6 +319,15 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   bytes nothing can name), and the time-unit control now *converts* the typed
   value on every path instead of discarding it on an existing record and
   silently reinterpreting it on a new one (`2` hours became two minutes).
+  <br>**Zero and unknown are not the same chip (PR #68).** A failed receipts
+  request reached the timeline as an empty map, so every card rendered as "no
+  receipts attached" with nothing saying the request had failed — a wrong
+  answer wearing the clothes of a right one, on the page that is supposed to
+  be the record of what happened. The counts are now
+  `ReadonlyMap | null`, so a caller cannot read the failure as zero; the
+  records still paint (losing a whole work log to hide one chip is the worse
+  trade), no receipt chips are drawn, and a notice beside the rail says the
+  counts are unavailable and that opening a record still shows its own.
   <br>**Found, not fixed — receipts have no delete-trigger belt.**
   `on_vehicle_deleted` sweeps `vehicle-photos` by `<owner>/<vehicle>/` prefix;
   receipt objects are `<owner>/<file>` (the contract's shape), so no prefix

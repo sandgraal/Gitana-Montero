@@ -258,6 +258,37 @@ export const EMPTY_RECEIPT_DRAFT: ReceiptDraft = {
   currency: "",
 };
 
+/**
+ * How many receipts each record has — or `null`, meaning nobody knows.
+ *
+ * ## Why the "unknown" case is a type and not a flag
+ *
+ * The timeline draws a receipts chip when a record has receipts and no chip
+ * when it has none. Those are the only two states a `Map<string, number>` can
+ * express, so a *failed* receipts request had nowhere to go: passing an empty
+ * map rendered every card as "no receipts attached", which is a claim, and a
+ * false one, on a page whose whole purpose is being the record of what
+ * happened (T2-302 review, PR #68). Nothing said it had failed, either.
+ *
+ * `null` is that missing third state. A caller cannot accidentally treat it as
+ * zero — the type stops it — and the page's job becomes the one it should have
+ * had all along: say the counts are unavailable, and draw no chip that would
+ * imply otherwise.
+ *
+ * @param rows every receipt attached to the records on screen, or `null` when
+ *   the request for them failed.
+ */
+export function receiptCountsByRecord(
+  rows: readonly Pick<ReceiptRow, "record_id">[] | null
+): ReadonlyMap<string, number> | null {
+  if (rows === null) return null;
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    counts.set(row.record_id, (counts.get(row.record_id) ?? 0) + 1);
+  }
+  return counts;
+}
+
 /** Receipts in the order they are shown: by issue date, then by id. */
 export function sortReceipts(rows: readonly ReceiptRow[]): ReceiptRow[] {
   return [...rows].sort(

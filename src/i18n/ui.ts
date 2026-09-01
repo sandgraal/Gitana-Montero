@@ -392,6 +392,12 @@ export interface UiStrings
   readonly garageRecordIssueTime: string;
   readonly garageRecordIssueTimeLarge: string;
   readonly garageRecordIssueReferences: string;
+  /**
+   * Shown on the timeline when the records loaded but their receipt counts did
+   * not. Without it a card with no chip reads as "no receipts attached", which
+   * on a record of what happened is a wrong answer rather than a missing one.
+   */
+  readonly garageReceiptCountsUnavailable: string;
   readonly garageReceiptsHeading: string;
   readonly garageReceiptsEmpty: string;
   readonly garageReceiptsPrivateNote: string;
@@ -733,6 +739,8 @@ const en: UiStrings = {
     "That is longer than this site records for one job.",
   garageRecordIssueReferences:
     "One of the reference entries chosen is not on this site any more. Unselect it and save again.",
+  garageReceiptCountsUnavailable:
+    "Your records are here, but this page could not check which of them have receipts — so no receipt counts are shown below. Open a record to see its own. Reloading usually fixes it.",
   garageReceiptsHeading: "Receipts",
   garageReceiptsEmpty: "No receipts attached to this record.",
   garageReceiptsPrivateNote:
@@ -1080,6 +1088,8 @@ const es: UiStrings = {
     "Eso pasa del tiempo que el sitio registra para un solo trabajo.",
   garageRecordIssueReferences:
     "Una de las entradas de referencia escogidas ya no está en el sitio. Quítele la selección y guarde de nuevo.",
+  garageReceiptCountsUnavailable:
+    "Sus fichas están aquí, pero la página no pudo revisar cuáles tienen factura, así que abajo no se muestra ningún conteo de facturas. Abra una ficha para ver las suyas. Casi siempre se arregla recargando.",
   garageReceiptsHeading: "Facturas",
   garageReceiptsEmpty: "Esta ficha no tiene facturas adjuntas.",
   garageReceiptsPrivateNote:

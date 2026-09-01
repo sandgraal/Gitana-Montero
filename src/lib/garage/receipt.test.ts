@@ -8,6 +8,7 @@ import {
   receiptIssue,
   receiptObjectPath,
   receiptPathBelongsTo,
+  receiptCountsByRecord,
   receiptPrefix,
   receiptWriteFromDraft,
   sortReceipts,
@@ -234,6 +235,40 @@ describe("receiptWriteFromDraft", () => {
         draft({ amount: "1.500" })
       )
     ).toBeNull();
+  });
+});
+
+describe("receiptCountsByRecord", () => {
+  it("counts the receipts on each record", () => {
+    const counts = receiptCountsByRecord([
+      receipt({ id: "a", record_id: "r1" }),
+      receipt({ id: "b", record_id: "r1" }),
+      receipt({ id: "c", record_id: "r2" }),
+    ]);
+    expect(counts?.get("r1")).toBe(2);
+    expect(counts?.get("r2")).toBe(1);
+  });
+
+  it("says nothing about a record with no receipts", () => {
+    // Absent from the map, which the page renders as no chip — the honest
+    // reading of a successful request that found nothing.
+    expect(receiptCountsByRecord([])?.size).toBe(0);
+    expect(receiptCountsByRecord([])?.get("r1")).toBeUndefined();
+  });
+
+  it("distinguishes a failed request from a record with no receipts", () => {
+    /*
+     * The defect this pins (PR #68): a failed receipts request used to reach
+     * the timeline as an empty map, so every card rendered as "no receipts
+     * attached" with nothing on screen saying the request had failed. On a
+     * page that is somebody's record of what happened to their truck, a
+     * falsely-empty chip is worse than an error — it is a wrong answer
+     * wearing the clothes of a right one.
+     *
+     * `null` cannot be read as zero by accident; the type refuses it.
+     */
+    expect(receiptCountsByRecord(null)).toBeNull();
+    expect(receiptCountsByRecord([])).not.toBeNull();
   });
 });
 

@@ -308,6 +308,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
     data-string-receipt-vendor-long={strings.garageReceiptIssueVendorLong}
     data-string-receipt-issue-date={strings.garageReceiptIssueDate}
     data-string-receipt-untitled={strings.garageReceiptUntitled}
+    data-string-receipt-counts-unavailable={strings.garageReceiptCountsUnavailable}
     data-locale={LOCALE_BCP47[locale]}
   >
     <div class="garage__intro">
@@ -476,6 +477,23 @@ const hasReferences = Object.values(referenceCatalogue).some(
                     {strings.garageRecordAdd}
                   </button>
                 </div>
+
+                {/*
+                 * Whatever went wrong loading this vehicle's history, said
+                 * here rather than in the app-level line at the foot of the
+                 * page: it belongs beside the rail it is about, which is also
+                 * where a missing receipts chip would otherwise be read as
+                 * "no receipts". Kept in the layout always, empty or not — a
+                 * live region that is `display: none` when empty is not in
+                 * the accessibility tree, so its first message is the one
+                 * nobody hears.
+                 */}
+                <p
+                  class="garage__message"
+                  data-garage-records-message
+                  role="status"
+                  aria-live="polite"
+                />
 
                 <p class="garage__empty-note" data-garage-timeline-empty>
                   {strings.garageTimelineEmpty}
@@ -1295,6 +1313,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
   } from "../../lib/garage/record";
   import {
     EMPTY_RECEIPT_DRAFT,
+    receiptCountsByRecord,
     receiptIssue,
     receiptWriteFromDraft,
     sortReceipts,
@@ -1415,6 +1434,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
       photoMessage: query<HTMLElement>("[data-garage-photo-message]"),
       timeline: query<HTMLOListElement>("[data-garage-timeline]"),
       timelineEmpty: query<HTMLElement>("[data-garage-timeline-empty]"),
+      recordsMessage: query<HTMLElement>("[data-garage-records-message]"),
       plannedList: query<HTMLOListElement>("[data-garage-planned]"),
       plannedEmpty: query<HTMLElement>("[data-garage-planned-empty]"),
       recordAdd: query<HTMLButtonElement>("[data-garage-record-add]"),
@@ -1835,7 +1855,10 @@ const hasReferences = Object.values(referenceCatalogue).some(
       }
       show("detail");
       void paintPhotos(row).catch(() => unreachable(els.photoMessage));
-      void loadRecords(row).catch(() => unreachable(els.message));
+      // Beside the rail, like every other way loading records can fail. The
+      // app-level line stays for the boot path, which is about the whole page
+      // rather than about this panel.
+      void loadRecords(row).catch(() => unreachable(els.recordsMessage));
     }
 
     async function paintPhotos(row: VehicleRow): Promise<void> {
@@ -1910,7 +1933,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
       target: HTMLOListElement | null,
       empty: HTMLElement | null,
       rows: readonly RecordRow[],
-      countsByRecord: ReadonlyMap<string, number>
+      countsByRecord: ReadonlyMap<string, number> | null
     ): void {
       if (!target) return;
       target.replaceChildren();
@@ -1974,7 +1997,9 @@ const hasReferences = Object.values(referenceCatalogue).some(
               )
             );
           }
-          const attached = countsByRecord.get(row.id) ?? 0;
+          // `null` is "nobody knows", not "none": no chip either way, but the
+          // notice above the rail is what tells the reader which one this is.
+          const attached = countsByRecord?.get(row.id) ?? 0;
           if (attached > 0) {
             built.push(
               chip(
@@ -2035,8 +2060,24 @@ const hasReferences = Object.values(referenceCatalogue).some(
       }
     }
 
-    /** Both rails and the two counts, from one array of records. */
-    function paintRecords(countsByRecord: ReadonlyMap<string, number>): void {
+    /**
+     * Both rails and the two counts, from one array of records.
+     *
+     * `countsByRecord === null` means the receipts request failed, and the
+     * cards say so above the rail rather than drawing every record as though
+     * it had no receipts (PR #68). Painting the notice here and not at the
+     * call site is deliberate: every path that renders the rails goes through
+     * this function, so none of them can render the ambiguous state silently.
+     */
+    function paintRecords(
+      countsByRecord: ReadonlyMap<string, number> | null
+    ): void {
+      say(
+        els.recordsMessage,
+        countsByRecord === null
+          ? (text.stringReceiptCountsUnavailable ?? "")
+          : ""
+      );
       paintEntries(
         els.timeline,
         els.timelineEmpty,
@@ -2064,18 +2105,33 @@ const hasReferences = Object.values(referenceCatalogue).some(
      * Load one vehicle's records and the receipt counts that go on their
      * cards.
      *
-     * Two requests, both scoped by the policies rather than by these
-     * arguments: the records of a vehicle, then every receipt attached to any
-     * of them. A failure paints nothing and says so — an empty rail with an
-     * error beside it is honest; an empty rail alone would read as "you have
-     * never recorded anything".
+     * Two requests, and they fail differently on purpose (PR #68).
+     *
+     * **The records themselves** are the page. If that request fails there is
+     * nothing honest to draw, so nothing is drawn and the rail says why: an
+     * empty rail alone would read as "you have never recorded anything",
+     * which is a wrong answer rather than a missing one.
+     *
+     * **The receipt counts** are one chip on each card. If only that request
+     * fails, throwing away a work log that arrived intact would cost the
+     * reader the whole page to hide a decoration — so the records still
+     * paint, and the counts come through as `null`, which
+     * {@link paintRecords} renders as a notice above the rail and no chips at
+     * all. That keeps the failure visible without letting a missing chip
+     * assert "no receipts". Each record's own receipts are still reachable by
+     * opening it, where `paintReceipts` makes its own request and reports its
+     * own failure.
+     *
+     * Both messages land beside the rail rather than in the app-level line at
+     * the foot of the page, because both are about what is (or is not) drawn
+     * there.
      */
     async function loadRecords(vehicle: VehicleRow): Promise<void> {
       const result = await listRecords(vehicle.id);
       if (!result.ok) {
         records = [];
         paintRecords(new Map());
-        say(els.message, text.stringError ?? "");
+        say(els.recordsMessage, text.stringError ?? "");
         return;
       }
       if (opened?.id !== vehicle.id) return;
@@ -2083,16 +2139,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
 
       const attached = await listReceipts(records.map((row) => row.id));
       if (opened?.id !== vehicle.id) return;
-      const counts = new Map<string, number>();
-      if (attached.ok) {
-        for (const receipt of attached.value) {
-          counts.set(
-            receipt.record_id,
-            (counts.get(receipt.record_id) ?? 0) + 1
-          );
-        }
-      }
-      paintRecords(counts);
+      paintRecords(receiptCountsByRecord(attached.ok ? attached.value : null));
     }
 
     function currentRecordDraft(): RecordDraft {
