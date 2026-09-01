@@ -25,6 +25,7 @@ import { z } from "astro/zod";
 import { defineEntrySchema } from "./schemas/entry";
 import { communitySchema } from "./schemas/community";
 import { glossaryEntrySchema } from "./schemas/glossary";
+import { partsSchema } from "./schemas/parts";
 import { problemsEntrySchema } from "./schemas/problems";
 import { referenceEntrySchema } from "./schemas/reference";
 import { vehiclesEntrySchema } from "./schemas/vehicles";
@@ -159,8 +160,8 @@ export const collections = {
   garage: entryCollection("garage", baseEntrySchema()),
   /** PRB-01…06 — the symptom-driven problem finder. T401 (schema half). */
   problems: entryCollection("problems", problemsEntrySchema(baseProse)),
-  /** PRT-01…03 — parts, fitment, supersession chains. */
-  parts: entryCollection("parts", baseEntrySchema()),
+  /** PRT-01…03 — parts, fitment, supersession chains (T501). */
+  parts: entryCollection("parts", partsSchema),
   /** PRC-01…03 — step-by-step procedures. */
   procedures: entryCollection("procedures", baseEntrySchema()),
   /** MOD-01, MOD-02 — modifications and their tradeoffs. */

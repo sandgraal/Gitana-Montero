@@ -1,0 +1,732 @@
+---
+/**
+ * One part number's page (T501, PRT-01, PRT-02).
+ *
+ * > **PRT-02** WHEN a part number is superseded, THE page SHALL show the chain
+ * > oldest→current and mark the current orderable number.
+ *
+ * ## The URL is two registries composed (I18N-01, I18N-05)
+ *
+ * `/en/parts/water-pump-6g74/` and `/es/repuestos/bomba-de-agua-6g74/` are the
+ * same page: the *segment* comes from `src/i18n/routes.ts` and the *slug* from
+ * `src/i18n/entry-slugs.ts`, joined by `entryRouteParams` /
+ * `entryRoutePaths`. Both halves are per-locale, so neither locale reads as a
+ * translation of the other, and `routePathByLocale` hands `BaseLayout` the
+ * URLs that were actually built — which is what `check:hreflang` verifies
+ * after every build.
+ *
+ * The registry is empty until T503, so this route builds zero pages today.
+ * That is the intended state and not a stub: the index below `/en/parts/`
+ * exists, is audited, and says so.
+ *
+ * ## Page order, and why
+ *
+ * Follows the design handoff's problem-page order, which is the closest
+ * documented artboard (there is no parts artboard): title → identity and
+ * chips → **safety notice** (both languages in one band, page locale first)
+ * → confidence caveat (dashed, only below `tsb`) → the sections → numbered
+ * sources in Plex Mono with their archive state.
+ *
+ * The one thing that comes *before* the prose is the number itself. A reader
+ * on this page is holding a part or a catalogue and wants to know two things
+ * in this order: is this the right number, and is it still the number to
+ * order. So the OEM number is the first datum under the title and PRT-02's
+ * chain is the first section — not an appendix under the description.
+ *
+ * ## The chain is derived, never stored
+ *
+ * `supersessionChain` walks the one-way `supersededBy` pointers
+ * (`src/lib/parts/index.ts`); the build has already refused a dangling
+ * pointer or a loop, so the chain here always terminates. Where several old
+ * numbers were merged into one, the page **says so** rather than drawing one
+ * branch and calling it the chain — a reader orders a part from this picture.
+ *
+ * ## Vendors point inward
+ *
+ * A `vendors` id names a `community` entry, and the link goes to that entry's
+ * card in the directory rather than straight out to the seller. That keeps
+ * every outbound commercial link on one page, under COM-01's own rules and
+ * AGENTS.md's "no paid placement" and "no affiliate links without visible
+ * disclosure" — a parts page that sprayed shop links would be the surface
+ * where those rules quietly stop being checkable.
+ *
+ * refs specs/001-foundation (PRT-01, PRT-02, I18N-01, I18N-04, I18N-05, I18N-08)
+ */
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import {
+  LOCALES,
+  LOCALE_BCP47,
+  isLocale,
+  type Locale,
+} from "../../../i18n/routing";
+import {
+  collectionRoutePath,
+  entryRouteParams,
+  entryRoutePath,
+  entryRoutePaths,
+} from "../../../i18n/routes";
+import {
+  confidenceCaveat,
+  crossReferenceQualityLabel,
+  generationLabel,
+  glossarySystemLabel,
+  t,
+} from "../../../i18n/ui";
+import { needsConfidenceCaveat } from "../../../lib/confidence";
+import { isSafetyCritical } from "../../../lib/safety";
+import { buildTaxonomy, expandGenerations } from "../../../lib/fitment";
+import { selectorTaxonomyData } from "../../../lib/vehicle-taxonomy";
+import {
+  buildPartsIndex,
+  readParts,
+  supersessionChain,
+} from "../../../lib/parts";
+import { GENERATION_IDS, type GenerationId } from "../../../schemas/vehicles";
+
+export function getStaticPaths() {
+  return entryRouteParams("parts", "partsSegment", "partSlug");
+}
+
+const { locale: param } = Astro.params;
+if (!isLocale(param)) {
+  throw new Error(`Unknown locale segment: ${String(param)}`);
+}
+const locale: Locale = param;
+const strings = t(locale);
+
+const { entryId } = Astro.props;
+
+const entries = await getCollection("parts");
+const entry = entries.find((candidate) => candidate.data.id === entryId);
+if (entry === undefined) {
+  // Unreachable in a build that ran `validate-parts`, which fails on a slug
+  // row naming no entry. Kept because a page that silently rendered nothing
+  // would be worse than one that names the broken row (SCF-04).
+  throw new Error(
+    `ENTRY_SLUGS.parts lists \`${entryId}\`, and no entry in ` +
+      `src/content/parts/ has that id (I18N-05). refs specs/001-foundation`
+  );
+}
+
+const routes = entryRoutePaths("parts", entryId);
+if (routes === null) {
+  throw new Error(
+    `no slug row for parts entry \`${entryId}\` (I18N-05). ` +
+      `refs specs/001-foundation`
+  );
+}
+
+const otherLocale = LOCALES.find((candidate) => candidate !== locale) as Locale;
+/** Page locale first — the handoff's rule for a bilingual-always block. */
+const readingOrder: Locale[] = [locale, otherLocale];
+
+const data = entry.data;
+const local = data.prose[locale];
+
+const taxonomy = buildTaxonomy(
+  selectorTaxonomyData(
+    (await getCollection("vehicles")).map((vehicle) => vehicle.data)
+  ).nodes
+);
+
+/** A `GENERATION_IDS` value if `id` is one, else the raw string unchanged. */
+function isKnownGeneration(id: string): id is GenerationId {
+  return (GENERATION_IDS as readonly string[]).includes(id);
+}
+
+const genLabels = expandGenerations(data.fitment.gens, taxonomy).map((gen) =>
+  isKnownGeneration(gen) ? generationLabel(strings, gen) : gen
+);
+
+const partsIndex = buildPartsIndex(
+  readParts(entries.map((candidate) => candidate.data))
+);
+const chain = supersessionChain(entryId, partsIndex);
+
+/** Everything the chain rows need, including this row's own link and label. */
+const chainRows = (chain?.chain ?? []).map((part, index, all) => ({
+  id: part.id,
+  oemNumber: part.oemNumber,
+  href: part.id === entryId ? null : entryRoutePath("parts", part.id, locale),
+  isSelf: part.id === entryId,
+  isCurrent: index === all.length - 1,
+  isOldest: index === 0,
+}));
+
+const otherPredecessors = (chain?.otherPredecessors ?? [])
+  .filter((part) => !chainRows.some((row) => row.id === part.id))
+  .map((part) => ({
+    id: part.id,
+    oemNumber: part.oemNumber,
+    href: entryRoutePath("parts", part.id, locale),
+  }));
+
+/** Cross-references, joined to their per-locale note by `ref` (PRT-01). */
+const notes = local.crossReferenceNotes ?? {};
+const crossReferences = (data.crossReferences ?? []).map((reference) => ({
+  ...reference,
+  qualityLabel: crossReferenceQualityLabel(strings, reference.quality),
+  note: notes[reference.ref] ?? null,
+}));
+
+/** Vendors, resolved to their directory card rather than to an outbound link. */
+const communityEntries = await getCollection("community");
+const communityHref = `${collectionRoutePath("community", locale)}`;
+const vendors = (data.vendors ?? []).flatMap((vendorId) => {
+  const seller = communityEntries.find(
+    (candidate) => candidate.data.id === vendorId
+  );
+  if (seller === undefined) return [];
+  return [
+    {
+      id: vendorId,
+      title: seller.data.prose[locale].title,
+      href: `${communityHref}#community-${vendorId.replace(/\//g, "--")}`,
+    },
+  ];
+});
+
+const accessedDate = new Intl.DateTimeFormat(LOCALE_BCP47[locale], {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
+/** Parsed and formatted in UTC: an ISO date is a calendar day, not an instant. */
+function formatAccessed(iso: string): string {
+  return accessedDate.format(new Date(`${iso}T00:00:00Z`));
+}
+
+const safetyCritical = isSafetyCritical(data);
+const showCaveat = needsConfidenceCaveat(data.confidence);
+const indexHref = collectionRoutePath("parts", locale);
+---
+
+<BaseLayout
+  locale={locale}
+  routePathByLocale={routes}
+  title={`${local.title} — ${strings.partsHeading}`}
+  description={local.summary}
+>
+  <article class="part-page">
+    <nav class="part-page__crumbs" aria-label={strings.partsHeading}>
+      <a href={indexHref}>{strings.partsBackToIndex}</a>
+    </nav>
+
+    <header class="part-page__head">
+      <h1>{local.title}</h1>
+      <p class="part-page__number">
+        <span class="part-page__label">{strings.partsOemNumberLabel}</span>
+        <span class="datum part-page__number-value">{data.oemNumber}</span>
+        <span
+          class:list={[
+            "badge",
+            chain !== null && chain.current.id !== entryId
+              ? "badge--superseded"
+              : "badge--current",
+          ]}
+        >
+          {
+            chain !== null && chain.current.id !== entryId
+              ? strings.partsSupersededBadge
+              : strings.partsCurrentBadge
+          }
+        </span>
+      </p>
+
+      <div class="part-page__chips">
+        <span class="chip">{glossarySystemLabel(strings, data.system)}</span>
+        {
+          safetyCritical && (
+            <span class="chip chip--safety">{strings.safetyNoticeLabel}</span>
+          )
+        }
+        {
+          data.quantityPerVehicle !== undefined && (
+            <span class="chip datum">
+              {strings.partsQuantityTemplate.replace(
+                "{count}",
+                new Intl.NumberFormat(LOCALE_BCP47[locale]).format(
+                  data.quantityPerVehicle
+                )
+              )}
+            </span>
+          )
+        }
+        <span class="part-page__label">{strings.partsFitsLabel}</span>
+        {genLabels.map((label) => <span class="chip datum">{label}</span>)}
+      </div>
+    </header>
+
+    {
+      safetyCritical && (
+        /*
+         * A `div`, not an `aside`: `aside` maps to the `complementary`
+         * landmark, and a landmark nested inside this page's `article` is
+         * flagged by axe (`landmark-complementary-is-top-level`). It is also
+         * simply wrong — a safety warning about the part this page is about is
+         * not content "complementary to" the page, it is the page.
+         */
+        <div class="notice notice--safety">
+          {readingOrder.map((each, index) => (
+            <p
+              class:list={["notice__line", index === 0 && "notice__line--lead"]}
+              lang={LOCALE_BCP47[each]}
+            >
+              <strong>{t(each).safetyNoticeLabel}</strong>{" "}
+              {t(each).safetyNoticeBody}
+            </p>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      showCaveat && (
+        <div class="notice notice--caveat">
+          {readingOrder.map((each, index) => (
+            <p
+              class:list={["notice__line", index === 0 && "notice__line--lead"]}
+              lang={LOCALE_BCP47[each]}
+            >
+              {confidenceCaveat(t(each), data.confidence)}
+            </p>
+          ))}
+        </div>
+      )
+    }
+
+    <p class="part-page__summary">{local.summary}</p>
+
+    {
+      chainRows.length > 1 && (
+        <section class="section" aria-labelledby="supersession-heading">
+          <h2 id="supersession-heading">{strings.partsSupersessionHeading}</h2>
+          <p class="section__intro">{strings.partsSupersessionIntro}</p>
+          <ol class="chain">
+            {chainRows.map((row) => (
+              <li
+                class:list={[
+                  "chain__row",
+                  row.isCurrent && "chain__row--current",
+                ]}
+              >
+                <span class="datum chain__number">
+                  {row.href === null ? (
+                    row.oemNumber
+                  ) : (
+                    <a href={row.href}>{row.oemNumber}</a>
+                  )}
+                </span>
+                {row.isOldest && (
+                  <span class="chain__label">
+                    {strings.partsSupersessionOldestLabel}
+                  </span>
+                )}
+                {row.isCurrent && (
+                  <span class="badge badge--current">
+                    {strings.partsCurrentBadge}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+
+          {chain?.forked && (
+            <>
+              <p class="section__intro">{strings.partsSupersessionForkNote}</p>
+              <ul class="chain__others">
+                {otherPredecessors.map((part) => (
+                  <li class="datum">
+                    {part.href === null ? (
+                      part.oemNumber
+                    ) : (
+                      <a href={part.href}>{part.oemNumber}</a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      )
+    }
+
+    {
+      crossReferences.length > 0 && (
+        <section class="section" aria-labelledby="cross-references-heading">
+          <h2 id="cross-references-heading">
+            {strings.partsCrossReferencesHeading}
+          </h2>
+          <table class="cross-refs">
+            <thead>
+              <tr>
+                <th scope="col">{strings.partsCrossReferenceBrandLabel}</th>
+                <th scope="col">{strings.partsCrossReferenceNumberLabel}</th>
+                <th scope="col">{strings.partsCrossReferenceQualityLabel}</th>
+                <th scope="col">{strings.partsCrossReferenceNoteLabel}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {crossReferences.map((reference) => (
+                <tr
+                  id={`cross-ref-${reference.ref}`}
+                  data-quality={reference.quality}
+                >
+                  <th scope="row">{reference.brand}</th>
+                  <td class="datum">{reference.partNumber}</td>
+                  <td>{reference.qualityLabel}</td>
+                  <td>{reference.note}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )
+    }
+
+    {
+      vendors.length > 0 && (
+        <section class="section" aria-labelledby="vendors-heading">
+          <h2 id="vendors-heading">{strings.partsVendorsHeading}</h2>
+          <p class="section__intro">{strings.partsVendorsIntro}</p>
+          <ul class="vendors">
+            {vendors.map((vendor) => (
+              <li>
+                <a href={vendor.href}>{vendor.title}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      data.sources.length > 0 && (
+        <section class="section" aria-labelledby="sources-heading">
+          <h2 id="sources-heading">{strings.partsSourcesHeading}</h2>
+          <ol class="sources">
+            {data.sources.map((source) => (
+              <li>
+                <a href={source.url}>{source.title}</a>
+                <span class="sources__meta datum">
+                  <time datetime={source.accessed}>
+                    {strings.partsSourceAccessedTemplate.replace(
+                      "{date}",
+                      formatAccessed(source.accessed)
+                    )}
+                  </time>
+                  <a href={source.archiveUrl}>
+                    {strings.partsSourceArchiveLabel}
+                  </a>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  /* Tokens from specs/001-foundation/design/HANDOFF-DESIGN.md, page-scoped. */
+  .part-page {
+    --paper: #f7f4ee;
+    --panel: #ffffff;
+    --ink: #2b2620;
+    --muted: #6e6559;
+    --muted-strong: #55493c;
+    --line: #e4ddd1;
+    --chip: #efe9dd;
+    --rust: #b0532a;
+    --rust-deep: #93441f;
+    --green: #3e6b4f;
+    --green-tint: #e4efe7;
+    --caveat-bg: #efeae0;
+    --caveat-border: #a99c88;
+    --caveat-text: #55493c;
+    --safety-bg: #fdf3e4;
+    --safety-border: #b07a1f;
+    --safety-ink: #8a5e14;
+    --safety-chip-text: #7a2e2e;
+    --safety-chip-bg: #f6e3d8;
+    --safety-chip-border: #e4c4b0;
+
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 60rem;
+  }
+
+  .datum {
+    font-family:
+      "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  .part-page__crumbs {
+    font-size: 0.8125rem;
+  }
+
+  .part-page__crumbs a {
+    color: var(--rust-deep);
+  }
+
+  .part-page__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .part-page__head h1 {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  .part-page__number,
+  .part-page__chips {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .part-page__label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .part-page__number-value {
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .chip {
+    font-size: 0.75rem;
+    background: var(--chip);
+    border-radius: 4px;
+    padding: 0.125rem 0.5rem;
+    color: var(--muted-strong);
+  }
+
+  .chip--safety {
+    font-weight: 700;
+    color: var(--safety-chip-text);
+    background: var(--safety-chip-bg);
+    border: 1px solid var(--safety-chip-border);
+  }
+
+  .badge {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+    padding: 0.1875rem 0.5rem;
+  }
+
+  .badge--current {
+    color: var(--green);
+    background: var(--green-tint);
+  }
+
+  .badge--superseded {
+    color: var(--muted-strong);
+    background: var(--chip);
+  }
+
+  .notice {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  /* The handoff's safety-notice band: warm background, 1.5px amber border. */
+  .notice--safety {
+    background: var(--safety-bg);
+    border: 1.5px solid var(--safety-border);
+    color: var(--safety-ink);
+  }
+
+  /* The handoff's confidence caveat: dashed, deliberately quieter. */
+  .notice--caveat {
+    background: var(--caveat-bg);
+    border: 1.5px dashed var(--caveat-border);
+    color: var(--caveat-text);
+  }
+
+  .notice__line {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+
+  /*
+   * The other-locale line is *smaller*, and — in the safety band — never
+   * dimmer. Pa11y caught the first draft: `--safety-ink` (#8a5e14) on
+   * `--safety-bg` measures 5.18:1, and 85% opacity blends it toward the
+   * background to 3.85:1, under WCAG AA's 4.5:1. The right fix is not a darker
+   * amber but no dimming at all: AGENTS.md requires the safety notice "in both
+   * languages", and a warning rendered at reduced contrast in the reader's own
+   * language is a warning the site is only pretending to give. Size alone
+   * carries the hierarchy.
+   *
+   * The confidence caveat keeps the dimming (it measures clear of the
+   * threshold, and it is genuinely secondary information rather than a
+   * warning).
+   */
+  .notice__line:not(.notice__line--lead) {
+    font-size: 0.75rem;
+  }
+
+  .notice--caveat .notice__line:not(.notice__line--lead) {
+    opacity: 0.85;
+  }
+
+  .part-page__summary {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--muted-strong);
+    max-width: 66ch;
+  }
+
+  .section {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem 1.375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .section h2 {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+
+  .section__intro {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    max-width: 62ch;
+  }
+
+  .chain {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .chain__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    border-left: 2px solid var(--line);
+    padding-left: 0.75rem;
+  }
+
+  .chain__row--current {
+    border-left-color: var(--rust);
+  }
+
+  .chain__number {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .chain__number a {
+    color: var(--rust-deep);
+  }
+
+  .chain__label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .chain__others {
+    margin: 0;
+    padding-left: 1.125rem;
+    font-size: 0.875rem;
+  }
+
+  .cross-refs {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.875rem;
+  }
+
+  .cross-refs th,
+  .cross-refs td {
+    text-align: left;
+    padding: 0.5rem 0.625rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  .cross-refs thead th {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .cross-refs tbody th {
+    font-weight: 600;
+  }
+
+  .cross-refs tr[data-quality="avoid"] {
+    background: var(--safety-chip-bg);
+  }
+
+  .vendors,
+  .sources {
+    margin: 0;
+    padding-left: 1.125rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .vendors a,
+  .sources a {
+    color: var(--rust-deep);
+  }
+
+  .sources__meta {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .sources__meta a {
+    margin-left: 0.5rem;
+  }
+
+  @media (max-width: 48rem) {
+    .part-page__head h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
