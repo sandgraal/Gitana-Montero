@@ -121,6 +121,34 @@ describe("findCitationIssues", () => {
     expect(issues[0]?.field).toBe("capacities.oilQt");
   });
 
+  it("names a decoder row's VIN positions and decoded model year (T208)", () => {
+    // REF-02 over the decoder kinds. A VIN position range and a decoded model
+    // year are numbers a factory chart states, so they are stored as numbers in
+    // shared data — `positions: { from, to }`, not the string `"12-17"` — which
+    // is precisely what puts them inside this scan. Storing them as a string
+    // would have taken the decoder out of REF-02 entirely.
+    const issues = findCitationIssues(
+      entry({
+        file: "src/content/reference/test-vin-position.json",
+        data: {
+          id: "test-vin-position",
+          fitment: { gens: ["gen3"], years: { from: 2001, to: 2006 } },
+          confidence: "fsm-confirmed",
+          sources: [],
+          kind: "vin-code",
+          positions: { from: 10 },
+          code: "2",
+          decodesTo: { modelYear: 2002 },
+          prose: { en: {}, es: {} },
+        },
+      })
+    );
+    expect(issues.map((issue) => issue.field)).toEqual([
+      "positions.from",
+      "decodesTo.modelYear",
+    ]);
+  });
+
   it("ignores numbers inside the reserved entry envelope (fitment.years)", () => {
     const issues = findCitationIssues(
       entry({
