@@ -58,6 +58,7 @@ import {
   LOCALES,
   LOCALE_BCP47,
   isLocale,
+  localeHref,
   type Locale,
 } from "../../../i18n/routing";
 import {
@@ -80,7 +81,7 @@ import { selectorTaxonomyData } from "../../../lib/vehicle-taxonomy";
 import {
   buildPartsIndex,
   readParts,
-  supersessionChain,
+  supersessionView,
 } from "../../../lib/parts";
 import { GENERATION_IDS, type GenerationId } from "../../../schemas/vehicles";
 
@@ -142,25 +143,53 @@ const genLabels = expandGenerations(data.fitment.gens, taxonomy).map((gen) =>
 const partsIndex = buildPartsIndex(
   readParts(entries.map((candidate) => candidate.data))
 );
-const chain = supersessionChain(entryId, partsIndex);
+/**
+ * Whether this page shows a supersession history, and what it shows, is
+ * `supersessionView`'s answer and not this template's (T501 review, F1). The
+ * template asks one question and renders what it is told; the gate itself is
+ * unit-tested in `tests/lib/parts/parts-graph.test.ts` and the fact that this
+ * file *asks* is pinned by `tests/pages/part-page.render.test.ts`.
+ */
+const chain = supersessionView(entryId, partsIndex);
 
-/** Everything the chain rows need, including this row's own link and label. */
-const chainRows = (chain?.chain ?? []).map((part, index, all) => ({
-  id: part.id,
-  oemNumber: part.oemNumber,
-  href: part.id === entryId ? null : entryRoutePath("parts", part.id, locale),
-  isSelf: part.id === entryId,
-  isCurrent: index === all.length - 1,
-  isOldest: index === 0,
+/**
+ * A route path from `src/i18n/routes.ts` is **locale-independent** — that is
+ * its contract, because `BaseLayout` needs the whole set to build hreflang
+ * pairs. Anything rendered into an `href` therefore has to go through
+ * `localeHref`, which adds the `/en` or `/es` prefix and the deploy base.
+ *
+ * This is not a stylistic wrapper: without it every internal link on this page
+ * pointed at `/parts/fork-a/` rather than `/en/parts/fork-a/`, i.e. at a 404 —
+ * and nothing caught it, because `check:links`' internal-reference half is
+ * still owed by T703 and this page had no entries to render at build time.
+ * `tests/pages/part-page.render.test.ts` caught it and now pins it.
+ */
+function hrefFor(routePath: string | null): string | null {
+  return routePath === null ? null : localeHref(locale, routePath);
+}
+
+/** Everything the chain rows need, including this row's own link and labels. */
+const chainRows = chain.rows.map((row) => ({
+  id: row.part.id,
+  oemNumber: row.part.oemNumber,
+  href:
+    row.part.id === entryId
+      ? null
+      : hrefFor(entryRoutePath("parts", row.part.id, locale)),
+  isCurrent: row.isCurrent,
+  isOldest: row.isOldest,
 }));
 
-const otherPredecessors = (chain?.otherPredecessors ?? [])
-  .filter((part) => !chainRows.some((row) => row.id === part.id))
-  .map((part) => ({
-    id: part.id,
-    oemNumber: part.oemNumber,
-    href: entryRoutePath("parts", part.id, locale),
-  }));
+const otherPredecessors = chain.otherPredecessors.map((part) => ({
+  id: part.id,
+  oemNumber: part.oemNumber,
+  href: hrefFor(entryRoutePath("parts", part.id, locale)),
+}));
+
+/** The badge under the title: is this the number to order, or a replaced one? */
+const isCurrentNumber = chainRows.every(
+  (row) => !row.isCurrent || row.id === entryId
+);
 
 /** Cross-references, joined to their per-locale note by `ref` (PRT-01). */
 const notes = local.crossReferenceNotes ?? {};
@@ -172,7 +201,10 @@ const crossReferences = (data.crossReferences ?? []).map((reference) => ({
 
 /** Vendors, resolved to their directory card rather than to an outbound link. */
 const communityEntries = await getCollection("community");
-const communityHref = `${collectionRoutePath("community", locale)}`;
+const communityHref = localeHref(
+  locale,
+  collectionRoutePath("community", locale)
+);
 const vendors = (data.vendors ?? []).flatMap((vendorId) => {
   const seller = communityEntries.find(
     (candidate) => candidate.data.id === vendorId
@@ -201,7 +233,7 @@ function formatAccessed(iso: string): string {
 
 const safetyCritical = isSafetyCritical(data);
 const showCaveat = needsConfidenceCaveat(data.confidence);
-const indexHref = collectionRoutePath("parts", locale);
+const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
 ---
 
 <BaseLayout
@@ -223,15 +255,13 @@ const indexHref = collectionRoutePath("parts", locale);
         <span
           class:list={[
             "badge",
-            chain !== null && chain.current.id !== entryId
-              ? "badge--superseded"
-              : "badge--current",
+            isCurrentNumber ? "badge--current" : "badge--superseded",
           ]}
         >
           {
-            chain !== null && chain.current.id !== entryId
-              ? strings.partsSupersededBadge
-              : strings.partsCurrentBadge
+            isCurrentNumber
+              ? strings.partsCurrentBadge
+              : strings.partsSupersededBadge
           }
         </span>
       </p>
@@ -301,10 +331,41 @@ const indexHref = collectionRoutePath("parts", locale);
     <p class="part-page__summary">{local.summary}</p>
 
     {
-      chainRows.length > 1 && (
+      /*
+       * `chain.show`, never a length test done here (T501 review, F1). Two old
+       * numbers consolidated into *this* number give a one-row chain and a
+       * real history, and a length test suppressed the whole section on
+       * exactly that page.
+       *
+       * The fork note and the older numbers are rendered **above** the chain,
+       * because they are older than every row in it — putting them underneath
+       * a list introduced as "each number was replaced by the one after it"
+       * reads as "and then these", which is backwards.
+       */
+      chain.show && (
         <section class="section" aria-labelledby="supersession-heading">
           <h2 id="supersession-heading">{strings.partsSupersessionHeading}</h2>
           <p class="section__intro">{strings.partsSupersessionIntro}</p>
+
+          {chain.forked && (
+            <>
+              <p class="section__intro">{strings.partsSupersessionForkNote}</p>
+              <ul class="chain__others">
+                {otherPredecessors.map((part) => (
+                  <li>
+                    {part.href === null ? (
+                      <span class="datum">{part.oemNumber}</span>
+                    ) : (
+                      <a class="datum" href={part.href}>
+                        {part.oemNumber}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
           <ol class="chain">
             {chainRows.map((row) => (
               <li
@@ -320,6 +381,13 @@ const indexHref = collectionRoutePath("parts", locale);
                     <a href={row.href}>{row.oemNumber}</a>
                   )}
                 </span>
+                {/*
+                 * Never labelled on a forked chain — `supersessionView` owns
+                 * that rule, because the first row of a forked chain has older
+                 * numbers behind it and calling it "oldest" above them is a
+                 * false ordering claim on a page a reader orders from
+                 * (T501 review, F2).
+                 */}
                 {row.isOldest && (
                   <span class="chain__label">
                     {strings.partsSupersessionOldestLabel}
@@ -333,23 +401,6 @@ const indexHref = collectionRoutePath("parts", locale);
               </li>
             ))}
           </ol>
-
-          {chain?.forked && (
-            <>
-              <p class="section__intro">{strings.partsSupersessionForkNote}</p>
-              <ul class="chain__others">
-                {otherPredecessors.map((part) => (
-                  <li class="datum">
-                    {part.href === null ? (
-                      part.oemNumber
-                    ) : (
-                      <a href={part.href}>{part.oemNumber}</a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
         </section>
       )
     }
@@ -665,10 +716,49 @@ const indexHref = collectionRoutePath("parts", locale);
     color: var(--muted);
   }
 
+  /*
+   * T501 review, F3. These are 0.875rem links stacked in a list, so their hit
+   * targets measured under Lighthouse's `target-size` audit and forked pages
+   * scored 96 against a budget of 95 in both locales — no headroom on a page
+   * whose whole job is "tap the number you should order instead".
+   *
+   * The fix is the design handoff's own rule rather than a nudge past the
+   * threshold: "mobile tap targets ≥44px". Applied to every list link on this
+   * page — the fork numbers, the vendors and the sources — because they are
+   * the same shape and only the fork list happened to have two adjacent
+   * targets close enough to be measured.
+   */
+  .chain__others a,
+  .vendors a,
+  .sources > li > a,
+  .sources__meta a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
   .chain__others {
+    list-style: none;
     margin: 0;
-    padding-left: 1.125rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
     font-size: 0.875rem;
+  }
+
+  .chain__others li {
+    border-left: 2px solid var(--line);
+    padding-left: 0.75rem;
+  }
+
+  .chain__others .datum {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .chain__others a {
+    color: var(--rust-deep);
   }
 
   .cross-refs {

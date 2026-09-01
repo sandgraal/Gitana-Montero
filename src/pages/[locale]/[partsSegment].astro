@@ -55,6 +55,7 @@ import {
   LOCALES,
   LOCALE_BCP47,
   isLocale,
+  localeHref,
   type Locale,
 } from "../../i18n/routing";
 import {
@@ -105,6 +106,18 @@ function isKnownGeneration(id: string): id is GenerationId {
 }
 
 /**
+ * A locale-independent route path turned into a real `href`.
+ *
+ * `null` in, `null` out — a card whose entry has no slug row renders its title
+ * unlinked rather than linking somewhere plausible-but-wrong. (The build
+ * refuses that corpus anyway; this is what the page does if it is ever
+ * rendered outside one.)
+ */
+function partHref(routePath: string | null): string | null {
+  return routePath === null ? null : localeHref(locale, routePath);
+}
+
+/**
  * The same taxonomy the selector ships to the browser, built here so the
  * *server* render answers generation questions the same way the client does —
  * one engine, one answer, whichever side of the wire asks (FIT-01).
@@ -144,7 +157,15 @@ const parts = entries
     return {
       id,
       domId: `part-${id.replace(/\//g, "--")}`,
-      href: entryRoutePath("parts", id, locale),
+      /*
+       * `entryRoutePath` returns a **locale-independent** route (`/parts/x/`)
+       * — that is its contract, because `BaseLayout` needs the whole set to
+       * build hreflang pairs. An `href` needs the locale prefix and the deploy
+       * base on top, which is `localeHref`'s job. Without it every card linked
+       * to a 404, and nothing caught it: `check:links`' internal-reference half
+       * is owed by T703 and this collection was empty at build time.
+       */
+      href: partHref(entryRoutePath("parts", id, locale)),
       oemNumber,
       system,
       systemLabel: glossarySystemLabel(strings, system),

@@ -647,6 +647,15 @@ export interface UiStrings
    * a safety warning nobody can quote.
    */
   readonly safetyNoticeLabel: string;
+  /**
+   * **Subject-neutral on purpose** (T501 review, F4). The first draft said
+   * "This part is part of a system…", which reads as nonsense the moment a
+   * problem or procedure page renders the same key — and this key exists
+   * precisely so PRB-03 and PRC-02 render the *same* warning rather than three
+   * slightly different ones. It names the page, never what the page is about,
+   * so it stays true for a part, a fault and a job alike. Fixed here while
+   * this branch is its only consumer.
+   */
   readonly safetyNoticeBody: string;
   /* Parts — T501, PRT-01, PRT-02, PRT-03 */
   readonly navParts: string;
@@ -1059,7 +1068,7 @@ const en: UiStrings = {
     "Confidence: {tier}. This entry has not been checked against a factory manual or technical bulletin — treat it as a starting point, not a verified fact.",
   safetyNoticeLabel: "Safety-critical",
   safetyNoticeBody:
-    "This part is part of a system that keeps the truck under control. Get the work checked by a qualified mechanic, and never treat this page as a substitute for one.",
+    "This page covers a system that keeps the truck under control. Have the work checked by a qualified mechanic, and never treat this page as a substitute for one.",
   navParts: "Parts",
   partsHeading: "Parts",
   partsIntro:
@@ -1076,11 +1085,11 @@ const en: UiStrings = {
   partsSupersededBadge: "Replaced",
   partsSupersessionHeading: "Supersession chain",
   partsSupersessionIntro:
-    "Oldest number first. Each number was replaced by the one after it, and only the last one can still be ordered.",
+    "Each number was replaced by the one after it. Only the last one can still be ordered.",
   partsSupersessionOldestLabel: "Oldest number",
   partsSupersessionCurrentLabel: "Current number",
   partsSupersessionForkNote:
-    "Several older numbers were merged into this one, so the chain above is one branch of a few. The other numbers that end here are listed below.",
+    "Several older numbers were replaced by the same number, so the chain below is one branch of several. These other numbers join it at the same point:",
   partsCrossReferencesHeading: "Aftermarket cross-references",
   partsCrossReferenceBrandLabel: "Brand",
   partsCrossReferenceNumberLabel: "Their number",
@@ -1535,7 +1544,7 @@ const es: UiStrings = {
     "Nivel de confianza: {tier}. Esta ficha no se ha contrastado con un manual de fábrica ni con un boletín técnico — tómela como punto de partida, no como un dato verificado.",
   safetyNoticeLabel: "Crítico para la seguridad",
   safetyNoticeBody:
-    "Este repuesto pertenece a un sistema que mantiene el carro bajo control. Haga revisar el trabajo por un mecánico calificado y nunca tome esta página como sustituto de uno.",
+    "Esta página trata de un sistema que mantiene el carro bajo control. Haga revisar el trabajo por un mecánico calificado y nunca tome esta página como sustituto de uno.",
   navParts: "Repuestos",
   partsHeading: "Repuestos",
   partsIntro:
@@ -1552,11 +1561,11 @@ const es: UiStrings = {
   partsSupersededBadge: "Reemplazado",
   partsSupersessionHeading: "Cadena de reemplazos",
   partsSupersessionIntro:
-    "Primero el número más viejo. Cada número fue reemplazado por el siguiente, y solo el último se puede pedir hoy.",
+    "Cada número fue reemplazado por el siguiente. Solo el último se puede pedir hoy.",
   partsSupersessionOldestLabel: "Número más viejo",
   partsSupersessionCurrentLabel: "Número vigente",
   partsSupersessionForkNote:
-    "Varios números viejos se juntaron en este, así que la cadena de arriba es una rama entre varias. Los otros números que terminan aquí aparecen abajo.",
+    "Varios números viejos fueron reemplazados por el mismo número, así que la cadena de abajo es una rama entre varias. Estos otros números se unen en el mismo punto:",
   partsCrossReferencesHeading: "Equivalentes de otras marcas",
   partsCrossReferenceBrandLabel: "Marca",
   partsCrossReferenceNumberLabel: "Número de la marca",

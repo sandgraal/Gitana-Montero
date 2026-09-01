@@ -23,6 +23,7 @@ import {
   readParts,
   readSellers,
   supersessionChain,
+  supersessionView,
   type PartIdentity,
 } from "../../../src/lib/parts/index.ts";
 
@@ -234,6 +235,97 @@ describe("the chain a page renders (PRT-02)", () => {
 
   it("returns null for an id nothing declares", () => {
     expect(supersessionChain("test-parts-ghost", index)).toBeNull();
+  });
+});
+
+/**
+ * `supersessionView` is the page's *gate*, moved out of the template by the
+ * T501 review (F1) because the template was answering a different question
+ * from the one this module was being asked. These pin the gate; the page
+ * actually asking it is pinned by `tests/pages/part-page.render.test.ts`,
+ * which renders the real `.astro` file — a lib grader alone is exactly what
+ * missed the defect the first time.
+ */
+describe("what a part page is told to render (PRT-02)", () => {
+  it("shows the section for an ordinary chain", () => {
+    const index = buildPartsIndex([
+      part("test-parts-alpha", "TEST-A0001", "test-parts-beta"),
+      part("test-parts-beta", "TEST-A0002"),
+    ]);
+    const view = supersessionView("test-parts-alpha", index);
+    expect(view.show).toBe(true);
+    expect(view.rows.map((row) => row.part.oemNumber)).toEqual([
+      "TEST-A0001",
+      "TEST-A0002",
+    ]);
+    expect(view.rows.map((row) => row.isOldest)).toEqual([true, false]);
+    expect(view.rows.map((row) => row.isCurrent)).toEqual([false, true]);
+  });
+
+  it("shows the section for a one-row chain that forks behind it (F1)", () => {
+    // Two old numbers consolidated into the CURRENT one: one row, and a real
+    // history. A `rows.length > 1` gate rendered nothing here — on the one
+    // page a reader orders the part from.
+    const index = buildPartsIndex([
+      part("test-parts-alpha", "TEST-A0001", "test-parts-gamma"),
+      part("test-parts-beta", "TEST-A0002", "test-parts-gamma"),
+      part("test-parts-gamma", "TEST-A0003"),
+    ]);
+    const view = supersessionView("test-parts-gamma", index);
+
+    expect(view.show).toBe(true);
+    expect(view.rows).toHaveLength(1);
+    expect(view.forked).toBe(true);
+    expect(view.otherPredecessors.map((entry) => entry.oemNumber)).toEqual([
+      "TEST-A0001",
+      "TEST-A0002",
+    ]);
+  });
+
+  it("never calls a forked head the oldest number (F2)", () => {
+    const index = buildPartsIndex([
+      part("test-parts-alpha", "TEST-A0001", "test-parts-gamma"),
+      part("test-parts-beta", "TEST-A0002", "test-parts-gamma"),
+      part("test-parts-gamma", "TEST-A0003", "test-parts-delta"),
+      part("test-parts-delta", "TEST-A0004"),
+    ]);
+    const view = supersessionView("test-parts-gamma", index);
+
+    expect(view.forked).toBe(true);
+    // `TEST-A0003` has TEST-A0001 and TEST-A0002 behind it. Labelling it
+    // "oldest" directly above them is a false ordering claim.
+    expect(view.rows.map((row) => row.isOldest)).toEqual([false, false]);
+    expect(view.rows[view.rows.length - 1]?.isCurrent).toBe(true);
+  });
+
+  it("hides the section for a part with no history at all", () => {
+    const index = buildPartsIndex([part("test-parts-solo", "TEST-S0001")]);
+    const view = supersessionView("test-parts-solo", index);
+    expect(view.show).toBe(false);
+    expect(view.forked).toBe(false);
+    expect(view.otherPredecessors).toEqual([]);
+  });
+
+  it("never repeats a chain row in the fork list", () => {
+    const index = buildPartsIndex([
+      part("test-parts-alpha", "TEST-A0001", "test-parts-gamma"),
+      part("test-parts-beta", "TEST-A0002", "test-parts-gamma"),
+      part("test-parts-gamma", "TEST-A0003"),
+    ]);
+    const view = supersessionView("test-parts-gamma", index);
+    const rowIds = new Set(view.rows.map((row) => row.part.id));
+    for (const other of view.otherPredecessors) {
+      expect(rowIds.has(other.id)).toBe(false);
+    }
+  });
+
+  it("renders nothing for a corpus the build would have rejected", () => {
+    const looped = buildPartsIndex([
+      part("test-parts-alpha", "TEST-A0001", "test-parts-beta"),
+      part("test-parts-beta", "TEST-A0002", "test-parts-alpha"),
+    ]);
+    expect(supersessionView("test-parts-alpha", looped).show).toBe(false);
+    expect(supersessionView("test-parts-ghost", looped).show).toBe(false);
   });
 });
 

@@ -276,6 +276,92 @@ export function supersessionChain(
 }
 
 /* -------------------------------------------------------------------------
+ * What a part page renders (PRT-02)
+ * ---------------------------------------------------------------------- */
+
+/** One row of the rendered chain, with the two labels it may carry. */
+export interface SupersessionRow {
+  readonly part: PartIdentity;
+  /**
+   * Whether this row is the start of the whole history.
+   *
+   * **False on every row of a forked chain**, including the first. When the
+   * backward walk stopped at a fork, the first row demonstrably has older
+   * numbers behind it — labelling it "oldest" directly above the numbers it
+   * descends from is a false ordering claim, and this is a page a reader
+   * orders a part from (T501 review, F2).
+   */
+  readonly isOldest: boolean;
+  /** The number to order today — the last row, always (PRT-02). */
+  readonly isCurrent: boolean;
+}
+
+/**
+ * Everything the supersession section of a part page shows, decided here
+ * rather than in the template.
+ *
+ * ## Why the *gate* lives in this module (T501 review, F1)
+ *
+ * The template's first draft gated the whole section on "more than one row",
+ * which is not the same question as "is there a history to show". Two old
+ * numbers consolidated into a **current** number give
+ * `chain: [self], forked: true, otherPredecessors: [A, B]` — one row, and a
+ * real history — so the heading, the chain, the fork note and the older
+ * numbers were all suppressed on the one page a reader actually orders from.
+ * The lib grader used exactly that shape and passed, because it asked
+ * `supersessionChain` a question the template was answering differently.
+ *
+ * So the template no longer decides: `show` is computed here, beside the data
+ * it is about, and `tests/pages/part-page.render.test.ts` renders the real
+ * `.astro` file to HTML to prove the template asks.
+ */
+export interface SupersessionView {
+  /** Whether the page renders the supersession section at all. */
+  readonly show: boolean;
+  readonly rows: readonly SupersessionRow[];
+  readonly forked: boolean;
+  /** The older numbers that join the chain at the fork, never on `rows`. */
+  readonly otherPredecessors: readonly PartIdentity[];
+}
+
+/** The empty view — no chain, nothing rendered. */
+const NO_SUPERSESSION: SupersessionView = {
+  show: false,
+  rows: [],
+  forked: false,
+  otherPredecessors: [],
+};
+
+export function supersessionView(
+  id: string,
+  index: PartsIndex
+): SupersessionView {
+  const chain = supersessionChain(id, index);
+  // `null` means an unknown id, a dangling pointer or a loop — all three are
+  // build errors, so this is unreachable in a build that got as far as
+  // rendering. Rendering nothing is the safe answer either way.
+  if (chain === null) return NO_SUPERSESSION;
+
+  const onChain = new Set(chain.chain.map((part) => part.id));
+  const rows = chain.chain.map((part, position, all) => ({
+    part,
+    isOldest: position === 0 && !chain.forked,
+    isCurrent: position === all.length - 1,
+  }));
+
+  return {
+    // A single-row chain with a fork behind it is a history worth showing;
+    // a single-row chain with nothing behind it is just a part.
+    show: rows.length > 1 || chain.forked,
+    rows,
+    forked: chain.forked,
+    otherPredecessors: chain.otherPredecessors.filter(
+      (part) => !onChain.has(part.id)
+    ),
+  };
+}
+
+/* -------------------------------------------------------------------------
  * The build rules
  * ---------------------------------------------------------------------- */
 
