@@ -85,6 +85,7 @@ import { createHmac, randomUUID } from "node:crypto";
 import {
   PURGE_FUNCTION,
   RECEIPTS_BUCKET,
+  VEHICLE_PHOTOS_BUCKET,
   RECOVERY_WINDOW_DAYS,
   REQUEST_DELETION_FUNCTION,
   TEST_TAXONOMY_IDENTITY,
@@ -589,36 +590,63 @@ export async function createOwnedFixture(
  * Storage
  * ---------------------------------------------------------------------- */
 
-/** Upload bytes into the private receipts bucket as `actor`. */
+/**
+ * How an upload differs from the default receipt.
+ *
+ * `bucket` defaults to receipts so every T2-201 call site reads unchanged;
+ * T2-301a's photo graders pass it explicitly. The alternative — a required
+ * argument — would have meant touching two dozen assertions that are already
+ * proved, to say the thing they already said.
+ */
+export interface UploadOptions {
+  readonly bucket?: string;
+  readonly bytes?: Buffer;
+  readonly contentType?: string;
+}
+
+/** A one-pixel JPEG. Real enough for a bucket that filters on MIME type. */
+export const SYNTHETIC_JPEG = Buffer.from(
+  "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////" +
+    "////////////////////////////////////////////////////wgALCAABAAEBAREA" +
+    "/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=",
+  "base64"
+);
+
+/** Upload bytes into a private bucket as `actor`. */
 export function uploadObject(
   scenario: Scenario,
   actor: Actor,
   path: string,
-  bytes: Buffer = Buffer.from("%PDF-1.4 TEST-T2-201 synthetic receipt\n")
+  options: UploadOptions = {}
 ): Promise<ApiResponse> {
-  return request(
-    scenario.stack,
-    `/storage/v1/object/${RECEIPTS_BUCKET}/${path}`,
-    {
-      method: "POST",
-      token: actor.token,
-      rawBody: bytes,
-      headers: { "content-type": "application/pdf" },
-    }
-  );
+  const bucket = options.bucket ?? RECEIPTS_BUCKET;
+  const isPhotos = bucket === VEHICLE_PHOTOS_BUCKET;
+  const bytes =
+    options.bytes ??
+    (isPhotos
+      ? SYNTHETIC_JPEG
+      : Buffer.from("%PDF-1.4 TEST-T2-201 synthetic receipt\n"));
+  return request(scenario.stack, `/storage/v1/object/${bucket}/${path}`, {
+    method: "POST",
+    token: actor.token,
+    rawBody: bytes,
+    headers: {
+      "content-type":
+        options.contentType ?? (isPhotos ? "image/jpeg" : "application/pdf"),
+    },
+  });
 }
 
 /** Fetch an object as `actor` — the authenticated read path. */
 export function downloadObject(
   scenario: Scenario,
   actor: Actor,
-  path: string
+  path: string,
+  bucket: string = RECEIPTS_BUCKET
 ): Promise<ApiResponse> {
-  return request(
-    scenario.stack,
-    `/storage/v1/object/${RECEIPTS_BUCKET}/${path}`,
-    { token: actor.token }
-  );
+  return request(scenario.stack, `/storage/v1/object/${bucket}/${path}`, {
+    token: actor.token,
+  });
 }
 
 /**
@@ -627,11 +655,12 @@ export function downloadObject(
  */
 export async function fetchPublicObject(
   scenario: Scenario,
-  path: string
+  path: string,
+  bucket: string = RECEIPTS_BUCKET
 ): Promise<ApiResponse> {
   assertLocalTarget(scenario.stack.url);
   const response = await fetch(
-    `${scenario.stack.url}/storage/v1/object/public/${RECEIPTS_BUCKET}/${path}`,
+    `${scenario.stack.url}/storage/v1/object/public/${bucket}/${path}`,
     { signal: AbortSignal.timeout(10_000) }
   );
   return {
@@ -647,13 +676,14 @@ export function signObject(
   scenario: Scenario,
   actor: Actor,
   path: string,
+  bucket: string = RECEIPTS_BUCKET,
   expiresIn = 60
 ): Promise<ApiResponse> {
-  return request(
-    scenario.stack,
-    `/storage/v1/object/sign/${RECEIPTS_BUCKET}/${path}`,
-    { method: "POST", token: actor.token, body: { expiresIn } }
-  );
+  return request(scenario.stack, `/storage/v1/object/sign/${bucket}/${path}`, {
+    method: "POST",
+    token: actor.token,
+    body: { expiresIn },
+  });
 }
 
 /** Follow a signed URL with no credentials at all. */
@@ -679,9 +709,10 @@ export async function followSignedUrl(
 export function listObjects(
   scenario: Scenario,
   actor: Actor,
-  prefix = ""
+  prefix = "",
+  bucket: string = RECEIPTS_BUCKET
 ): Promise<ApiResponse> {
-  return request(scenario.stack, `/storage/v1/object/list/${RECEIPTS_BUCKET}`, {
+  return request(scenario.stack, `/storage/v1/object/list/${bucket}`, {
     method: "POST",
     token: actor.token,
     body: { prefix, limit: 100, offset: 0 },

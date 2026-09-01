@@ -505,6 +505,66 @@ export function storagePolicyIssues(normalized: string): string[] {
   );
 }
 
+/**
+ * Every finding against the policies protecting **one** storage bucket.
+ *
+ * `storagePolicyIssues` grades every `storage.objects` policy together, which
+ * was the whole truth while receipts were the only bucket. It stops being the
+ * whole truth the moment there are two: a project whose receipts policies are
+ * flawless and whose photo objects have no policy at all passes it, because
+ * every policy that exists is fine and the missing one is not a policy.
+ *
+ * So this asks the question per bucket — are there policies naming this
+ * bucket, do they cover all four commands, and is each one owner-scoped
+ * through the object path. A bucket nobody wrote a policy for is a finding
+ * here, and under `force row level security` it is also, mercifully, an
+ * outage rather than a leak.
+ *
+ * refs specs/002-montero-garage (GAR-01′ photos, GAR-05′ receipts, SHR-01)
+ */
+export function bucketPolicyIssues(
+  normalized: string,
+  bucket: string
+): string[] {
+  const forBucket = policies(normalized).filter(
+    (policy) =>
+      policy.table === "objects" &&
+      [policy.usingExpr, policy.withCheckExpr]
+        .filter((expr): expr is string => expr !== null)
+        .some((expr) => expr.includes(`'${bucket}'`))
+  );
+
+  if (forBucket.length === 0) {
+    return [`storage.objects: no policy names the ${bucket} bucket`];
+  }
+
+  const issues = forBucket.flatMap((policy) =>
+    policyIssues(policy, {
+      requirePathExtraction: true,
+      outerTable: "objects",
+      outerColumns: ["name", "bucket_id", "owner", "id"],
+    })
+  );
+
+  const covered = new Set<string>();
+  for (const policy of forBucket) {
+    if (!policy.permissive) continue;
+    if (policy.command === "all") {
+      for (const command of ["select", "insert", "update", "delete"]) {
+        covered.add(command);
+      }
+    } else {
+      covered.add(policy.command);
+    }
+  }
+  for (const command of ["select", "insert", "update", "delete"]) {
+    if (!covered.has(command)) {
+      issues.push(`${bucket}: no policy covers ${command}`);
+    }
+  }
+  return issues;
+}
+
 /** Which SQL commands each table's policies cover. */
 export function coveredCommands(
   normalized: string,

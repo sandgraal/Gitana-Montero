@@ -49,6 +49,7 @@ import { describe, expect, it } from "vitest";
 import { RECEIPTS_BUCKET } from "./contract.ts";
 import {
   authUidComparands,
+  bucketPolicyIssues,
   bucketPrivacyIssues,
   effectiveCheck,
   isCorrelated,
@@ -684,6 +685,71 @@ describe("CORRECT: valid schemas must be accepted", () => {
 
   it("C9 accepts a path-scoped storage policy", () => {
     expect(storagePolicyIssues(C9_STORAGE_PATH_SCOPED)).toEqual([]);
+  });
+
+  it("N15 rejects a SECOND bucket left with no policy of its own", () => {
+    // T2-301a. `storagePolicyIssues` grades every storage.objects policy
+    // together, which was the whole truth while receipts were the only
+    // bucket. Here every policy that exists is flawless and the photos bucket
+    // has none — so the whole-table rule says nothing, and only the
+    // per-bucket rule catches it.
+    expect(storagePolicyIssues(C9_STORAGE_PATH_SCOPED)).toEqual([]);
+    expect(
+      bucketPolicyIssues(C9_STORAGE_PATH_SCOPED, "vehicle-photos").join(" | ")
+    ).toContain("no policy names the vehicle-photos bucket");
+  });
+
+  it("N16 rejects a bucket whose policies miss a command", () => {
+    // Select-only means the owner cannot upload; delete-less means the
+    // cascade cannot reach the objects. Both are findings, and neither is
+    // visible to a rule that only asks whether the policies present are sound.
+    const readOnly = sql(`
+      create policy "photos owner select" on storage.objects
+        for select to authenticated
+        using (
+          bucket_id = 'vehicle-photos'
+          and (storage.foldername(name))[1] = (select auth.uid())::text
+        );
+    `);
+
+    const issues = bucketPolicyIssues(readOnly, "vehicle-photos").join(" | ");
+
+    expect(issues).toContain("no policy covers insert");
+    expect(issues).toContain("no policy covers delete");
+    expect(issues).not.toContain("no policy covers select");
+  });
+
+  it("N17 rejects a second bucket scoped by bucket id but not by path", () => {
+    // The F2 shape again, one bucket over: every authenticated user reads
+    // every user's photos.
+    const noPath = sql(`
+      create policy "photos any user" on storage.objects
+        for all to authenticated
+        using (bucket_id = 'vehicle-photos' and auth.uid() is not null)
+        with check (bucket_id = 'vehicle-photos' and auth.uid() is not null);
+    `);
+
+    expect(bucketPolicyIssues(noPath, "vehicle-photos").join(" | ")).toContain(
+      "not owner-scoped"
+    );
+  });
+
+  it("N18 accepts a correctly policed second bucket", () => {
+    // The positive control: the rule must not simply dislike photos.
+    const correct = sql(`
+      create policy "photos owner all" on storage.objects
+        for all to authenticated
+        using (
+          bucket_id = 'vehicle-photos'
+          and (storage.foldername(name))[1] = (select auth.uid())::text
+        )
+        with check (
+          bucket_id = 'vehicle-photos'
+          and (storage.foldername(name))[1] = (select auth.uid())::text
+        );
+    `);
+
+    expect(bucketPolicyIssues(correct, "vehicle-photos")).toEqual([]);
   });
 
   it("C10 accepts a restrictive policy that only narrows", () => {
