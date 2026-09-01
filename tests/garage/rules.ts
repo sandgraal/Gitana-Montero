@@ -75,6 +75,7 @@ import {
   USER_TABLE_NAMES,
 } from "./contract.ts";
 import {
+  balancedAt,
   createTableBody,
   createdTables,
   createdViews,
@@ -984,7 +985,104 @@ const NOT_AN_ALIAS = new Set([
   "for",
   "loop",
   "with",
+  "intersect",
+  "except",
+  "fetch",
+  "window",
+  "values",
+  "distinct",
+  "tablesample",
+  "end",
+  "then",
+  "else",
+  "when",
+  "case",
+  "is",
+  "not",
+  "null",
+  "returns",
+  "begin",
+  "declare",
 ]);
+
+/** Words that may precede a relation in a `from` item, and are not the relation. */
+const RELATION_PREFIXES = new Set(["lateral", "only"]);
+
+function skipSpace(text: string, index: number): number {
+  let cursor = index;
+  while (cursor < text.length && /\s/.test(text[cursor])) cursor += 1;
+  return cursor;
+}
+
+/** The `[schema.]name` or bare identifier at `index`, unquoted. */
+function readReference(
+  text: string,
+  index: number
+): { readonly word: string; readonly next: number } {
+  const match = /^[a-z0-9_."]+/.exec(text.slice(index));
+  if (!match) return { word: "", next: index };
+  return { word: match[0].replace(/"/g, ""), next: index + match[0].length };
+}
+
+/**
+ * Read ONE relation of a `from`/`join` list, binding whatever name the rest of
+ * the query would use to refer to its rows.
+ *
+ * Returns the index just past the relation, or `null` when there is no
+ * relation here — which is how the comma loop knows to stop.
+ */
+function readRelation(
+  body: string,
+  index: number,
+  aliases: Set<string>
+): number | null {
+  let cursor = skipSpace(body, index);
+
+  // `lateral (…)`, `only public.t`
+  for (;;) {
+    const prefix = readReference(body, cursor);
+    if (!RELATION_PREFIXES.has(prefix.word)) break;
+    cursor = skipSpace(body, prefix.next);
+  }
+
+  let bound: string | null = null;
+  if (body[cursor] === "(") {
+    // A subquery or a parenthesised join. Its own `from` is found separately
+    // by the scan below; what matters here is the alias the outer query uses.
+    const group = balancedAt(body, cursor);
+    if (!group) return null;
+    cursor = skipSpace(body, group.close + 1);
+  } else {
+    const relation = readReference(body, cursor);
+    if (!relation.word) return null;
+    bound = relation.word.split(".").pop() ?? relation.word;
+    cursor = skipSpace(body, relation.next);
+  }
+
+  // An explicit `as` is not itself the alias.
+  const maybeAs = readReference(body, cursor);
+  if (maybeAs.word === "as") cursor = skipSpace(body, maybeAs.next);
+
+  const maybeAlias = readReference(body, cursor);
+  if (
+    maybeAlias.word &&
+    !NOT_AN_ALIAS.has(maybeAlias.word) &&
+    /^[a-z_][a-z0-9_]*$/.test(maybeAlias.word)
+  ) {
+    bound = maybeAlias.word;
+    cursor = maybeAlias.next;
+    // A column alias list — `f(x) as t(a, b)` — belongs to the alias, not to
+    // the next relation.
+    const afterAlias = skipSpace(body, cursor);
+    if (body[afterAlias] === "(") {
+      const group = balancedAt(body, afterAlias);
+      if (group) cursor = group.close + 1;
+    }
+  }
+
+  if (bound) aliases.add(bound);
+  return cursor;
+}
 
 /**
  * The row aliases a query body binds — `from public.records r` → `r`,
@@ -992,18 +1090,54 @@ const NOT_AN_ALIAS = new Set([
  *
  * Needed because whole-row projection is spelled *through* an alias, and the
  * only way to tell `to_jsonb(r)` (the entire row) from `to_jsonb(payload)` (a
- * column) is to know which names are rows.
+ * column) is to know which names are rows. **A name this misses is a whole row
+ * that leaves the database unexamined**, so it errs toward binding too much:
+ * an over-bound name can only cause a false finding, and an under-bound one
+ * causes silence.
+ *
+ * ## Two defects this replaces (round-2 review, D2 — both confirmed, not theoretical)
+ *
+ * The first version was one regex —
+ * `\b(?:from|join)\s+(?:(\w+)\.)?(\w+)(?:\s+(?:as\s+)?(\w+))?` — and it under-bound
+ * in two ways that each let a whole row through:
+ *
+ * ```sql
+ * -- 1. COMMA JOINS. Only `from` and `join` introduce a relation to that regex,
+ * --    so the second relation of a comma list was never bound at all:
+ * select to_jsonb(s) from public.records r, public.shares s …
+ * --    bound {r}; `to_jsonb(s)` — the whole grants row, token hash included —
+ * --    produced ZERO findings.
+ *
+ * -- 2. AN UNALIASED FIRST RELATION. The optional alias group happily matched
+ * --    the word `join`, consuming it, so the scan never saw the second
+ * --    relation as a join at all:
+ * select to_jsonb(s) from public.records join public.shares s on …
+ * --    bound {records} and nothing else.
+ * ```
+ *
+ * So the `from` list is now *parsed* rather than pattern-matched: split on
+ * top-level commas, each item read as an optional prefix, a relation or a
+ * parenthesised subquery, an optional `as`, and an alias that is refused if it
+ * is a keyword. Every `from` and `join` in the body is scanned, at any nesting
+ * depth, so a subquery's own relations are bound too.
  */
 export function rowAliases(body: string): string[] {
   const aliases = new Set<string>();
-  for (const match of body.matchAll(
-    /\b(?:from|join)\s+(?:([a-z0-9_]+)\.)?([a-z0-9_]+)(?:\s+(?:as\s+)?([a-z0-9_]+))?/g
-  )) {
-    const table = match[2];
-    const alias = match[3];
-    if (alias && !NOT_AN_ALIAS.has(alias)) aliases.add(alias);
-    else aliases.add(table);
+
+  for (const keyword of body.matchAll(/\b(from|join)\b/g)) {
+    let cursor = keyword.index + keyword[0].length;
+    for (;;) {
+      const next = readRelation(body, cursor, aliases);
+      if (next === null) break;
+      cursor = next;
+      // `join` takes exactly one relation; only a `from` list continues.
+      if (keyword[1] === "join") break;
+      const afterItem = skipSpace(body, cursor);
+      if (body[afterItem] !== ",") break;
+      cursor = afterItem + 1;
+    }
   }
+
   return [...aliases];
 }
 

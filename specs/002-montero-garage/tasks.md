@@ -662,24 +662,25 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   reads nothing. If that ever stops being true, the declaration tier will not
   notice.
   <br>**Two defects in T2-401a's own projection rule, found in its round-2
-  review and recorded here rather than fixed there (doc-only pass). The first
-  is a live miss, not a theoretical one.**
-  <br>*(c) `rowAliases` under-binds, so whole-row projection escapes.* It
-  matches only relations introduced by `from`/`join`, and its optional
-  alias group can swallow a following `join` keyword. Two confirmed
-  consequences, both verified against the shipped rule:
-  <br>— **comma joins:** `from public.records r, public.shares s` binds only
-  `r`, so `select to_jsonb(s)` — a whole-row leak of the grants table —
-  produces **zero findings**;
-  <br>— **an unaliased first relation:** `from public.records join public.shares s
-  on …` binds only `records`, because the alias group consumes the word `join`
-  and the second relation is never matched at all.
-  <br>Fix is small and known: split the `from` clause on top-level commas, and
-  add a lookahead so the alias group cannot match a keyword. Needs a probe per
-  shape, mutation-verified like the rest of the corpus. **Until it lands, the
-  projection rule's guarantee holds only for single-relation and
-  aliased-`join` bodies** — which is what T2-404's readers are expected to look
-  like, but "expected" is not "enforced".
+  review. (c) is FIXED on the T2-401a branch; (d) remains for this task.**
+  <br>*(c) `rowAliases` under-bound, so whole-row projection escaped.* **Fixed
+  2026-09-01.** The old single regex matched only relations introduced by
+  `from`/`join` and its optional alias group could swallow a following `join`,
+  so two shapes bound the wrong set and the whole-row projection over the
+  unbound relation produced **zero findings** — both confirmed against the
+  shipped rule: `from public.records r, public.shares s` bound only `r` (so
+  `select to_jsonb(s)`, a whole-row leak of the grants table, was silent), and
+  `from public.records join public.shares s on …` bound only `records`.
+  <br>The `from` list is now parsed rather than pattern-matched — split on
+  top-level commas, each item read as optional prefix / relation or
+  parenthesised subquery / optional `as` / alias refused if it is a keyword —
+  and every `from` and `join` is scanned at any nesting depth. **The guarantee
+  now covers comma joins, unaliased relations, `as` aliases, `lateral`, and
+  subquery aliases**, in addition to the single-relation and aliased-`join`
+  bodies it always covered. A third shape the reviewer raised, the subquery
+  alias, was previously caught only when the subquery happened to contain a
+  literal `*`; it is now caught on its own merits and pinned with a fixture
+  that contains no `*` at all. Nine mutants over the new clauses, all killed.
   <br>*(d) No accept-case control on the `setof` rule.* `returns setof
   <user table>` is rejected and pinned, but nothing asserts that
   `returns setof <non-user-table>` — a composite type, a view, a domain — is

@@ -1356,7 +1356,13 @@ const G14_WHOLE_ROW_SPELLINGS = [
   ["alias.* inside a builder", "select jsonb_build_object('all', r.*)"],
 ] as const;
 
-function wholeRowReader(projection: string): string {
+const DEFAULT_READER_FROM =
+  "from public.records r join public.shares s on s.vehicle_id = r.vehicle_id";
+
+function wholeRowReader(
+  projection: string,
+  from: string = DEFAULT_READER_FROM
+): string {
   return sql(`
     create function public.share_read_records(p_token text)
     returns jsonb
@@ -1366,8 +1372,7 @@ function wholeRowReader(projection: string): string {
     set search_path = ''
     as $share$
       ${projection}
-      from public.records r
-      join public.shares s on s.vehicle_id = r.vehicle_id
+      ${from}
       where s.token_hash = extensions.digest(p_token, 'sha256')
         and s.revoked_at is null
         and s.expires_at > now();
@@ -1377,6 +1382,32 @@ function wholeRowReader(projection: string): string {
     grant execute on function public.share_read_records(text) to anon;
   `);
 }
+
+/**
+ * G16 — **round-2 D2**: the `from`-clause shapes `rowAliases` used to miss.
+ *
+ * Each binds a relation the old single-regex version never saw, and in each
+ * the whole-row projection over that relation produced **zero** findings.
+ * Confirmed against the shipped rule before the fix rather than derived from
+ * reading it — the same discipline as the two recorded grader defects.
+ */
+const G16_MISSED_ALIAS_SHAPES = [
+  [
+    "comma join, second relation",
+    "select to_jsonb(s)",
+    "from public.records r, public.shares s",
+  ],
+  [
+    "unaliased first relation, then join",
+    "select to_jsonb(s)",
+    "from public.records join public.shares s on s.id = records.id",
+  ],
+  [
+    "subquery alias",
+    "select to_jsonb(x)",
+    "from (select r.id, r.kind from public.records r) x join public.shares s on true",
+  ],
+] as const;
 
 /** G15 — a view that runs as its owner, so RLS is evaluated against the owner. */
 const G15_VIEW_WITHOUT_INVOKER = sql(`
@@ -1797,6 +1828,104 @@ describe("WIDE-OPEN: the two recorded grader defects", () => {
     ]);
   });
 
+  it.each(G16_MISSED_ALIAS_SHAPES)(
+    "G16 rejects whole-row projection over a %s",
+    (_label, projection, from) => {
+      expect(
+        projectionIssues(readerOf(wholeRowReader(projection, from)))
+      ).not.toEqual([]);
+    }
+  );
+
+  it("G16: the subquery-alias finding is NOT coming from a literal `*`", () => {
+    // The honest version of the reviewer's third shape. Before D2 this was
+    // caught only when the subquery happened to contain `select *`; with named
+    // inner columns it was invisible. The fixture below names every inner
+    // column, so the literal-`*` clause cannot be what rejects it — the alias
+    // binding is.
+    const fixture = wholeRowReader(
+      "select to_jsonb(x)",
+      "from (select r.id, r.kind from public.records r) x join public.shares s on true"
+    );
+    const routine = readerOf(fixture);
+
+    expect(routine.body).not.toMatch(/\*/);
+    expect(rowAliases(routine.body)).toContain("x");
+    expect(projectionIssues(routine).join(" | ")).toContain("to_jsonb(x)");
+  });
+
+  it.each(G16_MISSED_ALIAS_SHAPES)(
+    "G16 CONTROL: naming the columns over the same %s is accepted",
+    (_label, _projection, from) => {
+      // Binding more relations must not make the rule reject correct queries —
+      // over-binding is the safe direction only if it stays quiet on a named
+      // projection.
+      const named = wholeRowReader("select r.id, r.kind", from);
+
+      expect(projectionIssues(readerOf(named))).toEqual([]);
+    }
+  );
+
+  it.each<[string, string, string[]]>([
+    [
+      "aliased join",
+      "select 1 from public.records r join public.shares s on true",
+      ["r", "s"],
+    ],
+    [
+      "comma join",
+      "select 1 from public.records r, public.shares s",
+      ["r", "s"],
+    ],
+    [
+      "three-way comma join",
+      "select 1 from public.records r, public.shares s, public.receipts t",
+      ["r", "s", "t"],
+    ],
+    [
+      "unaliased first relation",
+      "select 1 from public.records join public.shares s on true",
+      ["records", "s"],
+    ],
+    [
+      "neither relation aliased",
+      "select 1 from public.records join public.shares on true",
+      ["records", "shares"],
+    ],
+    ["explicit AS", "select 1 from public.records as r", ["r"]],
+    [
+      "subquery alias binds the alias AND the inner relation",
+      "select 1 from (select r.id from public.records r) x",
+      ["x", "r"],
+    ],
+    [
+      "lateral",
+      "select 1 from public.records r, lateral (select 1) y",
+      ["r", "y"],
+    ],
+    [
+      "no alias at all",
+      "select id from public.records where id = 1",
+      ["records"],
+    ],
+  ])("G16 rowAliases binds %s", (_label, body, expected) => {
+    // Graded directly as well as end-to-end: the whole-row rules are only as
+    // good as this, and a regression here would make all of them quietly
+    // vacuous rather than visibly wrong.
+    expect(rowAliases(body).sort()).toEqual([...expected].sort());
+  });
+
+  it("G16: a keyword is still never bound as an alias", () => {
+    // The half of the old behaviour that was right, and must survive the
+    // rewrite: `from public.records where …` must not bind `where`.
+    for (const keyword of ["where", "join", "left", "group", "order", "on"]) {
+      expect(
+        rowAliases(`select 1 from public.records ${keyword} x`),
+        keyword
+      ).not.toContain(keyword);
+    }
+  });
+
   it("G15 rejects a view created without `security_invoker`", () => {
     // The option arrived in PG15 and defaults to `false`, so the default is
     // the unsafe direction: the view runs as its owner and RLS on the
@@ -1932,6 +2061,12 @@ describe("CORRECT: the reference share reader must be accepted", () => {
         "G15c view with security_invoker = false",
         viewSecurityInvokerIssues(G15C_VIEW_INVOKER_FALSE),
       ],
+      ...G16_MISSED_ALIAS_SHAPES.map(
+        ([label, projection, from]): [string, string[]] => [
+          `G16 whole row over ${label}`,
+          anonSurfaceIssues(wholeRowReader(projection, from)),
+        ]
+      ),
     ];
 
     expect(
