@@ -51,10 +51,15 @@ for (const role of requiredRoles) {
     fail(`invalid default for role: ${role}`);
 }
 
-// The graders must never be quietly downgraded.
+// Graders default to sonnet; opus is a per-dispatch escalation driven by
+// hard triggers (see routing.md), not a static role default. Anything other
+// than sonnet here means the policy drifted from what this file's own
+// success message claims.
 for (const grader of ["fact-checker", "bilingual-editor", "code-reviewer"]) {
-  if (policy.roleDefaults[grader].model !== "opus")
-    fail(`grader role downgraded from opus: ${grader}`);
+  if (policy.roleDefaults[grader].model !== "sonnet")
+    fail(
+      `grader role default is not sonnet-baseline: ${grader} (${policy.roleDefaults[grader].model})`
+    );
 }
 
 const requiredOpus = [
@@ -102,5 +107,5 @@ for (const f of [
 }
 
 console.log(
-  `routing validation passed: ${requiredRoles.length} roles, 3 models, graders on opus, safety triggers intact`
+  `routing validation passed: ${requiredRoles.length} roles, 3 models, graders sonnet-baseline with opus escalation, safety triggers intact`
 );

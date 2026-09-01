@@ -13,9 +13,9 @@ apply them when a task requires judgment.
 | `implementer`        | `sonnet`      | `high`         |
 | `test-writer`        | `sonnet`      | `high`         |
 | `content-researcher` | `sonnet`      | `high`         |
-| `fact-checker`       | `opus`        | `high`         |
-| `bilingual-editor`   | `opus`        | `high`         |
-| `code-reviewer`      | `opus`        | `high`         |
+| `fact-checker`       | `sonnet`      | `high`         |
+| `bilingual-editor`   | `sonnet`      | `high`         |
+| `code-reviewer`      | `sonnet`      | `high`         |
 | `pr-shepherd`        | `haiku`       | `medium`       |
 
 Use `opus` with `high` effort for the **authoring** role too when any hard
@@ -35,6 +35,14 @@ trigger applies:
 
 Do not downgrade a hard trigger because the diff looks small. A one-line
 torque-spec edit is Opus work.
+
+The graders (`fact-checker`, `bilingual-editor`, `code-reviewer`) classify
+the branch under review against the same trigger list — they do not inherit
+the author's tier. A grader reviewing a hard-trigger branch (safety-critical
+content, torque/fluid specs, schemas, i18n routing, translation of safety
+content, legal/regulatory claims, or any phase-closing review) is itself
+`opus`/`high` work. A grader reviewing a routine, no-hard-trigger branch (a
+glossary-only content pass, a UI-only platform diff) stays `sonnet`/`high`.
 
 Increase to `xhigh` only for broad or ambiguous audits (T902-style content
 integrity sweeps), difficult incident diagnosis, or a failed high-effort
@@ -60,7 +68,9 @@ Record one concise routing decision before launch, for example:
 ```text
 T104 -> implementer        -> opus/high   (content-schema: base entry schemas)
 T206 -> content-researcher -> sonnet/high (glossary seed, no safety content)
+T206 -> fact-checker       -> sonnet/high (glossary seed, no safety content)
 T207 -> content-researcher -> opus/high   (torque master table: hard trigger)
+T207 -> fact-checker       -> opus/high   (torque master table: hard trigger)
 T403 -> content-researcher -> opus/high   (part numbers + safety-critical systems)
 T128 -> pr-shepherd        -> haiku/medium (PR administration only)
 ```
