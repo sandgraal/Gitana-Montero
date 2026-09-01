@@ -1,0 +1,52 @@
+{
+  "id": "vin-pos-gen3-us-serial",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2003,
+      "to": 2006
+    }
+  },
+  "kind": "vin-position",
+  "system": "general",
+  "positions": {
+    "from": 12,
+    "to": 17
+  },
+  "encodes": "serial",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2006 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20250110043214id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "49 CFR 565.25 — Content requirements: United States vehicle identification number format for vehicles of model year 2009 and earlier (eCFR)",
+      "url": "https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "archiveUrl": "https://web.archive.org/web/20250211055325id_/https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "accessed": "2026-09-01",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: serial number",
+      "summary": "The sequential production number that closes the VIN, and the only part of it that is unique to one truck. The federal rule requires the last five characters to be numeric on a vehicle of this class, and the factory chart states the range the plant worked through."
+    },
+    "es": {
+      "title": "VIN norteamericano: número de serie",
+      "summary": "El número correlativo de producción que cierra el VIN, y la única parte de él que es única de un solo carro. La norma federal exige que los últimos cinco caracteres sean numéricos en un vehículo de esta clase, y la tabla de fábrica indica el rango que recorrió la planta."
+    }
+  }
+}

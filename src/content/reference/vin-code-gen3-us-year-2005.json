@@ -1,0 +1,40 @@
+{
+  "id": "vin-code-gen3-us-year-2005",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2005,
+      "to": 2005
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 10
+  },
+  "code": "5",
+  "decodesTo": {
+    "modelYear": 2005
+  },
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "49 CFR 565.25 — Content requirements: United States vehicle identification number format for vehicles of model year 2009 and earlier (eCFR)",
+      "url": "https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "archiveUrl": "https://web.archive.org/web/20250211055325id_/https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "accessed": "2026-09-01",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: model year 2005",
+      "summary": "The model-year value the federal cipher table assigns to this model year, which falls between the two model years the North American manuals read here do cover. Both of them confirm the same cipher, so reading across the gap is safe enough — but the claim is still the regulation's and not the factory's, and the tier says so."
+    },
+    "es": {
+      "title": "VIN norteamericano: año modelo 2005",
+      "summary": "El valor de año modelo que la tabla de claves federal asigna a este año modelo, que cae entre los dos años modelo que sí cubren los manuales norteamericanos consultados. Ambos confirman la misma clave, así que leer por encima del vacío es bastante seguro; aun así la afirmación sigue siendo de la norma y no de la fábrica, y el nivel de confianza lo dice."
+    }
+  }
+}

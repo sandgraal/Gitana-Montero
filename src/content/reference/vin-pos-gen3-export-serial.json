@@ -1,0 +1,38 @@
+{
+  "id": "vin-pos-gen3-export-serial",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-position",
+  "system": "general",
+  "positions": {
+    "from": 12,
+    "to": 17
+  },
+  "encodes": "serial",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: serial number",
+      "summary": "The block that closes the chassis number is the sequential production number and nothing else. It decodes to no attribute of the truck: two Monteros built minutes apart differ here and nowhere else."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: número de serie",
+      "summary": "El bloque que cierra el número de chasis es el número correlativo de producción y nada más. No decodifica ninguna característica del carro: dos Monteros armados con minutos de diferencia se distinguen aquí y en ningún otro lado."
+    }
+  }
+}

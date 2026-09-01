@@ -1,0 +1,40 @@
+{
+  "id": "vin-code-gen3-us-year-2002",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2002,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 10
+  },
+  "code": "2",
+  "decodesTo": {
+    "modelYear": 2002
+  },
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "49 CFR 565.25 — Content requirements: United States vehicle identification number format for vehicles of model year 2009 and earlier (eCFR)",
+      "url": "https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "archiveUrl": "https://web.archive.org/web/20250211055325id_/https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "accessed": "2026-09-01",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: model year 2002",
+      "summary": "The model-year value the federal cipher table assigns to this model year. No factory chart read for this seed covers it, so the tier stays below the documentary one: the regulation is what states this mapping, and the two North American charts confirm the same cipher at the model years they do cover."
+    },
+    "es": {
+      "title": "VIN norteamericano: año modelo 2002",
+      "summary": "El valor de año modelo que la tabla de claves federal asigna a este año modelo. Ninguna tabla de fábrica consultada para esta base lo cubre, así que el nivel de confianza queda por debajo del documental: la norma es lo que declara esta correspondencia, y las dos tablas norteamericanas confirman la misma clave en los años modelo que sí cubren."
+    }
+  }
+}

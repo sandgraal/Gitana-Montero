@@ -1,0 +1,37 @@
+{
+  "id": "vin-code-gen3-export-channel-m",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 2
+  },
+  "code": "M",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: Japanese distribution channel",
+      "summary": "The character of the manufacturer identifier that the manual labels the distribution channel, decoded as the Japanese channel. It says the vehicle went out through the Japanese export organisation — not which market it was eventually sold in, which is a different question the chassis number does not answer."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: canal de distribución japonés",
+      "summary": "El carácter del identificador del fabricante que el manual rotula como canal de distribución, decodificado como el canal japonés. Dice que el vehículo salió por la organización japonesa de exportación, no en cuál mercado se vendió al final: esa es otra pregunta que el número de chasis no responde."
+    }
+  }
+}

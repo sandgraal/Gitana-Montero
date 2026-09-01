@@ -1,0 +1,35 @@
+{
+  "id": "option-code-gen3-destination-6",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "option-code",
+  "system": "general",
+  "code": "6",
+  "codeSet": "destination",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Destination code for Europe",
+      "summary": "The last character of the model series on the build plate is a destination code, and the workshop manual's model-code breakdown documents exactly one value for it: Europe. A model series ending in anything else was built for a destination this manual does not decode — which is a limit of the document, not evidence that no such truck exists."
+    },
+    "es": {
+      "title": "Código de destino para Europa",
+      "summary": "El último carácter de la serie del modelo en la placa de códigos es un código de destino, y el desglose del código de modelo del manual de taller documenta exactamente un valor: Europa. Una serie de modelo que termine en otra cosa se armó para un destino que este manual no decodifica, y eso es un límite del documento, no una prueba de que ese carro no exista."
+    }
+  }
+}

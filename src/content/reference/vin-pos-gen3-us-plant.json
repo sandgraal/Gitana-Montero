@@ -1,0 +1,44 @@
+{
+  "id": "vin-pos-gen3-us-plant",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2003,
+      "to": 2006
+    }
+  },
+  "kind": "vin-position",
+  "system": "general",
+  "positions": {
+    "from": 11
+  },
+  "encodes": "plant",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2006 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20250110043214id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: assembly plant",
+      "summary": "The plant character. Both North American manuals print the same single value, so in practice this position confirms rather than distinguishes."
+    },
+    "es": {
+      "title": "VIN norteamericano: planta de ensamblaje",
+      "summary": "El carácter de planta. Los dos manuales norteamericanos imprimen el mismo valor único, así que en la práctica esta posición confirma más de lo que distingue."
+    }
+  }
+}

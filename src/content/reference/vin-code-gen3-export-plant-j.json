@@ -1,0 +1,37 @@
+{
+  "id": "vin-code-gen3-export-plant-j",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 11
+  },
+  "code": "J",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: Nagoya-3 plant",
+      "summary": "The plant value the export chart decodes to the Nagoya-3 assembly line. It is the only plant value the chart prints for this generation. Do not read it across to the North American chart, which prints the same letter for a differently named plant — two code tables that happen to share a character are still two tables."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: planta Nagoya-3",
+      "summary": "El valor de planta que la tabla de exportación decodifica como la línea de ensamblaje Nagoya-3. Es el único valor de planta que imprime la tabla para esta generación. No conviene leerlo cruzado con la tabla norteamericana, que imprime la misma letra para una planta con otro nombre: dos tablas de códigos que coinciden en un carácter siguen siendo dos tablas."
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id": "vin-code-gen3-us-engine-s",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2003,
+      "to": 2006
+    },
+    "engines": ["6g75"]
+  },
+  "kind": "vin-code",
+  "system": "engine",
+  "positions": {
+    "from": 8
+  },
+  "code": "S",
+  "decodesTo": {
+    "engine": "6g75"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2006 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20250110043214id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: 6G75 petrol V6",
+      "summary": "The engine character on a North American Montero. The VIN chart gives it by displacement as the larger petrol V6; the vehicle information code plate, on the following page of the same manual and for the same vehicle, names the engine model — and that model is what this row decodes to. Both manuals read here agree, which is why the decoding is stated rather than hedged."
+    },
+    "es": {
+      "title": "VIN norteamericano: V6 de gasolina 6G75",
+      "summary": "El carácter de motor en un Montero norteamericano. La tabla del VIN lo da por cilindrada como el V6 de gasolina mayor; la placa de códigos, en la página siguiente del mismo manual y para el mismo vehículo, nombra el modelo de motor, y ese modelo es a lo que decodifica esta fila. Los dos manuales consultados coinciden, y por eso la decodificación se afirma en lugar de matizarse."
+    }
+  }
+}

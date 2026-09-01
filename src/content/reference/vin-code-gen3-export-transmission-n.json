@@ -1,0 +1,41 @@
+{
+  "id": "vin-code-gen3-export-transmission-n",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "transmissions": ["manual-5-speed"]
+  },
+  "kind": "vin-code",
+  "system": "transmission",
+  "positions": {
+    "from": 5
+  },
+  "code": "N",
+  "decodesTo": {
+    "transmission": "manual-5-speed"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: manual gearbox",
+      "summary": "The transmission value the export chart gives for the manual gearbox. Because the character is stamped when the truck is built, it is evidence of what left the factory and not of what is bolted in today; the build plate names the specific transmission model."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: caja de cambios",
+      "summary": "El valor de transmisión que la tabla de exportación da para la caja de cambios. Como el carácter se estampa cuando se arma el carro, es evidencia de lo que salió de fábrica y no de lo que tiene montado hoy; la placa de códigos nombra el modelo exacto de transmisión."
+    }
+  }
+}

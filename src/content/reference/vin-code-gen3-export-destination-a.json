@@ -1,0 +1,37 @@
+{
+  "id": "vin-code-gen3-export-destination-a",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 3
+  },
+  "code": "A",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: Europe, right-hand drive",
+      "summary": "The destination value the manual reads as a European vehicle with the steering wheel on the right. Destination is what the plant built the truck for, not where it ended its life: a great many of these were re-exported, and the character does not follow the truck."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: Europa, volante a la derecha",
+      "summary": "El valor de destino que el manual lee como vehículo europeo con el volante a la derecha. El destino es para qué armó la planta el carro, no dónde terminó: muchísimos de estos se reexportaron, y el carácter no sigue al vehículo."
+    }
+  }
+}

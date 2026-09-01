@@ -1,0 +1,37 @@
+{
+  "id": "vin-pos-gen3-export-transmission",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-position",
+  "system": "transmission",
+  "positions": {
+    "from": 5
+  },
+  "encodes": "transmission",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: transmission type",
+      "summary": "The character that records which gearbox the truck was built with. The export chart documents one value for the manual and one for the automatic and nothing else, so this is the fastest way to tell an original automatic from one fitted later — the character is stamped at build and never changes with the hardware."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: tipo de transmisión",
+      "summary": "El carácter que registra con cuál caja se armó el carro. La tabla de exportación documenta un valor para la manual y otro para la automática, y nada más, así que es la forma más rápida de distinguir una automática original de una montada después: el carácter se estampa al armar el vehículo y no cambia aunque cambie la pieza."
+    }
+  }
+}

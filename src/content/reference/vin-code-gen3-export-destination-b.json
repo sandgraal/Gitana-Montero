@@ -1,0 +1,37 @@
+{
+  "id": "vin-code-gen3-export-destination-b",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 3
+  },
+  "code": "B",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: Europe, left-hand drive",
+      "summary": "The destination value the manual reads as a European vehicle with the steering wheel on the left. It is the only other destination this chart decodes, which is a limit of the document rather than a claim that no other destinations exist."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: Europa, volante a la izquierda",
+      "summary": "El valor de destino que el manual lee como vehículo europeo con el volante a la izquierda. Es el único otro destino que decodifica esta tabla, y eso es un límite del documento, no una afirmación de que no existan otros destinos."
+    }
+  }
+}

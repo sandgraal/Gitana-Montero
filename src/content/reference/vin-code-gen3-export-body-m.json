@@ -1,0 +1,37 @@
+{
+  "id": "vin-code-gen3-export-body-m",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "body",
+  "positions": {
+    "from": 4
+  },
+  "code": "M",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: three-door body",
+      "summary": "The body-style value the manual gives for the short three-door wagon. Read together with the line characters, it is the pair that settles which panels, glass and interior parts a donor vehicle can give up."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: carrocería de tres puertas",
+      "summary": "El valor de tipo de carrocería que el manual da para la carrocería corta de tres puertas. Leído junto con los caracteres de línea, es el par que resuelve cuáles paneles, vidrios y piezas de interior puede aportar un vehículo donante."
+    }
+  }
+}

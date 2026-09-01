@@ -1,0 +1,41 @@
+{
+  "id": "vin-code-gen3-export-engine-4",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "engines": ["4d56"]
+  },
+  "kind": "vin-code",
+  "system": "engine",
+  "positions": {
+    "from": 8
+  },
+  "code": "4",
+  "decodesTo": {
+    "engine": "4d56"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: 4D56 turbodiesel",
+      "summary": "The engine value the export chart reads as the 4D56 intercooled turbodiesel four. The chart states the displacement alongside it; the taxonomy entry this row decodes to is where that figure is kept, so it is stored once and rendered rather than repeated here."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: turbodiésel 4D56",
+      "summary": "El valor de motor que la tabla de exportación lee como el turbodiésel 4D56 de cuatro cilindros con intercooler. La tabla indica la cilindrada al lado; la entrada de taxonomía a la que decodifica esta fila es donde se guarda ese dato, de modo que se almacena una sola vez y se muestra, en lugar de repetirse aquí."
+    }
+  }
+}

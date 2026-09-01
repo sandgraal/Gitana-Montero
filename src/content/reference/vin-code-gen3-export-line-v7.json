@@ -1,0 +1,38 @@
+{
+  "id": "vin-code-gen3-export-line-v7",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 6,
+    "to": 7
+  },
+  "code": "V7",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: long-wheelbase Montero",
+      "summary": "The line value the manual decodes as MITSUBISHI PAJERO long wheelbase — the export name for the truck this site calls the Montero. Together with the body-style character it is what says whether a part off a donor truck is even the right length."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: Montero de distancia entre ejes larga",
+      "summary": "El valor de línea que el manual decodifica como «MITSUBISHI PAJERO long wheelbase», el nombre de exportación del carro que este sitio llama Montero. Junto con el carácter de tipo de carrocería es lo que indica si una pieza de un carro donante siquiera tiene el largo correcto."
+    }
+  }
+}

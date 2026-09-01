@@ -1,0 +1,47 @@
+{
+  "id": "vin-code-gen3-us-year-2001",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2001,
+      "to": 2001
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 10
+  },
+  "code": "1",
+  "decodesTo": {
+    "modelYear": 2001
+  },
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "49 CFR 565.25 — Content requirements: United States vehicle identification number format for vehicles of model year 2009 and earlier (eCFR)",
+      "url": "https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "archiveUrl": "https://web.archive.org/web/20250211055325id_/https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "accessed": "2026-09-01",
+      "kind": "reference"
+    },
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: model year 2001",
+      "summary": "The model-year value the federal cipher table assigns to this model year. No North American factory chart read for this seed reaches back this far, so the tier stays below the documentary one — but the general-export chassis-number chart from the same maker decodes the very same character to the very same year, which is about as good as corroboration gets without the document itself."
+    },
+    "es": {
+      "title": "VIN norteamericano: año modelo 2001",
+      "summary": "El valor de año modelo que la tabla de claves federal asigna a este año modelo. Ninguna tabla de fábrica norteamericana consultada para esta base llega tan atrás, así que el nivel de confianza queda por debajo del documental; ahora bien, la tabla del número de chasis de exportación del mismo fabricante decodifica ese mismísimo carácter al mismísimo año, que es casi lo más cerca que se llega sin tener el documento en la mano."
+    }
+  }
+}

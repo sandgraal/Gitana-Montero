@@ -1,0 +1,44 @@
+{
+  "id": "vin-pos-gen3-us-line",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2003,
+      "to": 2006
+    }
+  },
+  "kind": "vin-position",
+  "system": "general",
+  "positions": {
+    "from": 5
+  },
+  "encodes": "line",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2006 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20250110043214id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: vehicle line",
+      "summary": "The character that names the vehicle line. The North American charts document a single value for it, which makes this position the quickest confirmation that a VIN belongs to this truck at all before anything else is read out of it."
+    },
+    "es": {
+      "title": "VIN norteamericano: línea del vehículo",
+      "summary": "El carácter que nombra la línea del vehículo. Las tablas norteamericanas documentan un solo valor, lo que convierte a esta posición en la confirmación más rápida de que un VIN corresponde a este carro antes de leerle cualquier otra cosa."
+    }
+  }
+}

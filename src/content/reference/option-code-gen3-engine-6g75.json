@@ -1,0 +1,46 @@
+{
+  "id": "option-code-gen3-engine-6g75",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2003,
+      "to": 2006
+    },
+    "engines": ["6g75"]
+  },
+  "kind": "option-code",
+  "system": "engine",
+  "code": "6G75",
+  "codeSet": "engine-model",
+  "decodesTo": {
+    "engine": "6g75"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2006 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20250110043214id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine model 6G75",
+      "summary": "The engine model printed on the vehicle information code plate of a North American Montero. Both manuals read here print the same value, and it is the engine the VIN's own engine character stands for on this market."
+    },
+    "es": {
+      "title": "Modelo de motor 6G75",
+      "summary": "El modelo de motor impreso en la placa de códigos de un Montero norteamericano. Los dos manuales consultados imprimen el mismo valor, y es el motor que representa el propio carácter de motor del VIN en ese mercado."
+    }
+  }
+}

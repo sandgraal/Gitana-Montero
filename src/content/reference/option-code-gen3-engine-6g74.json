@@ -1,0 +1,35 @@
+{
+  "id": "option-code-gen3-engine-6g74",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "option-code",
+  "system": "engine",
+  "code": "6G74",
+  "codeSet": "engine-model",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine model 6G74",
+      "summary": "The engine model as the block stamp gives it on the petrol V6. This row deliberately decodes to nothing. The block stamp names the family and no more, while the code plate on the direct-injection cars this manual covers carries a longer value that does say which version is fitted. Picking one family member off the block stamp alone would be a guess, and the wrong guess sends someone to the wrong parts bin."
+    },
+    "es": {
+      "title": "Modelo de motor 6G74",
+      "summary": "El modelo de motor tal como lo da el estampado del bloque en el V6 de gasolina. Esta fila no decodifica a nada, y es a propósito. El estampado del bloque nombra la familia y nada más, mientras que la placa de códigos de los carros de inyección directa que cubre este manual lleva un valor más largo que sí dice cuál versión trae. Escoger un miembro de la familia solo con el estampado del bloque sería adivinar, y adivinar mal manda a alguien al estante de repuestos equivocado."
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "option-code-gen3-transmission-v5a51",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global", "us"],
+    "years": {
+      "from": 1999,
+      "to": 2006
+    },
+    "transmissions": ["automatic-5-speed"]
+  },
+  "kind": "option-code",
+  "system": "transmission",
+  "code": "V5A51",
+  "codeSet": "transmission-model",
+  "decodesTo": {
+    "transmission": "automatic-5-speed"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2006 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20250110043214id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Transmission model V5A51",
+      "summary": "The five-speed automatic transmission model. It is the only automatic in the general-export chassis manual's model tables for this generation, and the North American manuals print the same code on their own vehicle information code plate — where it shares a field with a rear differential reduction value, so read the whole field and not just the first token."
+    },
+    "es": {
+      "title": "Modelo de transmisión V5A51",
+      "summary": "El modelo de transmisión automática de cinco velocidades. Es la única automática en las tablas de modelos del manual de chasis de exportación general para esta generación, y los manuales norteamericanos imprimen el mismo código en su propia placa de códigos, donde comparte campo con un valor de reducción del diferencial trasero: conviene leer el campo completo y no solo el primer dato."
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "vin-pos-gen3-export-body-style",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-position",
+  "system": "general",
+  "positions": {
+    "from": 4
+  },
+  "encodes": "body-style",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: body style",
+      "summary": "The character the export chart reads as body style, with one documented value for the three-door and one for the five-door. It opens the descriptor section, immediately after the manufacturer identifier."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: tipo de carrocería",
+      "summary": "El carácter que la tabla de exportación lee como tipo de carrocería, con un valor documentado para la de tres puertas y otro para la de cinco. Abre la sección descriptora, justo después del identificador del fabricante."
+    }
+  }
+}

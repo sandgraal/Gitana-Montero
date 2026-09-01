@@ -1,0 +1,39 @@
+{
+  "id": "option-code-gen3-engine-4m41",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "engines": ["4m41"]
+  },
+  "kind": "option-code",
+  "system": "engine",
+  "code": "4M41",
+  "codeSet": "engine-model",
+  "decodesTo": {
+    "engine": "4m41"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine model 4M41",
+      "summary": "The engine model stamped on the block of the larger turbodiesel. The manual's model tables describe this engine with electronically controlled high-pressure fuel distribution, so a workshop that treats it as a mechanically injected diesel will be looking for parts that do not exist on it."
+    },
+    "es": {
+      "title": "Modelo de motor 4M41",
+      "summary": "El modelo de motor estampado en el bloque del turbodiésel mayor. Las tablas de modelos del manual describen este motor con distribución de combustible a alta presión de control electrónico, así que un taller que lo trate como un diésel de inyección mecánica va a andar buscando piezas que este motor no tiene."
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "vin-code-gen3-export-transmission-y",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "transmissions": ["automatic-5-speed"]
+  },
+  "kind": "vin-code",
+  "system": "transmission",
+  "positions": {
+    "from": 5
+  },
+  "code": "Y",
+  "decodesTo": {
+    "transmission": "automatic-5-speed"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: automatic transmission",
+      "summary": "The transmission value the export chart gives for the automatic. The build plate on the same truck names the transmission model that goes with it, and that model code — not this character — is what a parts counter needs."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: transmisión automática",
+      "summary": "El valor de transmisión que la tabla de exportación da para la automática. La placa de códigos del mismo carro nombra el modelo de transmisión que le corresponde, y ese código de modelo, no este carácter, es lo que pide una repuestera."
+    }
+  }
+}
