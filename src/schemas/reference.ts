@@ -426,6 +426,66 @@ export const VIN_FIELDS = [
 export type VinField = (typeof VIN_FIELDS)[number];
 
 /**
+ * The three sections ISO 3779 divides a VIN into.
+ *
+ * - **WMI**, positions 1–3: the World Manufacturer Identifier.
+ * - **VDS**, positions 4–9: the vehicle descriptor — what the manufacturer
+ *   chose to encode about the vehicle itself.
+ * - **VIS**, positions 10–17: the vehicle indicator — the model year, the
+ *   plant, and the serial.
+ */
+export const VIN_SECTIONS = {
+  wmi: { from: 1, to: 3 },
+  vds: { from: 4, to: 9 },
+  vis: { from: 10, to: 17 },
+} as const;
+
+/**
+ * Which section of the VIN each field can legally appear in — the standard's
+ * own division, and nothing finer.
+ *
+ * Without this, `encodes` and `positions` were two independent fields: `wmi` at
+ * positions 4–8 and `country` at position 17 both parsed, which made a nonsense
+ * of the reason `vin-position` is its own kind (T208 review, F1).
+ *
+ * **The bound is the section, deliberately not the position.** In the North
+ * American scheme the model year is position 10, the plant is 11 and the serial
+ * is 12–17 — but that is 49 CFR 565, a national rule, and this site is
+ * global-scope by spec (§1, all markets). Pinning `model-year === 10` would
+ * make a legitimate row from a market that assigns VIS differently unwritable,
+ * which is a worse failure than the one being fixed. The section bound is the
+ * conservative subset that survives every market ISO 3779 covers.
+ *
+ * **`check-digit` is unbounded on purpose.** ISO 3779 does not place a check
+ * digit at all; it is 49 CFR 565 that puts it at position 9 for the North
+ * American market, and markets that do not require one leave that position to
+ * the VDS. A row that says "position 9 is the check digit" and a row that says
+ * "positions 4–9 are the descriptor" are both true of the same truck, from
+ * different charts, which is exactly the both-granularities case `VIN_FIELDS`
+ * already admits for the WMI.
+ */
+export const VIN_FIELD_SECTIONS: Readonly<
+  Record<VinField, { readonly from: number; readonly to: number } | null>
+> = {
+  wmi: VIN_SECTIONS.wmi,
+  country: VIN_SECTIONS.wmi,
+  manufacturer: VIN_SECTIONS.wmi,
+  "vehicle-type": VIN_SECTIONS.wmi,
+  line: VIN_SECTIONS.vds,
+  "body-style": VIN_SECTIONS.vds,
+  engine: VIN_SECTIONS.vds,
+  transmission: VIN_SECTIONS.vds,
+  drive: VIN_SECTIONS.vds,
+  "restraint-system": VIN_SECTIONS.vds,
+  series: VIN_SECTIONS.vds,
+  /** Not placed by ISO 3779 — see the docstring above. */
+  "check-digit": null,
+  "model-year": VIN_SECTIONS.vis,
+  plant: VIN_SECTIONS.vis,
+  serial: VIN_SECTIONS.vis,
+};
+
+/**
  * Which table an `option-code` comes from — the build plate's model, engine,
  * transmission and transfer-case codes, the paint and interior codes, the
  * equipment/option codes, and the destination code.
@@ -449,19 +509,30 @@ export const OPTION_CODE_SETS = [
 export type OptionCodeSet = (typeof OPTION_CODE_SETS)[number];
 
 /**
- * A code as it is *stamped*: uppercase alphanumerics, hyphens allowed inside.
+ * A code as it is *stamped*: uppercase alphanumerics joined by single hyphens.
  *
- * Uppercase-only for the reason taxonomy ids are lowercase-only — `s` and `S`
- * must not be two rows for one code — and no whitespace, so the field cannot
- * hold a sentence. The pattern subsumes {@link nonBlankString}: it requires at
- * least one leading alphanumeric, so `""` and `" "` are already rejected.
+ * This is {@link TAXONOMY_ID_PATTERN}'s shape with the case inverted, and
+ * deliberately so — uppercase for the reason taxonomy ids are lowercase (`s`
+ * and `S` must not be two rows for one code), and the *same* structure, so a
+ * hyphen is a separator rather than a character that may appear anywhere.
+ * The first draft (`/^[0-9A-Z][0-9A-Z-]*$/`) accepted `V45W-` and `V45--W`,
+ * which the docstring already claimed it did not (T208 review, F5).
+ *
+ * The pattern subsumes {@link nonBlankString}: it requires at least one
+ * alphanumeric, so `""` and `" "` are rejected, as is any code with a space.
  */
-export const CODE_PATTERN = /^[0-9A-Z][0-9A-Z-]*$/;
+export const CODE_PATTERN = /^[0-9A-Z]+(?:-[0-9A-Z]+)*$/;
 
 /**
  * A stamped code is a token, not a description. Real ones run to about a dozen
  * characters (`V45WGNXFZ`); this cap is far above anything genuine and still
  * refuses a paragraph pasted into a data field.
+ *
+ * **Load-bearing, and the only length bound an `option-code` has** (T208 review,
+ * F2): a `vin-code`'s length is pinned from below and above by its position
+ * range, but an option code has no positions, so removing this cap lets an
+ * arbitrarily long "code" through with nothing else objecting. Its grader is a
+ * `option-code` fixture, for exactly that reason.
  */
 export const CODE_MAX_LENGTH = 32;
 
@@ -551,11 +622,20 @@ const taxonomyIdSchema = z.string().regex(TAXONOMY_ID_PATTERN, {
  * the 6G74" while claiming to fit every engine is a contradiction whichever way
  * you read it.
  *
- * **`generation` is deliberately absent from this table.** Generations contain
- * one another (`gen2-5` declares `parentGeneration: "gen2"`) and expanding that
- * containment is the resolver's job; a literal membership test here would
- * reject a row that decodes to `gen2-5` while correctly scoped to `gen2`. The
- * enum still catches a misspelling.
+ * **`generation` is deliberately absent from this table — and that leaves a
+ * real hole, stated here rather than implied.** Generations contain one another
+ * (`gen2-5` declares `parentGeneration: "gen2"`), so a literal membership test
+ * would reject a row that decodes to `gen2-5` while correctly scoped to `gen2`.
+ * But dropping the test is not free, and the two options are not the only two
+ * (T208 review, F4): a row scoped to `gen1` that decodes to `gen4` is
+ * **accepted today**, and it is nonsense. The honest check is containment-aware
+ * membership — `expandGenerationIds` in `src/lib/fitment/index.ts`, which is
+ * where the containment is already expanded — and it belongs in the FIT-02
+ * build layer beside `validateEntryFitments`, not here, because it needs the
+ * taxonomy. This module cannot do it and does not pretend to; the enum catches
+ * a misspelling and nothing catches an unrelated generation. **Owed, recorded
+ * on the T208 tasks.md line**, and pinned as a known-accepted case in
+ * `reference.test.ts` so the day it is fixed, a test says so.
  */
 export const DECODED_FACET_FITMENT_KEYS = {
   engine: "engines",
@@ -574,10 +654,15 @@ export const DECODED_FACET_FITMENT_KEYS = {
  * entity the taxonomy knows, so a decoder row can link to it instead of
  * re-spelling it and drifting from it.
  *
- * `market` is not a facet here on purpose. A WMI or a plant code says where a
- * truck was *built*, and a market id is where one was *sold*; folding the
- * two together would encode a claim no VIN chart makes. Where a code really is
- * market-scoped, that is the row's `fitment.markets`.
+ * `market` is not a facet here on purpose. A WMI does correlate with the market
+ * a truck was built *for* — a manufacturer takes a separate WMI for its export
+ * lines, and in practice `JA3`/`JA4` and a US-market Montero travel together —
+ * but a correlation is not what `decodesTo` holds. These fields say "this code
+ * *is* that entity"; the WMI identifies a manufacturer and a plant country, and
+ * turning that into a sales market is an inference a reader can draw and a
+ * decoder row should not assert. Where a code really is market-scoped, that is
+ * the row's `fitment.markets`, which says the same thing without claiming the
+ * chart said it (T208 review, F4 — decision kept, reasoning corrected).
  */
 export const decodedMeaningSchema = z
   .object({
@@ -616,6 +701,30 @@ export const decodedMeaningSchema = z
         "refs specs/001-foundation (REF-01)",
     });
   });
+
+/**
+ * The code sets that name a thing the taxonomy already has an id for.
+ *
+ * A `transmission-model` code on the build plate *is* the transmission — that
+ * is what the set means — so a row in that set whose `decodesTo` names an
+ * engine, or a generation, or a trim, has one of its two fields wrong. Three
+ * sets, a closed vocabulary on both sides, so the rule costs a lookup (T208
+ * review, F6).
+ *
+ * The rule only fires when `decodesTo` is present. Requiring it outright would
+ * make a build-plate code unrecordable until its taxonomy entry exists, which
+ * would push authors into the worse habit of inventing an id to satisfy a
+ * schema; a row with no `decodesTo` states its meaning in prose, in both
+ * locales, like a plant code does. The sets that name no taxonomy entity at all
+ * (`paint`, `interior-trim`, `equipment`, `destination`, and `model-code`,
+ * whose `V45W` spans engine *and* body *and* wheelbase at once) are absent for
+ * the same reason `decodesTo` is optional.
+ */
+export const CODE_SET_DECODED_FACETS = {
+  "engine-model": "engine",
+  "transmission-model": "transmission",
+  "transfer-case-model": "transferCase",
+} as const;
 
 /* -------------------------------------------------------------------------
  * Per-kind shapes
@@ -928,6 +1037,90 @@ function checkFsmSectionSummaryLength(
 }
 
 /**
+ * A VIN field sits in the section of the VIN that holds it.
+ *
+ * `encodes` and `positions` were independent fields until this rule existed:
+ * `wmi` at positions 4–8, `country` at 17 and `serial` at 1 all parsed, which
+ * made a nonsense of the reason `vin-position` is a kind of its own (T208
+ * review, F1). The bound is ISO 3779's section, not a national position
+ * convention — {@link VIN_FIELD_SECTIONS} says why, and why `check-digit` is
+ * bounded by nothing.
+ */
+function checkVinPositionSection(
+  entry: ReferenceEntryShape,
+  ctx: ReferenceRefineContext
+): void {
+  const { encodes } = entry;
+  if (typeof encodes !== "string") return;
+  if (!(VIN_FIELDS as readonly string[]).includes(encodes)) return;
+
+  const section = VIN_FIELD_SECTIONS[encodes as VinField];
+  if (section === null) return;
+
+  const positions = entry.positions;
+  if (typeof positions !== "object" || positions === null) return;
+  const { from, to } = positions as { from?: unknown; to?: unknown };
+  if (typeof from !== "number") return;
+  const last = typeof to === "number" ? to : from;
+
+  if (from >= section.from && last <= section.to) return;
+
+  ctx.addIssue({
+    code: "custom",
+    path: ["positions"],
+    message:
+      `\`${encodes}\` is encoded in positions ${section.from}–${section.to} of ` +
+      `the VIN (ISO 3779), and this row places it at ` +
+      `${from}${to === undefined ? "" : `–${String(to)}`}. One of the two ` +
+      `fields was mistyped. The bound is the standard's section, not a ` +
+      `national position convention — a market that assigns the descriptor ` +
+      `differently is still writable here. ` +
+      `refs specs/001-foundation (REF-01)`,
+  });
+}
+
+/**
+ * A `-model` code set names the thing it says it names.
+ *
+ * See {@link CODE_SET_DECODED_FACETS}: a `transmission-model` code decoding to
+ * an engine has one of its two fields wrong, and both fields are closed
+ * vocabularies, so the contradiction is visible from inside one entry.
+ */
+function checkCodeSetMeaning(
+  entry: ReferenceEntryShape,
+  ctx: ReferenceRefineContext
+): void {
+  const { codeSet } = entry;
+  if (typeof codeSet !== "string") return;
+
+  const expected = (
+    CODE_SET_DECODED_FACETS as Record<string, string | undefined>
+  )[codeSet];
+  if (expected === undefined) return;
+
+  const decoded = entry.decodesTo;
+  if (typeof decoded !== "object" || decoded === null) return;
+  const meaning = decoded as Record<string, unknown>;
+  if (meaning[expected] !== undefined) return;
+
+  ctx.addIssue({
+    code: "custom",
+    path: ["decodesTo", expected],
+    message:
+      `a \`${codeSet}\` code *is* the ${expected} — that is what the code set ` +
+      `means — so a decoding of one states \`${expected}\`. This row decodes ` +
+      `to ${Object.keys(meaning)
+        .map((key) => `\`${key}\``)
+        .join(
+          ", "
+        )} instead: either the set or the meaning is wrong. (A code ` +
+      `whose ${expected} has no taxonomy entry yet is written with no ` +
+      `\`decodesTo\` at all and its meaning in prose — never with an invented ` +
+      `id.) refs specs/001-foundation (REF-01)`,
+  });
+}
+
+/**
  * A VIN code is spelled in the alphabet a VIN actually uses, and it occupies
  * exactly the characters it claims.
  *
@@ -1111,7 +1304,13 @@ export function checkReferenceEntry(
     checkFsmSectionSummaryLength(candidate, ctx);
   }
 
+  if (referenceKind === "vin-position") {
+    checkVinPositionSection(candidate, ctx);
+  }
+
   if (referenceKind === "vin-code") checkVinCode(candidate, ctx);
+
+  if (referenceKind === "option-code") checkCodeSetMeaning(candidate, ctx);
 
   if (referenceKind === "vin-code" || referenceKind === "option-code") {
     checkDecodedMeaning(candidate, ctx);

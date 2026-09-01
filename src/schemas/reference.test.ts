@@ -643,11 +643,96 @@ describe("the VIN position map (`vin-position`)", () => {
     ).toContain("encodes");
   });
 
-  it.each([...VIN_FIELDS])("accepts the VIN field %s", (encodes) => {
-    expect(
-      schema.safeParse(vinPositionEntry({ encodes, positions: { from: 1 } }))
-        .success
-    ).toBe(true);
+  /**
+   * One position each field really is encoded at, written out rather than read
+   * from `VIN_FIELD_SECTIONS` — a table derived from the table it grades proves
+   * nothing. Changing the section map must change this list too.
+   */
+  const A_REAL_POSITION: Record<string, number> = {
+    wmi: 1,
+    country: 1,
+    manufacturer: 2,
+    "vehicle-type": 3,
+    line: 4,
+    "body-style": 5,
+    engine: 6,
+    transmission: 7,
+    drive: 8,
+    "restraint-system": 5,
+    series: 9,
+    "check-digit": 9,
+    "model-year": 10,
+    plant: 11,
+    serial: 12,
+  };
+
+  it.each([...VIN_FIELDS])(
+    "accepts the VIN field %s where it lives",
+    (encodes) => {
+      expect(
+        schema.safeParse(
+          vinPositionEntry({
+            encodes,
+            positions: { from: A_REAL_POSITION[encodes] },
+          })
+        ).success
+      ).toBe(true);
+    }
+  );
+
+  /**
+   * T208 review, F1: `encodes` and `positions` used to be two independent
+   * fields, so `wmi` at 4–8 and `country` at 17 both parsed — which made a
+   * nonsense of the reason this kind exists. The bound is ISO 3779's *section*
+   * (WMI 1–3, VDS 4–9, VIS 10–17), never a national position convention.
+   */
+  it.each([
+    ["wmi", { from: 4, to: 8 }],
+    ["country", { from: 17 }],
+    ["manufacturer", { from: 10 }],
+    ["engine", { from: 1 }],
+    ["engine", { from: 8, to: 11 }],
+    ["series", { from: 12 }],
+    ["serial", { from: 1 }],
+    ["plant", { from: 1 }],
+    ["model-year", { from: 9 }],
+  ] as const)(
+    "REJECTS %s at %o — it is not in that section of the VIN",
+    (encodes, positions) => {
+      const outcome = schema.safeParse(
+        vinPositionEntry({ encodes, positions })
+      );
+      expect(issuePaths(outcome)).toContain("positions");
+      expect(JSON.stringify(outcome)).toMatch(/ISO 3779/);
+    }
+  );
+
+  it("accepts a range that fills a whole section", () => {
+    for (const [encodes, positions] of [
+      ["wmi", { from: 1, to: 3 }],
+      ["series", { from: 4, to: 9 }],
+      ["serial", { from: 12, to: 17 }],
+    ] as const) {
+      expect(
+        schema.safeParse(vinPositionEntry({ encodes, positions })).success,
+        encodes
+      ).toBe(true);
+    }
+  });
+
+  it("bounds the check digit by nothing — ISO 3779 does not place it", () => {
+    // 49 CFR 565 puts it at position 9 for the North American market; markets
+    // that require no check digit leave that position to the descriptor. This
+    // site is global-scope, so the row a market's own chart prints must be
+    // writable — including the one this deliberately does not pin.
+    for (const positions of [{ from: 9 }, { from: 1 }, { from: 17 }]) {
+      expect(
+        schema.safeParse(
+          vinPositionEntry({ encodes: "check-digit", positions })
+        ).success,
+        JSON.stringify(positions)
+      ).toBe(true);
+    }
   });
 
   it("REJECTS a position outside the 17-character VIN", () => {
@@ -739,9 +824,11 @@ describe("VIN code rows (`vin-code`)", () => {
     }
   });
 
-  it("rejects a description pasted into the code field", () => {
-    // The width rule alone would not catch this — a `to` far enough away would
-    // make any length "correct" — so the cap is its own rule.
+  it("needs no length cap of its own — the positions are the cap", () => {
+    // A vin-code's length is bounded from both sides by its position range,
+    // and the range is bounded by VIN_LENGTH: 17 characters is the ceiling and
+    // there is no `to` "far enough away" to make a 33-character code legal.
+    // That is why CODE_MAX_LENGTH's grader is an option-code, below.
     expect(
       schema.safeParse(
         vinCodeEntry({
@@ -790,6 +877,122 @@ describe("option and build-plate codes (`option-code`)", () => {
           codeSet: "model-code",
           code: "V45W",
           system: "general",
+        })
+      ).success
+    ).toBe(true);
+  });
+
+  /**
+   * T208 review, F2. This is `CODE_MAX_LENGTH`'s real grader: an option code
+   * has **no positions**, so the cap is the only length bound it has. Remove
+   * `.max(CODE_MAX_LENGTH)` from the code schema and this test — and only this
+   * test — goes red.
+   */
+  it("REJECTS a description pasted into an option code", () => {
+    expect(
+      schema.safeParse(
+        optionCodeEntry({ code: "A".repeat(CODE_MAX_LENGTH + 1) })
+      ).success
+    ).toBe(false);
+    // The neighbouring length is legal, so the assertion above is the cap and
+    // not some other rule objecting.
+    expect(
+      schema.safeParse(optionCodeEntry({ code: "A".repeat(CODE_MAX_LENGTH) }))
+        .success
+    ).toBe(true);
+  });
+
+  it("pins the code cap at 32 characters", () => {
+    // Same precedent as FSM_SUMMARY_MAX_LENGTH: a bound nothing else enforces
+    // is a bound a refactor deletes silently. Changing this number is a
+    // deliberate act that updates this line and says why.
+    expect(CODE_MAX_LENGTH).toBe(32);
+  });
+
+  /**
+   * T208 review, F5: the first pattern was `/^[0-9A-Z][0-9A-Z-]*$/`, which
+   * accepted `V45W-` and `V45--W` while the docstring claimed hyphens were
+   * *inside* a code. It now mirrors `TAXONOMY_ID_PATTERN`'s shape with the case
+   * inverted — alphanumeric groups joined by single hyphens.
+   */
+  it.each(["V45W-", "-V45W", "V45--W", "V45 W", "v45w", "V45W_A", ""])(
+    "REJECTS the malformed code %o",
+    (code) => {
+      expect(issuePaths(schema.safeParse(optionCodeEntry({ code })))).toContain(
+        "code"
+      );
+    }
+  );
+
+  it.each(["V45W", "T69", "A31", "MB-000001", "6G74-SOHC"])(
+    "accepts the well-formed code %s",
+    (code) => {
+      expect(
+        schema.safeParse(optionCodeEntry({ code, codeSet: "equipment" }))
+          .success
+      ).toBe(true);
+    }
+  );
+
+  /**
+   * T208 review, F6: a `-model` code set names an entity the taxonomy has an
+   * id for, so a decoding of one that names something else has one of its two
+   * fields wrong. Both sides are closed vocabularies, so the rule is a lookup.
+   */
+  it("accepts an engine-model code that decodes to an engine", () => {
+    expect(
+      schema.safeParse(
+        optionCodeEntry({
+          codeSet: "engine-model",
+          code: "6G74",
+          system: "engine",
+          fitment: { gens: ["gen3"], engines: ["test-engine"] },
+          decodesTo: { engine: "test-engine" },
+        })
+      ).success
+    ).toBe(true);
+  });
+
+  it.each([
+    ["engine-model", "engine"],
+    ["transmission-model", "transmission"],
+    ["transfer-case-model", "transferCase"],
+  ] as const)(
+    "REJECTS a %s code whose decoding names no %s",
+    (codeSet, facet) => {
+      const outcome = schema.safeParse(
+        optionCodeEntry({
+          codeSet,
+          system: "general",
+          decodesTo: { generation: "gen3" },
+        })
+      );
+      expect(issuePaths(outcome)).toContain(`decodesTo.${facet}`);
+      expect(JSON.stringify(outcome)).toMatch(/that is what the code set/);
+    }
+  );
+
+  it("does not require a decoding at all — an id is never invented to satisfy a schema", () => {
+    // A build-plate code whose engine has no taxonomy entry yet is written
+    // with its meaning in prose, in both locales, and no `decodesTo`.
+    expect(
+      schema.safeParse(
+        optionCodeEntry({ codeSet: "engine-model", system: "engine" })
+      ).success
+    ).toBe(true);
+  });
+
+  it("imposes no such rule on the sets that name no taxonomy entity", () => {
+    // `model-code` is deliberately absent from the table: `V45W` spans engine
+    // *and* body *and* wheelbase at once, so there is no one facet it must
+    // state.
+    expect(
+      schema.safeParse(
+        optionCodeEntry({
+          codeSet: "model-code",
+          code: "V45W",
+          system: "general",
+          decodesTo: { generation: "gen3" },
         })
       ).success
     ).toBe(true);
@@ -891,6 +1094,24 @@ describe("what a code decodes to (`decodesTo`)", () => {
         vinCodeEntry({
           fitment: { gens: ["gen2"] },
           decodesTo: { generation: "gen2-5" },
+        })
+      ).success
+    ).toBe(true);
+  });
+
+  it("RECORDS THE RESIDUAL: an unrelated generation is accepted today", () => {
+    // T208 review, F4. Dropping the membership test to protect the `gen2-5` ⊂
+    // `gen2` case also lets this nonsense through — a row scoped to `gen1` that
+    // decodes to `gen4`. The honest rule is containment-aware membership, which
+    // needs `expandGenerationIds` and therefore the taxonomy, so it belongs in
+    // the FIT-02 build layer beside `validateEntryFitments`, not in this
+    // module. Asserting `true` is not an endorsement: it is the hole, pinned,
+    // so the day it is closed this line has to be rewritten deliberately.
+    expect(
+      schema.safeParse(
+        vinCodeEntry({
+          fitment: { gens: ["gen1"] },
+          decodesTo: { generation: "gen4" },
         })
       ).success
     ).toBe(true);
