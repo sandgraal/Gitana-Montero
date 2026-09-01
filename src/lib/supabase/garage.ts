@@ -731,11 +731,19 @@ export async function uploadReceipt(
 }
 
 /**
- * Remove one receipt: the row first, then the object.
+ * Remove one receipt: the object first, then the row.
  *
- * The mirror image of the upload's order. Dropping the row first means the
- * worst case is an orphan object nobody renders; deleting the object first
- * would mean a live row offering a link to bytes that are gone.
+ * The same order as {@link deleteRecord}, and for the same reason — which is
+ * the reason receipts differ from photos here (T2-302 review, F2). A photo's
+ * index is `vehicles.photo_paths`, an array that survives the object, so the
+ * photo path drops the *reference* first and the worst case is an orphan
+ * object nobody renders. A receipt's index is the row itself: delete it first
+ * and a failed object delete leaves bytes that nothing in the system can name
+ * again until the account purge sweeps the owner's whole prefix.
+ *
+ * The other order's cost is a row pointing at bytes that are gone, for as long
+ * as it takes to press the button again — visible, retryable, and recoverable.
+ * An unreachable object is none of the three.
  */
 export async function removeReceipt(
   receipt: ReceiptRow
@@ -744,12 +752,12 @@ export async function removeReceipt(
   if (!open.ok) return open;
   const { client, userId } = open.value;
 
-  const { error } = await client.from("receipts").delete().eq("id", receipt.id);
-  if (error) return failed();
-
   if (receiptPathBelongsTo(userId, receipt.storage_path)) {
     await client.storage.from(RECEIPTS_BUCKET).remove([receipt.storage_path]);
   }
+
+  const { error } = await client.from("receipts").delete().eq("id", receipt.id);
+  if (error) return failed();
   return { ok: true, value: null };
 }
 

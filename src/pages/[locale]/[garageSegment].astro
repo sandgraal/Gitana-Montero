@@ -1271,6 +1271,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
   } from "../../lib/supabase/garage";
   import {
     EMPTY_CATALOGUE,
+    convertTimeField,
     emptyRecordDraft,
     formatCost,
     formatDuration,
@@ -1505,6 +1506,17 @@ const hasReferences = Object.values(referenceCatalogue).some(
     let editingRecord: RecordRow | null = null;
     let receipts: ReceiptRow[] = [];
     let currency = readCurrency(window, locale);
+    /*
+     * The unit the time field is currently written in.
+     *
+     * Held here rather than read off the `<select>` at each use, because the
+     * two have to change in a defined order: the digits in the box mean
+     * something different under each unit, so "what unit is the box in?" is a
+     * question about the last *conversion*, not about the control's current
+     * value. Reading the control instead is what made the first version
+     * reinterpret `2` hours as two minutes (T2-302 review, F4).
+     */
+    let recordTimeUnit: TimeUnit = "h";
 
     /* --------------------------------------------------------------- view */
 
@@ -2096,9 +2108,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
         cost: els.recordCost?.value ?? "",
         currency: els.recordCurrency?.value ?? currency,
         time: els.recordTime?.value ?? "",
-        timeUnit: (els.recordTimeUnit?.value === "min"
-          ? "min"
-          : "h") as TimeUnit,
+        timeUnit: recordTimeUnit,
         odometer: els.recordOdometer?.value ?? "",
         odometerUnit: unit,
         problemIds: chosen(els.recordProblems),
@@ -2158,6 +2168,10 @@ const hasReferences = Object.values(referenceCatalogue).some(
           draft.currency === "" ? currency : draft.currency;
       }
       if (els.recordTime) els.recordTime.value = draft.time;
+      // The control and the variable move together, always: `recordTimeUnit`
+      // is what every read of the field is interpreted against, so a `<select>`
+      // set without it would reinterpret the digits already in the box.
+      recordTimeUnit = draft.timeUnit;
       if (els.recordTimeUnit) els.recordTimeUnit.value = draft.timeUnit;
       if (els.recordOdometer) els.recordOdometer.value = draft.odometer;
       const restore = (
@@ -2204,12 +2218,13 @@ const hasReferences = Object.values(referenceCatalogue).some(
               today: todayLocal(),
               currency,
               odometerUnit: unit,
+              timeUnit: recordTimeUnit,
             })
           : recordDraftFromRow(row, {
               odometerUnit: unit,
-              timeUnit: (els.recordTimeUnit?.value === "min"
-                ? "min"
-                : "h") as TimeUnit,
+              // The unit the reader last chose, carried across records: a
+              // reader who thinks in minutes keeps thinking in minutes.
+              timeUnit: recordTimeUnit,
             })
       );
 
@@ -2581,17 +2596,28 @@ const hasReferences = Object.values(referenceCatalogue).some(
     });
 
     els.recordTimeUnit?.addEventListener("change", () => {
-      // Re-render the field from the stored row in the newly chosen unit, so
-      // switching units never re-parses an already-converted figure — the
-      // odometer's lesson, applied to the second figure that has two units.
-      const previous = editingRecord;
-      if (previous === null || !els.recordTime) return;
+      /*
+       * Convert what is in the field, on every path.
+       *
+       * Not "re-render from the stored row", which is what this did first: on
+       * an existing record that silently discarded whatever the reader had
+       * typed and not yet saved, and on a *new* record it did nothing at all,
+       * so `2` hours quietly became two minutes (T2-302 review, F4). The unit
+       * control changes how a figure is written, never which figure it is.
+       *
+       * The save path is unaffected: `recordWriteFromDraft` compares the field
+       * against `previous` rendered in the unit the form is *now* in, so an
+       * untouched stored figure converted here still saves as the stored one.
+       */
       const chosen = (els.recordTimeUnit?.value === "min" ? "min" : "h") as
         "h" | "min";
-      els.recordTime.value = recordDraftFromRow(previous, {
-        odometerUnit: unit,
-        timeUnit: chosen,
-      }).time;
+      if (!els.recordTime || chosen === recordTimeUnit) return;
+      els.recordTime.value = convertTimeField(
+        els.recordTime.value,
+        recordTimeUnit,
+        chosen
+      );
+      recordTimeUnit = chosen;
     });
 
     els.recordDelete?.addEventListener("click", () => {
@@ -3049,8 +3075,8 @@ const hasReferences = Object.values(referenceCatalogue).some(
    * by one class on the `<li>`, set from `kind`.
    *
    * One deliberate departure from the artboard: the `date · odometer` meta
-   * line is `--muted` rather than `--faint`. `#A99C88` on the panel is about
-   * 2.2:1, and this site holds itself to WCAG 2.1 AA, where body text needs
+   * line is `--muted` rather than `--faint`. `#A99C88` on `--paper` measures
+   * 2.69:1, and this site holds itself to WCAG 2.1 AA, where body text needs
    * 4.5:1. The artboard's *hierarchy* is kept — the meta line is still the
    * quietest thing in the card — at a colour a reader can actually read.
    * ------------------------------------------------------------------- */

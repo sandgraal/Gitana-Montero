@@ -726,7 +726,7 @@ const en: UiStrings = {
     "Those notes are longer than {max} characters.",
   garageRecordIssueCost: "Write the cost in digits, or leave the field empty.",
   garageRecordIssueCostSeparator:
-    "That figure could be read two ways. Write it without separators — 1500, or 1500.50.",
+    "That figure could be read two ways. Write it without thousands separators — 1500, or 1500.50.",
   garageRecordIssueCostLarge: "That cost is higher than this site accepts.",
   garageRecordIssueTime: "Write the time in digits, or leave the field empty.",
   garageRecordIssueTimeLarge:
@@ -1073,7 +1073,7 @@ const es: UiStrings = {
   garageRecordIssueNotesLongTemplate: "Esas notas pasan de {max} caracteres.",
   garageRecordIssueCost: "Escriba el costo en dígitos, o deje el campo vacío.",
   garageRecordIssueCostSeparator:
-    "Esa cifra se puede leer de dos maneras. Escríbala sin separadores: 1500, o 1500.50.",
+    "Esa cifra se puede leer de dos maneras. Escríbala sin separadores de miles: 1500, o 1500,50.",
   garageRecordIssueCostLarge: "Ese costo pasa de lo que el sitio acepta.",
   garageRecordIssueTime: "Escriba el tiempo en dígitos, o deje el campo vacío.",
   garageRecordIssueTimeLarge:

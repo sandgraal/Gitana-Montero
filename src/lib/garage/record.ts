@@ -405,11 +405,14 @@ export type TimeIssue = "not-a-number" | "negative" | "too-large";
 /**
  * Parse a typed duration into whole minutes.
  *
- * Hours take a fractional part (`1.5`, `1,5` — both, since the decimal comma
- * is how half the readers of this site write it and there is no thousands
- * separator to confuse it with at this scale); minutes do not, because half a
- * minute is not a figure anybody logs. Empty is a legitimate answer: GAR-02′
- * calls time optional.
+ * Either unit takes a fractional part (`1.5`, `1,5` — both, since the decimal
+ * comma is how half the readers of this site write it, and at this scale there
+ * is no thousands separator to confuse it with). Hours are where that matters;
+ * a fractional *minute* is not a figure anybody logs, but it is rounded to the
+ * nearest whole minute rather than refused, because rejecting `1.5 min` would
+ * be a lecture in place of an answer the field can perfectly well store.
+ *
+ * Empty is a legitimate answer: GAR-02′ calls time optional.
  */
 export function parseTime(
   raw: string,
@@ -433,6 +436,36 @@ export function parseTime(
 /** Stored minutes back in the unit the form is showing. */
 export function timeInUnit(minutes: number, unit: TimeUnit): number {
   return unit === "h" ? Math.round((minutes / 60) * 10) / 10 : minutes;
+}
+
+/**
+ * The text of the time field, re-expressed after the reader changes the unit.
+ *
+ * The least-surprising thing a unit control can do is convert what is in the
+ * field: `2` in hours becomes `120` in minutes, and the reader's answer to
+ * "how long did it take" does not change meaning under them. The two
+ * alternatives were both worse and both shipped in the first draft of this
+ * page (T2-302 review, F4): re-rendering from the stored row silently threw
+ * away whatever they had typed and not yet saved, and doing nothing silently
+ * *reinterpreted* it, so a new record's `2` hours became two minutes.
+ *
+ * Text that does not parse is returned unchanged. A half-typed figure is still
+ * the reader's, and rewriting it to `0` while they are mid-keystroke is the
+ * same class of surprise this function exists to remove.
+ *
+ * The save path does not depend on this: `recordWriteFromDraft` compares the
+ * field against `previous` rendered in the *current* unit, so converting an
+ * untouched stored figure here still saves as the stored figure.
+ */
+export function convertTimeField(
+  raw: string,
+  from: TimeUnit,
+  to: TimeUnit
+): string {
+  if (from === to) return raw;
+  const parsed = parseTime(raw, from);
+  if (parsed.issue !== null || parsed.minutes === null) return raw;
+  return String(timeInUnit(parsed.minutes, to));
 }
 
 /**
@@ -654,6 +687,8 @@ export function emptyRecordDraft(input: {
   readonly today: string;
   readonly currency: RecordCurrency;
   readonly odometerUnit: OdometerUnit;
+  /** The unit the reader last chose. Hours when nobody has chosen yet. */
+  readonly timeUnit?: TimeUnit;
 }): RecordDraft {
   return {
     occurredOn: input.today,
@@ -663,7 +698,7 @@ export function emptyRecordDraft(input: {
     cost: "",
     currency: input.currency,
     time: "",
-    timeUnit: "h",
+    timeUnit: input.timeUnit ?? "h",
     odometer: "",
     odometerUnit: input.odometerUnit,
     problemIds: [],
@@ -783,11 +818,26 @@ export function normalizeRecordText(value: string): string {
  * The row body for an insert or an update, or `null` when the draft has
  * issues.
  *
- * `previous` plays exactly the part it plays in `vehicleWriteFromDraft`: when
- * the odometer field still reads what {@link recordDraftFromRow} put there,
- * the stored kilometres are carried over unconverted, so a reader whose
- * display unit is miles does not walk the figure by a kilometre every time
- * they fix a typo in the title. The same trap, the same answer.
+ * `previous` plays exactly the part it plays in `vehicleWriteFromDraft`, and it
+ * plays it for **both** of this row's two-unit figures: when a field still
+ * reads what {@link recordDraftFromRow} put there, the stored value is carried
+ * over unconverted.
+ *
+ * ## The odometer's trap is the time's trap
+ *
+ * A display round trip is not lossless in the direction that starts from
+ * storage. 247 500 km renders as 153 789 mi and converts back to 247 499 — and
+ * 45 minutes renders as 0.8 h and converts back to **48**, 100 minutes to 102,
+ * and one minute to zero. So a reader who fixed a typo in the *title* would
+ * have added three minutes to the job on every save, and a one-minute entry
+ * would have vanished on the first.
+ *
+ * The first version of this guarded only the odometer, and the suite missed it
+ * because every fixture used 72 minutes — 1.2 h, one of the few values that
+ * survives the round trip (T2-302 review, F1). The fix is not more precision;
+ * it is not converting a figure nobody touched, so both branches below are the
+ * same branch written twice, on purpose, against one shared rendering of
+ * `previous`.
  */
 export function recordWriteFromDraft(
   vehicleId: string,
@@ -798,16 +848,25 @@ export function recordWriteFromDraft(
   if (validateRecordDraft(draft, catalogue).length > 0) return null;
   if (!isRecordKind(draft.kind)) return null;
 
-  const untouchedOdometer =
-    previous !== null &&
-    draft.odometer ===
-      recordDraftFromRow(previous, {
-        odometerUnit: draft.odometerUnit,
-        timeUnit: draft.timeUnit,
-      }).odometer;
-  const odometerKm = untouchedOdometer
-    ? previous.odometer_km
-    : parseOdometer(draft.odometer, draft.odometerUnit).km;
+  // `previous` as the form would be showing it, in the units the form is
+  // currently in — the only thing "untouched" can honestly be compared to.
+  const asShown =
+    previous === null
+      ? null
+      : recordDraftFromRow(previous, {
+          odometerUnit: draft.odometerUnit,
+          timeUnit: draft.timeUnit,
+        });
+
+  const odometerKm =
+    previous !== null && asShown !== null && draft.odometer === asShown.odometer
+      ? previous.odometer_km
+      : parseOdometer(draft.odometer, draft.odometerUnit).km;
+
+  const timeMinutes =
+    previous !== null && asShown !== null && draft.time === asShown.time
+      ? previous.time_minutes
+      : parseTime(draft.time, draft.timeUnit).minutes;
 
   const cost = parseCost(draft.cost);
   const body = draft.body.trim();
@@ -820,7 +879,7 @@ export function recordWriteFromDraft(
     body: body === "" ? null : body,
     cost_amount: cost.amount,
     cost_currency: cost.amount === null ? null : draft.currency,
-    time_minutes: parseTime(draft.time, draft.timeUnit).minutes,
+    time_minutes: timeMinutes,
     odometer_km: odometerKm,
     problem_ids: [...draft.problemIds],
     part_ids: [...draft.partIds],

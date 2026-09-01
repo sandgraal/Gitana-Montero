@@ -49,6 +49,20 @@
  * as photos. The account-level purge is unaffected: it deletes by *owner*
  * prefix across both buckets, and the owner is segment one here too.
  *
+ * ## Four constants here are restatements, and nothing checks that they agree
+ *
+ * The bucket id, the MIME allow-list, the size limit and the path shape are
+ * all *copies*: `tests/garage/contract.ts` declares the bucket id and the path,
+ * and `…_receipts_storage.sql` declares the bucket id, the MIME list and the
+ * limit, where they are the ones actually enforced. This copy exists so the
+ * page can refuse a file before spending a reader's data uploading it — but no
+ * test ties the two sides together, so a migration that widened the limit or
+ * dropped a type would leave this file quietly wrong, and the symptom would be
+ * an upload that fails after the bytes have gone up the wire (T2-302 review).
+ * Importing the contract's declarations into `src/` — or grading the pair —
+ * is the fix; it belongs with whoever next touches the storage contract, and
+ * `photos.ts` carries the identical exposure.
+ *
  * ## The file name is generated, never the reader's
  *
  * An uploaded name is attacker-controlled text that becomes part of a URL: it

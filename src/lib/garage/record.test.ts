@@ -6,6 +6,7 @@ import {
   MAX_TIME_MINUTES,
   RECORD_CURRENCIES,
   RECORD_KINDS,
+  convertTimeField,
   defaultCurrency,
   emptyRecordDraft,
   formatCost,
@@ -238,6 +239,58 @@ describe("parseTime", () => {
   });
 });
 
+describe("convertTimeField", () => {
+  it("converts what is in the field rather than reinterpreting it", () => {
+    // The F4 case: on a new record, `2` hours must not become two minutes
+    // because the unit control moved.
+    expect(convertTimeField("2", "h", "min")).toBe("120");
+    expect(convertTimeField("120", "min", "h")).toBe("2");
+    expect(convertTimeField("1,5", "h", "min")).toBe("90");
+  });
+
+  it("leaves the field alone when the unit did not change", () => {
+    expect(convertTimeField("2", "h", "h")).toBe("2");
+  });
+
+  it("leaves a half-typed or empty figure exactly as typed", () => {
+    // Rewriting somebody's keystrokes to `0` mid-entry is the same class of
+    // surprise this function exists to remove.
+    expect(convertTimeField("", "h", "min")).toBe("");
+    expect(convertTimeField("about two", "h", "min")).toBe("about two");
+    expect(convertTimeField("-1", "h", "min")).toBe("-1");
+  });
+
+  it("keeps a converted stored figure recognisable as untouched", () => {
+    // The join with F1: switching units on an unedited record has to leave
+    // the field equal to what `recordDraftFromRow` would render in the new
+    // unit, or the save path would stop seeing it as untouched and would
+    // write the walked value after all.
+    const previous = row({ time_minutes: 45 });
+    const inMinutes = recordDraftFromRow(previous, {
+      odometerUnit: "km",
+      timeUnit: "min",
+    }).time;
+    const switched = convertTimeField(inMinutes, "min", "h");
+    expect(switched).toBe(
+      recordDraftFromRow(previous, { odometerUnit: "km", timeUnit: "h" }).time
+    );
+    const write = recordWriteFromDraft(
+      "v1",
+      {
+        ...recordDraftFromRow(previous, {
+          odometerUnit: "km",
+          timeUnit: "h",
+        }),
+        title: "Edited only the title",
+        time: switched,
+      },
+      CATALOGUE,
+      previous
+    );
+    expect(write?.time_minutes).toBe(45);
+  });
+});
+
 describe("formatDuration", () => {
   it("reads in minutes under the hour and in hours above it", () => {
     expect(formatDuration(45, "en")).toContain("45");
@@ -436,6 +489,48 @@ describe("recordWriteFromDraft", () => {
     expect(
       recordWriteFromDraft("v1", draft({ title: "" }), CATALOGUE)
     ).toBeNull();
+  });
+
+  it("does not walk a time nobody touched", () => {
+    // The odometer's trap, on the second figure that has two units, and the
+    // one the first version of this suite missed: every fixture used 72 min,
+    // which is 1.2 h and converts back to exactly 72. Most values do not.
+    // 45 min renders as 0.8 h, which converts back to 48 — so an edit to the
+    // *title* alone would have added three minutes to the job, every save.
+    for (const minutes of [1, 45, 100, 359]) {
+      const previous = row({ time_minutes: minutes });
+      const asShown = recordDraftFromRow(previous, {
+        odometerUnit: "km",
+        timeUnit: "h",
+      });
+      const write = recordWriteFromDraft(
+        "v1",
+        { ...asShown, title: "Edited only the title" },
+        CATALOGUE,
+        previous
+      );
+      expect(write?.time_minutes).toBe(minutes);
+    }
+  });
+
+  it("takes a time the reader did edit", () => {
+    // The other half of the guard: "untouched" has to mean untouched, or the
+    // stored figure would outlive every correction made to it.
+    const previous = row({ time_minutes: 45 });
+    const write = recordWriteFromDraft(
+      "v1",
+      {
+        ...recordDraftFromRow(previous, {
+          odometerUnit: "km",
+          timeUnit: "h",
+        }),
+        title: "Took longer than that",
+        time: "2",
+      },
+      CATALOGUE,
+      previous
+    );
+    expect(write?.time_minutes).toBe(120);
   });
 
   it("does not walk an odometer nobody touched", () => {

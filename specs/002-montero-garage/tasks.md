@@ -298,6 +298,19 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   which is T2-303's; a panel saying "nothing is planned" beside a planned card
   on the timeline would have been the page lying to its owner. (b) The
   Current-state tab is untouched, T2-303's entirely.
+  <br>**Review found the second two-unit figure walking (F1).** The
+  odometer's "do not convert a figure nobody touched" guard was written for the
+  odometer only, so `time_minutes` went through the display round trip on every
+  save: 45 min renders as 0.8 h and comes back as **48**, 100 → 102, and 1 → 0.
+  An edit to a record's *title* added three minutes to the job. The suite
+  missed it because every fixture used 72 minutes — 1.2 h — one of the few
+  values that survives. Both figures now share one rendering of `previous`, and
+  the counterpart grader sweeps 1/45/100/359. Two smaller ones folded in: a
+  receipt's object is now removed **before** its row (the row is the only index
+  a receipt has, unlike a photo's `photo_paths`, so row-first could strand
+  bytes nothing can name), and the time-unit control now *converts* the typed
+  value on every path instead of discarding it on an existing record and
+  silently reinterpreting it on a new one (`2` hours became two minutes).
   <br>**Found, not fixed — receipts have no delete-trigger belt.**
   `on_vehicle_deleted` sweeps `vehicle-photos` by `<owner>/<vehicle>/` prefix;
   receipt objects are `<owner>/<file>` (the contract's shape), so no prefix
