@@ -108,5 +108,5 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
 - [ ] **T803 [PLATFORM]** Server-side search endpoint + site integration behind client-side fallback. Depends: T802. *(SRCH-01)*
 
 ## Phase-closing reviews
-- [ ] **T901 [TEST]** Phase 1–2 closing review: separation held (graders unedited by implementers), locale gate provably red on one-locale input, routing policy intact. Opus, fresh instance. *(SCF-02…04, I18N-06)*
+- [x] **T901 [TEST]** Phase 1–2 closing review: separation held (graders unedited by implementers), locale gate provably red on one-locale input, routing policy intact. Opus, fresh instance. *(SCF-02…04, I18N-06)*
 - [ ] **T902 [TEST]** Content-integrity audit after Phase 5: sample-verify citations against sources, glossary conformance sweep, confidence-tier honesty check. Opus, fresh instance. *(REF-02, GLO-02, PRB-04)*
