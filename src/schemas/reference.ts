@@ -463,6 +463,15 @@ export const VIN_SECTIONS = {
  * "positions 4–9 are the descriptor" are both true of the same truck, from
  * different charts, which is exactly the both-granularities case `VIN_FIELDS`
  * already admits for the WMI.
+ *
+ * **One place this table is stricter than the standard, recorded so it is not
+ * rediscovered as a bug.** For a manufacturer building fewer than 500 vehicles
+ * a year, ISO 3779 and 49 CFR 565.15(e) assign characters **12–14** to the
+ * second part of the manufacturer identifier — so `manufacturer` at 12–14 is a
+ * legitimate row for such a builder, and this table rejects it as VIS. That
+ * is deliberate and harmless here: Mitsubishi is not a small-volume builder
+ * and no vehicle within this site's coverage (spec §1) carries such a VIN. If
+ * one ever does, the fix is a documented exception, not a surprise.
  */
 export const VIN_FIELD_SECTIONS: Readonly<
   Record<VinField, { readonly from: number; readonly to: number } | null>
