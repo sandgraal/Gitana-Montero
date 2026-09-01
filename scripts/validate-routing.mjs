@@ -51,10 +51,15 @@ for (const role of requiredRoles) {
     fail(`invalid default for role: ${role}`);
 }
 
-// Graders may start at sonnet but must never be silently dropped to haiku.
+// Graders default to sonnet; opus is a per-dispatch escalation driven by
+// hard triggers (see routing.md), not a static role default. Anything other
+// than sonnet here means the policy drifted from what this file's own
+// success message claims.
 for (const grader of ["fact-checker", "bilingual-editor", "code-reviewer"]) {
-  if (policy.roleDefaults[grader].model === "haiku")
-    fail(`grader role downgraded to haiku: ${grader}`);
+  if (policy.roleDefaults[grader].model !== "sonnet")
+    fail(
+      `grader role default is not sonnet-baseline: ${grader} (${policy.roleDefaults[grader].model})`
+    );
 }
 
 const requiredOpus = [
