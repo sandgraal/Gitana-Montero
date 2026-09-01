@@ -33,7 +33,7 @@ conducts.
 - `npm run verify` — every merge-blocking check except link/a11y (CI runs those
   on top); must pass before any commit
 - `npm run dev` / `npm run build` / `npm run check`
-- `npm test` / `npm run lint` (`test:e2e` arrives with T204 — not yet implemented)
+- `npm test` / `npm run lint` / `npm run test:e2e` (Playwright, `tests/e2e/`)
 - `npm run check:locales` / `check:citations` / `check:glossary` / `check:links`
 - `npm run gaps` — generates the content backlog report
 - `npm run test:garage` — the user-data graders. Tier A (parses the migration
