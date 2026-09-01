@@ -508,7 +508,7 @@ second principal to a phase that was written for one, and the instrument work
 that implies is large enough to be its own task — hence T2-401a. T2-404 is new.
 Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
 
-- [ ] **T2-401a [TEST]** The instrument: grade functions and grants, not just
+- [x] **T2-401a [TEST]** The instrument: grade functions and grants, not just
   policies. Split from T2-401 so it is reviewed as harness work rather than
   feature work — the T2-201/T2-202 rationale. Depends: T2-302. *(SHR-01, SHR-05..08)*
   <br>**Why this exists.** The recommended architecture for SHR-07 is a

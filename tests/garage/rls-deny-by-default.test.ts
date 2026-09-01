@@ -64,8 +64,19 @@ import {
   teardownScenario,
   updateRows,
 } from "./harness.ts";
-import { coveredCommands, userTablePolicyIssues } from "./rules.ts";
-import { enablesRls, forcesRls, migrationSql, statements } from "./sql.ts";
+import {
+  coveredCommands,
+  tableGrantIssues,
+  ungradedTableIssues,
+  userTablePolicyIssues,
+} from "./rules.ts";
+import {
+  createdTables,
+  enablesRls,
+  forcesRls,
+  grants,
+  migrationSql,
+} from "./sql.ts";
 
 const live = await detectLiveStack();
 
@@ -140,26 +151,91 @@ describe("RLS is declared on every user table", () => {
 });
 
 describe("deny-by-default is declared, not assumed", () => {
-  it("revokes anon's grants on the user tables", () => {
+  it("leaves anon and public with NO privilege on any user table", () => {
     // RLS filters rows; GRANT decides whether a role may reach the table at
     // all. Supabase's `anon` role ships with broad grants on `public`, so
     // "we wrote policies" is not the whole story — the revoke is what makes a
     // table that ships before its policies do an outage rather than a leak.
+    //
+    // ## Rewritten by T2-401a. The previous version was a false pass.
+    //
+    // It counted statements matching `^revoke … from … anon` and asserted the
+    // count was above zero. It never asked what the ACL was at the end, so a
+    // directory containing
+    //
+    //   revoke all on public.records from anon;
+    //   grant select on public.records to anon;
+    //
+    // scored 1 and passed — verified 2026-08-31. `sql.ts` established replay
+    // discipline for policies for exactly this reason (`alter policy`, D2) and
+    // it had never been applied to grants. A migration directory is a
+    // sequence, and the only honest question is what the database looks like
+    // at the end.
+    //
+    // Second-order while forced RLS and no anon policy still yield zero rows;
+    // first-order the moment a `security definer` RPC granted to `anon` adds a
+    // surface where no policy is consulted at all — which is T2-404.
+    //
+    // The list is the union of what is enumerated and what is **created**, so
+    // a fifth table cannot dodge the question by not being in the contract.
     const sql = migrationSql();
-    const revokes = statements(sql).filter((statement) =>
-      /^revoke\b[\s\S]*\bfrom\b[\s\S]*\banon\b/.test(statement)
-    );
+    const tables = [
+      ...new Set([
+        ...USER_TABLE_NAMES,
+        ...createdTables(sql).map((table) => table.name),
+      ]),
+    ];
 
-    expect(revokes.length).toBeGreaterThan(0);
+    expect(tableGrantIssues(sql, tables)).toEqual([]);
   });
 
   it("revokes future default privileges too", () => {
-    // The revoke above covers the four tables that exist. This covers the
-    // fifth one, written a year from now by someone who has not read this
-    // file.
-    expect(migrationSql()).toMatch(
-      /alter default privileges[\s\S]*revoke[\s\S]*from [\s\S]*\b(anon|public)\b/
-    );
+    // The revoke above covers the tables that exist. This covers the one
+    // written a year from now by someone who has not read this file.
+    //
+    // Read from the replayed `alter default privileges` records rather than by
+    // regex over the whole file: the previous spelling matched
+    // `alter default privileges[\s\S]*revoke[\s\S]*from[\s\S]*anon`, which
+    // spans arbitrary distance and would be satisfied by three unrelated
+    // statements — or by one statement and a comment.
+    const records = grants(migrationSql()).defaultPrivileges;
+    const revokedTypes = records
+      .filter(
+        (record) =>
+          record.action === "revoke" &&
+          record.roles.some((role) => role === "anon" || role === "public")
+      )
+      .map((record) => record.objectType);
+
+    expect(revokedTypes).toContain("tables");
+  });
+});
+
+describe("every table that exists is a table the graders know about", () => {
+  it("creates no public table that is neither enumerated nor exempt", () => {
+    // ## Added by T2-401a. The second recorded defect.
+    //
+    // Nothing enumerated the tables that actually exist. Every table-level
+    // grader in this suite is driven from `contract.ts`, and
+    // `userTablePolicyIssues` filters to `USER_TABLE_NAMES` — so a fifth user
+    // table was **invisible**: a `shares` table with
+    // `for all to anon using (true)` and no `force` produced zero findings,
+    // verified 2026-08-31.
+    //
+    // > every user table ships with row-level security proven by graders
+    // > before content flows — AGENTS.md, Boundaries
+    //
+    // That guarantee cannot be driven off a hand-written list of user tables.
+    // This sweep runs the other way: it starts from what the directory
+    // actually creates and reports anything no grader knows about, with a
+    // named-exemption map in the style of `check-hreflang.mjs`'s
+    // `EXEMPT_PAGES`. RLS is checked on every created table, enumerated or
+    // not — a table nobody added to the contract is exactly the table whose
+    // `force` was forgotten.
+    //
+    // The rule is graded against DDL with a known answer, both directions, in
+    // `reviewer-probes.test.ts` (G10).
+    expect(ungradedTableIssues(migrationSql())).toEqual([]);
   });
 });
 

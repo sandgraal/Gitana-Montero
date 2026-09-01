@@ -64,15 +64,35 @@
  *
  * refs specs/002-montero-garage (SHR-01, SHR-03, GAR-05′, ACC-03)
  */
-import { USER_TABLES } from "./contract.ts";
+import {
+  ANONYMOUS_ROLES,
+  EXEMPT_PUBLIC_TABLES,
+  GRANT_EXPIRY_COLUMN,
+  GRANT_REVOCATION_COLUMN,
+  PLAINTEXT_TOKEN_COLUMNS,
+  SHARE_TOKEN_HASH_COLUMN,
+  USER_TABLES,
+  USER_TABLE_NAMES,
+} from "./contract.ts";
 import {
   createTableBody,
+  createdTables,
+  createdViews,
   columnDefinition,
+  columnDefinitions,
   defaultExpression,
+  enablesRls,
+  forcesRls,
+  functions,
+  grants,
   parenExpression,
   policies,
+  privilegeVerdict,
   representsAbsence,
+  rolePrivileges,
   statements,
+  type FunctionDefinition,
+  type GrantState,
   type PolicyDefinition,
 } from "./sql.ts";
 
@@ -683,3 +703,510 @@ export function isOptionalColumn(
 
 /** Re-exported so the probe suite can reach the parser it is grading. */
 export { parenExpression };
+
+/* =========================================================================
+ * T2-401a — rules over FUNCTIONS and GRANTS
+ *
+ * The rules above judge policies, which is the whole story only while every
+ * path to user data goes through RLS. A `security definer` function granted to
+ * `anon` is a path that does not: it runs as its owner, RLS on the tables it
+ * reads is not consulted, and whatever its body checks is the access control.
+ *
+ * Same shape as the policy rules, for the same reasons: pure functions over
+ * DDL text returning a list of findings, so the graders stay thin, a rule can
+ * be fixed in one place, and every rule is itself gradeable against DDL with a
+ * known answer — which is what `reviewer-probes.test.ts` does to all of them.
+ *
+ * refs specs/002-montero-garage (SHR-01, SHR-05, SHR-06, SHR-07, SHR-08)
+ * ====================================================================== */
+
+/* -------------------------------------------------------------------------
+ * `security definer` hygiene
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Every `security definer` routine must carry `set search_path = ''`.
+ *
+ * Codifies what T2-202 already does in all four of its functions, which is the
+ * moment to codify it: a practice that is universal and ungraded is a practice
+ * one hurried migration away from not being universal.
+ *
+ * The reason it is not style. A definer function runs with its owner's
+ * privileges and resolves unqualified names through the *caller's*
+ * `search_path`. A caller who can create a schema can therefore put their own
+ * `records` table ahead of `public.records` and have privileged code read it.
+ * `set search_path = ''` removes the ambiguity by removing the search path:
+ * every name in the body must then be schema-qualified, which is a cost worth
+ * paying and a diff worth seeing.
+ *
+ * Accepted spellings are `''` and `pg_catalog` alone — both mean "resolve
+ * nothing implicitly from a schema a caller controls". Anything else,
+ * including `public`, is a finding.
+ */
+export function definerSearchPathIssues(normalized: string): string[] {
+  const issues: string[] = [];
+  for (const routine of functions(normalized)) {
+    if (!routine.securityDefiner) continue;
+    const searchPath = routine.searchPath;
+    if (searchPath === null) {
+      issues.push(
+        `${routine.identity}: security definer with no \`set search_path\` — ` +
+          `unqualified names resolve through the caller's search path`
+      );
+      continue;
+    }
+    const value = searchPath.replace(/^'|'$/g, "").trim();
+    if (value !== "" && value !== "pg_catalog") {
+      issues.push(
+        `${routine.identity}: security definer with ` +
+          `\`set search_path = ${searchPath}\` — must be '' so every name is ` +
+          `schema-qualified`
+      );
+    }
+  }
+  return issues;
+}
+
+/* -------------------------------------------------------------------------
+ * The closed allow-list of anon-executable functions
+ * ---------------------------------------------------------------------- */
+
+/**
+ * `true` when `anon` or `public` can execute `routine` at the end of the
+ * migration directory — **including when the text does not say**.
+ *
+ * An `"unknown"` verdict counts as executable on purpose. Postgres grants
+ * `EXECUTE` on a new function to `PUBLIC` by default; a routine whose ACL no
+ * migration ever emptied is therefore reachable by `anon` in the running
+ * database while being silent in the file. Reading that silence as "not
+ * granted" is the single easiest way for this whole instrument to be
+ * decorative, so it reads as "granted" and the fix is one `revoke` line.
+ */
+export function isAnonExecutable(
+  state: GrantState,
+  routine: FunctionDefinition
+): boolean {
+  return ANONYMOUS_ROLES.some(
+    (role) =>
+      privilegeVerdict(state, routine.identity, role, "execute") !== "none"
+  );
+}
+
+/** Every routine `anon` or `public` can reach, at the end of the directory. */
+export function anonExecutableFunctions(
+  normalized: string
+): FunctionDefinition[] {
+  const state = grants(normalized);
+  return functions(normalized).filter((routine) =>
+    isAnonExecutable(state, routine)
+  );
+}
+
+/**
+ * The closed allow-list, as two independently-failing halves.
+ *
+ * `unexpected` is the security half and it is live today: anything reachable
+ * by `anon` that is not a named share reader. `missing` is the completeness
+ * half and it is the expected failure until T2-404 ships — a share reader that
+ * does not exist, or exists and was never granted, cannot serve anybody.
+ *
+ * Kept apart because they fail for opposite reasons and a caller that merged
+ * them would have to choose which one to be wrong about.
+ */
+export function anonFunctionAllowListIssues(
+  normalized: string,
+  allowed: readonly string[]
+): { readonly unexpected: string[]; readonly missing: string[] } {
+  const state = grants(normalized);
+  const declared = functions(normalized);
+  const reachable = declared.filter((routine) =>
+    isAnonExecutable(state, routine)
+  );
+
+  const unexpected = reachable
+    .filter((routine) => !allowed.includes(routine.name))
+    .map((routine) => {
+      const verdicts = ANONYMOUS_ROLES.map(
+        (role) =>
+          `${role}=${privilegeVerdict(state, routine.identity, role, "execute")}`
+      ).join(" ");
+      return (
+        `${routine.identity}: executable by an anonymous caller (${verdicts}) ` +
+        `but is not a declared share reader` +
+        (routine.securityDefiner ? " — and it is security definer" : "")
+      );
+    });
+
+  const missing = allowed
+    .filter((name) => !reachable.some((routine) => routine.name === name))
+    .map((name) => {
+      const exists = declared.some((routine) => routine.name === name);
+      return exists
+        ? `${name}: declared share reader exists but is not executable by anon`
+        : `${name}: declared share reader does not exist in the migrations`;
+    });
+
+  return { unexpected, missing };
+}
+
+/* -------------------------------------------------------------------------
+ * The token triple — three rules, because they fail independently
+ * ---------------------------------------------------------------------- */
+
+/** The routine's body with `select … for update` locking clauses removed. */
+function bodyWithoutLockClauses(routine: FunctionDefinition): string {
+  return routine.body.replace(/\bfor\s+(?:no\s+key\s+)?update\b/g, " ");
+}
+
+/**
+ * **Rule 1 of 3.** The grant is looked up by *hash*, and the bearer token is
+ * never compared against a column holding it in the clear.
+ *
+ * Separate from expiry and revocation because it fails on its own and for its
+ * own reason: this one is about what a database leak costs. If the row holds
+ * the token, reading the table *is* holding every live grant.
+ */
+export function tokenHashIssues(routine: FunctionDefinition): string[] {
+  const issues: string[] = [];
+  const body = routine.body;
+  const where = routine.identity;
+
+  const hashes = /\b(?:digest|sha256|sha512|hmac|crypt|encode)\s*\(/.test(body);
+  if (!hashes) {
+    issues.push(
+      `${where}: never hashes the token — a lookup that does not hash is a ` +
+        `lookup against a plaintext secret`
+    );
+  }
+  if (!new RegExp(`\\b${SHARE_TOKEN_HASH_COLUMN}\\b`).test(body)) {
+    issues.push(
+      `${where}: does not compare against ${SHARE_TOKEN_HASH_COLUMN}`
+    );
+  }
+  for (const column of PLAINTEXT_TOKEN_COLUMNS) {
+    // `token_hash` is not `token`: `\b` will not match across the underscore,
+    // so the hash column cannot be mistaken for the plaintext one.
+    const compared = new RegExp(
+      `\\b${column}\\s*=|=\\s*(?:[a-z0-9_]+\\.)?${column}\\b`
+    );
+    if (compared.test(body)) {
+      issues.push(
+        `${where}: compares a plaintext token column \`${column}\` — the ` +
+          `stored value must be a hash, never the bearer secret`
+      );
+    }
+  }
+  return issues;
+}
+
+/**
+ * **Rule 2 of 3.** The grant's `expires_at` is tested.
+ *
+ * SHR-08: "Every grant … SHALL carry an expiry". A column nobody reads is not
+ * an expiry, it is a comment. Requires the column to appear in a comparison,
+ * not merely to appear — the F1 lesson, one surface over.
+ */
+export function expiryCheckIssues(routine: FunctionDefinition): string[] {
+  const body = bodyWithoutLockClauses(routine);
+  const column = GRANT_EXPIRY_COLUMN;
+  const compared =
+    new RegExp(`\\b${column}\\b\\s*(?:>|<|>=|<=|is\\b)`).test(body) ||
+    new RegExp(`(?:>|<|>=|<=)\\s*(?:[a-z0-9_]+\\.)?${column}\\b`).test(body);
+  if (compared) return [];
+  return [
+    `${routine.identity}: does not test ${column} — ` +
+      (new RegExp(`\\b${column}\\b`).test(body)
+        ? `the column is mentioned but never compared`
+        : `an expiry nothing reads is not an expiry (SHR-08)`),
+  ];
+}
+
+/**
+ * **Rule 3 of 3, and the one most likely to be the real defect.** The grant's
+ * `revoked_at` is tested.
+ *
+ * SHR-08: revocation "SHALL take effect on the next request and SHALL never be
+ * gated by payment, by plan, or by any other condition". A reader that
+ * validates the hash and checks the expiry and skips this is a grant that
+ * **cannot be revoked** — and it passes every hand-test, because a grant you
+ * have not revoked behaves identically either way. Its own finding for exactly
+ * that reason: merged into the other two, a green expiry check would carry it.
+ */
+export function revocationCheckIssues(routine: FunctionDefinition): string[] {
+  const body = bodyWithoutLockClauses(routine);
+  const column = GRANT_REVOCATION_COLUMN;
+  const compared =
+    new RegExp(`\\b${column}\\b\\s*is\\s+(?:not\\s+)?null\\b`).test(body) ||
+    new RegExp(`\\b${column}\\b\\s*(?:>|<|>=|<=)`).test(body) ||
+    new RegExp(`(?:>|<|>=|<=)\\s*(?:[a-z0-9_]+\\.)?${column}\\b`).test(body) ||
+    new RegExp(`\\bcoalesce\\s*\\([^)]*\\b${column}\\b`).test(body);
+  if (compared) return [];
+  return [
+    `${routine.identity}: does not test ${column} — ` +
+      `a grant that cannot be revoked (SHR-08)`,
+  ];
+}
+
+/* -------------------------------------------------------------------------
+ * Column projection, not row projection
+ * ---------------------------------------------------------------------- */
+
+/**
+ * An anon-reachable routine must name the columns it returns.
+ *
+ * > **SHR-06** WHERE a grant does not open costs, THE data returned SHALL omit
+ * > the cost fields entirely rather than blanking them at render time.
+ *
+ * `select *` and `returns setof public.records` both make that impossible to
+ * honour: the shape is the table's shape, so every column the table gains
+ * later — a cost, a note, a private flag — is served to every grant holder
+ * from the moment the migration lands, with no diff in the function at all.
+ * The rule is about *columns*; RLS and the token checks are about rows, and
+ * neither says anything about width.
+ */
+export function projectionIssues(routine: FunctionDefinition): string[] {
+  const issues: string[] = [];
+  const where = routine.identity;
+
+  if (/\bselect\s+(?:[a-z0-9_]+\.)?\*/.test(routine.body)) {
+    issues.push(
+      `${where}: selects \`*\` — an anon-reachable routine must name its ` +
+        `columns, or every column the table gains later is served with it (SHR-06)`
+    );
+  }
+  const setof = /\bsetof\s+(?:public\.)?([a-z0-9_]+)/.exec(
+    `${routine.returns} ${routine.header}`
+  );
+  if (setof && USER_TABLE_NAMES.includes(setof[1])) {
+    issues.push(
+      `${where}: returns \`setof ${setof[1]}\` — the return shape is the ` +
+        `whole user table, so cost fields cannot be omitted (SHR-06)`
+    );
+  }
+  return issues;
+}
+
+/**
+ * An anon-reachable routine must not write.
+ *
+ * > **SHR-07** THE holder of a grant SHALL NOT be required to have an account,
+ * > and the accountless path SHALL be read-only. WHILE a request carries no
+ * > authenticated session, no grant SHALL admit any write.
+ *
+ * Read literally: the property is of the *path*, so it is graded on the path —
+ * every routine an anonymous caller can execute — rather than on the three
+ * this file happens to name.
+ */
+export function anonWriteIssues(routine: FunctionDefinition): string[] {
+  const body = bodyWithoutLockClauses(routine);
+  const writes = [
+    ["insert", /\binsert\s+into\b/],
+    ["update", /\bupdate\s+(?:only\s+)?[a-z0-9_"]+\s+set\b/],
+    ["delete", /\bdelete\s+from\b/],
+    ["truncate", /\btruncate\b/],
+    ["ddl", /\b(?:create|drop|alter)\s+(?:table|view|function|policy|role)\b/],
+  ] as const;
+  return writes
+    .filter(([, pattern]) => pattern.test(body))
+    .map(
+      ([verb]) =>
+        `${routine.identity}: anon-reachable routine performs a ${verb} — ` +
+        `the accountless path is read-only (SHR-07)`
+    );
+}
+
+/**
+ * Every finding against the routines an anonymous caller can execute.
+ *
+ * The sweep that makes the rules above apply to whatever T2-404 actually
+ * ships, rather than to the three names this repo currently guesses at. It is
+ * vacuous today — nothing is anon-reachable — and that vacuity is itself
+ * pinned, by the `missing` half of the allow-list going red until the readers
+ * exist.
+ */
+export function anonSurfaceIssues(normalized: string): string[] {
+  return anonExecutableFunctions(normalized).flatMap((routine) => [
+    ...projectionIssues(routine),
+    ...anonWriteIssues(routine),
+    ...tokenHashIssues(routine),
+    ...expiryCheckIssues(routine),
+    ...revocationCheckIssues(routine),
+    ...(routine.securityDefiner && routine.searchPath === null
+      ? [`${routine.identity}: security definer with no \`set search_path\``]
+      : []),
+  ]);
+}
+
+/* -------------------------------------------------------------------------
+ * DEFECT FIX (1) — the end-state ACL, not a count of revokes
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Every finding against the **end-state** privileges on the named user tables.
+ *
+ * Replaces a grader that counted `revoke … from anon` statements and asserted
+ * the count was above zero. A directory containing
+ *
+ * ```sql
+ * revoke all on public.records from anon;
+ * grant select on public.records to anon;
+ * ```
+ *
+ * scored 1 and passed — verified 2026-08-31. The count answers "was a revoke
+ * written", which is not a security property; this answers "who can reach the
+ * table when the migrations finish", which is.
+ *
+ * Three findings, all of which are one wrong line away:
+ *
+ * - an anonymous role holding **anything**;
+ * - an ACL the text never emptied, so an inherited Supabase grant may survive
+ *   (`"unknown"` — the shape of T2-202's near-miss, where nobody granted the
+ *   privilege that nearly shipped the hole);
+ * - `authenticated` holding more than the four verbs the schema means to give
+ *   it. `TRUNCATE` is the one that matters and the one RLS does not filter.
+ */
+export function tableGrantIssues(
+  normalized: string,
+  tables: readonly string[]
+): string[] {
+  const state = grants(normalized);
+  const issues: string[] = [];
+  const expected = ["select", "insert", "update", "delete"];
+
+  for (const table of tables) {
+    const identity = `public.${table}`;
+
+    for (const role of ANONYMOUS_ROLES) {
+      const held = rolePrivileges(state, identity, role);
+      if (held.verdict === "granted") {
+        issues.push(
+          `${identity}: ${role} holds ${held.privileges.join(", ")} at the ` +
+            `end of the migrations`
+        );
+      } else if (held.verdict === "unknown") {
+        issues.push(
+          `${identity}: nothing revokes ${role}'s inherited privileges — the ` +
+            `end-state ACL is unknown, and Supabase grants on public by default`
+        );
+      }
+    }
+
+    const authenticated = rolePrivileges(state, identity, "authenticated");
+    if (authenticated.verdict === "unknown") {
+      issues.push(
+        `${identity}: nothing revokes authenticated's inherited privileges ` +
+          `before granting — a grant adds to an ACL, it does not replace it`
+      );
+      continue;
+    }
+    const extra = authenticated.privileges.filter(
+      (privilege) => !expected.includes(privilege)
+    );
+    if (extra.length > 0) {
+      issues.push(
+        `${identity}: authenticated holds ${extra.join(", ")} beyond ` +
+          `select/insert/update/delete — RLS does not filter truncate`
+      );
+    }
+  }
+  return issues;
+}
+
+/** Every finding against the privileges on views in `public`. */
+export function viewGrantIssues(normalized: string): string[] {
+  const state = grants(normalized);
+  const issues: string[] = [];
+  for (const view of createdViews(normalized)) {
+    for (const role of ANONYMOUS_ROLES) {
+      const held = rolePrivileges(state, view.identity, role);
+      if (held.verdict === "granted") {
+        issues.push(
+          `${view.identity}: ${role} holds ${held.privileges.join(", ")} on a view`
+        );
+      }
+    }
+  }
+  return issues;
+}
+
+/* -------------------------------------------------------------------------
+ * DEFECT FIX (2) — what exists, cross-checked against what is enumerated
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Every finding against a table that exists but nothing grades.
+ *
+ * The constitution says *every* user table ships with RLS proven by graders.
+ * Every table-level grader in this suite is driven from `USER_TABLE_NAMES`, so
+ * before this, "every" meant "these four": a `shares` table with
+ * `for all to anon using (true)` and no `force` produced zero findings —
+ * verified 2026-08-31.
+ *
+ * The sweep runs the other way. It starts from `createdTables()` — what the
+ * directory actually leaves behind — and reports anything neither enumerated
+ * in `USER_TABLES` nor named in `EXEMPT_PUBLIC_TABLES`, in the style of
+ * `check-hreflang.mjs`'s `EXEMPT_PAGES`: an exemption is a decision with a
+ * reason attached, and everything else is a bug.
+ *
+ * RLS is checked on **every** created table, enumerated or not. A table nobody
+ * added to the contract is exactly the table whose `force` was forgotten, and
+ * making the RLS finding conditional on enumeration would put the check behind
+ * the door it exists to open.
+ */
+export function ungradedTableIssues(
+  normalized: string,
+  options: {
+    readonly enumerated?: readonly string[];
+    readonly exempt?: ReadonlyMap<string, string>;
+  } = {}
+): string[] {
+  const enumerated = options.enumerated ?? USER_TABLE_NAMES;
+  const exempt = options.exempt ?? EXEMPT_PUBLIC_TABLES;
+  const issues: string[] = [];
+
+  for (const table of createdTables(normalized)) {
+    const exemptReason = exempt.get(table.name);
+    if (!enumerated.includes(table.name) && exemptReason === undefined) {
+      issues.push(
+        `${table.identity}: created but not enumerated in USER_TABLES and not ` +
+          `named in EXEMPT_PUBLIC_TABLES — no grader knows it exists`
+      );
+    }
+    if (exemptReason !== undefined) continue;
+
+    if (!enablesRls(normalized, table.name)) {
+      issues.push(`${table.identity}: row level security is not enabled`);
+    }
+    if (!forcesRls(normalized, table.name)) {
+      issues.push(
+        `${table.identity}: row level security is not FORCED — the owner role ` +
+          `is exempt, and migrations run as the owner`
+      );
+    }
+  }
+  return issues;
+}
+
+/**
+ * Every finding against a table column that stores a bearer secret in the clear.
+ *
+ * A sweep over every created table rather than over a named `shares` table:
+ * the claim is that nothing anywhere holds a share token in plaintext, and
+ * naming the table would narrow it to a claim about one table's spelling.
+ */
+export function plaintextTokenColumnIssues(normalized: string): string[] {
+  const issues: string[] = [];
+  for (const table of createdTables(normalized)) {
+    const body = createTableBody(normalized, table.name);
+    if (!body) continue;
+    for (const column of columnDefinitions(body)) {
+      if (!PLAINTEXT_TOKEN_COLUMNS.includes(column.name as never)) continue;
+      issues.push(
+        `${table.identity}.${column.name}: a share token stored in the clear — ` +
+          `store ${SHARE_TOKEN_HASH_COLUMN} instead, so reading the table is ` +
+          `not holding every live grant`
+      );
+    }
+  }
+  return issues;
+}
