@@ -45,6 +45,28 @@
  * the built chunks for `GoTrueClient`, the class the library's own auth
  * client is named after and which appears in no other bundle this site ships.
  *
+ * ## Detection has to fail loudly, not skip quietly (review F1)
+ *
+ * `pageWasBuiltConfigured()` decides "configured" from one string —
+ * `data-garage-gate` — sourced from `[garageSegment].astro`'s markup. That
+ * string can drift from the component (a legitimate attribute rename) without
+ * either file *knowing* it broke the other. A first version of this spec
+ * treated that drift the same as "this is genuinely the plain build": both
+ * `test.skip`, both green, and the whole point of this suite — catching the
+ * T2-301 boot-stall regression — goes dark silently.
+ *
+ * So the CI step that runs this file against the configured build also sets
+ * `E2E_EXPECT_CONFIGURED=1` (`ci.yml`) — an independent claim, not derived
+ * from parsing any markup, that *this* run's `dist` was built with a
+ * Supabase project configured. When that claim is true, "no page looks
+ * configured" is not a reason to skip any more; it is exactly the drift this
+ * note describes, and the run fails loudly instead — both at module load
+ * (catches every page losing the marker at once, e.g. a self-consistent
+ * rename) and per test (catches just one locale losing it). Only when
+ * `E2E_EXPECT_CONFIGURED` is unset — the plain-`dist/` run in the same CI
+ * job, and `npm run test:e2e` locally — does "not configured" fall back to an
+ * honest skip.
+ *
  * refs specs/002-montero-garage (GAR-01′, ACC-01, MIG-03), T2-301 review F1
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
@@ -64,24 +86,44 @@ const REPO_ROOT = path.resolve(
 /** The `dist` directory this run's `webServer` is actually serving. */
 const DIST_DIR = path.resolve(REPO_ROOT, process.env["E2E_DIST"] ?? "dist");
 
+/**
+ * CI's independent claim that *this run's* build was made with a Supabase
+ * project configured — set only alongside `E2E_DIST=dist-configured`
+ * (`ci.yml`). Never derived from `pageWasBuiltConfigured()` itself: the whole
+ * point is a second, unrelated source of truth for "should be configured" to
+ * check the markup-sniffing one against (see the file header, "Detection has
+ * to fail loudly, not skip quietly").
+ */
+const EXPECT_CONFIGURED = process.env["E2E_EXPECT_CONFIGURED"] === "1";
+
 const PAGES = [
   { locale: "en" as const, path: "/en/garage/" },
   { locale: "es" as const, path: "/es/taller/" },
 ];
 
 /**
- * `true` when `path`'s *built HTML* rendered the configured garage app
+ * The one attribute that only exists inside `[garageSegment].astro`'s
+ * `configured ? … : …` branch — an *attribute*, matched at attribute
+ * boundaries, not a bare substring. `.includes()` would also match a renamed
+ * `data-garage-gate-open` or a `data-garage-gate2`, silently widening what
+ * counts as "found" the next time a nearby attribute is added; the
+ * lookaround below requires the character on each side (if any) to be
+ * neither a word character nor a hyphen, so only the exact token counts.
+ */
+const CONFIGURED_MARKER = /(?<![\w-])data-garage-gate(?![\w-])/;
+
+/**
+ * `true` when `servedPath`'s *built HTML* rendered the configured garage app
  * rather than the "accounts are not switched on here" notice.
  *
  * Reads the page `[garageSegment].astro` actually emitted rather than
  * inferring configuration from environment variables or from chunk
  * existence — see the file header on why neither of those is reliable here.
- * `data-garage-gate` only appears inside the `configured ? … : …` branch.
  */
 function pageWasBuiltConfigured(distDir: string, servedPath: string): boolean {
   const file = path.join(distDir, servedPath.replace(/^\//, ""), "index.html");
   if (!existsSync(file)) return false;
-  return readFileSync(file, "utf8").includes("data-garage-gate");
+  return CONFIGURED_MARKER.test(readFileSync(file, "utf8"));
 }
 
 /**
@@ -104,19 +146,75 @@ function findSupabaseChunk(distDir: string): string | null {
 
 const SUPABASE_CHUNK = findSupabaseChunk(DIST_DIR);
 
+/**
+ * Loud, at module load, before a single test runs: if CI declared this run's
+ * build configured but *every* page in `PAGES` disagrees, that is not "this
+ * happens to be the plain build" (CI would not have set the env var) — it is
+ * `CONFIGURED_MARKER` (or the chunk lookup) having drifted from what the
+ * build actually contains. Throwing here fails the whole file load rather
+ * than reporting a row of green skips, which is the failure mode review
+ * finding F1 was about: a detection string that quietly stops detecting
+ * anything must break CI, not un-wire the suite it is part of.
+ */
+if (EXPECT_CONFIGURED) {
+  const anyPageConfigured = PAGES.some(({ path: pagePath }) =>
+    pageWasBuiltConfigured(DIST_DIR, pagePath)
+  );
+  if (!anyPageConfigured || SUPABASE_CHUNK === null) {
+    throw new Error(
+      "garage-unreachable — E2E_EXPECT_CONFIGURED=1 (this run's build is " +
+        "supposed to have a Supabase project configured) but " +
+        (!anyPageConfigured
+          ? `no page under ${DIST_DIR} contains the ${CONFIGURED_MARKER} ` +
+            "marker. Either [garageSegment].astro no longer renders " +
+            "`data-garage-gate` when configured (update CONFIGURED_MARKER " +
+            "to match), or this build genuinely was not made with " +
+            "PUBLIC_SUPABASE_URL/PUBLIC_SUPABASE_ANON_KEY set (check the CI " +
+            "step that builds dist-configured/). "
+          : "") +
+        (SUPABASE_CHUNK === null
+          ? `no chunk under ${DIST_DIR}/_astro contains "GoTrueClient". `
+          : "") +
+        "Failing the whole file rather than skipping every test: a stale " +
+        "detection string here must break CI, not silently stop catching " +
+        "the T2-301 boot-stall regression this suite exists for."
+    );
+  }
+}
+
 for (const { locale, path: pagePath } of PAGES) {
   test.describe(locale, () => {
     test.beforeEach(async ({ page }) => {
       const configured = pageWasBuiltConfigured(DIST_DIR, pagePath);
-      test.skip(
-        !configured || SUPABASE_CHUNK === null,
-        `${DIST_DIR}${pagePath} was not built with a configured Supabase ` +
-          "project (no PUBLIC_SUPABASE_URL/PUBLIC_SUPABASE_ANON_KEY at build " +
-          "time), so the garage app never renders and there is no client " +
-          "chunk fetch to abort. Run against a configured build " +
-          "(E2E_DIST=dist-configured; see ci.yml) to exercise this spec for " +
-          "real."
-      );
+      const chunkFound = SUPABASE_CHUNK !== null;
+
+      if (!configured || !chunkFound) {
+        if (EXPECT_CONFIGURED) {
+          // Same reasoning as the module-level check above, for the case
+          // where only *this* locale's page lost the marker (e.g. an
+          // asymmetric rename) while another page in `PAGES` kept it, so the
+          // module-level "at least one" check passed.
+          throw new Error(
+            `garage-unreachable — E2E_EXPECT_CONFIGURED=1 but ${pagePath} ` +
+              (!configured
+                ? `does not contain the ${CONFIGURED_MARKER} marker `
+                : "") +
+              (!chunkFound ? "and no Supabase chunk was found " : "") +
+              "— failing loudly instead of skipping (review F1: a silent " +
+              "skip here is exactly how this spec's regression coverage " +
+              "would go dark)."
+          );
+        }
+        test.skip(
+          true,
+          `${DIST_DIR}${pagePath} was not built with a configured Supabase ` +
+            "project (no PUBLIC_SUPABASE_URL/PUBLIC_SUPABASE_ANON_KEY at " +
+            "build time), so the garage app never renders and there is no " +
+            "client chunk fetch to abort. Run against a configured build " +
+            "(E2E_DIST=dist-configured E2E_EXPECT_CONFIGURED=1; see " +
+            "ci.yml) to exercise this spec for real."
+        );
+      }
 
       // `hasStoredSession()` is what sends the boot chain down the branch
       // that asks Supabase who is signed in, rather than settling straight

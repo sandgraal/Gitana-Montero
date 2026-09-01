@@ -246,14 +246,23 @@ jobs:
       # not what tells the two builds apart). The step above already ran every
       # other spec against plain `dist/`; this one points
       # `playwright.config.ts`'s `E2E_DIST`/`E2E_PORT` at `dist-configured/`
-      # and a different port, and runs only the one spec that needs it. (The
-      # spec skips itself — rather than failing — if it is ever run against an
-      # unconfigured build, so it stays harmless in the step above and in
-      # `npm run test:e2e` locally.)
+      # and a different port, and runs only the one spec that needs it.
+      #
+      # `E2E_EXPECT_CONFIGURED=1` is a second, independent claim (review F1):
+      # the spec's own markup-sniffing detector (`data-garage-gate` in the
+      # built HTML) could silently stop matching — an attribute rename in
+      # `[garageSegment].astro` that nobody re-synced with the test — and
+      # without this variable that reads as "this must be the plain build",
+      # so the suite would skip-green and quietly stop catching the
+      # regression it exists for. With it set, "detector says unconfigured"
+      # on a run CI declared configured fails the file outright instead. The
+      # step above (plain `dist/`, no `E2E_EXPECT_CONFIGURED`) still skips
+      # cleanly, and so does `npm run test:e2e` locally.
       - name: End-to-end (Playwright, garage unreachable — configured build)
         env:
           E2E_DIST: dist-configured
           E2E_PORT: 4323
+          E2E_EXPECT_CONFIGURED: "1"
         run: npx playwright test tests/e2e/garage-unreachable.spec.ts
   # ── Where the deploy job went (T2-102, 002 MIG-02) ──────────────────────
   #
