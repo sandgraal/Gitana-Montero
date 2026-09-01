@@ -2390,6 +2390,25 @@ const hasReferences = Object.values(referenceCatalogue).some(
      * are mutually exclusive here and the markup keeps them in three separate
      * elements so they cannot half-overlap.
      */
+    /**
+     * Every slot on the current-state sheet, emptied.
+     *
+     * Called whenever there is no sheet to draw, so no figure outlives the
+     * vehicle it was computed for. The odometer is the one that matters —
+     * "251 930 km" left under another truck's name is not a stale render, it
+     * is a false statement — but the service lines and the open-item counts
+     * are the same kind of claim and go the same way.
+     */
+    function clearCurrentState(): void {
+      say(els.currentOdometer, "");
+      say(els.currentOdometerOn, "");
+      if (els.currentOdometerWarning) els.currentOdometerWarning.hidden = true;
+      els.currentServices?.replaceChildren();
+      if (els.currentServicesEmpty) els.currentServicesEmpty.hidden = true;
+      say(els.currentOpenOverdue, "");
+      say(els.currentOpenUpcoming, "");
+    }
+
     function paintCurrentState(sheet: CurrentState | null): void {
       const empty = sheet !== null && sheet.recordsConsidered === 0;
       if (els.currentLoading) {
@@ -2400,7 +2419,20 @@ const hasReferences = Object.values(referenceCatalogue).some(
       }
       if (els.currentEmpty) els.currentEmpty.hidden = !empty;
       if (els.currentSheet) els.currentSheet.hidden = sheet === null || empty;
-      if (sheet === null || empty) return;
+      if (sheet === null || empty) {
+        /*
+         * Emptied, not merely hidden (T2-303 review, F9).
+         *
+         * The `hidden` attribute above is now backed by a CSS guard, but a
+         * stale figure that is only *invisible* is one style regression away
+         * from being a wrong answer again — and this panel's wrong answer is
+         * the previous vehicle's odometer asserted as a fact about this one.
+         * So the slots are cleared as well: the two mechanisms fail
+         * independently, and nothing here survives the vehicle it described.
+         */
+        clearCurrentState();
+        return;
+      }
 
       const reading = sheet.odometer;
       say(
@@ -2499,11 +2531,23 @@ const hasReferences = Object.values(referenceCatalogue).some(
         els.plannedQueueView.hidden = queue === null || empty;
       }
       if (queue === null || empty) {
-        // Both rails cleared. The panel's own note — unknown or empty — is
-        // what speaks; the rails must not keep the last vehicle's plans.
+        /*
+         * Both rails cleared, and the group blocks and estimate rows with
+         * them (T2-303 review, F9). The panel's own note — loading, unknown
+         * or empty — is what speaks; nothing here may keep the last vehicle's
+         * plans or its totals, and the two group headings must not stand over
+         * emptied rails.
+         */
         const cleared = queue === null ? null : [];
         paintEntries(els.plannedOverdue, null, cleared, countsByRecord);
         paintEntries(els.plannedUpcoming, null, cleared, countsByRecord);
+        if (els.plannedOverdueBlock) els.plannedOverdueBlock.hidden = true;
+        if (els.plannedUpcomingBlock) els.plannedUpcomingBlock.hidden = true;
+        els.plannedEstimate?.replaceChildren();
+        if (els.plannedEstimateNone) els.plannedEstimateNone.hidden = true;
+        if (els.plannedEstimateCurrencyNote) {
+          els.plannedEstimateCurrencyNote.hidden = true;
+        }
         return;
       }
 
@@ -3673,6 +3717,33 @@ const hasReferences = Object.values(referenceCatalogue).some(
    * competing with it. The queue's cards are the timeline's own template, so
    * the one thing that *is* the artboard's design stays the artboard's.
    * ------------------------------------------------------------------ */
+
+  /*
+   * The `[hidden]` guard, and why these three need it (T2-303 review, F9).
+   *
+   * An author-origin `display: flex` outranks the user-agent
+   * `[hidden] { display: none }` rule, so every one of these elements carried
+   * `hidden` from the script and rendered anyway. `.garage__gate` below
+   * documents the same trap and the glossary and community toolbars shipped
+   * it once each; these three missed the guard.
+   *
+   * It is not cosmetic here. `.garage__sheet` is what `paintCurrentState`
+   * hides while the records are in flight, so without this, opening vehicle B
+   * while its request was still running showed B's loading notice with
+   * **vehicle A's** odometer still asserted underneath it as computed fact —
+   * and it persisted into the failure state, which is the whole class of wrong
+   * answer this task exists to prevent. `.garage__sheet-block` is the group
+   * wrapper, so an empty "Past their date" heading rendered over nothing.
+   *
+   * `.garage__sheet-list` is included because it is the same trap waiting: no
+   * caller hides one today, and the first one that does would find out the
+   * same way.
+   */
+  .garage__sheet[hidden],
+  .garage__sheet-block[hidden],
+  .garage__sheet-list[hidden] {
+    display: none;
+  }
 
   .garage__sheet {
     display: flex;

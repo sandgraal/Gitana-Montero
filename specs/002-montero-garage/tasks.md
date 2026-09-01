@@ -412,6 +412,25 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   repro now renders `Time — 2 hr — From 2 of 7` / `Cost — $400 — From 4 of 7`
   (ES: `A partir de 2 de 7` / `de 4 de 7`). Two new graders and two new mutants
   (M19/M20) pin it.
+  <br>**An author `display: flex` beat the `[hidden]` attribute (F9,
+  round 2).** `.garage__sheet` and `.garage__sheet-block` set `display: flex`
+  at author origin, which outranks the user-agent `[hidden]` rule, so three
+  new elements carried `hidden` from the script and rendered anyway — the
+  exact trap `.garage__gate` already documents in this file and the glossary
+  and community toolbars each shipped once. The consequence was the worst one
+  available here: opening vehicle B while its records were in flight showed
+  B's loading notice with **vehicle A's odometer still asserted underneath as
+  computed fact**, persisting into the failure state; and an empty "Past their
+  date" heading rendered over nothing. Reproduced in a real browser in both
+  locales (computed `display: flex` with `hidden` set), fixed with the
+  guard, re-probed to `none`. `.garage__sheet-list` is in the guard too — the
+  same trap waiting for the first caller that hides one.
+  <br>**And the slots are emptied, not merely hidden.** `paintCurrentState`
+  and `paintPlannedQueue` now clear every figure on their early returns, so
+  correctness does not rest on a CSS rule: a stale odometer that is only
+  *invisible* is one style regression away from being a false statement about
+  somebody's truck again. Two independent mechanisms, and nothing survives
+  the vehicle it described.
   <br>**Pending is not failed (F2).** `openDetail` painted `records = null`
   before `loadRecords` fired, so during the ordinary network beat both derived
   panels showed "…they could not be loaded" — a past-tense failure claim about
@@ -452,6 +471,14 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   `formatOdometer`, so the fix is a `paintRecords` call on the unit change,
   but it belongs with a sweep of every unit-dependent surface rather than a
   spot fix here.
+  <br>· **F8 — the stale-request guard has a gap on the failure paths.**
+  `loadRecords`'s `!result.ok` branch runs *before* the `opened?.id !==
+  vehicle.id` check, and the `.catch` in `openDetail` has no such check at
+  all, so a slow failure for vehicle A can mark vehicle B failed. It
+  self-corrects (B's own request resolves and repaints) and predates this
+  round — the success path has always been guarded and still is. Pair it with
+  F3's harness when that lands, since "a request for the vehicle you are no
+  longer looking at" is exactly the case a render grader should own.
   <br>· **F7 — `plannedRecords` in `src/lib/garage/record.ts` is now dead
   production code.** The planned tab was its only caller and now goes through
   `plannedQueue`. Left in place rather than deleted because T2-401's public
