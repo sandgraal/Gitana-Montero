@@ -79,6 +79,8 @@ import {
   insertRow,
   listObjects,
   liveTitle,
+  PHOTO_BODY_MARKER,
+  SYNTHETIC_JPEG,
   provisionScenario,
   runAccountPurge,
   signObject,
@@ -92,8 +94,16 @@ import { migrationSql, statements } from "./sql.ts";
 
 const live = await detectLiveStack();
 
-/** The bytes the upload helper writes for a photo, as a recognisable string. */
-const PHOTO_MARKER = "TEST-T2-201-PHOTO";
+/**
+ * The string a leaked photo's *bytes* would contain.
+ *
+ * Imported rather than re-declared: an earlier draft spelled its own constant
+ * that the fixture bytes never contained, so `not.toContain` could not fail
+ * under any circumstance (T2-301a review, F3). `harness.ts` appends this after
+ * the JPEG's end-of-image marker precisely so the assertion has weight, and
+ * `the photo fixtures are coherent` below proves the bytes really carry it.
+ */
+const PHOTO_MARKER = PHOTO_BODY_MARKER;
 
 /* -------------------------------------------------------------------------
  * Declaration-tier helpers
@@ -122,6 +132,34 @@ function deletionReachesBucket(body: string, bucket: string): boolean {
   if (!/delete from storage\.objects/.test(body)) return false;
   if (!/bucket_id/.test(body)) return true;
   return body.includes(`'${bucket}'`);
+}
+
+/** The `create trigger` statement that fires on a vehicle being deleted. */
+function vehicleDeleteTrigger(sql: string): string | undefined {
+  return statements(sql).find(
+    (statement) =>
+      statement.startsWith("create trigger") &&
+      /\bdelete\b/.test(statement) &&
+      /\bon (?:public\.)?vehicles\b/.test(statement)
+  );
+}
+
+/**
+ * The body of whatever function the vehicles delete trigger calls.
+ *
+ * Follows `execute function <name>` rather than matching a list of plausible
+ * names, so the grader pins the behaviour the requirement asks for and leaves
+ * the naming to whoever writes it (T2-301a review, F1).
+ */
+function vehicleDeleteCleanupBody(sql: string): string {
+  const trigger = vehicleDeleteTrigger(sql);
+  if (!trigger) return "";
+  const target = /execute (?:function|procedure)\s+([a-z0-9_.]+)\s*\(/.exec(
+    trigger
+  )?.[1];
+  if (!target) return "";
+  const bare = target.includes(".") ? target.split(".").pop() : target;
+  return bare ? functionBody(sql, bare) : "";
 }
 
 /* =========================================================================
@@ -203,29 +241,103 @@ describe("ACC-03 reaches photos, not just receipts", () => {
     // `vehicles` — and the two-segment path convention is what makes the
     // cleanup a prefix match rather than a reconciliation against
     // `photo_paths`.
-    const sql = migrationSql();
-    const trigger = statements(sql).find(
-      (statement) =>
-        statement.startsWith("create trigger") &&
-        /\bdelete\b/.test(statement) &&
-        /\bon (?:public\.)?vehicles\b/.test(statement)
-    );
-
-    expect(trigger, "no delete trigger on public.vehicles").toBeDefined();
+    expect(
+      vehicleDeleteTrigger(migrationSql()),
+      "no delete trigger on public.vehicles"
+    ).toBeDefined();
   });
 
   it.fails("the vehicle-delete cleanup targets the photos bucket", () => {
     // Separate from the trigger existing, because a trigger that fires and
     // deletes nothing is the failure this whole file is about.
+    //
+    // **The function is found by following the trigger, not by guessing its
+    // name** (T2-301a review, F1). An earlier draft matched a hard-coded list
+    // — `handle_vehicle_deleted`, `vehicle_photos_cleanup` — which is a
+    // contract nobody declared: an implementer who wrote the equally natural
+    // `cleanup_vehicle_photos` would have failed this grader with no
+    // legitimate route to green, and the fix would have been to rename their
+    // function to satisfy a test. What the requirement actually cares about is
+    // that *whatever the trigger calls* deletes the photo objects, so that is
+    // what is asked.
     const sql = migrationSql();
-    const reaches = ["handle_vehicle_deleted", "vehicle_photos_cleanup"]
-      .map((name) => functionBody(sql, name))
-      .filter((body) => body !== "")
-      .some((body) => deletionReachesBucket(body, VEHICLE_PHOTOS_BUCKET));
+    const body = vehicleDeleteCleanupBody(sql);
 
-    expect(reaches).toBe(true);
+    expect(body, "the vehicles delete trigger calls nothing findable").not.toBe(
+      ""
+    );
+    expect(deletionReachesBucket(body, VEHICLE_PHOTOS_BUCKET)).toBe(true);
   });
 });
+
+/* =========================================================================
+ * The manifest sweep — every private bucket, not just this one
+ * ====================================================================== */
+
+/** `true` once some statement creates `bucket`. */
+function bucketIsCreated(sql: string, bucket: string): boolean {
+  return !bucketPrivacyIssues(sql, bucket).some((issue) =>
+    issue.includes("no statement creates")
+  );
+}
+
+/**
+ * The invariants that hold for **every** bucket in `PRIVATE_BUCKETS`.
+ *
+ * `PRIVATE_BUCKETS`' docstring promised that the privacy graders iterate it,
+ * and until now nothing did — the marked graders above name `vehicle-photos`
+ * directly, so a third bucket added to the manifest would have got zero
+ * coverage from a list that claimed to provide it (T2-301a review, F5).
+ *
+ * **Unmarked, and conditional on the bucket existing.** That is not a hedge:
+ * receipts exists and must pass today, photos does not exist and must not turn
+ * this suite red — its *existence* is pinned by the marked grader above, which
+ * is where that claim belongs. The conditional is asserted rather than
+ * silently returned, so a reader sees the branch instead of wondering why a
+ * bucket vanished from the run.
+ */
+describe.each(PRIVATE_BUCKETS.map((bucket) => [bucket]))(
+  "%s — the private-bucket invariants",
+  (bucket) => {
+    it("is created private and never flipped public", () => {
+      const sql = migrationSql();
+      if (!bucketIsCreated(sql, bucket)) {
+        expect(bucketIsCreated(sql, bucket)).toBe(false);
+        return;
+      }
+
+      expect(bucketPrivacyIssues(sql, bucket)).toEqual([]);
+    });
+
+    it("is policed on all four commands, owner-scoped by path", () => {
+      const sql = migrationSql();
+      if (!bucketIsCreated(sql, bucket)) {
+        expect(bucketIsCreated(sql, bucket)).toBe(false);
+        return;
+      }
+
+      expect(bucketPolicyIssues(sql, bucket)).toEqual([]);
+    });
+
+    it("is reached by the account purge", () => {
+      // ACC-03 applies to every stored file, so this is a manifest-wide claim
+      // rather than a photos one. It is the sweep's whole point: the next
+      // private bucket inherits the purge requirement automatically.
+      const sql = migrationSql();
+      if (!bucketIsCreated(sql, bucket)) {
+        expect(bucketIsCreated(sql, bucket)).toBe(false);
+        return;
+      }
+
+      expect(
+        deletionReachesBucket(
+          functionBody(sql, "purge_expired_accounts"),
+          bucket
+        )
+      ).toBe(true);
+    });
+  }
+);
 
 /* =========================================================================
  * Tier B — behavioural
@@ -254,18 +366,14 @@ async function createVehicleWithPhoto(
     vehicle.id,
     actor.slot
   );
-  const uploaded = await uploadObject(scenario, actor, photoPath, {
-    bucket: VEHICLE_PHOTOS_BUCKET,
-  });
-  if (!uploaded.ok) {
-    throw new Error(
-      `could not upload photo: ${uploaded.status} ${uploaded.text}`
-    );
-  }
-
-  // The row half of the contract: the object is only findable because its
-  // path is recorded on the vehicle. Uploading without this would leave an
-  // orphan that no page renders and no cleanup knows about.
+  // **Row half first, on purpose** (T2-301a review, F2). The handoff claimed
+  // this fixture proved `photo_paths` round-trips against the shipped schema,
+  // and with the upload first that claim was not something the run could
+  // support: the upload threw `NoSuchBucket` and the update never executed.
+  // The claim happened to be true, but the evidence offered for it was not
+  // evidence. Recording the path before uploading makes it true by
+  // construction — every live run now exercises the column — and leaves the
+  // failure point exactly where it belongs, on the missing bucket.
   const linked = await updateRows(
     scenario,
     actor,
@@ -276,6 +384,15 @@ async function createVehicleWithPhoto(
   if (!linked.ok) {
     throw new Error(
       `could not record photo_paths: ${linked.status} ${linked.text}`
+    );
+  }
+
+  const uploaded = await uploadObject(scenario, actor, photoPath, {
+    bucket: VEHICLE_PHOTOS_BUCKET,
+  });
+  if (!uploaded.ok) {
+    throw new Error(
+      `could not upload photo: ${uploaded.status} ${uploaded.text}`
     );
   }
 
@@ -591,7 +708,26 @@ describe("the photo fixtures are coherent", () => {
   });
 
   it("lists both private buckets, receipts included", () => {
-    expect([...PRIVATE_BUCKETS]).toEqual(["receipts", "vehicle-photos"]);
+    // `toContain`, not exact equality (T2-301a review, F5): a third private
+    // bucket added to the manifest should pick up the sweep below, not turn
+    // this control red for having done the right thing.
+    expect(PRIVATE_BUCKETS).toContain("receipts");
+    expect(PRIVATE_BUCKETS).toContain(VEHICLE_PHOTOS_BUCKET);
+  });
+
+  it("the photo bytes really carry the marker the leak graders look for", () => {
+    // The guard behind F3. `not.toContain(PHOTO_MARKER)` is worth nothing if
+    // the fixture never contained it — so this proves the bytes do, and that
+    // the JPEG is still a JPEG: `FFD9` is the end-of-image marker, and the
+    // text sits after it where decoders ignore it.
+    const eoi = SYNTHETIC_JPEG.lastIndexOf(Buffer.from([0xff, 0xd9]));
+
+    expect(eoi, "no JPEG end-of-image marker in the fixture").toBeGreaterThan(
+      0
+    );
+    expect(SYNTHETIC_JPEG.subarray(0, 2)).toEqual(Buffer.from([0xff, 0xd8]));
+    expect(SYNTHETIC_JPEG.includes(PHOTO_MARKER)).toBe(true);
+    expect(SYNTHETIC_JPEG.indexOf(PHOTO_MARKER)).toBeGreaterThan(eoi);
   });
 
   it("reads an unfiltered storage deletion as reaching every bucket", () => {

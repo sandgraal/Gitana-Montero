@@ -321,15 +321,29 @@ export const RECEIPTS_BUCKET = "receipts";
  * solved with long-lived signed URLs, a render-time proxy, or a second public
  * bucket that a user opts an image into, is a *sharing* decision and belongs
  * with the sharing graders. Pinning it here would be inventing the answer.
+ *
+ * The constraint that makes it hard, so T2-401 does not have to rediscover it:
+ * **this site is static** (AGENTS.md, Stack — Astro, static output, on Vercel).
+ * There is no request-time server to mint a fresh signed URL for an anonymous
+ * visitor, so every option collapses to signing at *build* time — which means
+ * a URL whose expiry is a deploy-cadence problem, and a rebuild whenever a
+ * user adds a photo — or introducing an Edge Function, which is a new runtime
+ * surface and therefore a stop-and-ask rather than a drive-by.
  */
 export const VEHICLE_PHOTOS_BUCKET = "vehicle-photos";
 
 /**
  * Every bucket that must never serve an object without a session.
  *
- * The privacy graders iterate this rather than naming one bucket, so a third
- * private bucket added later is covered the day it appears in this list —
- * and a bucket added *without* appearing here is the thing to notice.
+ * `vehicle-photos.test.ts` runs a `describe.each` sweep over this list —
+ * created-private, policed on all four commands, reached by the account purge
+ * — so a third private bucket added here inherits those invariants the day it
+ * is created, rather than the day someone remembers to write graders for it.
+ *
+ * The sweep is unmarked and conditional on the bucket existing, because a
+ * bucket's *existence* is a different claim from its privacy and is pinned
+ * separately. Adding a name here therefore costs nothing until the migration
+ * catches up, and starts paying the moment it does.
  */
 export const PRIVATE_BUCKETS = [
   RECEIPTS_BUCKET,

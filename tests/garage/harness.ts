@@ -604,13 +604,61 @@ export interface UploadOptions {
   readonly contentType?: string;
 }
 
-/** A one-pixel JPEG. Real enough for a bucket that filters on MIME type. */
-export const SYNTHETIC_JPEG = Buffer.from(
-  "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////" +
-    "////////////////////////////////////////////////////wgALCAABAAEBAREA" +
-    "/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=",
+/**
+ * A string that appears in the *bytes* of a synthetic photo.
+ *
+ * Distinct from the marker in a photo's filename, which is a different claim
+ * about a different thing: a listing leaking a name is not a bucket leaking
+ * content, and an assertion should say which one it means.
+ */
+export const PHOTO_BODY_MARKER = "TEST-T2-301-PHOTO-BYTES";
+
+/**
+ * A genuine 1×1 JPEG: `FFD8` … `FFD9`, 631 bytes, decodable.
+ *
+ * The first version of this constant was not actually a JPEG — it had no
+ * end-of-image marker, and the coherence guard in `vehicle-photos.test.ts`
+ * caught that the moment the guard existed. It had never mattered because
+ * Supabase's bucket filter reads the declared content type rather than
+ * sniffing the bytes, which is exactly the kind of "works for a reason
+ * unrelated to the claim" the graders here are meant to refuse.
+ */
+const JPEG_ONE_PIXEL = Buffer.from(
+  "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoM" +
+    "DAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsN" +
+    "FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAAR" +
+    "CAABAAEDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAA" +
+    "AgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2Jyggk" +
+    "KFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIW" +
+    "Gh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+T" +
+    "l5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtRE" +
+    "AAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChY" +
+    "kNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goO" +
+    "EhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uP" +
+    "k5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigD//2Q==",
   "base64"
 );
+
+/**
+ * The photo fixture: a real JPEG with `PHOTO_BODY_MARKER` appended **after**
+ * the end-of-image marker.
+ *
+ * The trailing text is why it is here rather than a bare JPEG. A grader
+ * asserting `not.toContain(marker)` on a response body is worthless if the
+ * bytes never contained the marker under any circumstance — it passes whether
+ * the bucket leaked or not, which is precisely the vacuous-grader failure this
+ * directory exists to catch, shipped inside the file that advertises catching
+ * it (T2-301a review, F3).
+ *
+ * Safe on both sides: JPEG decoders stop at `FFD9` and ignore what follows, and
+ * Supabase's bucket MIME filter reads the declared content type and the header,
+ * not the tail. So the object is still a valid image *and* the leak assertions
+ * can now fail.
+ */
+export const SYNTHETIC_JPEG = Buffer.concat([
+  JPEG_ONE_PIXEL,
+  Buffer.from(`\n${PHOTO_BODY_MARKER}\n`, "utf8"),
+]);
 
 /** Upload bytes into a private bucket as `actor`. */
 export function uploadObject(

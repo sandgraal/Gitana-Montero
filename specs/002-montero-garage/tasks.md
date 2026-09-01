@@ -233,9 +233,13 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   bucket). (c) The bucket needs `allowed_mime_types` restricted to images: an
   untyped private bucket is a general-purpose file host attached to a truck.
   <br>Verified live against a stack with T2-202's four migrations applied: all
-  11 live markers fail with `NoSuchBucket` and nothing else — the fixture gets
-  past the vehicle insert and the `photo_paths` update and stops exactly at the
-  missing bucket, so the row half of the contract is already known to fit.
+  11 live markers fail with `NoSuchBucket` and nothing else. The fixture writes
+  the row half **before** the upload — vehicle insert, then `photo_paths`, then
+  the object — so every live run exercises the column and the only thing left
+  to fail is the missing bucket. (Review caught that the original ordering put
+  the upload first, which meant the update never ran and the "the row half
+  already fits" claim, though true, had no evidence behind it. Reordering makes
+  it true by construction.)
   <br>**Deliberately left open, and yours only if you want it early:** SHR-02's
   showcase page is public and cannot render an object from a private bucket
   without a signed URL, which expires. Long-lived signatures, a render-time
