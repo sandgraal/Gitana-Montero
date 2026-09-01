@@ -257,10 +257,12 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   `vehicleWriteFromDraft` takes the previous row so an untouched figure is
   never re-converted — 247 500 km renders as 153 789 mi and converts back to
   247 499, which would walk a stored odometer a kilometre per save.
-  <br>**Migration amended, not appended (T2-301a's `functionBody` reads the
-  FIRST definition):** `purge_expired_accounts`'s bucket list is edited in
-  place in `20260830120200_account_lifecycle.sql`. Safe only because no hosted
-  project exists yet; the file says so, and says what to do if that changes.
+  <br>**The purge is replaced forward, not edited backward:**
+  `purge_expired_accounts` named only the receipts bucket, so ACC-03's "stored
+  files" stopped at photos. The new migration `create or replace`s it. Editing
+  T2-202's applied migration was tried first and reverted — a migration is a
+  record of what ran, so an edit to one already pushed changes what a *fresh*
+  database gets and nothing about the one that exists.
 - [ ] **T2-302 [PLATFORM]** Records + receipts: dated typed records, cost/time/
   odometer, attachment upload to private storage, vendor/date/amount fields,
   typed references into reference collections. Depends: T2-301. *(GAR-02′, GAR-05′)*

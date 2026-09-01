@@ -108,6 +108,88 @@ export async function currentUserId(): Promise<string | null> {
 }
 
 /* -------------------------------------------------------------------------
+ * Asking "is anyone signed in?" without downloading a client
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The shape of the key `supabase-js` persists a session under.
+ *
+ * `sb-<project ref>-auth-token`, its default `storageKey`. Matched by shape
+ * rather than rebuilt from the project URL, because the derivation is the
+ * library's business and a second copy of it here would be wrong the day the
+ * library changed it — and being wrong in that direction (no key matched)
+ * would sign a reader out. See {@link hasStoredSession} for why a false
+ * negative is the one failure that matters.
+ */
+export const SESSION_STORAGE_KEY_PATTERN = /^sb-.+-auth-token$/;
+
+/**
+ * `true` when this browser has a persisted session for *some* Supabase project.
+ *
+ * The point is what it lets the caller skip. `getSupabaseClient()` dynamically
+ * imports `@supabase/supabase-js` — around 200 kB — and asking it "who is
+ * signed in?" therefore costs that download **on page load**, for every
+ * visitor, including the reference-site reader who clicked "Garage" out of
+ * curiosity and is about to be shown a sign-in prompt. That measured 89 on the
+ * Lighthouse performance budget against SCF-06's 90, and the wasted bytes were
+ * the whole of the difference.
+ *
+ * Deliberately optimistic: a stray key means the client loads and then reports
+ * no session, which costs a download and nothing else. A *missing* key when a
+ * session exists would show a signed-in reader the sign-in prompt, so the
+ * caller pairs this with {@link carriesAuthResponse} for the one case where a
+ * real session has not been written to storage yet.
+ */
+export function hasStoredSession(win: Window): boolean {
+  try {
+    const storage = win.localStorage;
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index);
+      if (key !== null && SESSION_STORAGE_KEY_PATTERN.test(key)) return true;
+    }
+    return false;
+  } catch {
+    // Storage blocked: no session can have been persisted either, so the
+    // honest answer is the same one.
+    return false;
+  }
+}
+
+/**
+ * `true` when this URL is a landing from an auth redirect.
+ *
+ * The moment `hasStoredSession` is wrong: a browser arriving from a magic link
+ * or from Google carries the grant in the URL and has nothing in storage yet.
+ * Today those land on the sign-in page rather than here, but "today's
+ * `emailRedirectTo`" is not a property this page should depend on — a reader
+ * who is silently signed out by a redirect target changing would have no way
+ * to tell what happened.
+ */
+export function carriesAuthResponse(href: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(href);
+  } catch {
+    return false;
+  }
+  const hash = new URLSearchParams(url.hash.replace(/^#/, ""));
+  return ["code", "access_token", "error", "error_description"].some(
+    (key) => url.searchParams.has(key) || hash.has(key)
+  );
+}
+
+/**
+ * The signed-in account's id, without paying for the client to find out there
+ * is nobody. `null` means "show the sign-in prompt".
+ */
+export async function currentUserIdIfAny(win: Window): Promise<string | null> {
+  if (!hasStoredSession(win) && !carriesAuthResponse(win.location.href)) {
+    return null;
+  }
+  return currentUserId();
+}
+
+/* -------------------------------------------------------------------------
  * Vehicles
  * ---------------------------------------------------------------------- */
 

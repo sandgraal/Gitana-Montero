@@ -109,6 +109,87 @@ create policy "vehicle photos owner delete" on storage.objects
   );
 
 -- ---------------------------------------------------------------------------
+-- ACC-03: the purge has to know this bucket exists
+-- ---------------------------------------------------------------------------
+-- > **ACC-03** … after a 30-day recovery window, all vehicles, records, and
+-- > **stored files** SHALL be hard-deleted.
+--
+-- `20260830120200_account_lifecycle.sql` deletes `storage.objects` for
+-- `bucket_id = 'receipts'` — the whole truth for exactly as long as there was
+-- one bucket, and silently incomplete now. The failure is invisible from the
+-- outside: the count that function returns is deleted *accounts*, so a purge
+-- that leaves an entire bucket behind reads as a healthy one.
+--
+-- ## Replaced here, not edited there
+--
+-- The first draft of this task amended the `delete` inside T2-202's migration,
+-- on the grounds that one routine should have one definition in the directory.
+-- That is true and it is the wrong trade, because a migration is not a
+-- definition — it is a *record of what was applied*. Once the owner has run
+-- `supabase db push`, `20260830120200` is marked applied and is never read
+-- again, so an edit to it changes what a fresh database gets and nothing at
+-- all about the one that exists. The two would silently diverge, and the
+-- symptom would be photos surviving a purge on production only.
+--
+-- So the routine is replaced forward, which is what every database that has
+-- already seen the old body needs. `create or replace` preserves the ACL, and
+-- the grants below are restated rather than repaired — see the note on them.
+
+create or replace function public.purge_expired_accounts(p_now timestamptz default now())
+returns integer
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_expired uuid[];
+  v_expired_text text[];
+  v_count integer := 0;
+begin
+  select coalesce(array_agg(p.id), array[]::uuid[])
+    into v_expired
+    from public.profiles p
+   where p.deleted_at is not null
+     and p.deleted_at <= p_now - interval '30 days';
+
+  if array_length(v_expired, 1) is null then
+    return 0;
+  end if;
+
+  select array_agg(id::text) into v_expired_text
+    from unnest(v_expired) as t(id);
+
+  perform set_config('storage.allow_delete_query', 'true', true);
+
+  -- Every bucket this project stores user files in. A bucket added without
+  -- being added here is how ACC-03 stops being true with nothing going red.
+  delete from storage.objects o
+   where o.bucket_id in ('receipts', 'vehicle-photos')
+     and (storage.foldername(o.name))[1] = any (v_expired_text);
+
+  delete from auth.users u
+   where u.id = any (v_expired);
+
+  get diagnostics v_count = row_count;
+  return v_count;
+end;
+$$;
+
+-- `create or replace` keeps the existing ACL, so these are a restatement and
+-- not a repair. They are here anyway: the grant is this routine's entire
+-- defence — it runs with no session and so cannot check `auth.uid()` — and a
+-- reader of the file that last defined it should be able to see who may call
+-- it without opening another one.
+
+revoke all on function public.purge_expired_accounts(timestamptz) from public;
+revoke all on function public.purge_expired_accounts(timestamptz) from anon;
+revoke all on function public.purge_expired_accounts(timestamptz) from authenticated;
+grant execute on function public.purge_expired_accounts(timestamptz) to service_role;
+
+comment on function public.purge_expired_accounts(timestamptz) is
+  'ACC-03 step 2: hard-deletes accounts whose 30-day window has closed, and their objects in every user bucket. Service role only.';
+
+-- ---------------------------------------------------------------------------
 -- Deleting one vehicle has to reach its objects
 -- ---------------------------------------------------------------------------
 -- `records` and `receipts` disappear with a vehicle because they are rows

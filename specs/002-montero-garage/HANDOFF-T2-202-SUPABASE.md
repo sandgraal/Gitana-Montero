@@ -70,32 +70,26 @@ It should print five migrations applied, in this order:
 | `20260830120300_no_password_auth.sql` | `deny_password_login()`, the hook that refuses every password sign-in |
 | `20260831120000_vehicle_photos_storage.sql` | the private `vehicle-photos` bucket, its four path-scoped policies, and `handle_vehicle_deleted()` + its trigger |
 
-**T2-301 amendment, and the one case where it matters.** T2-301 edited one
-line *inside* `20260830120200_account_lifecycle.sql` rather than shipping a
-`create or replace` in the new migration: `purge_expired_accounts` deleted
-storage rows for `bucket_id = 'receipts'`, and now does so for both buckets,
-because ACC-03 says "all vehicles, records, and **stored files**" and a photo
-is a stored file. Editing in place keeps one definition of the routine in the
-directory.
+**T2-301 replaces `purge_expired_accounts`, and nothing else about T2-202.**
+That routine deleted storage rows for `bucket_id = 'receipts'`, which was the
+whole truth while receipts were the only bucket. ACC-03 says "all vehicles,
+records, and **stored files**", and a photo is a stored file, so the fifth
+migration replaces the routine with one that names both buckets.
 
-That is safe **only because nothing has been pushed to a hosted project yet**
-— Step 1 above is still an owner action. If you have already run
-`supabase db push` against a real project, `db push` will consider
-`20260830120200` applied and skip it, and the purge on that project will keep
-leaving photos behind. In that case, run this once in the SQL editor to see
-which reading is live, before trusting the purge:
+It is a `create or replace` in the **new** migration rather than an edit to
+`20260830120200`, deliberately: once you have run `supabase db push` that
+migration is marked applied and is never read again, so editing it would change
+what a *fresh* database gets and nothing at all about the one you have. This
+way the fix reaches both, and it does not matter whether you have pushed yet.
+
+Step 5's "assert it once, by hand" check gains a line: after the purge runs,
+the deleted account's objects must be gone from **both** `receipts` and
+`vehicle-photos`. To confirm which body is live before trusting it:
 
 ```sql
 select prosrc like '%vehicle-photos%' as reaches_photos
   from pg_proc where proname = 'purge_expired_accounts';
 ```
-
-If it returns `false`, re-apply the current body of
-`supabase/migrations/20260830120200_account_lifecycle.sql` by hand.
-
-Step 5's "assert it once, by hand" check gains a line with this: after the
-purge runs, the deleted account's objects should be gone from **both**
-`receipts` and `vehicle-photos`.
 
 **Verify in the dashboard:** `Storage` now lists two buckets, `receipts` and
 `vehicle-photos`, and **neither** is marked public.
