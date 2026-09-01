@@ -392,6 +392,15 @@ export interface UiStrings
   /** Label-then-number, so neither locale has to agree with a plural. */
   readonly garageCurrentOpenOverdueTemplate: string;
   readonly garageCurrentOpenUpcomingTemplate: string;
+  /**
+   * The records are still on their way.
+   *
+   * A third state beside "empty" and "unavailable", and the reason there is
+   * one: `garageDerivedUnavailable` is past tense ("could not be loaded"), so
+   * showing it during the ordinary network beat claims a failure that has not
+   * happened (T2-303 review, F2). Pending is not failed.
+   */
+  readonly garageDerivedLoading: string;
   /** The records did not load — said instead of an empty sheet. */
   readonly garageDerivedUnavailable: string;
   readonly garagePlannedQueueNote: string;
@@ -824,6 +833,7 @@ const en: UiStrings = {
   garageCurrentOpenHeading: "Open items",
   garageCurrentOpenOverdueTemplate: "Past their date: {count}",
   garageCurrentOpenUpcomingTemplate: "Still ahead: {count}",
+  garageDerivedLoading: "Working this out from your records…",
   garageDerivedUnavailable:
     "This view is worked out from your records, and they could not be loaded. Nothing here is a statement about the truck.",
   garagePlannedQueueNote:
@@ -1258,6 +1268,7 @@ const es: UiStrings = {
   garageCurrentOpenHeading: "Pendientes",
   garageCurrentOpenOverdueTemplate: "Con la fecha vencida: {count}",
   garageCurrentOpenUpcomingTemplate: "Por delante: {count}",
+  garageDerivedLoading: "Calculando esto con sus fichas…",
   garageDerivedUnavailable:
     "Esta vista se calcula con sus fichas, y no se pudieron cargar. Nada de lo que aparece aquí dice algo sobre el carro.",
   garagePlannedQueueNote:
@@ -1268,7 +1279,7 @@ const es: UiStrings = {
   garagePlannedEstimateTimeLabel: "Tiempo",
   garagePlannedEstimateCostLabel: "Costo",
   garagePlannedEstimateCoverageTemplate:
-    "De {counted} de {total} fichas pendientes.",
+    "A partir de {counted} de {total} fichas pendientes.",
   garagePlannedEstimateNone:
     "Todavía ninguna ficha pendiente trae un estimado.",
   garagePlannedEstimateCurrencyNote:

@@ -534,13 +534,20 @@ const hasReferences = Object.values(referenceCatalogue).some(
                  * a slot the script fills or hides; none of it is a figure
                  * anybody types or maintains.
                  *
-                 * Three states, and the markup keeps them apart on purpose:
-                 * `[data-garage-current-unavailable]` (the records did not
-                 * arrive — the sheet is unknown), `[data-garage-current-empty]`
-                 * (nothing recorded yet), and the sheet itself. Collapsing
-                 * the first two would turn a failed request into a finding
-                 * about somebody's truck.
+                 * Four states, and the markup keeps them apart on purpose:
+                 * `[data-garage-current-loading]` (the request is in flight),
+                 * `[data-garage-current-unavailable]` (it failed — the sheet
+                 * is unknown), `[data-garage-current-empty]` (nothing recorded
+                 * yet), and the sheet itself. Collapsing any two of them puts
+                 * something untrue on screen: an empty sheet is a finding
+                 * about the truck, and "they could not be loaded" is a
+                 * past-tense failure claim made while the request is still
+                 * running (T2-303 review, F2). Pending is not failed, for the
+                 * same reason `null` is not `[]`.
                  */}
+                <p class="garage__empty-note" data-garage-current-loading>
+                  {strings.garageDerivedLoading}
+                </p>
                 <p
                   class="garage__message"
                   data-garage-current-unavailable
@@ -619,6 +626,10 @@ const hasReferences = Object.values(referenceCatalogue).some(
                  * a plan looks the same wherever it is drawn and the two rails
                  * cannot drift apart.
                  */}
+                {/* The same four states as the sheet, same reasoning (F2). */}
+                <p class="garage__empty-note" data-garage-planned-loading>
+                  {strings.garageDerivedLoading}
+                </p>
                 <p
                   class="garage__message"
                   data-garage-planned-unavailable
@@ -664,10 +675,6 @@ const hasReferences = Object.values(referenceCatalogue).some(
                     <ul
                       class="garage__sheet-list"
                       data-garage-planned-estimate
-                    />
-                    <p
-                      class="garage__fineprint"
-                      data-garage-planned-estimate-coverage
                     />
                     {/*
                      * Said in the layout and not only in a comment: the
@@ -1380,11 +1387,26 @@ const hasReferences = Object.values(referenceCatalogue).some(
               </li>
             </template>
 
-            {/* One totalled figure on the planned queue: its label, then it. */}
+            {/*
+             * One totalled figure on the planned queue: its label, the figure,
+             * and **its own** coverage sentence.
+             *
+             * The coverage belongs to the row and not to the panel (T2-303
+             * review, F1). One sentence under a stack of rows describes
+             * whichever row the reader happens to associate it with: a queue of
+             * 7 with 2 time-only plans and 4 cost-only ones read as "2 h,
+             * $400, from 4 of 7", which is true of neither. `PlannedEstimate`
+             * carries a count per figure so this slot always has a truthful
+             * number to put in.
+             */}
             <template data-garage-estimate-template>
-              <li class="garage__sheet-line">
+              <li class="garage__sheet-line garage__sheet-line--estimate">
                 <span class="garage__sheet-line-name" data-estimate-label />
                 <span class="garage__sheet-line-meta" data-estimate-value />
+                <span
+                  class="garage__sheet-line-coverage"
+                  data-estimate-coverage
+                />
               </li>
             </template>
 
@@ -1619,6 +1641,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
       recordsMessage: query<HTMLElement>("[data-garage-records-message]"),
       plannedEmpty: query<HTMLElement>("[data-garage-planned-empty]"),
       /* The derived views (T2-303, GAR-03′). */
+      currentLoading: query<HTMLElement>("[data-garage-current-loading]"),
       currentUnavailable: query<HTMLElement>(
         "[data-garage-current-unavailable]"
       ),
@@ -1643,6 +1666,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
       currentOpenUpcoming: query<HTMLElement>(
         "[data-garage-current-open-upcoming]"
       ),
+      plannedLoading: query<HTMLElement>("[data-garage-planned-loading]"),
       plannedUnavailable: query<HTMLElement>(
         "[data-garage-planned-unavailable]"
       ),
@@ -1662,9 +1686,6 @@ const hasReferences = Object.values(referenceCatalogue).some(
       ),
       plannedEstimateNone: query<HTMLElement>(
         "[data-garage-planned-estimate-none]"
-      ),
-      plannedEstimateCoverage: query<HTMLElement>(
-        "[data-garage-planned-estimate-coverage]"
       ),
       plannedEstimateCurrencyNote: query<HTMLElement>(
         "[data-garage-planned-estimate-currency-note]"
@@ -1774,6 +1795,17 @@ const hasReferences = Object.values(referenceCatalogue).some(
      * type rather than flattened into an empty array at the fetch site.
      */
     let records: RecordRow[] | null = null;
+    /*
+     * Why `records === null` is not enough on its own (T2-303 review, F2).
+     *
+     * `null` covers both "the request has not come back" and "the request
+     * failed", and the two need different words. The failure copy is past
+     * tense — "they could not be loaded" — so showing it during the ordinary
+     * network beat asserts a failure that has not happened, which is the same
+     * class of wrong answer as rendering `[]` for a failure. Pending is not
+     * failed, exactly as `null` is not `[]`.
+     */
+    let recordsStatus: "loading" | "loaded" | "failed" = "loading";
     let editingRecord: RecordRow | null = null;
     let receipts: ReceiptRow[] = [];
     let currency = readCurrency(window, locale);
@@ -2101,6 +2133,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
        * flash "nothing has ever been done to this truck" on every open.
        */
       records = null;
+      recordsStatus = "loading";
       paintRecords(new Map());
       say(els.browseNote, "");
       if (els.browse) {
@@ -2114,7 +2147,16 @@ const hasReferences = Object.values(referenceCatalogue).some(
       // Beside the rail, like every other way loading records can fail. The
       // app-level line stays for the boot path, which is about the whole page
       // rather than about this panel.
-      void loadRecords(row).catch(() => unreachable(els.recordsMessage));
+      void loadRecords(row).catch(() => {
+        // A rejection is a failure too, and the panels must leave "loading"
+        // for it — otherwise the derived tabs sit on "working this out from
+        // your records…" forever with nothing ever arriving (T2-303 F2's
+        // mirror image: pending must not outlive the request either).
+        records = null;
+        recordsStatus = "failed";
+        paintRecords(new Map());
+        unreachable(els.recordsMessage);
+      });
     }
 
     async function paintPhotos(row: VehicleRow): Promise<void> {
@@ -2350,8 +2392,12 @@ const hasReferences = Object.values(referenceCatalogue).some(
      */
     function paintCurrentState(sheet: CurrentState | null): void {
       const empty = sheet !== null && sheet.recordsConsidered === 0;
-      if (els.currentUnavailable)
-        els.currentUnavailable.hidden = sheet !== null;
+      if (els.currentLoading) {
+        els.currentLoading.hidden = recordsStatus !== "loading";
+      }
+      if (els.currentUnavailable) {
+        els.currentUnavailable.hidden = recordsStatus !== "failed";
+      }
       if (els.currentEmpty) els.currentEmpty.hidden = !empty;
       if (els.currentSheet) els.currentSheet.hidden = sheet === null || empty;
       if (sheet === null || empty) return;
@@ -2442,8 +2488,12 @@ const hasReferences = Object.values(referenceCatalogue).some(
       countsByRecord: ReadonlyMap<string, number> | null
     ): void {
       const empty = queue !== null && queue.length === 0;
-      if (els.plannedUnavailable)
-        els.plannedUnavailable.hidden = queue !== null;
+      if (els.plannedLoading) {
+        els.plannedLoading.hidden = recordsStatus !== "loading";
+      }
+      if (els.plannedUnavailable) {
+        els.plannedUnavailable.hidden = recordsStatus !== "failed";
+      }
       if (els.plannedEmpty) els.plannedEmpty.hidden = !empty;
       if (els.plannedQueueView) {
         els.plannedQueueView.hidden = queue === null || empty;
@@ -2471,12 +2521,24 @@ const hasReferences = Object.values(referenceCatalogue).some(
       paintEntries(els.plannedOverdue, null, overdue, countsByRecord);
       paintEntries(els.plannedUpcoming, null, upcoming, countsByRecord);
 
+      /*
+       * Each total is built with **its own** coverage and never a shared one
+       * (T2-303 review, F1). One sentence under a stack of rows describes
+       * whichever row the reader pairs it with: 7 plans, 2 carrying only a
+       * time and 4 only a cost, rendered as "2 h; $400; from 4 of 7" — true
+       * of neither figure, and precisely the failure the module documents
+       * preventing. `PlannedEstimate` therefore has no "items with any
+       * estimate" field to reach for; the duration carries `itemsWithTime`
+       * and each currency carries its own `items`.
+       */
       const estimate = plannedEstimate(queue);
       const rows: HTMLElement[] = [];
       if (estimate.minutes !== null) {
         const row = estimateRow(
           text.stringEstimateTime ?? "",
-          formatDuration(estimate.minutes, locale)
+          formatDuration(estimate.minutes, locale),
+          estimate.itemsWithTime,
+          estimate.totalItems
         );
         if (row) rows.push(row);
       }
@@ -2486,42 +2548,52 @@ const hasReferences = Object.values(referenceCatalogue).some(
        * shape the data can be rendered in — there is no single total in the
        * result to accidentally print (`src/lib/garage/derived.ts`).
        */
-      for (const [code, amount] of estimate.byCurrency) {
+      for (const [code, total] of estimate.byCurrency) {
         const row = estimateRow(
           text.stringEstimateCost ?? "",
-          formatCost(amount, code, locale)
+          formatCost(total.amount, code, locale),
+          total.items,
+          estimate.totalItems
         );
         if (row) rows.push(row);
       }
       els.plannedEstimate?.replaceChildren(...rows);
 
-      const counted = Math.max(estimate.itemsWithTime, estimate.itemsWithCost);
       if (els.plannedEstimateNone) {
         els.plannedEstimateNone.hidden = rows.length > 0;
       }
-      // A total is a lie without its coverage: six hours over a queue of seven
-      // where two carry an estimate is six hours of the two, not of the queue.
-      say(
-        els.plannedEstimateCoverage,
-        rows.length === 0
-          ? ""
-          : (text.stringEstimateCoverage ?? "")
-              .replace("{counted}", count(counted))
-              .replace("{total}", count(estimate.totalItems))
-      );
       if (els.plannedEstimateCurrencyNote) {
         els.plannedEstimateCurrencyNote.hidden = estimate.byCurrency.size < 2;
       }
     }
 
-    /** One totalled figure on the planned queue. */
-    function estimateRow(label: string, value: string): HTMLElement | null {
+    /**
+     * One totalled figure on the planned queue, with the coverage that makes
+     * it honest.
+     *
+     * A total is a lie without its coverage: six hours over a queue of seven
+     * where two items carry an estimate is six hours of the two, not of the
+     * queue. `counted` is always the count for *this* figure — the caller has
+     * no shared number available to pass by mistake.
+     */
+    function estimateRow(
+      label: string,
+      value: string,
+      counted: number,
+      total: number
+    ): HTMLElement | null {
       const item = els.estimateTemplate?.content.firstElementChild?.cloneNode(
         true
       ) as HTMLElement | null;
       if (!item) return null;
       say(item.querySelector<HTMLElement>("[data-estimate-label]"), label);
       say(item.querySelector<HTMLElement>("[data-estimate-value]"), value);
+      say(
+        item.querySelector<HTMLElement>("[data-estimate-coverage]"),
+        (text.stringEstimateCoverage ?? "")
+          .replace("{counted}", count(counted))
+          .replace("{total}", count(total))
+      );
       return item;
     }
 
@@ -2604,6 +2676,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
         // conclusions about the truck. `[]` here published three of them —
         // no history, no mileage, nothing planned — off a failed request.
         records = null;
+        recordsStatus = "failed";
         paintRecords(new Map());
         say(els.recordsMessage, text.stringError ?? "");
         return;
@@ -2611,6 +2684,7 @@ const hasReferences = Object.values(referenceCatalogue).some(
       if (opened?.id !== vehicle.id) return;
       const loaded = result.value;
       records = loaded;
+      recordsStatus = "loaded";
 
       const attached = await listReceipts(loaded.map((row) => row.id));
       if (opened?.id !== vehicle.id) return;
@@ -3673,6 +3747,24 @@ const hasReferences = Object.values(referenceCatalogue).some(
 
   .garage__sheet-line-meta {
     font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+
+  /*
+   * An estimate row is three parts, not two: label, figure, and the coverage
+   * that keeps the figure honest. The coverage takes the full width under the
+   * pair so it reads as belonging to *this* row — the whole point of F1's fix
+   * was that a coverage sentence floating under a stack of rows attaches
+   * itself to whichever one the reader was looking at.
+   */
+  .garage__sheet-line--estimate {
+    row-gap: 0.125rem;
+  }
+
+  .garage__sheet-line-coverage {
+    flex-basis: 100%;
+    font-size: 0.75rem;
+    line-height: 1.5;
     color: var(--muted);
   }
 

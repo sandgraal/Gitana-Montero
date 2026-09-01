@@ -357,14 +357,37 @@ export function plannedGroup(
 }
 
 /**
+ * One currency's total, and how many items are behind it.
+ *
+ * The count lives here rather than only on the estimate as a whole because a
+ * queue can carry two currencies, and one coverage figure spread over both
+ * cost lines describes neither (T2-303 review, F1, one level down). "₡42 750,
+ * from 4 of 7" is wrong when three of those four were colones and the fourth
+ * was dollars — so each line carries its own.
+ */
+export interface CurrencyTotal {
+  readonly amount: number;
+  /** How many planned items contributed to {@link amount}. */
+  readonly items: number;
+}
+
+/**
  * What the owner estimated the queue will take and cost.
  *
  * The two figures a plan's draft fields carry (`time_minutes`, `cost_amount` +
  * `cost_currency`), totalled — with the coverage attached, because a total is
  * a lie without it. "Six hours" over a queue of seven where two carry an
  * estimate is not six hours of work; it is six hours of the two somebody
- * bothered to estimate. So {@link itemsWithTime} and {@link itemsWithCost} are
- * part of the result and the page renders them in the same sentence.
+ * bothered to estimate.
+ *
+ * The coverage is **per figure and never shared**. Every total in this object
+ * sits next to its own count: {@link itemsWithTime} for the duration, and
+ * {@link CurrencyTotal.items} for each currency's amount. The first version
+ * exposed one number for all of them and the page rendered a single sentence
+ * under every row — 7 plans with 2 time-only and 4 cost-only read as "2 h,
+ * $400, from 4 of 7", which is true of neither figure (T2-303 review, F1).
+ * There is deliberately no "items with an estimate of any kind" field here,
+ * because that is the number that produced the wrong sentence.
  */
 export interface PlannedEstimate {
   /** Every item in the queue, estimated or not. */
@@ -382,10 +405,12 @@ export interface PlannedEstimate {
    * would be the single most expensive wrong answer this page could give, so
    * the type makes it unavailable — there is no field here to put it in.
    *
+   * Each entry carries its **own** item count, so one currency's coverage is
+   * never borrowed to describe another's (see {@link CurrencyTotal}).
+   *
    * Empty when nothing in the queue carries a cost.
    */
-  readonly byCurrency: ReadonlyMap<string, number>;
-  readonly itemsWithCost: number;
+  readonly byCurrency: ReadonlyMap<string, CurrencyTotal>;
 }
 
 export function plannedEstimate(
@@ -393,15 +418,17 @@ export function plannedEstimate(
 ): PlannedEstimate {
   let minutes = 0;
   let itemsWithTime = 0;
-  let itemsWithCost = 0;
   /*
    * Totalled in cents and divided once at the end. `0.1 + 0.2` is not `0.3` in
    * binary floating point, and a queue of a dozen colón amounts summed as
    * decimals lands a fraction of a céntimo off — which `formatCost` then
    * rounds into a total that does not equal the sum of the parts a reader can
    * see on the cards. Integers make the arithmetic exact.
+   *
+   * The count rides along in the same map so a currency's total and its
+   * coverage are incremented in one place and cannot come apart.
    */
-  const cents = new Map<string, number>();
+  const cents = new Map<string, { total: number; items: number }>();
 
   for (const { row } of items) {
     if (row.time_minutes !== null) {
@@ -409,21 +436,24 @@ export function plannedEstimate(
       itemsWithTime += 1;
     }
     if (row.cost_amount !== null && row.cost_currency !== null) {
-      const held = cents.get(row.cost_currency) ?? 0;
-      cents.set(row.cost_currency, held + Math.round(row.cost_amount * 100));
-      itemsWithCost += 1;
+      const held = cents.get(row.cost_currency) ?? { total: 0, items: 0 };
+      cents.set(row.cost_currency, {
+        total: held.total + Math.round(row.cost_amount * 100),
+        items: held.items + 1,
+      });
     }
   }
 
-  const byCurrency = new Map<string, number>();
-  for (const [currency, total] of cents) byCurrency.set(currency, total / 100);
+  const byCurrency = new Map<string, CurrencyTotal>();
+  for (const [currency, held] of cents) {
+    byCurrency.set(currency, { amount: held.total / 100, items: held.items });
+  }
 
   return {
     totalItems: items.length,
     minutes: itemsWithTime === 0 ? null : minutes,
     itemsWithTime,
     byCurrency,
-    itemsWithCost,
   };
 }
 

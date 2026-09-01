@@ -396,15 +396,67 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   <br>**Money is totalled per currency and there is no field to put a
   cross-currency total in.** `PlannedEstimate.byCurrency` is a map, so the type
   itself makes the wrong answer unavailable. Summed in integer cents — decimal
-  addition leaves a total that does not equal the visible parts. Every total
-  carries its coverage ("from 3 of 7 planned items"), because six hours over a
-  queue of seven where two are estimated is six hours of the two.
+  addition leaves a total that does not equal the visible parts.
+  <br>**Coverage is per figure, and round 1 caught it not being so (F1).** The
+  first version exposed one `itemsWithCost` and the page rendered
+  `Math.max(itemsWithTime, itemsWithCost)` as a single sentence under every
+  row: 7 plans with 2 time-only and 4 cost-only read as "Time 2 h; Cost
+  $400.00; From 4 of 7 planned items" — true of neither figure, and exactly the
+  failure the module's own docs claimed to prevent. Now the duration carries
+  `itemsWithTime` and **each currency carries its own** `CurrencyTotal.items`
+  (one shared cost coverage would have been the same lie one level down, with
+  a colón line borrowing a dollar line's count). `PlannedEstimate` has no
+  "items with any estimate" field left to reach for, the coverage slot lives on
+  the estimate row's template, and `estimateRow` takes the count as an
+  argument so no caller has a shared number available to pass by mistake. The
+  repro now renders `Time — 2 hr — From 2 of 7` / `Cost — $400 — From 4 of 7`
+  (ES: `A partir de 2 de 7` / `de 4 de 7`). Two new graders and two new mutants
+  (M19/M20) pin it.
+  <br>**Pending is not failed (F2).** `openDetail` painted `records = null`
+  before `loadRecords` fired, so during the ordinary network beat both derived
+  panels showed "…they could not be loaded" — a past-tense failure claim about
+  a request still in flight, which is the `null`-vs-`[]` argument one step
+  further on. There is now a third state: `recordsStatus` is
+  `loading | loaded | failed`, each derived panel has its own loading note
+  (`garageDerivedLoading`, both locales), and the failure copy is reserved for
+  the real failure — including the `.catch` path, which also leaves `loading`
+  so the panels cannot sit on "working this out…" forever.
   <br>**Not done, deliberately:** the current-state sheet reports open items as
   two counts and sends the reader to the Planned tab rather than drawing the
   queue twice; there is no reminder, notification or due-date surface anywhere
   (the copy says so in both locales). `/en/garage/` performance is 92 against
   the 90 budget — passing with two points, unchanged in kind by this task but
   worth knowing before the next thing lands on this page.
+  <br>**Follow-ups recorded in round 1, not implemented here** (each is a
+  separate change with its own blast radius, and both round-1 findings were
+  found by reading rather than by a failing test — F3 is the one that fixes
+  that):
+  <br>· **F3 — the derived rendering layer has no automated coverage.**
+  `paintCurrentState`, `paintPlannedQueue` and `estimateRow` in
+  `[garageSegment].astro` are ~90 lines of glue that nothing grades, and
+  **both** round-1 findings lived there while `derived.ts` itself cleared
+  20/20 mutants. The next change to these functions has nothing to fail
+  against. Adopt the container-API seam T501 built in
+  `part-page.render.test.ts` as the pattern; the four states per panel
+  (loading / failed / empty / populated) and the per-row coverage are the
+  cases worth pinning first.
+  <br>· **F4 — the profile odometer's stat label is the unqualified one, and
+  that is backwards.** The derived figure is carefully labelled "Latest
+  reading in your records" while the hand-maintained profile figure beside it
+  is just "Odometer", so the *less* authoritative number reads as the plain
+  one. It is a T2-301 string; suggested "Odometer on the profile" /
+  "Kilometraje del perfil".
+  <br>· **F5 — the km/mi switch does not repaint the derived sheet.** Inherited
+  T2-301 shape: the unit control repaints what it knew about, and the
+  current-state figures are new. Every derived distance renders through
+  `formatOdometer`, so the fix is a `paintRecords` call on the unit change,
+  but it belongs with a sweep of every unit-dependent surface rather than a
+  spot fix here.
+  <br>· **F7 — `plannedRecords` in `src/lib/garage/record.ts` is now dead
+  production code.** The planned tab was its only caller and now goes through
+  `plannedQueue`. Left in place rather than deleted because T2-401's public
+  work-log plausibly wants exactly "the plans, soonest first, unadorned"
+  without the queue's grouping; if that lands elsewhere, delete it.
 - [ ] **T2-304 [CONTENT+DESIGN]** Gitana Blanca seed — user page #1: owner
   interview (001 T303's content) entered as real records with receipts;
   conductor+owner refine the garage views against it before generalization.

@@ -455,7 +455,89 @@ describe("plannedEstimate — the draft figures on the queue", () => {
     expect(estimate.byCurrency.size).toBe(0);
     expect(estimate.totalItems).toBe(2);
     expect(estimate.itemsWithTime).toBe(0);
-    expect(estimate.itemsWithCost).toBe(0);
+  });
+
+  it("gives the time and each currency their own coverage", () => {
+    // The F1 case exactly: 7 plans, 2 carrying only a time, 4 carrying only a
+    // cost. One shared coverage number reads as "2 h, $400, from 4 of 7",
+    // which is true of neither figure. Each total must carry its own.
+    const estimate = plannedEstimate(
+      queue(
+        row({ kind: "plan", occurred_on: "2026-07-01", time_minutes: 45 }),
+        row({ kind: "plan", occurred_on: "2026-07-02", time_minutes: 75 }),
+        row({
+          kind: "plan",
+          occurred_on: "2026-07-03",
+          cost_amount: 100,
+          cost_currency: "USD",
+        }),
+        row({
+          kind: "plan",
+          occurred_on: "2026-07-04",
+          cost_amount: 100,
+          cost_currency: "USD",
+        }),
+        row({
+          kind: "plan",
+          occurred_on: "2026-07-05",
+          cost_amount: 100,
+          cost_currency: "USD",
+        }),
+        row({
+          kind: "plan",
+          occurred_on: "2026-07-06",
+          cost_amount: 100,
+          cost_currency: "USD",
+        }),
+        row({ kind: "plan", occurred_on: "2026-07-07" })
+      )
+    );
+    expect(estimate.totalItems).toBe(7);
+    expect(estimate.minutes).toBe(120);
+    // Two behind the duration, four behind the money. Different numbers, so a
+    // single shared figure cannot describe both.
+    expect(estimate.itemsWithTime).toBe(2);
+    expect(estimate.byCurrency.get("USD")).toEqual({ amount: 400, items: 4 });
+  });
+
+  it("does not lend one currency's coverage to another", () => {
+    // Three colón items and one dollar item. "From 4 of 5" under the dollar
+    // line would be the same defect one level down.
+    const estimate = plannedEstimate(
+      queue(
+        row({
+          kind: "plan",
+          occurred_on: "2026-07-01",
+          cost_amount: 10_000,
+          cost_currency: "CRC",
+        }),
+        row({
+          kind: "plan",
+          occurred_on: "2026-07-02",
+          cost_amount: 20_000,
+          cost_currency: "CRC",
+        }),
+        row({
+          kind: "plan",
+          occurred_on: "2026-07-03",
+          cost_amount: 12_750,
+          cost_currency: "CRC",
+        }),
+        row({
+          kind: "plan",
+          occurred_on: "2026-07-04",
+          cost_amount: 120,
+          cost_currency: "USD",
+        }),
+        row({ kind: "plan", occurred_on: "2026-07-05" })
+      )
+    );
+    expect(estimate.byCurrency.get("CRC")).toEqual({
+      amount: 42_750,
+      items: 3,
+    });
+    expect(estimate.byCurrency.get("USD")).toEqual({ amount: 120, items: 1 });
+    expect(estimate.totalItems).toBe(5);
   });
 
   it("totals minutes and reports how many items are behind the figure", () => {
@@ -497,11 +579,11 @@ describe("plannedEstimate — the draft figures on the queue", () => {
         })
       )
     );
-    expect([...estimate.byCurrency.entries()].sort()).toEqual([
-      ["CRC", 42_750],
-      ["USD", 120],
-    ]);
-    expect(estimate.itemsWithCost).toBe(3);
+    expect(estimate.byCurrency.get("CRC")).toEqual({
+      amount: 42_750,
+      items: 2,
+    });
+    expect(estimate.byCurrency.get("USD")).toEqual({ amount: 120, items: 1 });
   });
 
   it("totals money exactly, not in binary floating point", () => {
@@ -523,7 +605,7 @@ describe("plannedEstimate — the draft figures on the queue", () => {
         })
       )
     );
-    expect(pennies.byCurrency.get("USD")).toBe(0.3);
+    expect(pennies.byCurrency.get("USD")?.amount).toBe(0.3);
 
     const bigger = plannedEstimate(
       queue(
@@ -541,7 +623,7 @@ describe("plannedEstimate — the draft figures on the queue", () => {
         })
       )
     );
-    expect(bigger.byCurrency.get("CRC")).toBe(38_621);
+    expect(bigger.byCurrency.get("CRC")?.amount).toBe(38_621);
   });
 
   it("ignores an amount whose currency is missing", () => {
@@ -559,7 +641,6 @@ describe("plannedEstimate — the draft figures on the queue", () => {
       )
     );
     expect(estimate.byCurrency.size).toBe(0);
-    expect(estimate.itemsWithCost).toBe(0);
   });
 });
 
