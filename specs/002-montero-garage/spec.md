@@ -68,8 +68,13 @@ the user's own record and is not fact-checked by the site.
 ## 5. Sharing (SHR)
 
 - **SHR-01** Everything a user stores SHALL default to private (owner decision
-  2026-08-28). Row-level security in the database enforces it; no
-  client-trusted checks.
+  2026-08-28). The database enforces it; no client-trusted checks. Enforcement
+  has exactly **three** modes and no fourth (amended 2026-08-31, see §10):
+  row-level security scoped to `auth.uid()`; the public visibility columns of
+  SHR-02; and the typed grants of SHR-05, whose checks live in
+  `security definer` functions inside the database. A check that lives in
+  client code, in page code, or in a server route is none of these and is
+  forbidden.
 - **SHR-02** A user SHALL be able to publish, per vehicle: a showcase page
   and/or a work-log page, each at a stable public URL under their handle,
   bilingual chrome, user content in whatever language the user wrote.
@@ -77,6 +82,35 @@ the user's own record and is not fact-checked by the site.
   unless opened per record.
 - **SHR-04** Public pages SHALL carry the reference site's chrome and design
   (HANDOFF-DESIGN.md) and hreflang per 001 I18N-04.
+
+### Typed share grants (added 2026-08-31 — owner ruling, see §10)
+
+The four columns behind SHR-02/03 express one audience: the world. They cannot
+express the thing an owner needs most — *hand my mechanic this truck's whole
+history, costs included, for the next month.* SHR-05..08 add a second principal.
+
+- **SHR-05** A user SHALL be able to issue, per vehicle, a **typed share
+  grant**: a revocable, expiring, capability-scoped bearer token that admits
+  its holder to a defined subset of that vehicle's data. A grant SHALL carry a
+  `kind` naming its preset (`mechanic`, `buyer`), and the preset SHALL be a
+  label over explicit capability fields, never a branch in consuming code.
+- **SHR-06** Capabilities SHALL be scoped per grant and SHALL open
+  independently: costs and receipts are two decisions, not one. WHERE a grant
+  does not open costs, THE data returned SHALL omit the cost fields entirely
+  rather than blanking them at render time.
+- **SHR-07** THE holder of a grant SHALL NOT be required to have an account,
+  and the accountless path SHALL be read-only. WHILE a request carries no
+  authenticated session, no grant SHALL admit any write.
+- **SHR-08** Every grant SHALL be revocable by its issuer at any time and
+  SHALL carry an expiry. IF a grant is expired, revoked, or unknown, THEN the
+  refusal SHALL be indistinguishable across all three cases — same status, same
+  body, same shape — so that the surface is not an existence oracle. Revocation
+  SHALL take effect on the next request and SHALL never be gated by payment,
+  by plan, or by any other condition.
+- **SHR-09** A grant SHALL NOT make a record eligible for the community
+  evidence surfacing of GAR-04′. That path keys on a *public* work-log; a
+  record visible to one grantee is not public, and treating it as such would
+  put a private work-log on a public problem page.
 
 ## 6. Platform & migration (MIG)
 
@@ -126,6 +160,54 @@ the user's own record and is not fact-checked by the site.
 ## 9. Task list
 
 Draft task breakdown in [`tasks.md`](tasks.md) (same conventions as 001).
-Routing: everything touching auth, RLS, storage policies, or user-data schemas
-is hard-Opus (extends 001's routing policy `secrets-or-deploy` /
-`content-schema` triggers).
+Routing: everything touching auth, RLS, storage policies, user-data schemas, or
+**share grants and anon-executable functions** is hard-Opus (extends 001's
+routing policy `secrets-or-deploy` / `content-schema` triggers).
+
+## 10. Amendment 2026-08-31 — typed share grants
+
+§8's amendments landed as `e7fd9b2`. This is a **second round**, and it is
+recorded separately rather than folded into §8 so the audit trail stays
+readable.
+
+**Owner rulings, 2026-08-31:**
+
+1. **Propose-and-accept.** A mechanic holding an account and a live grant may
+   draft a quote or a completed job. It lands in the owner's garage as a
+   *pending proposal* and becomes a record only when the owner accepts. The
+   owner's acceptance is the write.
+2. **Monetization is authorized, shop-side only.** Owners are free forever.
+3. Grants amend this spec (SHR-05..09). The shop surface — accounts, roster,
+   proposals, entitlements — is [`specs/003-shop-tools`](../003-shop-tools/spec.md).
+4. The accountless mechanic view is history + costs + receipts **plus** the 001
+   reference filtered to that exact vehicle by the fitment engine.
+
+**Why SHR-01 needed widening rather than an exception.** SHR-01 said RLS
+enforces privacy "with no client-trusted checks". A grant read by someone with
+no `auth.uid()` is not RLS, and it is not a client-trusted check either — it is
+a third thing. Left unnamed, every grader citing SHR-01 for a grant would be
+citing a requirement that does not cover it. §5 now names all three modes and
+closes the set.
+
+### Constitution amendments required
+
+Owner sign-off = merging this PR authorizes a follow-up PR making exactly these
+edits to `AGENTS.md`, and no others (the §8 pattern).
+
+1. **Boundaries, "any user-to-user writable surface" (currently ~:149-152).**
+   Carve out propose-and-accept per 003: a holder of a live grant may submit a
+   proposal, which is inert until the owner accepts it. Direct writes into
+   another user's records, comments, and messaging stay stop-and-ask.
+2. **Boundaries, "Adding affiliate or monetization mechanics of any kind"
+   (currently :154).** Replace the blanket ban with a bounded one:
+   shop-side subscription per 003 is permitted; **owners are free forever and
+   payment never gates an owner's access to their own data, nor revocation of a
+   grant**; no sale or brokerage of user data; no paid placement or paid
+   ranking in the community directory; the :137 affiliate-disclosure rule and
+   ACC-04's ads/analytics ban both survive untouched.
+3. **Facts, "user-entered garage records are the user's own testimony"
+   (currently :118-120).** Extend to accepted proposals: a record created by
+   accepting a mechanic's proposal carries its provenance, remains the owner's
+   own record, and is never presented as a site-verified reference fact.
+4. **"What this is".** A second actor class now exists — shops — and the
+   platform has two kinds of account, not one.
