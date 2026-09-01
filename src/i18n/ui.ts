@@ -1141,7 +1141,7 @@ const en: UiStrings = {
   safetyNoticeBody:
     "This affects a safety-critical system. Reference material only: for safety-critical work, consult a qualified mechanic.",
   confidenceCaveatTemplate:
-    "{tier}. This entry is not backed by factory documentation — treat its values and steps as a starting point, not as manual authority.",
+    "{tier}. This entry is not backed by factory documentation — treat its values and steps as a starting point, not as if they came from the factory manual.",
   problemProvisionalSafetyNote:
     "This is safety-critical, and the match to your truck is only provisional: it was made on generation, market, year and engine alone. Narrow your selection, and confirm against your own vehicle, before acting on anything here.",
   "sourceKind.fsm": "Factory Service Manual",
@@ -1238,7 +1238,7 @@ const es: UiStrings = {
   communityFilterActivityLabel: "Filtre por actividad",
   communityFilterActivityAll: "Todos los niveles de actividad",
   communityNoResults: "Ninguna comunidad coincide con estos filtros.",
-  communityEmpty: "El directorio de comunidades todavía no tiene fichas.",
+  communityEmpty: "El directorio de comunidades todavía no tiene entradas.",
   communityGoodForLabel: "Bueno para",
   communityVisitLabel: "Visitar",
   communityAlsoOnLabel: "También en",
@@ -1538,9 +1538,9 @@ const es: UiStrings = {
   vehicleDoesNotFitLabel: "No le sirve al vehículo que usted eligió",
   vehicleProvisionalLabel: "Coincidencia provisional",
   vehicleProvisionalNote:
-    "La coincidencia se hizo solo con generación, mercado, año y motor. Las fichas marcadas como provisionales dependen además de algún dato que usted no nos ha dado, así que algunas no le van a servir a su carro. Si afina su selección, la marca desaparece.",
+    "La coincidencia se hizo solo con generación, mercado, año y motor. Las entradas marcadas como provisionales dependen además de algún dato que usted no nos ha dado, así que algunas no le van a servir a su carro. Si afina su selección, la marca desaparece.",
   vehicleProvisionalDetailTemplate:
-    "Esta ficha depende además de datos que usted no ha indicado: {facets}.",
+    "Esta entrada depende además de datos que usted no ha indicado: {facets}.",
   navParts: "Repuestos",
   partsHeading: "Repuestos",
   partsIntro:
@@ -1584,7 +1584,7 @@ const es: UiStrings = {
   navProblems: "Problemas",
   problemsHeading: "Problemas",
   problemsIntro:
-    "Empiece por lo que está haciendo el carro. Cada ficha dice qué se puede hacer con seguridad en este momento, qué revisar, cuál suele ser la causa y qué implica la reparación.",
+    "Empiece por lo que está haciendo el carro. Cada entrada dice qué se puede hacer con seguridad en este momento, qué revisar, cuál suele ser la causa y qué implica la reparación.",
   problemsEmpty: "Todavía no hay problemas documentados.",
   problemsCountTemplate: "{shown} de {total} problemas",
   problemBreadcrumbLabel: "Ruta de navegación",
@@ -1612,14 +1612,14 @@ const es: UiStrings = {
   safetyNoticeBody:
     "Esto afecta un sistema crítico para la seguridad. Material de referencia únicamente: en trabajos críticos para la seguridad, consulte a un mecánico calificado.",
   confidenceCaveatTemplate:
-    "{tier}. Esta ficha no se apoya en documentación de fábrica — tome sus valores y sus pasos como punto de partida, no como autoridad del manual.",
+    "{tier}. Esta entrada no se apoya en documentación de fábrica — tome los valores y los pasos como punto de partida, no como si vinieran del manual de fábrica.",
   problemProvisionalSafetyNote:
     "Esto es crítico para la seguridad y la coincidencia con su carro es apenas provisional: se hizo solo con generación, mercado, año y motor. Afine su selección, y confirme contra su propio vehículo, antes de actuar con base en esta página.",
   "sourceKind.fsm": "Manual de servicio de fábrica",
   "sourceKind.tsb": "Boletín de servicio",
-  "sourceKind.manufacturer": "Literatura de fábrica",
+  "sourceKind.manufacturer": "Documentación del fabricante",
   "sourceKind.forum": "Foro de dueños",
-  "sourceKind.video": "Video de reparación o armado",
+  "sourceKind.video": "Video de reparación o de preparación",
   "sourceKind.vendor": "Catálogo de proveedor",
   "sourceKind.reference": "Obra de referencia",
   "sourceKind.first-hand": "De primera mano",
