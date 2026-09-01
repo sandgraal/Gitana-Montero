@@ -355,6 +355,64 @@ export interface UiStrings
   readonly garageTimelineEmpty: string;
   readonly garageCurrentEmpty: string;
   readonly garagePlannedEmpty: string;
+
+  /* ---------------------------------------------------------------------
+   * The derived views (T2-303, GAR-03′)
+   *
+   * Both sheets are computed from the records and nothing else
+   * (`src/lib/garage/derived.ts`). Two distinctions run through the strings
+   * below and neither is cosmetic:
+   *
+   * - **Unknown is not empty.** `…Unavailable` says the records did not
+   *   arrive; `…Empty` says the owner has recorded nothing. Rendering the
+   *   second when the first is true would make a failed request into a
+   *   statement about somebody's truck (PR #68).
+   * - **Nothing here is advice.** No string says a service is *due*, because
+   *   a due date needs an interval the records cannot reach. The sheet
+   *   reports elapsed time and distance, and "past its date" means the date
+   *   the owner wrote has passed — not that the site thinks the work is late.
+   * ------------------------------------------------------------------ */
+
+  /** Heading over the derived mileage line. */
+  readonly garageCurrentOdometerHeading: string;
+  /** `{date}` is the day the reading was written down. */
+  readonly garageCurrentOdometerOnTemplate: string;
+  readonly garageCurrentOdometerUnknown: string;
+  /** Shown when an earlier record reads higher — the owner's data disagrees. */
+  readonly garageCurrentOdometerContradiction: string;
+  readonly garageCurrentServiceHeading: string;
+  readonly garageCurrentServiceHint: string;
+  readonly garageCurrentServiceEmpty: string;
+  /** `{date}` — when this reference entry was last named by a done record. */
+  readonly garageCurrentServiceLastTemplate: string;
+  /** `{distance}` is `Intl`-formatted in the reader's odometer unit. */
+  readonly garageCurrentServiceSinceTemplate: string;
+  readonly garageCurrentServiceSinceUnknown: string;
+  readonly garageCurrentOpenHeading: string;
+  /** Label-then-number, so neither locale has to agree with a plural. */
+  readonly garageCurrentOpenOverdueTemplate: string;
+  readonly garageCurrentOpenUpcomingTemplate: string;
+  /**
+   * The records are still on their way.
+   *
+   * A third state beside "empty" and "unavailable", and the reason there is
+   * one: `garageDerivedUnavailable` is past tense ("could not be loaded"), so
+   * showing it during the ordinary network beat claims a failure that has not
+   * happened (T2-303 review, F2). Pending is not failed.
+   */
+  readonly garageDerivedLoading: string;
+  /** The records did not load — said instead of an empty sheet. */
+  readonly garageDerivedUnavailable: string;
+  readonly garagePlannedQueueNote: string;
+  readonly garagePlannedOverdueHeading: string;
+  readonly garagePlannedUpcomingHeading: string;
+  readonly garagePlannedEstimateHeading: string;
+  readonly garagePlannedEstimateTimeLabel: string;
+  readonly garagePlannedEstimateCostLabel: string;
+  /** `{counted}` of `{total}` — a total without its coverage is a lie. */
+  readonly garagePlannedEstimateCoverageTemplate: string;
+  readonly garagePlannedEstimateNone: string;
+  readonly garagePlannedEstimateCurrencyNote: string;
   readonly garagePhotosHeading: string;
   readonly garagePhotosEmpty: string;
   readonly garagePhotosAdd: string;
@@ -758,6 +816,38 @@ const en: UiStrings = {
   garageCurrentEmpty:
     "The current-state sheet is worked out from what you record, so it fills in as you go.",
   garagePlannedEmpty: "Nothing is planned on this vehicle yet.",
+  garageCurrentOdometerHeading: "Latest reading in your records",
+  garageCurrentOdometerOnTemplate: "Written down on {date}.",
+  garageCurrentOdometerUnknown:
+    "No record on this vehicle carries an odometer reading yet.",
+  garageCurrentOdometerContradiction:
+    "An earlier record reads higher than this one. Both are kept exactly as you wrote them.",
+  garageCurrentServiceHeading: "Service history",
+  garageCurrentServiceHint:
+    "One line for each reference entry you have linked to a record, the one left longest first. The site does not know when any of it is due — it only knows what you wrote down.",
+  garageCurrentServiceEmpty:
+    "Nothing here yet. This history is built from the problems, parts and procedures you link to a record.",
+  garageCurrentServiceLastTemplate: "Last done {date}",
+  garageCurrentServiceSinceTemplate: "{distance} since",
+  garageCurrentServiceSinceUnknown: "distance since unknown",
+  garageCurrentOpenHeading: "Open items",
+  garageCurrentOpenOverdueTemplate: "Past their date: {count}",
+  garageCurrentOpenUpcomingTemplate: "Still ahead: {count}",
+  garageDerivedLoading: "Working this out from your records…",
+  garageDerivedUnavailable:
+    "This view is worked out from your records, and they could not be loaded. Nothing here is a statement about the truck.",
+  garagePlannedQueueNote:
+    "In the order of the dates you gave, the ones already past first. The site sends no reminders.",
+  garagePlannedOverdueHeading: "Past their date",
+  garagePlannedUpcomingHeading: "Still ahead",
+  garagePlannedEstimateHeading: "What you estimated",
+  garagePlannedEstimateTimeLabel: "Time",
+  garagePlannedEstimateCostLabel: "Cost",
+  garagePlannedEstimateCoverageTemplate:
+    "From {counted} of {total} planned items.",
+  garagePlannedEstimateNone: "No planned item carries an estimate yet.",
+  garagePlannedEstimateCurrencyNote:
+    "Amounts are added up per currency and never converted between them.",
   garagePhotosHeading: "Photos",
   garagePhotosEmpty: "No photos yet.",
   garagePhotosAdd: "Add a photo",
@@ -1160,6 +1250,40 @@ const es: UiStrings = {
   garageCurrentEmpty:
     "La hoja de estado actual se calcula con lo que usted anote, así que se va llenando sola.",
   garagePlannedEmpty: "Todavía no hay nada pendiente en este carro.",
+  garageCurrentOdometerHeading: "Última lectura en sus fichas",
+  garageCurrentOdometerOnTemplate: "Anotada el {date}.",
+  garageCurrentOdometerUnknown:
+    "Todavía ninguna ficha de este carro trae una lectura del kilometraje.",
+  garageCurrentOdometerContradiction:
+    "Una ficha anterior marca más que esta. Las dos quedan tal como usted las escribió.",
+  garageCurrentServiceHeading: "Historial de servicio",
+  garageCurrentServiceHint:
+    "Una línea por cada entrada de referencia que usted haya enlazado a una ficha, primero la que lleva más tiempo sin tocarse. El sitio no sabe cuándo toca ninguna: solo sabe lo que usted anotó.",
+  garageCurrentServiceEmpty:
+    "Todavía no hay nada. Este historial se arma con las fallas, los repuestos y los procedimientos que usted enlace a una ficha.",
+  garageCurrentServiceLastTemplate: "Última vez el {date}",
+  garageCurrentServiceSinceTemplate: "{distance} desde entonces",
+  garageCurrentServiceSinceUnknown:
+    "no se sabe cuánto ha corrido desde entonces",
+  garageCurrentOpenHeading: "Pendientes",
+  garageCurrentOpenOverdueTemplate: "Con la fecha vencida: {count}",
+  garageCurrentOpenUpcomingTemplate: "Por delante: {count}",
+  garageDerivedLoading: "Calculando esto con sus fichas…",
+  garageDerivedUnavailable:
+    "Esta vista se calcula con sus fichas, y no se pudieron cargar. Nada de lo que aparece aquí dice algo sobre el carro.",
+  garagePlannedQueueNote:
+    "En el orden de las fechas que usted puso, primero las que ya pasaron. El sitio no manda recordatorios.",
+  garagePlannedOverdueHeading: "Con la fecha vencida",
+  garagePlannedUpcomingHeading: "Por delante",
+  garagePlannedEstimateHeading: "Lo que usted estimó",
+  garagePlannedEstimateTimeLabel: "Tiempo",
+  garagePlannedEstimateCostLabel: "Costo",
+  garagePlannedEstimateCoverageTemplate:
+    "A partir de {counted} de {total} fichas pendientes.",
+  garagePlannedEstimateNone:
+    "Todavía ninguna ficha pendiente trae un estimado.",
+  garagePlannedEstimateCurrencyNote:
+    "Los montos se suman por moneda y nunca se convierten de una a otra.",
   garagePhotosHeading: "Fotos",
   garagePhotosEmpty: "Todavía no hay fotos.",
   garagePhotosAdd: "Agregar una foto",
