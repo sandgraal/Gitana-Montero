@@ -21,25 +21,63 @@
  * prose — and it is what makes REF-02 enforceable, since a row's number is a
  * top-level shared-data field that `check:citations` walks.
  *
- * | `kind`        | one entry is…                                   |
- * |---------------|-------------------------------------------------|
- * | `fsm-section` | a pointer into the factory manual, nothing more |
- * | `torque`      | one fastener's tightening specification         |
- * | `fluid`       | one fill: which fluid, and how much             |
- * | `capacity`    | one volume with no fluid specification to give  |
- * | `dimension`   | one measured dimension, weight or angle         |
+ * | `kind`         | one entry is…                                     |
+ * |----------------|---------------------------------------------------|
+ * | `fsm-section`  | a pointer into the factory manual, nothing more   |
+ * | `torque`       | one fastener's tightening specification           |
+ * | `fluid`        | one fill: which fluid, and how much               |
+ * | `capacity`     | one volume with no fluid specification to give    |
+ * | `dimension`    | one measured dimension, weight or angle           |
+ * | `vin-position` | one field of the VIN: which characters, what for  |
+ * | `vin-code`     | one code at those characters, and what it means   |
+ * | `option-code`  | one build-plate / option code, and what it means  |
  *
  * `fluid` vs `capacity`: use `fluid` whenever a fluid *specification* exists
  * (the ATF fill has both a spec and a volume). `capacity` is for a volume
  * where naming a fluid would be wrong — the fuel tank holds whatever the
  * market sells.
  *
- * **VIN/option-code decoder data (REF-01) is not here.** It is T208's, it is a
- * different shape entirely (a code table, not a measured figure), and adding
- * an unused kind with invented fields would be a schema change made by a task
- * that does not own it. T208 adds its own kind to `REFERENCE_KINDS` and its
- * own shape to `REFERENCE_KIND_SHAPES`; nothing else about this module needs
- * to change for it.
+ * ## The decoder kinds (T208) — why three, and not one
+ *
+ * REF-01 asks for "VIN/option-code decoder data" and that phrase covers three
+ * genuinely different rows, which is why they are three kinds rather than one
+ * kind with optional fields:
+ *
+ * 1. **`vin-position`** — the VIN's *layout*. "Positions 12–17 are the serial
+ *    number." It has a position range and the field it encodes, and it has no
+ *    code at all: the serial and the check digit are positions nobody tabulates
+ *    values for.
+ * 2. **`vin-code`** — one *value* at a position range. "At position 8, `S`
+ *    means the 6G74." It has a code, the positions it occupies, and (where the
+ *    taxonomy knows the thing it names) the id it decodes to.
+ * 3. **`option-code`** — a code that is not in the VIN at all: the build
+ *    plate's model code (`V45W`), paint, interior trim, equipment codes. Same
+ *    code→meaning shape as `vin-code` minus the positions, plus the code set it
+ *    belongs to.
+ *
+ * The alternative — one `code` kind with `positions` optional — was rejected on
+ * this module's own precedent: `fluid` and `capacity` were kept apart rather
+ * than folded into one kind with an optional `specification`, because an
+ * optional field cannot say "required *here*", and "a VIN code with no
+ * positions" or "a paint code that claims position 4" would both be spellable
+ * and meaningless. Requiredness per kind is the whole point of
+ * {@link REFERENCE_KIND_SHAPES}.
+ *
+ * The three share their fields *literally* where they mean the same thing —
+ * `positions` across the two VIN kinds, `code` and `decodesTo` across
+ * `vin-code` and `option-code` — which is the case the flatten guard admits.
+ *
+ * **Scope of `vin-position` / `vin-code`: the 17-character ISO 3779 VIN.** JDM
+ * Monteros are identified by a chassis code and number (`V45W-0301234`), which
+ * is not a VIN and has no ISO positions; a JDM model code is an `option-code`
+ * in the `model-code` set. That is why positions are bounded at
+ * {@link VIN_LENGTH} and why VIN codes are checked for the letters ISO 3779
+ * excludes.
+ *
+ * **What a decoded meaning may name.** `decodesTo` holds *taxonomy ids*, not
+ * re-spelled prose: an engine code decodes to the engine the `vehicles`
+ * collection already knows. See {@link decodedMeaningSchema} for how far this
+ * module can validate those ids and where the build takes over.
  *
  * ## Numbers, and REF-02
  *
@@ -80,7 +118,14 @@
 import { z } from "astro/zod";
 import { defineEntrySchema, nonBlankString } from "./entry";
 import { glossarySystemSchema } from "./glossary";
+import { assertNoFieldCollisions } from "./reference-kind-collisions";
 import { systemIsSafetyCritical } from "../lib/safety";
+import {
+  DRIVE_TYPES,
+  GENERATION_IDS,
+  PRODUCTION_YEAR_RANGE,
+  TAXONOMY_ID_PATTERN,
+} from "./vehicle-vocabulary";
 
 /* -------------------------------------------------------------------------
  * Kinds
@@ -92,6 +137,9 @@ export const REFERENCE_KINDS = [
   "fluid",
   "capacity",
   "dimension",
+  "vin-position",
+  "vin-code",
+  "option-code",
 ] as const;
 
 export type ReferenceKind = (typeof REFERENCE_KINDS)[number];
@@ -318,6 +366,258 @@ export const pageRangeSchema = z
   });
 
 /* -------------------------------------------------------------------------
+ * VIN and option-code decoding — REF-01 "VIN/option-code decoder data" (T208)
+ * ---------------------------------------------------------------------- */
+
+/**
+ * A VIN is seventeen characters (ISO 3779, mandatory in the North American
+ * market from model year 1981 — every generation this site covers). The bound
+ * is what makes "position 18" a build error instead of a row nobody can use.
+ */
+export const VIN_LENGTH = 17;
+
+/**
+ * The letters a VIN never contains: `I`, `O` and `Q`, excluded by ISO 3779
+ * because they are indistinguishable from `1` and `0` on a stamped plate.
+ *
+ * This is the single most likely transcription error in the whole decoder —
+ * someone reads a `0` off a door jamb and types `O` — and it is one of the
+ * very few things about a code that a schema can check without a source.
+ */
+export const VIN_EXCLUDED_LETTERS = ["I", "O", "Q"] as const;
+
+/**
+ * What a range of VIN positions encodes.
+ *
+ * Closed for the reason every vocabulary in this module is closed: `mdl-year`,
+ * `model year` and `year` are three spellings of one field, and a free-text
+ * `encodes` could not be grouped, filtered or translated once in the UI-strings
+ * module.
+ *
+ * Both granularities factory charts use are here on purpose. Some print
+ * positions 1–3 as one **`wmi`** (the World Manufacturer Identifier); others
+ * break the same three characters out as `country` / `manufacturer` /
+ * `vehicle-type`. Both are legitimate rows, each states its own range, and a
+ * corpus that had to pick one would be a corpus that could not follow its own
+ * cited chart.
+ *
+ * This is a *field vocabulary local to the reference schema*, in the same class
+ * as {@link TORQUE_UNITS} — not a change to the vehicle taxonomy, which stays
+ * `src/schemas/vehicle-vocabulary.ts`'s business.
+ */
+export const VIN_FIELDS = [
+  "wmi",
+  "country",
+  "manufacturer",
+  "vehicle-type",
+  "line",
+  "body-style",
+  "engine",
+  "transmission",
+  "drive",
+  "restraint-system",
+  "series",
+  "check-digit",
+  "model-year",
+  "plant",
+  "serial",
+] as const;
+
+export type VinField = (typeof VIN_FIELDS)[number];
+
+/**
+ * Which table an `option-code` comes from — the build plate's model, engine,
+ * transmission and transfer-case codes, the paint and interior codes, the
+ * equipment/option codes, and the destination code.
+ *
+ * Closed, and deliberately generous. A code set missing from this list is a
+ * schema change and therefore a stop-and-ask, not a drive-by edit by whoever
+ * hits it first (AGENTS.md); adding a set is cheap, but a free-text `codeSet`
+ * would quietly split one table into `paint`, `Paint` and `color`.
+ */
+export const OPTION_CODE_SETS = [
+  "model-code",
+  "engine-model",
+  "transmission-model",
+  "transfer-case-model",
+  "paint",
+  "interior-trim",
+  "equipment",
+  "destination",
+] as const;
+
+export type OptionCodeSet = (typeof OPTION_CODE_SETS)[number];
+
+/**
+ * A code as it is *stamped*: uppercase alphanumerics, hyphens allowed inside.
+ *
+ * Uppercase-only for the reason taxonomy ids are lowercase-only — `s` and `S`
+ * must not be two rows for one code — and no whitespace, so the field cannot
+ * hold a sentence. The pattern subsumes {@link nonBlankString}: it requires at
+ * least one leading alphanumeric, so `""` and `" "` are already rejected.
+ */
+export const CODE_PATTERN = /^[0-9A-Z][0-9A-Z-]*$/;
+
+/**
+ * A stamped code is a token, not a description. Real ones run to about a dozen
+ * characters (`V45WGNXFZ`); this cap is far above anything genuine and still
+ * refuses a paragraph pasted into a data field.
+ */
+export const CODE_MAX_LENGTH = 32;
+
+const decoderCodeSchema = z
+  .string()
+  .regex(CODE_PATTERN, {
+    message:
+      "a code is written as it is stamped: uppercase letters and digits, " +
+      "hyphens allowed inside, no spaces (so `S` and `s` cannot become two " +
+      "rows for one code). refs specs/001-foundation (REF-01)",
+  })
+  .max(CODE_MAX_LENGTH, {
+    message: `a stamped code is at most ${CODE_MAX_LENGTH} characters — longer than that is a description, and descriptions are prose`,
+  });
+
+/**
+ * Which characters of the VIN a row is about. `to` omitted means one position.
+ *
+ * Numbers, in shared data, at a top level `check:citations` walks: a position
+ * range is a fact stated by a factory VIN chart, and REF-02 makes an uncited
+ * one fail the build naming `positions.from`. That is not a side effect of the
+ * shape — it is the reason the range is two integers rather than the string
+ * `"4-8"`.
+ *
+ * Not {@link pageRangeSchema}: page numbers are unbounded and a VIN position is
+ * bounded at {@link VIN_LENGTH}, and one schema serving both would have to drop
+ * the bound that catches a transposed `17` → `71`.
+ */
+export const vinPositionsSchema = z
+  .object({
+    from: z.number().int().min(1).max(VIN_LENGTH),
+    to: z.number().int().min(1).max(VIN_LENGTH).optional(),
+  })
+  .strict()
+  .refine(
+    (positions) => positions.to === undefined || positions.to >= positions.from,
+    {
+      message: "`to` must not be before `from`",
+      path: ["to"],
+    }
+  );
+
+/** How many characters a position range covers. */
+export function vinPositionWidth(positions: {
+  from: number;
+  to?: number;
+}): number {
+  return (positions.to ?? positions.from) - positions.from + 1;
+}
+
+const taxonomyIdSchema = z.string().regex(TAXONOMY_ID_PATTERN, {
+  message:
+    "a decoded meaning names a taxonomy entry by its id, which is kebab-case " +
+    "(`6g74`, `v5a51`) — not the code, and not the marketing name. " +
+    "refs specs/001-foundation (REF-01)",
+});
+
+/**
+ * Which `fitment` facet each decoded id must also appear in.
+ *
+ * ## Why this table is how the ids get validated
+ *
+ * The constraint on this task is that a decoded meaning references taxonomy ids
+ * and is validated against the fitment engine's id space "where feasible".
+ * Feasibility is asymmetric, and the split is exactly the one
+ * `src/schemas/entry.ts` already lives with:
+ *
+ * - **Closed constants** — `generation` ({@link GENERATION_IDS}), `drive`
+ *   ({@link DRIVE_TYPES}), `modelYear` ({@link PRODUCTION_YEAR_RANGE}) — are
+ *   checked here, by `z.enum` and by bounds. Nothing defers what a constant
+ *   already knows.
+ * - **Taxonomy *entry* ids** — engines, transmissions, transfer cases, trims —
+ *   are content, not constants. Only the resolver can see whether `6g74` is an
+ *   entry, and it is deliberately the only thing that interprets a fitment
+ *   (FIT-01). A second membership test in this module would be a second
+ *   resolver, drifting.
+ *
+ * So instead of duplicating the resolver, the rule below **routes the decoded
+ * id through the entry's own fitment**: a row whose meaning is "engine 6G74"
+ * must be scoped to that engine, so `decodesTo.engine` must appear in
+ * `fitment.engines` — and `fitment` is already validated against the real
+ * taxonomy at build time by `validateEntryFitments` (FIT-02, wired in
+ * `astro.config.mjs`). An id that names no taxonomy entry therefore still fails
+ * the build, named, without this module inventing its own id space.
+ *
+ * The coherence is worth having on its own: a decoder row that says "this means
+ * the 6G74" while claiming to fit every engine is a contradiction whichever way
+ * you read it.
+ *
+ * **`generation` is deliberately absent from this table.** Generations contain
+ * one another (`gen2-5` declares `parentGeneration: "gen2"`) and expanding that
+ * containment is the resolver's job; a literal membership test here would
+ * reject a row that decodes to `gen2-5` while correctly scoped to `gen2`. The
+ * enum still catches a misspelling.
+ */
+export const DECODED_FACET_FITMENT_KEYS = {
+  engine: "engines",
+  transmission: "transmissions",
+  transferCase: "transferCases",
+  trim: "trims",
+  drive: "drive",
+} as const;
+
+/**
+ * What a code *means*, in ids the rest of the site already understands.
+ *
+ * Optional, and legitimately so: a plant code means "Nagoya", which is a place,
+ * not a taxonomy entry — that meaning lives in the row's bilingual prose, like
+ * every other meaning. `decodesTo` is for the cases where the meaning **is** an
+ * entity the taxonomy knows, so a decoder row can link to it instead of
+ * re-spelling it and drifting from it.
+ *
+ * `market` is not a facet here on purpose. A WMI or a plant code says where a
+ * truck was *built*, and a market id is where one was *sold*; folding the
+ * two together would encode a claim no VIN chart makes. Where a code really is
+ * market-scoped, that is the row's `fitment.markets`.
+ */
+export const decodedMeaningSchema = z
+  .object({
+    generation: z.enum(GENERATION_IDS).optional(),
+    engine: taxonomyIdSchema.optional(),
+    transmission: taxonomyIdSchema.optional(),
+    transferCase: taxonomyIdSchema.optional(),
+    trim: taxonomyIdSchema.optional(),
+    drive: z.enum(DRIVE_TYPES).optional(),
+    /**
+     * The model year a VIN's year character resolves to — a number, in shared
+     * data, so `check:citations` requires the chart that states it.
+     *
+     * Bounded by {@link PRODUCTION_YEAR_RANGE} rather than left open because
+     * the ISO year cipher repeats every thirty years: `2` is 2002, and it is
+     * equally 1972 and 2032. The bound plus the required `fitment.years` window
+     * (below) is what stops one row from claiming all three.
+     */
+    modelYear: z
+      .number()
+      .int()
+      .min(PRODUCTION_YEAR_RANGE.from)
+      .max(PRODUCTION_YEAR_RANGE.to)
+      .optional(),
+  })
+  .strict()
+  .superRefine((decoded, ctx) => {
+    if (Object.values(decoded).some((value) => value !== undefined)) return;
+    ctx.addIssue({
+      code: "custom",
+      path: [],
+      message:
+        "`decodesTo` states at least one thing the code means — an empty " +
+        "object is not a decoding. Drop the field: a meaning the taxonomy has " +
+        "no id for belongs in the entry's prose, in both locales. " +
+        "refs specs/001-foundation (REF-01)",
+    });
+  });
+
+/* -------------------------------------------------------------------------
  * Per-kind shapes
  * ---------------------------------------------------------------------- */
 
@@ -396,6 +696,26 @@ export const REFERENCE_KIND_SHAPES = {
     /** Signed on purpose — camber, caster and toe are legitimately negative. */
     dimension: quantitySchema(DIMENSION_UNITS, { allowNonPositive: true }),
   },
+  "vin-position": {
+    positions: vinPositionsSchema,
+    /** What those characters are for — the row's whole content. */
+    encodes: z.enum(VIN_FIELDS),
+  },
+  "vin-code": {
+    /**
+     * The same schema object the `vin-position` kind declares, not a copy:
+     * "which characters" is one field asked twice, and the flatten guard is
+     * what makes that identity load-bearing rather than a coincidence.
+     */
+    positions: vinPositionsSchema,
+    code: decoderCodeSchema,
+    decodesTo: decodedMeaningSchema.optional(),
+  },
+  "option-code": {
+    code: decoderCodeSchema,
+    codeSet: z.enum(OPTION_CODE_SETS),
+    decodesTo: decodedMeaningSchema.optional(),
+  },
 } as const satisfies Record<ReferenceKind, z.ZodRawShape>;
 
 /* -------------------------------------------------------------------------
@@ -416,47 +736,18 @@ export const REFERENCE_KIND_SHAPES = {
  * object* — `capacity`, which `fluid` declares as `capacityQuantity.optional()`
  * and the `capacity` kind declares as `capacityQuantity` itself (the
  * comparison unwraps the `.optional()` wrapper, so the two are recognised as
- * one field that one kind happens to require). Anything else is a collision
- * that flattening would silently resolve by last-writer-wins, so it throws
- * here, at define time, before any content is parsed.
+ * one field that one kind happens to require); `positions`, shared by the two
+ * VIN kinds; `code` and `decodesTo`, shared by `vin-code` and `option-code`.
+ * Anything else is a collision that flattening would silently resolve by
+ * last-writer-wins, so it throws here, at define time, before any content is
+ * parsed.
+ *
+ * The guard itself lives in `./reference-kind-collisions` — a seam that exists
+ * so this **call** can be pinned by a test and not merely the function it calls
+ * (T207 review residual, closed by T208; see that module's docstring). It is
+ * re-exported below, so nothing that imported it from here had to change.
  */
-function unwrapOptional(schema: unknown): unknown {
-  const candidate = schema as { unwrap?: unknown };
-  return typeof candidate?.unwrap === "function"
-    ? (candidate.unwrap as () => unknown)()
-    : schema;
-}
-
-/**
- * Exported and parameterised so the guard itself is testable without mutating
- * the real {@link REFERENCE_KIND_SHAPES} — T207 review, F2: the guard worked,
- * but nothing would have noticed if a later task deleted it.
- */
-export function assertNoFieldCollisions(
-  shapes: Record<string, Record<string, unknown>>
-): void {
-  const declaredBy = new Map<string, { kind: string; schema: unknown }>();
-  for (const [kind, shape] of Object.entries(shapes)) {
-    for (const [field, schema] of Object.entries(
-      shape as Record<string, unknown>
-    )) {
-      const existing = declaredBy.get(field);
-      if (
-        existing !== undefined &&
-        unwrapOptional(existing.schema) !== unwrapOptional(schema)
-      ) {
-        throw new Error(
-          `\`${field}\` is declared by \`${existing.kind}\` and by \`${kind}\` ` +
-            `with a different schema: two reference kinds may share a field ` +
-            `name only when it is literally the same field (see ` +
-            `\`capacityQuantity\` in src/schemas/reference.ts). Rename one, or ` +
-            `hoist the shared schema. refs specs/001-foundation (REF-01)`
-        );
-      }
-      declaredBy.set(field, { kind, schema });
-    }
-  }
-}
+export { assertNoFieldCollisions };
 
 assertNoFieldCollisions(
   REFERENCE_KIND_SHAPES as unknown as Record<string, Record<string, unknown>>
@@ -637,6 +928,140 @@ function checkFsmSectionSummaryLength(
 }
 
 /**
+ * A VIN code is spelled in the alphabet a VIN actually uses, and it occupies
+ * exactly the characters it claims.
+ *
+ * Both are within-entry structural contradictions, which is the line this
+ * module draws for what a refinement may enforce (see
+ * `checkFsmSectionCitesManual`): a five-position range holding a one-character
+ * code is not a weak claim, it is two fields that cannot both be right, and a
+ * code containing `O` is not a code the chart could have printed.
+ *
+ * Neither is a check "against the source" — this module cannot read the chart.
+ * They catch the transcription mistakes that a reviewer reading a table of
+ * eighty single letters is least likely to catch.
+ */
+function checkVinCode(
+  entry: ReferenceEntryShape,
+  ctx: ReferenceRefineContext
+): void {
+  const { code } = entry;
+  if (typeof code !== "string") return;
+
+  const offending = [...VIN_EXCLUDED_LETTERS].filter((letter) =>
+    code.includes(letter)
+  );
+  if (offending.length > 0) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["code"],
+      message:
+        `a VIN never contains ${VIN_EXCLUDED_LETTERS.map((letter) => `\`${letter}\``).join(", ")} ` +
+        `(ISO 3779 excludes them because they are unreadable against \`1\` ` +
+        `and \`0\` on a stamped plate), so \`${code}\` is a transcription of ` +
+        `something else — most likely a digit. If the code is genuinely not in ` +
+        `the VIN, it is an \`option-code\`. refs specs/001-foundation (REF-01)`,
+    });
+  }
+
+  const positions = entry.positions;
+  if (typeof positions !== "object" || positions === null) return;
+  const { from, to } = positions as { from?: unknown; to?: unknown };
+  if (typeof from !== "number") return;
+  if (to !== undefined && typeof to !== "number") return;
+
+  const width = vinPositionWidth({ from, to });
+  if (width <= 0 || code.length === width) return;
+
+  ctx.addIssue({
+    code: "custom",
+    path: ["code"],
+    message:
+      `\`${code}\` is ${code.length} character(s) but \`positions\` covers ` +
+      `${width} (${from}${to === undefined ? "" : `–${to}`}): a VIN code fills ` +
+      `exactly the positions it is read from. Either the code or the range was ` +
+      `mistyped. refs specs/001-foundation (REF-01)`,
+  });
+}
+
+/**
+ * A decoded meaning agrees with the row's own fitment.
+ *
+ * The reasoning — including why this is the *only* honest way this module can
+ * validate an engine or transmission id against the taxonomy's id space — is on
+ * {@link DECODED_FACET_FITMENT_KEYS}. In short: the decoded id must appear in
+ * the matching `fitment` facet, and `fitment` is already resolved against the
+ * real taxonomy at build time (FIT-02), so an id that names nothing still fails
+ * the build without this module keeping a second copy of the taxonomy.
+ */
+function checkDecodedMeaning(
+  entry: ReferenceEntryShape,
+  ctx: ReferenceRefineContext
+): void {
+  const decoded = entry.decodesTo;
+  if (typeof decoded !== "object" || decoded === null) return;
+  const meaning = decoded as Record<string, unknown>;
+
+  const fitment =
+    typeof entry.fitment === "object" && entry.fitment !== null
+      ? (entry.fitment as Record<string, unknown>)
+      : {};
+
+  for (const [facet, fitmentKey] of Object.entries(
+    DECODED_FACET_FITMENT_KEYS
+  )) {
+    const value = meaning[facet];
+    if (typeof value !== "string") continue;
+
+    const scoped = fitment[fitmentKey];
+    if (Array.isArray(scoped) && scoped.includes(value)) continue;
+
+    ctx.addIssue({
+      code: "custom",
+      path: ["decodesTo", facet],
+      message:
+        `this row means \`${value}\`, so it only applies to trucks that have ` +
+        `it: \`fitment.${fitmentKey}\` must list \`${value}\` ` +
+        (Array.isArray(scoped)
+          ? `(it lists ${scoped.map((id) => `\`${String(id)}\``).join(", ")})`
+          : `(the entry states no \`fitment.${fitmentKey}\` at all, which ` +
+            `claims every one of them)`) +
+        `. That is also how the id is checked against the taxonomy — the ` +
+        `fitment is resolved at build time (FIT-02) and this module does not ` +
+        `keep a second copy of the id space. ` +
+        `refs specs/001-foundation (REF-01)`,
+    });
+  }
+
+  const { modelYear } = meaning;
+  if (typeof modelYear !== "number") return;
+
+  const years =
+    typeof fitment.years === "object" && fitment.years !== null
+      ? (fitment.years as { from?: unknown; to?: unknown })
+      : null;
+  const from = typeof years?.from === "number" ? years.from : null;
+  const to = typeof years?.to === "number" ? years.to : null;
+
+  if (from !== null && modelYear >= from && (to === null || modelYear <= to)) {
+    return;
+  }
+  if (from === null && to !== null && modelYear <= to) return;
+
+  ctx.addIssue({
+    code: "custom",
+    path: ["decodesTo", "modelYear"],
+    message:
+      `the VIN's year cipher repeats every thirty years — \`${modelYear}\` is ` +
+      `also ${modelYear - 30} and ${modelYear + 30} — so a row that decodes a ` +
+      `year states the window it decodes it in: \`fitment.years\` must ` +
+      `contain ${modelYear}` +
+      (years === null ? `, and this entry states no year window` : "") +
+      `. refs specs/001-foundation (REF-01)`,
+  });
+}
+
+/**
  * `safetyCritical` promotes; it never demotes. An entry whose `system` is
  * already on `SAFETY_CRITICAL_SYSTEMS` cannot opt out of the standing
  * bilingual safety notice by writing `false` — that is the one value of this
@@ -684,6 +1109,12 @@ export function checkReferenceEntry(
   if (referenceKind === "fsm-section") {
     checkFsmSectionCitesManual(candidate, ctx);
     checkFsmSectionSummaryLength(candidate, ctx);
+  }
+
+  if (referenceKind === "vin-code") checkVinCode(candidate, ctx);
+
+  if (referenceKind === "vin-code" || referenceKind === "option-code") {
+    checkDecodedMeaning(candidate, ctx);
   }
 }
 

@@ -16,7 +16,7 @@
  *
  * refs specs/001-foundation (REF-01, REF-02)
  */
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { z } from "astro/zod";
 import { issuePaths } from "../../tests/helpers/schema-outcome.ts";
 import {
@@ -26,10 +26,15 @@ import {
 } from "../content.config.ts";
 import {
   ANGLE_UNITS,
+  CODE_MAX_LENGTH,
   DIMENSION_UNITS,
   FSM_SUMMARY_MAX_LENGTH,
+  OPTION_CODE_SETS,
   REFERENCE_KINDS,
   TORQUE_UNITS,
+  VIN_EXCLUDED_LETTERS,
+  VIN_FIELDS,
+  VIN_LENGTH,
   VOLUME_UNITS,
   assertNoFieldCollisions,
   quantitySchema,
@@ -104,6 +109,50 @@ function fsmSectionEntry(
     system: "engine",
     manual: "TEST Service Manual, Vol. 2",
     section: "Group 00 — TEST",
+    ...overrides,
+  });
+}
+
+/**
+ * T208's decoder fixtures. Every code below is invented for shape, not read off
+ * a chart — `ZZ` is not a Mitsubishi engine code and `test-engine` is not a
+ * taxonomy id. Nothing here decodes a real VIN.
+ */
+function vinPositionEntry(
+  overrides: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return envelope({
+    kind: "vin-position",
+    system: "general",
+    sources: [source("manufacturer")],
+    positions: { from: 12, to: 17 },
+    encodes: "serial",
+    ...overrides,
+  });
+}
+
+function vinCodeEntry(
+  overrides: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return envelope({
+    kind: "vin-code",
+    system: "engine",
+    sources: [source("manufacturer")],
+    positions: { from: 8 },
+    code: "Z",
+    ...overrides,
+  });
+}
+
+function optionCodeEntry(
+  overrides: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return envelope({
+    kind: "option-code",
+    system: "body",
+    sources: [source("manufacturer")],
+    codeSet: "paint",
+    code: "T99",
     ...overrides,
   });
 }
@@ -553,6 +602,414 @@ describe("assertNoFieldCollisions", () => {
         beta: { threads: z.number() },
       })
     ).toThrow(/refs specs\/001-foundation \(REF-01\)/);
+  });
+});
+
+/**
+ * T208 — the VIN/option-code decoder kinds (REF-01).
+ *
+ * The schema cannot read a factory VIN chart, so nothing here grades whether a
+ * decoding is *true*; that is the content half's job, with its citations. What
+ * these grade is the class of mistake a reviewer skimming eighty single-letter
+ * rows will miss: a code in the wrong alphabet, a code that does not fill the
+ * positions it claims, and a meaning that contradicts the row's own fitment.
+ */
+describe("the VIN position map (`vin-position`)", () => {
+  it("accepts a row that says which characters are the serial", () => {
+    expect(schema.safeParse(vinPositionEntry()).success).toBe(true);
+  });
+
+  it("accepts a single position", () => {
+    expect(
+      schema.safeParse(
+        vinPositionEntry({ positions: { from: 10 }, encodes: "model-year" })
+      ).success
+    ).toBe(true);
+  });
+
+  it("requires the range and the field it encodes", () => {
+    for (const field of ["positions", "encodes"]) {
+      const entry = vinPositionEntry();
+      delete entry[field];
+      expect(issuePaths(schema.safeParse(entry)), field).toContain(field);
+    }
+  });
+
+  it("rejects a field outside the closed vocabulary", () => {
+    expect(
+      issuePaths(
+        schema.safeParse(vinPositionEntry({ encodes: "lucky-number" }))
+      )
+    ).toContain("encodes");
+  });
+
+  it.each([...VIN_FIELDS])("accepts the VIN field %s", (encodes) => {
+    expect(
+      schema.safeParse(vinPositionEntry({ encodes, positions: { from: 1 } }))
+        .success
+    ).toBe(true);
+  });
+
+  it("REJECTS a position outside the 17-character VIN", () => {
+    // A transposed `17` → `71` is the mistake this bound exists for.
+    for (const positions of [{ from: 0 }, { from: 18 }, { from: 1, to: 71 }]) {
+      expect(
+        schema.safeParse(vinPositionEntry({ positions })).success,
+        JSON.stringify(positions)
+      ).toBe(false);
+    }
+  });
+
+  it("rejects a fractional position", () => {
+    expect(
+      schema.safeParse(vinPositionEntry({ positions: { from: 4.5 } })).success
+    ).toBe(false);
+  });
+
+  it("rejects a backwards range", () => {
+    expect(
+      schema.safeParse(vinPositionEntry({ positions: { from: 8, to: 4 } }))
+        .success
+    ).toBe(false);
+  });
+
+  it("carries no code — the serial is a position, not a table", () => {
+    const outcome = schema.safeParse(vinPositionEntry({ code: "Z" }));
+    expect(issuePaths(outcome)).toContain("code");
+    expect(JSON.stringify(outcome)).toMatch(/another reference kind/);
+  });
+
+  it("pins the VIN at 17 characters (ISO 3779)", () => {
+    // Load-bearing: it is the only thing that makes "position 18" an error,
+    // and it is the difference between a VIN row and a JDM chassis code, which
+    // is an `option-code` precisely because it has no ISO positions.
+    expect(VIN_LENGTH).toBe(17);
+  });
+});
+
+describe("VIN code rows (`vin-code`)", () => {
+  it("accepts a one-character code at one position", () => {
+    expect(schema.safeParse(vinCodeEntry()).success).toBe(true);
+  });
+
+  it("accepts a code that fills a range exactly", () => {
+    expect(
+      schema.safeParse(
+        vinCodeEntry({ positions: { from: 4, to: 8 }, code: "ZZ5W7" })
+      ).success
+    ).toBe(true);
+  });
+
+  it("requires both the code and the positions it is read from", () => {
+    for (const field of ["code", "positions"]) {
+      const entry = vinCodeEntry();
+      delete entry[field];
+      expect(issuePaths(schema.safeParse(entry)), field).toContain(field);
+    }
+  });
+
+  it("REJECTS a code that does not fill the positions it claims", () => {
+    const outcome = schema.safeParse(
+      vinCodeEntry({ positions: { from: 4, to: 8 }, code: "Z" })
+    );
+    expect(issuePaths(outcome)).toContain("code");
+    expect(JSON.stringify(outcome)).toMatch(/fills exactly the positions/);
+  });
+
+  it.each([...VIN_EXCLUDED_LETTERS])(
+    "REJECTS the letter %s, which no VIN contains",
+    (letter) => {
+      const outcome = schema.safeParse(vinCodeEntry({ code: letter }));
+      expect(issuePaths(outcome)).toContain("code");
+      expect(JSON.stringify(outcome)).toMatch(/ISO 3779/);
+    }
+  );
+
+  it("rejects a lowercase code — one code is one row", () => {
+    expect(schema.safeParse(vinCodeEntry({ code: "z" })).success).toBe(false);
+  });
+
+  it("rejects a code with a space, and a blank one", () => {
+    for (const code of ["Z Z", "", " "]) {
+      expect(
+        schema.safeParse(vinCodeEntry({ positions: { from: 4, to: 6 }, code }))
+          .success,
+        JSON.stringify(code)
+      ).toBe(false);
+    }
+  });
+
+  it("rejects a description pasted into the code field", () => {
+    // The width rule alone would not catch this — a `to` far enough away would
+    // make any length "correct" — so the cap is its own rule.
+    expect(
+      schema.safeParse(
+        vinCodeEntry({
+          positions: { from: 1, to: 17 },
+          code: "A".repeat(CODE_MAX_LENGTH + 1),
+        })
+      ).success
+    ).toBe(false);
+  });
+});
+
+describe("option and build-plate codes (`option-code`)", () => {
+  it("accepts a paint code", () => {
+    expect(schema.safeParse(optionCodeEntry()).success).toBe(true);
+  });
+
+  it("requires the set the code comes from", () => {
+    const entry = optionCodeEntry();
+    delete entry.codeSet;
+    expect(issuePaths(schema.safeParse(entry))).toContain("codeSet");
+  });
+
+  it("rejects a set outside the closed vocabulary", () => {
+    expect(
+      issuePaths(schema.safeParse(optionCodeEntry({ codeSet: "vibes" })))
+    ).toContain("codeSet");
+  });
+
+  it.each([...OPTION_CODE_SETS])("accepts the code set %s", (codeSet) => {
+    expect(schema.safeParse(optionCodeEntry({ codeSet })).success).toBe(true);
+  });
+
+  it("carries no VIN positions — it is not in the VIN", () => {
+    const outcome = schema.safeParse(
+      optionCodeEntry({ positions: { from: 4 } })
+    );
+    expect(issuePaths(outcome)).toContain("positions");
+  });
+
+  it("takes a JDM model code, which is not a VIN and keeps its letters", () => {
+    // `V45W`: no ISO positions, and the excluded-letter rule is a VIN rule, so
+    // it does not fire here. This is the row the three-kind split exists for.
+    expect(
+      schema.safeParse(
+        optionCodeEntry({
+          codeSet: "model-code",
+          code: "V45W",
+          system: "general",
+        })
+      ).success
+    ).toBe(true);
+  });
+});
+
+describe("what a code decodes to (`decodesTo`)", () => {
+  it("accepts an engine id the row is also scoped to", () => {
+    expect(
+      schema.safeParse(
+        vinCodeEntry({
+          fitment: { gens: ["gen3"], engines: ["test-engine"] },
+          decodesTo: { engine: "test-engine" },
+        })
+      ).success
+    ).toBe(true);
+  });
+
+  it("REJECTS a meaning the row's own fitment contradicts", () => {
+    const outcome = schema.safeParse(
+      vinCodeEntry({
+        fitment: { gens: ["gen3"], engines: ["other-engine"] },
+        decodesTo: { engine: "test-engine" },
+      })
+    );
+    expect(issuePaths(outcome)).toContain("decodesTo.engine");
+    expect(JSON.stringify(outcome)).toMatch(/only applies to trucks that have/);
+  });
+
+  it("REJECTS a meaning the fitment does not scope at all", () => {
+    // This is also how the id reaches the taxonomy: `fitment.engines` is
+    // resolved against the real `vehicles` collection at build time (FIT-02),
+    // so an id that names nothing fails there — without this module keeping a
+    // second, driftable copy of the id space.
+    const outcome = schema.safeParse(
+      vinCodeEntry({ decodesTo: { engine: "test-engine" } })
+    );
+    expect(issuePaths(outcome)).toContain("decodesTo.engine");
+    expect(JSON.stringify(outcome)).toMatch(/claims every one of them/);
+  });
+
+  it("applies the same rule to a transmission, a transfer case and a trim", () => {
+    for (const [facet, fitmentKey] of [
+      ["transmission", "transmissions"],
+      ["transferCase", "transferCases"],
+      ["trim", "trims"],
+    ] as const) {
+      expect(
+        schema.safeParse(
+          vinCodeEntry({
+            fitment: { gens: ["gen3"], [fitmentKey]: ["test-id"] },
+            decodesTo: { [facet]: "test-id" },
+          })
+        ).success,
+        facet
+      ).toBe(true);
+      expect(
+        issuePaths(
+          schema.safeParse(vinCodeEntry({ decodesTo: { [facet]: "test-id" } }))
+        ),
+        facet
+      ).toContain(`decodesTo.${facet}`);
+    }
+  });
+
+  it("applies it to drive too", () => {
+    expect(
+      schema.safeParse(
+        vinCodeEntry({
+          fitment: { gens: ["gen3"], drive: ["4wd"] },
+          decodesTo: { drive: "4wd" },
+        })
+      ).success
+    ).toBe(true);
+    expect(
+      issuePaths(
+        schema.safeParse(vinCodeEntry({ decodesTo: { drive: "4wd" } }))
+      )
+    ).toContain("decodesTo.drive");
+  });
+
+  it("rejects a drive value outside the closed vocabulary", () => {
+    expect(
+      schema.safeParse(
+        vinCodeEntry({
+          fitment: { gens: ["gen3"], drive: ["awd"] },
+          decodesTo: { drive: "awd" },
+        })
+      ).success
+    ).toBe(false);
+  });
+
+  it("does NOT membership-test the generation — containment is the resolver's", () => {
+    // `gen2-5` declares `parentGeneration: "gen2"`, so a row scoped to `gen2`
+    // and decoding to `gen2-5` is correct, and a literal `includes` here would
+    // reject it. The enum still catches a misspelling (below).
+    expect(
+      schema.safeParse(
+        vinCodeEntry({
+          fitment: { gens: ["gen2"] },
+          decodesTo: { generation: "gen2-5" },
+        })
+      ).success
+    ).toBe(true);
+  });
+
+  it("still rejects a generation that is not a generation", () => {
+    expect(
+      issuePaths(
+        schema.safeParse(vinCodeEntry({ decodesTo: { generation: "gen9" } }))
+      )
+    ).toContain("decodesTo.generation");
+  });
+
+  it("requires ids in the taxonomy's kebab-case, not the code or the name", () => {
+    expect(
+      schema.safeParse(
+        vinCodeEntry({
+          fitment: { gens: ["gen3"], engines: ["6G74"] },
+          decodesTo: { engine: "6G74" },
+        })
+      ).success
+    ).toBe(false);
+  });
+
+  it("rejects an empty decoding and an unknown facet", () => {
+    expect(schema.safeParse(vinCodeEntry({ decodesTo: {} })).success).toBe(
+      false
+    );
+    expect(
+      schema.safeParse(vinCodeEntry({ decodesTo: { colour: "red" } })).success
+    ).toBe(false);
+  });
+
+  describe("model years — the cipher repeats every thirty years", () => {
+    const yearRow = (
+      modelYear: number,
+      years?: Record<string, number>
+    ): Record<string, unknown> =>
+      vinCodeEntry({
+        positions: { from: 10 },
+        code: "2",
+        system: "general",
+        fitment: years ? { gens: ["gen3"], years } : { gens: ["gen3"] },
+        decodesTo: { modelYear },
+      });
+
+    it("accepts a year inside the row's own window", () => {
+      expect(
+        schema.safeParse(yearRow(2002, { from: 2001, to: 2006 })).success
+      ).toBe(true);
+    });
+
+    it("REJECTS a year the window does not contain", () => {
+      const outcome = schema.safeParse(yearRow(1972, { from: 2001, to: 2006 }));
+      expect(issuePaths(outcome)).toContain("decodesTo.modelYear");
+      expect(JSON.stringify(outcome)).toMatch(/repeats every thirty years/);
+    });
+
+    it("REJECTS a decoded year with no window at all", () => {
+      expect(issuePaths(schema.safeParse(yearRow(2002)))).toContain(
+        "decodesTo.modelYear"
+      );
+    });
+
+    it("rejects a year outside anything the Montero was built in", () => {
+      expect(
+        schema.safeParse(yearRow(2032, { from: 2001, to: 2040 })).success
+      ).toBe(false);
+    });
+  });
+});
+
+/**
+ * The T207 review residual, closed here (T208).
+ *
+ * `assertNoFieldCollisions` had unit tests, but the **call** at the bottom of
+ * `reference.ts` — the one that runs it against the real
+ * `REFERENCE_KIND_SHAPES` — had none: delete that statement and every test in
+ * this file stayed green, while the guard silently stopped guarding anything.
+ * T208 is the first task to add kinds, so it is the task that owes the pin.
+ *
+ * Observing a call a module makes to itself is not possible under ESM, which is
+ * why the guard now lives in `./reference-kind-collisions` — a seam whose only
+ * purpose is to be substitutable. Both tests below go red if the call is
+ * deleted, commented out, moved behind a condition that is false, or wrapped in
+ * a `try`.
+ */
+describe("the collision guard is CALLED, not merely defined", () => {
+  afterEach(() => {
+    vi.doUnmock("./reference-kind-collisions");
+    vi.resetModules();
+  });
+
+  it("runs the guard against the real shapes when the module loads", async () => {
+    vi.resetModules();
+    const spy = vi.fn();
+    vi.doMock("./reference-kind-collisions", () => ({
+      assertNoFieldCollisions: spy,
+    }));
+
+    const module = await import("./reference");
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    // Identity, not shape: the guard must see the shapes the schema is built
+    // from, not a copy that could drift from them.
+    expect(spy.mock.calls[0]?.[0]).toBe(module.REFERENCE_KIND_SHAPES);
+  });
+
+  it("does not swallow the guard's failure — a collision fails the import", async () => {
+    vi.resetModules();
+    vi.doMock("./reference-kind-collisions", () => ({
+      assertNoFieldCollisions: () => {
+        throw new Error("TEST sentinel collision");
+      },
+    }));
+
+    await expect(import("./reference")).rejects.toThrow(
+      /TEST sentinel collision/
+    );
   });
 });
 
