@@ -43,8 +43,14 @@ Poll every ~5 minutes. Block on CI, then:
 
 ```
 gh pr view <n> --json mergeStateStatus,mergeable,reviewDecision,statusCheckRollup
-gh api graphql -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100){nodes{id isResolved isOutdated path line comments(first:20){nodes{author{login} body url}}}}}}}' -f o=sandgraal -f r=Gitana-Montero -F n=<n>
+gh api graphql -f query='query($o:String!,$r:String!,$n:Int!,$a:String){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100,after:$a){totalCount pageInfo{hasNextPage endCursor} nodes{id isResolved isOutdated path line comments(first:20){nodes{author{login} body url}}}}}}}' -f o=sandgraal -f r=monterogarage -F n=<n>
 ```
+
+**If `pageInfo.hasNextPage` is true, keep paging with `-f a=<endCursor>`
+until it is false.** "Zero unresolved" concluded from a truncated first
+page is the same false negative this section exists to prevent, and it
+fails silently — `totalCount` is in the query so the truncation is
+visible rather than inferred.
 
 Handle, in this order:
 
@@ -67,15 +73,43 @@ Handle, in this order:
   and never lease over commits you have not fetched and read.
 - **`mergeStateStatus: BEHIND`** → `gh pr update-branch <n>` or rebase as
   above; wait for CI again.
-- **`BLOCKED` with green checks** → almost always unresolved threads; go
-  back to the thread step. A protection rule you cannot satisfy →
-  `BLOCKED:`.
+- **`BLOCKED` with green checks** → on this repo, almost always unresolved
+  threads, and they are often *newer than your last look* — a bot
+  re-reviews on each push, so your own fix or rebase can summon the thread
+  that blocks you. Re-query threads (fully paged) before concluding
+  anything; go back to the thread step. **Threads are the first suspect,
+  not the only one:** `BLOCKED` also covers a missing required approval,
+  which shows in `reviewDecision` (today `main` requires no reviews, so
+  this is latent rather than live — protection can change under you), and
+  a stale head, which shows as `BEHIND`. Read the `reviewDecision` your
+  poll command already fetches before assuming threads. Only report
+  `BLOCKED:` after a fully-paged thread query comes back empty, the
+  required contexts on the head SHA are all SUCCESS, `reviewDecision` is
+  not `REVIEW_REQUIRED`, and the branch is not `BEHIND` — otherwise you
+  are escalating something you could have cleared yourself.
 
 ## 3. Merge
 
 Only when: `mergeStateStatus == CLEAN`, all required checks SUCCESS on the
 head SHA, zero unresolved threads, and the conductor told you every
 required independent pass is clean.
+
+**Re-query the threads immediately before merging, in the same breath as
+the head SHA.** A thread count from earlier in the watch loop is not
+evidence about now, and neither is the count in your handoff. Bot
+reviewers re-review on every new commit, so the push that *cleared* the
+last round of threads is itself what summons the next one — the PR goes
+green, you verify zero threads, your own force-push after a rebase wakes
+the bot, and `required_conversation_resolution` flips the PR to `BLOCKED`
+in the gap before your merge call. Twice now: PR #52 (threads arrived
+after a human APPROVE and green CI) and PR #59 (two threads arrived after
+a rebase force-push, on a PR verified clean minutes earlier). Nothing
+announces this — `mergeStateStatus` is the only tell, and it reads
+`BLOCKED` with every required check still SUCCESS.
+
+This is the same argument the SHA gets below, for the same reason: the
+question is what is true at the instant of the call, not what was true
+when you looked.
 
 Merge via the API, with the head SHA pinned so a race merges nothing you
 did not verify. Get that SHA fresh, immediately before the call — not a
