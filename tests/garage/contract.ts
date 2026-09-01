@@ -149,6 +149,20 @@ export const USER_TABLES: readonly TableContract[] = [
         type: /int|numeric/,
       },
       {
+        // GAR-01′ names photos in the same breath as the display name. T2-201
+        // could only grade that the word "photo" appeared somewhere in the
+        // DDL, because no photo *surface* existed to have a shape. It does
+        // now, so the column is pinned properly: an array of object paths in
+        // VEHICLE_PHOTOS_BUCKET, in the same optional-collection idiom as a
+        // record's reference arrays — `not null default '{}'`, where the
+        // empty array is "no photos yet" with no null-versus-empty ambiguity
+        // for every consumer to re-decide.
+        name: "photo_paths",
+        requirement: "GAR-01′ (photos) + SHR-01 (paths into a private bucket)",
+        type: /\[\]|array/,
+        absenceDefaultAllowed: true,
+      },
+      {
         name: "is_showcase_public",
         requirement: "SHR-01 + SHR-02 (showcase page, off by default)",
         type: /bool/,
@@ -280,6 +294,62 @@ export const SHARE_FLAG_COLUMNS: readonly {
  */
 export const RECEIPTS_BUCKET = "receipts";
 
+/**
+ * The private bucket vehicle photos live in — declared by T2-301a [TEST],
+ * created by T2-301 [PLATFORM].
+ *
+ * ## Naming (T2-301a decision)
+ *
+ * `vehicle-photos`, not `photos`. A bucket id is global to the project and
+ * permanent in every stored path, so the generic name would have to be shared
+ * the first time anything else needs images — a profile avatar, a showcase
+ * banner — and sharing it means one policy governing objects with different
+ * ownership rules. `vehicle-photos` says what is in it and leaves the generic
+ * name free.
+ *
+ * ## Private, like receipts, and for a reason that is *not* obvious
+ *
+ * A receipt is private because of what it shows. A vehicle photo is private
+ * because of SHR-01: "everything a user stores SHALL default to private". A
+ * truck in a driveway is a house, a plate, a neighbourhood. Nothing about
+ * GAR-01′ asks for photos to be reachable without a session, and a public
+ * bucket cannot be made private again for objects already uploaded.
+ *
+ * **Open question this deliberately does not answer, flagged for T2-401/402:**
+ * SHR-02's showcase page is public, and a public page cannot render an object
+ * from a private bucket without a signed URL, which expires. Whether that is
+ * solved with long-lived signed URLs, a render-time proxy, or a second public
+ * bucket that a user opts an image into, is a *sharing* decision and belongs
+ * with the sharing graders. Pinning it here would be inventing the answer.
+ *
+ * The constraint that makes it hard, so T2-401 does not have to rediscover it:
+ * **this site is static** (AGENTS.md, Stack — Astro, static output, on Vercel).
+ * There is no request-time server to mint a fresh signed URL for an anonymous
+ * visitor, so every option collapses to signing at *build* time — which means
+ * a URL whose expiry is a deploy-cadence problem, and a rebuild whenever a
+ * user adds a photo — or introducing an Edge Function, which is a new runtime
+ * surface and therefore a stop-and-ask rather than a drive-by.
+ */
+export const VEHICLE_PHOTOS_BUCKET = "vehicle-photos";
+
+/**
+ * Every bucket that must never serve an object without a session.
+ *
+ * `vehicle-photos.test.ts` runs a `describe.each` sweep over this list —
+ * created-private, policed on all four commands, reached by the account purge
+ * — so a third private bucket added here inherits those invariants the day it
+ * is created, rather than the day someone remembers to write graders for it.
+ *
+ * The sweep is unmarked and conditional on the bucket existing, because a
+ * bucket's *existence* is a different claim from its privacy and is pinned
+ * separately. Adding a name here therefore costs nothing until the migration
+ * catches up, and starts paying the moment it does.
+ */
+export const PRIVATE_BUCKETS = [
+  RECEIPTS_BUCKET,
+  VEHICLE_PHOTOS_BUCKET,
+] as const;
+
 /* -------------------------------------------------------------------------
  * Auth surface (ACC-01)
  * ---------------------------------------------------------------------- */
@@ -394,6 +464,33 @@ export function testVehicleName(slot: string): string {
 /** A receipt object path inside the private bucket. */
 export function testReceiptPath(ownerId: string, slot: string): string {
   return `${ownerId}/${TEST_NAMESPACE}-RECEIPT-${slot}.pdf`;
+}
+
+/**
+ * A vehicle-photo object path — **`<owner uuid>/<vehicle id>/<file>`**.
+ *
+ * ## Why two segments (T2-301a decision)
+ *
+ * The first segment is the owner, exactly as for receipts, because
+ * `(storage.foldername(name))[1]` is what every storage policy compares to
+ * `auth.uid()`. Keeping that position identical means the photos policies are
+ * the receipts policies with one bucket id changed — a shape already proved
+ * against the whole cross-user matrix, rather than a second thing to get
+ * right.
+ *
+ * The second segment is the vehicle, and it is what makes
+ * "delete this vehicle's photos" a prefix operation instead of a join. Without
+ * it, removing one vehicle from a garage with three would mean reading
+ * `photo_paths`, diffing it against the bucket, and hoping the two agree —
+ * a reconciliation that is wrong the moment either side is written outside
+ * the happy path.
+ */
+export function testVehiclePhotoPath(
+  ownerId: string,
+  vehicleId: string,
+  slot: string
+): string {
+  return `${ownerId}/${vehicleId}/${TEST_NAMESPACE}-PHOTO-${slot}.jpg`;
 }
 
 /**
