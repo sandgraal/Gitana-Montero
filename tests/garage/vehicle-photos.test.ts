@@ -90,7 +90,7 @@ import {
   uploadObject,
 } from "./harness.ts";
 import { bucketPolicyIssues, bucketPrivacyIssues } from "./rules.ts";
-import { migrationSql, statements } from "./sql.ts";
+import { migrationSql, normalizeSql, statements } from "./sql.ts";
 
 const live = await detectLiveStack();
 
@@ -109,15 +109,30 @@ const PHOTO_MARKER = PHOTO_BODY_MARKER;
  * Declaration-tier helpers
  * ---------------------------------------------------------------------- */
 
-/** The `create function` statement for `name`, body included. */
+/**
+ * The `create function` statement for `name`, body included — **the last one**.
+ *
+ * `create or replace function` is how a shipped function is extended once
+ * `db push` has run: the original migration is immutable history, so the
+ * change arrives as a redefinition in a later file. Taking the *first*
+ * definition therefore reads the version that is no longer in force, and two
+ * graders here would have rejected the correct implementation of the very fix
+ * they exist to demand — an implementer extending `purge_expired_accounts` to
+ * reach the photos bucket would still be graded against the receipts-only
+ * original (T2-301a confirm review).
+ *
+ * Last-definition-wins, which is the same principle `policies()` applies by
+ * replaying `create`/`alter`/`drop` in order (T2-201 round 2, finding D2). A
+ * migration directory is a sequence, and the only honest question to ask of it
+ * is what the database looks like at the **end**.
+ */
 function functionBody(sql: string, name: string): string {
-  return (
-    statements(sql).find((statement) =>
-      new RegExp(`create (?:or replace )?function [a-z_.]*${name}\\b`).test(
-        statement
-      )
-    ) ?? ""
+  const defined = statements(sql).filter((statement) =>
+    new RegExp(`create (?:or replace )?function [a-z_.]*${name}\\b`).test(
+      statement
+    )
   );
+  return defined.at(-1) ?? "";
 }
 
 /**
@@ -728,6 +743,56 @@ describe("the photo fixtures are coherent", () => {
     expect(SYNTHETIC_JPEG.subarray(0, 2)).toEqual(Buffer.from([0xff, 0xd8]));
     expect(SYNTHETIC_JPEG.includes(PHOTO_MARKER)).toBe(true);
     expect(SYNTHETIC_JPEG.indexOf(PHOTO_MARKER)).toBeGreaterThan(eoi);
+  });
+
+  it("reads the LAST definition of a function, not the first", () => {
+    // The confirm-review finding, pinned so it cannot come back. A later
+    // `create or replace` is how a shipped function is extended once db push
+    // has run — reading the first definition grades a version that is no
+    // longer in force, and would reject the correct fix for the purge gap
+    // this very file demands.
+    const extended = normalizeSql(`
+      create function public.purge_expired_accounts(p_now timestamptz)
+      returns integer language plpgsql as $$
+      begin
+        delete from storage.objects o where o.bucket_id = 'receipts';
+      end;
+      $$;
+
+      create or replace function public.purge_expired_accounts(p_now timestamptz)
+      returns integer language plpgsql as $$
+      begin
+        delete from storage.objects o
+         where o.bucket_id in ('receipts', 'vehicle-photos');
+      end;
+      $$;
+    `);
+
+    const body = functionBody(extended, "purge_expired_accounts");
+
+    expect(deletionReachesBucket(body, VEHICLE_PHOTOS_BUCKET)).toBe(true);
+    expect(deletionReachesBucket(body, "receipts")).toBe(true);
+  });
+
+  it("still reads a single definition, and reports a missing one as empty", () => {
+    // The other side, so the fix above cannot decay into "return whatever is
+    // last in the file".
+    const only = normalizeSql(`
+      create function public.purge_expired_accounts(p_now timestamptz)
+      returns integer language plpgsql as $$
+      begin
+        delete from storage.objects o where o.bucket_id = 'receipts';
+      end;
+      $$;
+    `);
+
+    expect(
+      deletionReachesBucket(
+        functionBody(only, "purge_expired_accounts"),
+        "receipts"
+      )
+    ).toBe(true);
+    expect(functionBody(only, "no_such_function")).toBe("");
   });
 
   it("reads an unfiltered storage deletion as reaching every bucket", () => {

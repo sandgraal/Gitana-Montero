@@ -331,3 +331,13 @@ The two `TEST-placeholder` values exist only because the CLI refuses to start an
 enabled OAuth provider with an empty client id. Google is never contacted; the
 graders assert that it is *advertised*, which is all that can be checked without
 a browser.
+
+**One stack per repo, no matter how many worktrees.** `supabase start` keys its
+containers and volumes on the **committed `project_id`**, not on the directory
+or the ports — so every agent worktree of this repo shares one database, and two
+concurrent live runs quietly overwrite each other's fixtures. That corrupts
+*green*-ward: a grader that should have failed can pass because another run had
+already created the row or deleted the object it was checking for. Before
+running the live tier alongside anyone else, either `supabase stop` first, or
+copy `supabase/` to a scratch directory outside the repo, give it a unique
+`project_id`, shift its ports, and `supabase start --workdir` there.
