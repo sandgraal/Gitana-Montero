@@ -10,6 +10,9 @@ export default defineConfig(
   {
     ignores: [
       "dist/**",
+      // The configured-build audit target (`ci.yml`, `dist-configured/`) is
+      // the same generated output as `dist/`, under a different name.
+      "dist-configured/**",
       ".astro/**",
       "node_modules/**",
       "coverage/**",

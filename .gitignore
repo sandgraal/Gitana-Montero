@@ -1,6 +1,8 @@
 # deps / build
 node_modules/
 dist/
+# The configured-build audit target (`ci.yml`, `tests/e2e/garage-unreachable.spec.ts`).
+dist-configured/
 .astro/
 coverage/
 playwright-report/
