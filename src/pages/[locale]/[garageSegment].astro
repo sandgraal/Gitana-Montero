@@ -2148,6 +2148,17 @@ const hasReferences = Object.values(referenceCatalogue).some(
       // app-level line stays for the boot path, which is about the whole page
       // rather than about this panel.
       void loadRecords(row).catch(() => {
+        /*
+         * The same staleness guard `loadRecords` makes, because this handler
+         * writes the same state and had none at all (T2-303 F8).
+         *
+         * A rejection for the vehicle the reader has already navigated away
+         * from would otherwise wipe the vehicle they *are* looking at: open
+         * A, switch to B, B loads and paints, then A's import or fetch
+         * rejects — and B's good records become `null` and the page says it
+         * failed, permanently, because B's own request is long finished.
+         */
+        if (opened?.id !== row.id) return;
         // A rejection is a failure too, and the panels must leave "loading"
         // for it — otherwise the derived tabs sit on "working this out from
         // your records…" forever with nothing ever arriving (T2-303 F2's
@@ -2714,6 +2725,24 @@ const hasReferences = Object.values(referenceCatalogue).some(
      */
     async function loadRecords(vehicle: VehicleRow): Promise<void> {
       const result = await listRecords(vehicle.id);
+      /*
+       * The staleness guard, before the outcome is read at all (T2-303 F8).
+       *
+       * It used to sit *after* the `!result.ok` branch, which guarded the
+       * success path and left the failure path open — and a failure is the
+       * more destructive thing to apply to the wrong vehicle. Open A, switch
+       * to B, let B load and paint correctly, then let A's request fail: the
+       * unguarded branch below would replace B's good records with `null` and
+       * mark the page failed, and nothing would correct it, because B's own
+       * request had already finished. A wrong answer with no path back to the
+       * right one.
+       *
+       * One guard covering both outcomes rather than one per branch: the
+       * question "is this still the vehicle on screen?" has nothing to do
+       * with whether the request succeeded, and asking it once is one fewer
+       * place for the next branch to forget.
+       */
+      if (opened?.id !== vehicle.id) return;
       if (!result.ok) {
         // `null`, not `[]`. This is the whole point of the nullable type: the
         // three tabs are drawn from this one value, and two of them state
@@ -2725,7 +2754,6 @@ const hasReferences = Object.values(referenceCatalogue).some(
         say(els.recordsMessage, text.stringError ?? "");
         return;
       }
-      if (opened?.id !== vehicle.id) return;
       const loaded = result.value;
       records = loaded;
       recordsStatus = "loaded";

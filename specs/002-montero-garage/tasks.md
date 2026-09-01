@@ -431,6 +431,24 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   *invisible* is one style regression away from being a false statement about
   somebody's truck again. Two independent mechanisms, and nothing survives
   the vehicle it described.
+  <br>**The staleness guard covered the success path only (F8, fixed round
+  3).** `loadRecords`'s `!result.ok` branch returned *before* reaching the
+  `opened?.id !== vehicle.id` check, and the `.catch` in `openDetail` had no
+  check at all — so a failure could be applied to whichever vehicle happened
+  to be on screen. Round 2 recorded this as self-correcting and **that was
+  wrong**: the shepherd's ordering is open A → switch to B → B loads and
+  paints correctly → *then* A's request rejects, and the unguarded handler
+  replaces B's good records with `null` and marks the page failed with nothing
+  left to correct it, because B's own request had already finished. A wrong
+  answer with no path back to the right one, which is worse than the missing
+  answer the nullable type exists to protect. Both paths are guarded now, and
+  in `loadRecords` the single guard moved *above* the outcome check rather
+  than being duplicated into each branch: whether the request succeeded has no
+  bearing on whether it is still the right vehicle, and asking once is one
+  fewer place for the next branch to forget. **Honest limit:** like the
+  slot-clearing in F9, this guard has no automated test behind it until F3
+  lands — "a request for the vehicle you are no longer looking at" is exactly
+  the case that harness should own.
   <br>**Pending is not failed (F2).** `openDetail` painted `records = null`
   before `loadRecords` fired, so during the ordinary network beat both derived
   panels showed "…they could not be loaded" — a past-tense failure claim about
@@ -453,12 +471,14 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   <br>· **F3 — the derived rendering layer has no automated coverage.**
   `paintCurrentState`, `paintPlannedQueue` and `estimateRow` in
   `[garageSegment].astro` are ~90 lines of glue that nothing grades, and
-  **both** round-1 findings lived there while `derived.ts` itself cleared
-  20/20 mutants. The next change to these functions has nothing to fail
-  against. Adopt the container-API seam T501 built in
-  `part-page.render.test.ts` as the pattern; the four states per panel
-  (loading / failed / empty / populated) and the per-row coverage are the
-  cases worth pinning first.
+  **every** finding across all three review rounds lived there — F1, F2, F9
+  and F8 — while `derived.ts` itself cleared 20/20 mutants. That is the
+  strongest argument in this task for the harness. The next change to these
+  functions still has nothing to fail against. Adopt the container-API seam
+  T501 built in `part-page.render.test.ts` as the pattern; the cases worth
+  pinning first are the four states per panel (loading / failed / empty /
+  populated), the per-row coverage, and the stale-vehicle guard from F8 —
+  each of those is a defect that shipped and was caught by reading.
   <br>· **F4 — the profile odometer's stat label is the unqualified one, and
   that is backwards.** The derived figure is carefully labelled "Latest
   reading in your records" while the hand-maintained profile figure beside it
@@ -471,14 +491,6 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   `formatOdometer`, so the fix is a `paintRecords` call on the unit change,
   but it belongs with a sweep of every unit-dependent surface rather than a
   spot fix here.
-  <br>· **F8 — the stale-request guard has a gap on the failure paths.**
-  `loadRecords`'s `!result.ok` branch runs *before* the `opened?.id !==
-  vehicle.id` check, and the `.catch` in `openDetail` has no such check at
-  all, so a slow failure for vehicle A can mark vehicle B failed. It
-  self-corrects (B's own request resolves and repaints) and predates this
-  round — the success path has always been guarded and still is. Pair it with
-  F3's harness when that lands, since "a request for the vehicle you are no
-  longer looking at" is exactly the case a render grader should own.
   <br>· **F7 — `plannedRecords` in `src/lib/garage/record.ts` is now dead
   production code.** The planned tab was its only caller and now goes through
   `plannedQueue`. Left in place rather than deleted because T2-401's public
