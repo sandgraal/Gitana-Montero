@@ -1,0 +1,44 @@
+{
+  "id": "vin-pos-gen3-us-engine",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2003,
+      "to": 2006
+    }
+  },
+  "kind": "vin-position",
+  "system": "engine",
+  "positions": {
+    "from": 8
+  },
+  "encodes": "engine",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2006 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20250110043214id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: engine",
+      "summary": "The engine character. One value is documented across both North American manuals, and the vehicle information code plate on the same page names the engine model that belongs with it — which is how a VIN character becomes an engine anybody can order parts against."
+    },
+    "es": {
+      "title": "VIN norteamericano: motor",
+      "summary": "El carácter de motor. Hay un valor documentado en los dos manuales norteamericanos, y la placa de códigos, en la misma página, nombra el modelo de motor que le corresponde: así es como un carácter del VIN se convierte en un motor al que de verdad se le pueden pedir repuestos."
+    }
+  }
+}

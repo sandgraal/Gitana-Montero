@@ -1,0 +1,51 @@
+{
+  "id": "vin-pos-gen3-us-series",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2003,
+      "to": 2006
+    }
+  },
+  "kind": "vin-position",
+  "system": "general",
+  "positions": {
+    "from": 6
+  },
+  "encodes": "series",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2006 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20250110043214id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "49 CFR 565.25 — Content requirements: United States vehicle identification number format for vehicles of model year 2009 and earlier (eCFR)",
+      "url": "https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "archiveUrl": "https://web.archive.org/web/20250211055325id_/https://www.ecfr.gov/current/title-49/subtitle-B/chapter-V/part-565/subpart-C/section-565.25",
+      "accessed": "2026-09-01",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: price class",
+      "summary": "The character the factory chart calls the price class and the federal rule calls the series: a subdivision of the vehicle line by equipment level. Two values are documented, so the VIN does separate the two equipment levels the chart names — but the chart does not print the marketing trim names, and this site does not invent the mapping."
+    },
+    "es": {
+      "title": "VIN norteamericano: clase de precio",
+      "summary": "El carácter que la tabla de fábrica llama clase de precio y la norma federal llama serie: una subdivisión de la línea del vehículo por nivel de equipamiento. Hay dos valores documentados, así que el VIN sí separa los dos niveles que nombra la tabla; lo que la tabla no imprime son los nombres comerciales de acabado, y aquí no se inventa esa correspondencia."
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "vin-code-gen3-export-engine-5",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "engine",
+  "positions": {
+    "from": 8
+  },
+  "code": "5",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: 6G74 petrol V6",
+      "summary": "The engine value the export chart reads as the 6G74 petrol V6. The chart names the family and stops there — it does not say which version of it is fitted — while the manual's own model tables show the models it covers carrying the direct-injection engine, spelled out on the build plate. This row therefore decodes to no taxonomy engine at all: choosing one would be a guess dressed as a fact."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: V6 de gasolina 6G74",
+      "summary": "El valor de motor que la tabla de exportación lee como el V6 de gasolina 6G74. La tabla nombra la familia y ahí se detiene —no dice cuál versión trae— mientras que las tablas de modelos del propio manual muestran que los modelos que cubre llevan el motor de inyección directa, detallado en la placa de códigos. Por eso esta fila no decodifica a ningún motor de la taxonomía: escoger uno sería adivinar con cara de dato."
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "option-code-gen3-model-v78w",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "engines": ["4m41"]
+  },
+  "kind": "option-code",
+  "system": "general",
+  "code": "V78W",
+  "codeSet": "model-code",
+  "decodesTo": {
+    "engine": "4m41"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Model code V78W",
+      "summary": "The build-plate model code for the long-wheelbase Montero with the 4M41 turbodiesel, as the workshop manual's model tables print it. The table pairs it with both a manual and an automatic. A model code is not a VIN and has no VIN positions: it is stamped on the vehicle information code plate riveted to the toeboard inside the engine bay, and it is the first thing a parts counter asks for."
+    },
+    "es": {
+      "title": "Código de modelo V78W",
+      "summary": "El código de modelo de la placa de códigos para el Montero de distancia entre ejes larga con el turbodiésel 4M41, tal como lo imprimen las tablas de modelos del manual de taller. La tabla lo combina tanto con una manual como con una automática. Un código de modelo no es un VIN y no tiene posiciones de VIN: va estampado en la placa de códigos remachada en el mamparo, dentro del compartimiento del motor, y es lo primero que pide una repuestera."
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "vin-pos-gen3-export-wmi",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-position",
+  "system": "general",
+  "positions": {
+    "from": 1,
+    "to": 3
+  },
+  "encodes": "wmi",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: world manufacturer identifier",
+      "summary": "The opening section of the chassis number on a general-export Montero. The workshop manual breaks it out as a region marker, a distribution channel and a destination; together those characters are what the international numbering standard calls the world manufacturer identifier — the part that records who built the truck and what it was built for, never where it was finally sold."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: identificador mundial del fabricante",
+      "summary": "La sección inicial del número de chasis en un Montero de exportación general. El manual de taller la desglosa como una marca de región, un canal de distribución y un destino; en conjunto esos caracteres son lo que la norma internacional de numeración llama identificador mundial del fabricante: la parte que registra quién armó el carro y para qué lo armó, nunca dónde se vendió al final."
+    }
+  }
+}

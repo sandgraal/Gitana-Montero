@@ -1,0 +1,39 @@
+{
+  "id": "option-code-gen3-engine-4d56",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "engines": ["4d56"]
+  },
+  "kind": "option-code",
+  "system": "engine",
+  "code": "4D56",
+  "codeSet": "engine-model",
+  "decodesTo": {
+    "engine": "4d56"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine model 4D56",
+      "summary": "The engine model as it is stamped on the cylinder block and printed on the vehicle information code plate. The chassis manual's engine-model table lists it against its displacement; that figure is kept once, on the taxonomy entry this row decodes to. The engine serial number is stamped alongside the model on the block."
+    },
+    "es": {
+      "title": "Modelo de motor 4D56",
+      "summary": "El modelo de motor tal como va estampado en el bloque y como aparece impreso en la placa de códigos. La tabla de modelos de motor del manual de chasis lo lista junto a su cilindrada; ese dato se guarda una sola vez, en la entrada de taxonomía a la que decodifica esta fila. El número de serie del motor va estampado junto al modelo, en el mismo bloque."
+    }
+  }
+}

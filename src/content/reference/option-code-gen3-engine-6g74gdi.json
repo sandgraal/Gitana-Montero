@@ -1,0 +1,39 @@
+{
+  "id": "option-code-gen3-engine-6g74gdi",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "engines": ["6g74-gdi"]
+  },
+  "kind": "option-code",
+  "system": "engine",
+  "code": "6G74GDI",
+  "codeSet": "engine-model",
+  "decodesTo": {
+    "engine": "6g74-gdi"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine model 6G74GDI",
+      "summary": "The engine model as the vehicle information code plate prints it on a direct-injection car — longer than the block stamp, and unambiguous where the block stamp is not. The manual's model tables give this value for every petrol model they cover, which is what makes the decoding safe to state."
+    },
+    "es": {
+      "title": "Modelo de motor 6G74GDI",
+      "summary": "El modelo de motor tal como lo imprime la placa de códigos en un carro de inyección directa: más largo que el estampado del bloque, y sin ambigüedad donde el estampado sí la tiene. Las tablas de modelos del manual dan este valor para todos los modelos de gasolina que cubren, y eso es lo que permite afirmar la decodificación."
+    }
+  }
+}

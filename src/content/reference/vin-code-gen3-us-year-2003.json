@@ -1,0 +1,40 @@
+{
+  "id": "vin-code-gen3-us-year-2003",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2003,
+      "to": 2003
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 10
+  },
+  "code": "3",
+  "decodesTo": {
+    "modelYear": 2003
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "North American VIN: model year 2003",
+      "summary": "The model-year value the factory chart prints for the model year that edition of the manual covers. The cipher repeats on a thirty-year cycle, so the row states the year it decodes as data and is scoped to that year alone."
+    },
+    "es": {
+      "title": "VIN norteamericano: año modelo 2003",
+      "summary": "El valor de año modelo que imprime la tabla de fábrica para el año modelo que cubre esa edición del manual. La clave se repite en un ciclo de treinta años, así que la fila declara como dato el año que decodifica y se limita a ese año."
+    }
+  }
+}

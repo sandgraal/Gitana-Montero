@@ -1,0 +1,37 @@
+{
+  "id": "vin-pos-gen3-export-model-year",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-position",
+  "system": "general",
+  "positions": {
+    "from": 10
+  },
+  "encodes": "model-year",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: model year",
+      "summary": "The single character that carries the model year. The cipher repeats on a thirty-year cycle, so the character alone never fixes a year: it has to be read together with the generation the truck plainly belongs to."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: año modelo",
+      "summary": "El carácter que lleva el año modelo. La clave se repite en un ciclo de treinta años, así que el carácter por sí solo nunca fija un año: hay que leerlo junto con la generación a la que el carro claramente pertenece."
+    }
+  }
+}

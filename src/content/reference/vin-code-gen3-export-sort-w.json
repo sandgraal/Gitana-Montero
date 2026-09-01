@@ -1,0 +1,37 @@
+{
+  "id": "vin-code-gen3-export-sort-w",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "body",
+  "positions": {
+    "from": 9
+  },
+  "code": "W",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: station wagon",
+      "summary": "The value the manual files under sort and decodes as a station wagon. Note where it sits: on the export scheme this character is not a check digit. The check digit belongs to the North American rule, and a general-export chassis number does not carry one — so a check-digit calculator will disagree with a perfectly genuine export number."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: carrocería tipo station wagon",
+      "summary": "El valor que el manual clasifica como tipo y decodifica como station wagon. Vale fijarse en dónde queda: en el esquema de exportación este carácter no es un dígito verificador. El dígito verificador pertenece a la norma norteamericana y un número de chasis de exportación general no lleva ninguno, así que una calculadora de dígito verificador va a rechazar un número de exportación perfectamente legítimo."
+    }
+  }
+}

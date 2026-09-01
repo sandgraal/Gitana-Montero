@@ -1,0 +1,37 @@
+{
+  "id": "vin-pos-gen3-export-engine",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-position",
+  "system": "engine",
+  "positions": {
+    "from": 8
+  },
+  "encodes": "engine",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: engine",
+      "summary": "One character for the engine the truck was built with. On the export scheme the engine is written into the chassis number itself rather than left to the build plate alone, which makes it the field to read before ordering anything that differs between the diesels and the petrol V6."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: motor",
+      "summary": "Un carácter para el motor con el que se armó el carro. En el esquema de exportación el motor va escrito en el propio número de chasis y no queda solo en la placa de códigos, lo que lo convierte en el campo que conviene leer antes de pedir cualquier repuesto que cambie entre los diésel y el V6 de gasolina."
+    }
+  }
+}

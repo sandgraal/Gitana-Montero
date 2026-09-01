@@ -1,0 +1,40 @@
+{
+  "id": "vin-code-gen3-export-year-1",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 2001,
+      "to": 2001
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 10
+  },
+  "code": "1",
+  "decodesTo": {
+    "modelYear": 2001
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: model year 2001",
+      "summary": "The only model-year value this edition of the export chart decodes, for the model year the manual itself covers. The cipher runs on a thirty-year cycle, so the row states the year it decodes as data and is scoped to that year alone; the same character stands for a year three decades earlier and another three decades later."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: año modelo 2001",
+      "summary": "El único valor de año modelo que decodifica esta edición de la tabla de exportación, correspondiente al año modelo que cubre el propio manual. La clave corre en un ciclo de treinta años, así que la fila declara como dato el año que decodifica y se limita a ese año: el mismo carácter vale para un año tres décadas antes y otro tres décadas después."
+    }
+  }
+}

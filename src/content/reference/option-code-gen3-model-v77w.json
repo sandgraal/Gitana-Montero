@@ -1,0 +1,46 @@
+{
+  "id": "option-code-gen3-model-v77w",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2003,
+      "to": 2006
+    },
+    "engines": ["6g75"]
+  },
+  "kind": "option-code",
+  "system": "general",
+  "code": "V77W",
+  "codeSet": "model-code",
+  "decodesTo": {
+    "engine": "6g75"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — 2003 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260901135027id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2003%20Montero/Service%20Manual/GR00001000-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    },
+    {
+      "title": "Mitsubishi Motors — 2006 MONTERO Workshop Manual, Group 00 General <Body and Chassis>: vehicle identification, pages 00-16 and 00-17",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "archiveUrl": "https://web.archive.org/web/20250110043214id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2006%20Montero/GR00001500-00.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Model code V77W",
+      "summary": "The build-plate model code for the North American Montero, printed on the vehicle information code plate and repeated at the head of the chassis number. Both North American manuals read here show it against the 6G75 petrol V6 and the automatic transmission, and neither documents any other combination."
+    },
+    "es": {
+      "title": "Código de modelo V77W",
+      "summary": "El código de modelo de la placa de códigos para el Montero norteamericano, impreso en la placa de códigos y repetido al inicio del número de chasis. Los dos manuales norteamericanos consultados lo muestran junto al V6 de gasolina 6G75 y a la transmisión automática, y ninguno documenta otra combinación."
+    }
+  }
+}

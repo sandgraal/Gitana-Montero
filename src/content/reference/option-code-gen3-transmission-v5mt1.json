@@ -1,0 +1,39 @@
+{
+  "id": "option-code-gen3-transmission-v5mt1",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "transmissions": ["manual-5-speed"]
+  },
+  "kind": "option-code",
+  "system": "transmission",
+  "code": "V5MT1",
+  "codeSet": "transmission-model",
+  "decodesTo": {
+    "transmission": "manual-5-speed"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Transmission model V5MT1",
+      "summary": "A five-speed manual transmission model from the chassis manual's model tables. It appears there only against the smaller turbodiesel, in both wheelbases — so a plate carrying this code and a petrol engine model is a combination the manual does not document."
+    },
+    "es": {
+      "title": "Modelo de transmisión V5MT1",
+      "summary": "Un modelo de caja de cambios manual de cinco velocidades de las tablas de modelos del manual de chasis. Ahí aparece únicamente junto al turbodiésel menor, en las dos distancias entre ejes, de modo que una placa con este código y un motor de gasolina es una combinación que el manual no documenta."
+    }
+  }
+}

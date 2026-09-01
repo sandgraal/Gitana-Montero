@@ -1,0 +1,37 @@
+{
+  "id": "vin-code-gen3-export-region-j",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-code",
+  "system": "general",
+  "positions": {
+    "from": 1
+  },
+  "code": "J",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: Asia region marker",
+      "summary": "The manual calls this a fixed figure and gives it a single meaning: Asia. It opens the manufacturer identifier on every general-export chassis number in the chart, so between two trucks it distinguishes nothing — what it confirms is which numbering scheme the number is written in."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: marca de región de Asia",
+      "summary": "El manual llama a este carácter figura fija y le da un solo significado: Asia. Abre el identificador del fabricante en todos los números de chasis de exportación de la tabla, así que entre dos carros no distingue nada; lo que confirma es en cuál esquema de numeración está escrito el número."
+    }
+  }
+}

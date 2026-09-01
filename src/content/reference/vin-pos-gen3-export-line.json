@@ -1,0 +1,38 @@
+{
+  "id": "vin-pos-gen3-export-line",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "vin-position",
+  "system": "general",
+  "positions": {
+    "from": 6,
+    "to": 7
+  },
+  "encodes": "line",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139id_/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-09-01",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Export chassis number: vehicle line",
+      "summary": "The pair of characters the manual labels the development order. They name the vehicle line, and on this generation the two documented values are what separate the short-wheelbase Montero from the long-wheelbase one."
+    },
+    "es": {
+      "title": "Número de chasis de exportación: línea del vehículo",
+      "summary": "El par de caracteres que el manual rotula como orden de desarrollo. Nombran la línea del vehículo y, en esta generación, los dos valores documentados son los que separan el Montero de distancia entre ejes corta del de distancia entre ejes larga."
+    }
+  }
+}
