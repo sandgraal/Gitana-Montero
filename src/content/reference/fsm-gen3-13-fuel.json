@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-13-fuel",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "fuel",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 13 — Fuel",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 13 — Fuel",
+      "summary": "Fuel and engine management, in four parts: 13A gasoline direct injection, 13B diesel fuel for the 2.5-litre engine, 13C diesel fuel for the 3.2-litre engine, and 13D fuel supply — tank, pump and lines. Diagnosis codes, sensor and actuator checks and the injection-system service specifications live here. Fuel work is safety-critical; a qualified mechanic should do it."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 13 — Combustible",
+      "summary": "Combustible y gestión del motor, en cuatro partes: 13A inyección directa de gasolina, 13B combustible diésel del motor de 2.5 litros, 13C combustible diésel del motor de 3.2 litros y 13D alimentación de combustible: tanque, bomba y cañerías. Ahí están los códigos de falla, las revisiones de sensores y actuadores y las especificaciones del sistema de inyección. El trabajo sobre el sistema de combustible es crítico para la seguridad: hágalo con un mecánico calificado."
+    }
+  }
+}

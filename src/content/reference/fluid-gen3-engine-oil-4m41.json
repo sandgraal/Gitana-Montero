@@ -1,0 +1,39 @@
+{
+  "id": "fluid-gen3-engine-oil-4m41",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "engines": ["4m41"]
+  },
+  "kind": "fluid",
+  "system": "engine",
+  "specification": "Engine oil, API classification CD or higher",
+  "capacity": {
+    "value": 9.8,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine oil — 4M41 diesel",
+      "summary": "The oil grade and total fill for the 3.2-litre common-rail diesel, from the engine lubrication group. The total includes the volume inside the oil filter and the engine oil cooler, both of which the manual lists separately in the same table."
+    },
+    "es": {
+      "title": "Aceite de motor — diésel 4M41",
+      "summary": "El grado de aceite y el llenado total del diésel de 3.2 litros de riel común, del grupo de lubricación del motor. El total incluye el volumen del filtro de aceite y del enfriador de aceite del motor, que el manual desglosa aparte en esa misma tabla."
+    }
+  }
+}

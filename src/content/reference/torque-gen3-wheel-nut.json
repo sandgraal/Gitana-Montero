@@ -1,0 +1,39 @@
+{
+  "id": "torque-gen3-wheel-nut",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "torque",
+  "system": "wheels-tires",
+  "torque": {
+    "value": 108,
+    "min": 98,
+    "max": 118,
+    "unit": "nm"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000), second scanned part: groups 25 to 55",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203149/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Wheel nut tightening torque",
+      "summary": "The factory tightening torque for the road wheel nuts, from the wheel and tyre group of the chassis manual, stated as a nominal with its tolerance band. Tighten in a star pattern with a torque wrench on clean, dry threads — never with an impact gun set by feel — and it is worth re-checking the torque after the first short drive on a wheel that has just been refitted. Wheels are safety-critical: if you do not have a torque wrench, have a qualified mechanic do it."
+    },
+    "es": {
+      "title": "Par de apriete de las tuercas de rueda",
+      "summary": "El par de apriete de fábrica para las tuercas de rueda, tomado del grupo de rueda y llanta del manual de chasis y expresado como valor nominal con su tolerancia. Apriete en cruz con llave de torque, con la rosca limpia y seca —nunca a puro pistolazo—; conviene además volver a revisar el apriete después del primer recorrido corto con la rueda recién montada. Las ruedas son un punto crítico de seguridad: si no tiene llave de torque, que se lo haga un mecánico calificado."
+    }
+  }
+}

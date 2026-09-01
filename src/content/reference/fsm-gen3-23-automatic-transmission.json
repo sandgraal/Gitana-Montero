@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-23-automatic-transmission",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "transmission",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 23 — Automatic Transmission",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 23 — Automatic Transmission",
+      "summary": "The automatic-gearbox group: solenoid resistance values, stall speed, line-pressure adjustment and the lubricants table with the fluid brand and fill quantity, followed by the diagnosis-code charts, the hydraulic circuit, the transmission oil cooler and the control units for the transmission and the transfer case."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 23 — Transmisión automática",
+      "summary": "El grupo de la transmisión automática: resistencias de los solenoides, régimen de calado, ajuste de la presión de línea y la tabla de lubricantes con la marca del aceite y la cantidad de llenado, y a continuación los cuadros de códigos de falla, el circuito hidráulico, el enfriador de aceite de la transmisión y las computadoras de la transmisión y de la caja de transferencia."
+    }
+  }
+}

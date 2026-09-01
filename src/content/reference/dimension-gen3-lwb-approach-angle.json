@@ -1,0 +1,37 @@
+{
+  "id": "dimension-gen3-lwb-approach-angle",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "dimension",
+  "system": "general",
+  "dimension": {
+    "value": 42,
+    "unit": "deg"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Approach angle — long-wheelbase models, general export",
+      "summary": "The approach angle in the chassis manual's major specifications table for the long-wheelbase models, the same figure across every engine and grade in that table. Mitsubishi Australia's NP brochure and the 2002 US specification sheet both print a smaller approach angle than this one; the entries are kept apart per market rather than reconciled, because the bodywork ahead of the front wheels is not the same truck to truck."
+    },
+    "es": {
+      "title": "Ángulo de ataque — carrocería larga, exportación general",
+      "summary": "El ángulo de ataque de la tabla de especificaciones principales del manual de chasis para los modelos de carrocería larga, igual en todos los motores y versiones de esa tabla. Tanto el folleto del NP de Mitsubishi Australia como la ficha estadounidense de 2002 imprimen un ángulo de ataque menor que este; las entradas se guardan por separado según el mercado en vez de reconciliarse, porque la carrocería delante de las ruedas delanteras no es la misma de un vehículo a otro."
+    }
+  }
+}

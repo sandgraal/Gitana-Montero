@@ -1,0 +1,39 @@
+{
+  "id": "dimension-gen3-us-curb-weight-xls",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2002,
+      "to": 2002
+    },
+    "engines": ["6g74-sohc"],
+    "trims": ["xls"]
+  },
+  "kind": "dimension",
+  "system": "general",
+  "dimension": {
+    "value": 4718,
+    "unit": "lb"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motor Sales of America — 2002 Montero specifications (XLS and Limited)",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Curb weight — 2002 US Montero XLS",
+      "summary": "Curb weight for the XLS on Mitsubishi's 2002 US specification sheet; the Limited on the same sheet is heavier. Curb weight is the truck with fluids and no occupants or cargo, so it is the starting point for a payload sum, not the answer to one."
+    },
+    "es": {
+      "title": "Peso en vacío — Montero XLS 2002 de Estados Unidos",
+      "summary": "El peso en vacío de la XLS en la ficha técnica de Mitsubishi para Estados Unidos de 2002; la Limited de esa misma ficha pesa más. El peso en vacío es el del vehículo con líquidos y sin ocupantes ni carga, así que es el punto de partida para calcular la carga útil, no el resultado."
+    }
+  }
+}

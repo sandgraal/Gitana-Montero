@@ -1,0 +1,38 @@
+{
+  "id": "fluid-gen3-front-differential-oil",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fluid",
+  "system": "drivetrain",
+  "specification": "Hypoid gear oil, API classification GL-5 or higher, SAE viscosity No. 90 or 80W",
+  "capacity": {
+    "value": 1.2,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000), second scanned part: groups 25 to 55",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203149/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front differential gear oil",
+      "summary": "The gear oil and fill for the front differential, from the front axle group. Note the API rating: the manual asks for GL-5 here, while the transfer case bolted alongside it takes GL-4 — neighbouring housings, different oils, so read the label before you pour. The manual's level check is at the filler plug hole, not by quantity alone."
+    },
+    "es": {
+      "title": "Aceite del diferencial delantero",
+      "summary": "El aceite de engranajes y el llenado del diferencial delantero, del grupo de eje delantero. Fíjese en la clasificación API: aquí el manual pide GL-5, mientras que la caja de transferencia que va al lado lleva GL-4. Son cajas vecinas con aceites distintos, así que lea la etiqueta antes de servir. El manual revisa el nivel en el hueco del tapón de llenado, no solo por cantidad."
+    }
+  }
+}

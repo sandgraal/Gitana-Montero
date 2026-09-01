@@ -1,0 +1,39 @@
+{
+  "id": "dimension-gen3-lwb-max-gross-vehicle-weight",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "engines": ["6g74-gdi"]
+  },
+  "kind": "dimension",
+  "system": "general",
+  "safetyCritical": true,
+  "dimension": {
+    "value": 2760,
+    "unit": "kg"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Maximum gross vehicle weight — long-wheelbase GDI petrol, general export",
+      "summary": "The maximum gross vehicle weight in the chassis manual's major specifications table for the long-wheelbase direct-injection petrol models — the ceiling for the truck plus everything and everyone in it. It is scoped to that engine on purpose: the same table gives a higher figure for one of the long-wheelbase diesel variants. The manual lists per-axle limits separately, and both have to be respected, not just the total."
+    },
+    "es": {
+      "title": "Peso bruto vehicular máximo — carrocería larga con motor GDI de gasolina, exportación general",
+      "summary": "El peso bruto vehicular máximo de la tabla de especificaciones principales del manual de chasis para los modelos de carrocería larga con motor de gasolina de inyección directa: el tope del vehículo con todo y todos los que van adentro. Se limita a ese motor a propósito, porque esa misma tabla da una cifra mayor para una de las versiones diésel de carrocería larga. El manual da aparte los límites por eje, y hay que respetar los dos, no solo el total."
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "fluid-gen3-coolant-with-rear-heater",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fluid",
+  "system": "cooling",
+  "specification": "MITSUBISHI GENUINE COOLANT or equivalent, mixed to 30-60% concentration",
+  "capacity": {
+    "value": 10.5,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine coolant — vehicles with rear heater",
+      "summary": "The same coolant, and the larger system fill the manual gives for trucks that have the rear heater — the extra volume is the rear heater core and its lines. The quantity includes the reservoir."
+    },
+    "es": {
+      "title": "Refrigerante — vehículos con calefacción trasera",
+      "summary": "El mismo refrigerante, con el llenado mayor que el manual indica para los vehículos que traen calefacción trasera: el volumen adicional es el del radiador de calefacción trasero y sus mangueras. La cantidad incluye el depósito de expansión."
+    }
+  }
+}

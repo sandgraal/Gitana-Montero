@@ -1,0 +1,37 @@
+{
+  "id": "fsm-gen3-00-lifting-jacking",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "general",
+  "safetyCritical": true,
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 00 — General",
+  "subsection": "Support Locations for Lifting and Jacking",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 00 — support locations for lifting and jacking",
+      "summary": "The sub-section of group 00 that shows where the factory says the vehicle may be supported: the garage-jack points, and the points for axle stands and a single- or double-post lift. It also carries the manual's own caution about supporting the vehicle anywhere else. Read it in the manual before going under the truck, and have safety-critical work done by a qualified mechanic."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 00 — puntos de apoyo para levantar el vehículo",
+      "summary": "La subsección del grupo 00 que muestra dónde permite la fábrica apoyar el vehículo: los puntos para la gata de taller y los puntos para los soportes de seguridad y para el elevador de una o dos columnas. Incluye además la advertencia del propio manual sobre apoyar el vehículo en cualquier otro punto. Consúltela en el manual antes de meterse debajo del carro, y deje el trabajo crítico de seguridad en manos de un mecánico calificado."
+    }
+  }
+}

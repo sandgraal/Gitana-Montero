@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-25-propeller-shaft",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "drivetrain",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 25 — Propeller Shaft",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 25 — Propeller Shaft",
+      "summary": "The driveshaft group: general information on the front and rear shafts, the runout and clearance service specifications, the lubricant for the sleeve yoke, and the removal, inspection and installation procedure. The manual carries its own cautions for the carbon-fiber reinforced rear shaft tube."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 25 — Cardán",
+      "summary": "El grupo del cardán: información general de los cardanes delantero y trasero, las especificaciones de excentricidad y de holgura, el lubricante del yugo deslizante y el procedimiento de desmontaje, revisión y montaje. El manual trae sus propias advertencias para el tubo trasero de plástico reforzado con fibra de carbono."
+    }
+  }
+}

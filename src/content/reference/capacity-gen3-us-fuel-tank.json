@@ -1,0 +1,38 @@
+{
+  "id": "capacity-gen3-us-fuel-tank",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2002,
+      "to": 2002
+    },
+    "engines": ["6g74-sohc"]
+  },
+  "kind": "capacity",
+  "system": "fuel",
+  "capacity": {
+    "value": 23.8,
+    "unit": "us-gal"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motor Sales of America — 2002 Montero specifications (XLS and Limited)",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Fuel tank capacity — 2002 US Montero",
+      "summary": "The fuel tank capacity on Mitsubishi's own 2002 Montero specification sheet for the United States, the same on the XLS and the Limited. The sheet prints it in US gallons; that is how it is stored here, because a converted second copy of a figure is a second thing that can drift."
+    },
+    "es": {
+      "title": "Capacidad del tanque de combustible — Montero 2002 de Estados Unidos",
+      "summary": "La capacidad del tanque de combustible que trae la propia ficha técnica de Mitsubishi para el Montero 2002 de Estados Unidos, igual en la XLS y en la Limited. La ficha la imprime en galones estadounidenses y así se guarda aquí, porque una copia convertida de una cifra es una cifra más que se puede desviar."
+    }
+  }
+}

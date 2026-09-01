@@ -1,0 +1,37 @@
+{
+  "id": "dimension-gen3-lwb-wheelbase",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "dimension",
+  "system": "general",
+  "dimension": {
+    "value": 2780,
+    "unit": "mm"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Wheelbase — long-wheelbase models, general export",
+      "summary": "The wheelbase in the chassis manual's major specifications table for the long-wheelbase, five-door models, the same across every engine and grade in that table. The short-wheelbase three-door figure is different and is not recorded here yet."
+    },
+    "es": {
+      "title": "Distancia entre ejes — carrocería larga, exportación general",
+      "summary": "La distancia entre ejes de la tabla de especificaciones principales del manual de chasis para los modelos de carrocería larga de cinco puertas, igual en todos los motores y versiones de esa tabla. La cifra de la carrocería corta de tres puertas es otra y todavía no está registrada aquí."
+    }
+  }
+}

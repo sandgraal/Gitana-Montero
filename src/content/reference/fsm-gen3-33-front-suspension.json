@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-33-front-suspension",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "suspension",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 33 — Front Suspension",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 33 — Front Suspension",
+      "summary": "The front suspension group: the coil-spring data for the double-wishbone independent front end, the service specifications and special tools, the wheel alignment procedure, and the removal and installation sequences for the strut assembly, the upper and lower arms and the stabilizer bar. Suspension work is safety-critical."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 33 — Suspensión delantera",
+      "summary": "El grupo de suspensión delantera: los datos del resorte de la suspensión independiente de doble tijereta, las especificaciones de servicio y las herramientas especiales, el procedimiento de alineamiento, y las secuencias de desmontaje y montaje del conjunto del amortiguador, de las tijeretas superior e inferior y de la barra estabilizadora. El trabajo de suspensión es crítico para la seguridad."
+    }
+  }
+}

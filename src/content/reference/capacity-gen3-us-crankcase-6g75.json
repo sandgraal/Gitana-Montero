@@ -1,0 +1,38 @@
+{
+  "id": "capacity-gen3-us-crankcase-6g75",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2004,
+      "to": 2004
+    },
+    "engines": ["6g75"]
+  },
+  "kind": "capacity",
+  "system": "engine",
+  "capacity": {
+    "value": 4.6,
+    "unit": "us-qt"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors North America — Montero features and specifications (mechanical), 2004 model year",
+      "url": "https://www.mitsubishicars.com/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "archiveUrl": "https://web.archive.org/web/20040409182647id_/http://www.mitsubishicars.com:80/MMSA/jsp/montero/features_specs.jsp?t=mechanical",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Crankcase capacity — 2004 US Montero, 3.8-litre V6",
+      "summary": "The crankcase capacity Mitsubishi North America lists for the 2004 Montero Limited with the 3.8-litre V6. The sheet gives no oil grade next to it, so this entry records the volume only — the oil specification for this engine in this market is still an open gap here, and the figure is in US quarts as printed."
+    },
+    "es": {
+      "title": "Capacidad del cárter — Montero 2004 de Estados Unidos, V6 de 3.8 litros",
+      "summary": "La capacidad del cárter que Mitsubishi Norteamérica indica para el Montero Limited 2004 con el V6 de 3.8 litros. La ficha no acompaña la cifra con un grado de aceite, así que esta entrada registra solo el volumen: la especificación de aceite de este motor en este mercado sigue siendo un vacío aquí, y la cifra va en cuartos de galón estadounidenses tal como la imprime la ficha."
+    }
+  }
+}

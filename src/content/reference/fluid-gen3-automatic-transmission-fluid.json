@@ -1,0 +1,39 @@
+{
+  "id": "fluid-gen3-automatic-transmission-fluid",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    },
+    "transmissions": ["automatic-5-speed"]
+  },
+  "kind": "fluid",
+  "system": "transmission",
+  "specification": "MITSUBISHI DIA QUEEN ATF SP II M, ATF SP III or equivalent",
+  "capacity": {
+    "value": 9.3,
+    "unit": "l"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis Volume 1, Pub. No. PWJE0001(1/2) (February 2000): groups 00 to 23",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203139/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P1_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Automatic transmission fluid",
+      "summary": "The fluid and total fill the chassis manual gives for the five-speed automatic. The manual names the fluid by its Mitsubishi brand designation, and that designation is the specification rather than a suggestion. The quantity is the whole system, so a drain-and-fill through the pan moves far less than this figure — treat it as the dry fill, not as the service volume."
+    },
+    "es": {
+      "title": "Aceite de la transmisión automática",
+      "summary": "El aceite de transmisión automática y el llenado total que el manual de chasis indica para la automática de cinco velocidades. El manual nombra el aceite por su denominación de marca Mitsubishi, y esa denominación es la especificación, no una sugerencia. La cantidad es la del sistema completo, así que un drenaje y llenado por el cárter mueve bastante menos que esa cifra: tómela como llenado en seco y no como volumen de servicio."
+    }
+  }
+}

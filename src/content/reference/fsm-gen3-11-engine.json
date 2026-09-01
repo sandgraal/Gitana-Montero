@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-11-engine",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "engine",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 11 — Engine",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 11 — Engine",
+      "summary": "On-vehicle engine work, split by engine family: 11A for the petrol V6, 11B for the 2.5-litre diesel and 11C for the 3.2-litre common-rail diesel. Each part opens with general information and service specifications and then covers drive-belt and idle checks, compression testing, the oil pan and screen, the timing belt, crankshaft and camshaft oil seals, the cylinder head gasket and engine removal. The manual points at the separate engine-group manual for bench work."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 11 — Motor",
+      "summary": "El trabajo de motor sobre el vehículo, por familia: 11A el V6 de gasolina, 11B el diésel de 2.5 litros y 11C el diésel de 3.2 litros de riel común. Cada parte abre con información general y especificaciones de servicio, y sigue con la revisión de la faja y de la marcha mínima, el cárter, la faja de distribución, los retenedores de cigüeñal y de árbol de levas, el empaque de cabezote y el desmontaje del motor. El trabajo en banco se remite al manual del grupo motor."
+    }
+  }
+}

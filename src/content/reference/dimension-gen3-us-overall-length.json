@@ -1,0 +1,38 @@
+{
+  "id": "dimension-gen3-us-overall-length",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2002,
+      "to": 2002
+    },
+    "engines": ["6g74-sohc"]
+  },
+  "kind": "dimension",
+  "system": "general",
+  "dimension": {
+    "value": 190.2,
+    "unit": "in"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motor Sales of America — 2002 Montero specifications (XLS and Limited)",
+      "url": "https://www.mitsubishicars.com/montero/specs.html",
+      "archiveUrl": "https://web.archive.org/web/20020803202621/http://www.mitsubishicars.com:80/montero/specs.html",
+      "accessed": "2026-08-31",
+      "kind": "manufacturer"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Overall length — 2002 US Montero",
+      "summary": "Overall length from Mitsubishi's 2002 US specification sheet, XLS and Limited alike. Useful when you are working out whether the truck fits a garage, a container or a ferry deck."
+    },
+    "es": {
+      "title": "Largo total — Montero 2002 de Estados Unidos",
+      "summary": "El largo total según la ficha técnica de Mitsubishi para Estados Unidos de 2002, tanto en la XLS como en la Limited. Sirve cuando hay que calcular si el vehículo cabe en un parqueo, en un contenedor o en la cubierta de un ferry."
+    }
+  }
+}

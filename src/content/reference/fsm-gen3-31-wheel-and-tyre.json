@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-31-wheel-and-tyre",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "wheels-tires",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 31 — Wheel and Tyre",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 31 — Wheel and Tyre",
+      "summary": "The wheel and tyre group: the factory wheel and tire sizes by engine and grade, wheel offset and pitch circle diameter, the service limits for tread depth and wheel runout, a troubleshooting chart for wear and vibration, and the on-vehicle checks plus the wheel installation service point. Wheels and tires are safety-critical work."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 31 — Rueda y llanta",
+      "summary": "El grupo de ruedas y llantas: las medidas de aro y de llanta de fábrica por motor y por versión, el desplazamiento del aro y el diámetro de círculo de pernos, los límites de profundidad de labrado y de excentricidad del aro, un cuadro de diagnóstico de desgaste y vibración, y las revisiones sobre el vehículo junto con el punto de servicio para montar la rueda. El trabajo de ruedas y llantas es crítico para la seguridad."
+    }
+  }
+}

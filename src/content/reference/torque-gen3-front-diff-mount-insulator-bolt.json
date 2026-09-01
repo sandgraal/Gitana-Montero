@@ -1,0 +1,39 @@
+{
+  "id": "torque-gen3-front-diff-mount-insulator-bolt",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "torque",
+  "system": "drivetrain",
+  "torque": {
+    "value": 69,
+    "min": 60,
+    "max": 78,
+    "unit": "nm"
+  },
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000), second scanned part: groups 25 to 55",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203149/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/PWJE0001_P2_PAJERO_2001_CHASSIS.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front differential mounting insulator bolt torque",
+      "summary": "The tightening torque for the front differential mounting insulator bolts, from the front axle group's inner shaft and housing tube procedure. The manual is specific about the method as well as the figure: tighten in the lettered order it shows, and only finish tightening with the vehicle back on the ground and unladen, so the bushings are not left twisted."
+    },
+    "es": {
+      "title": "Par de apriete de los tornillos del soporte del diferencial delantero",
+      "summary": "El par de apriete de los tornillos que sujetan el soporte elástico del diferencial delantero, tomado del procedimiento de eje interno y tubo de alojamiento del grupo de eje delantero. El manual es igual de específico con el método que con la cifra: apriete en el orden de letras que indica y dé el apriete final con el vehículo ya en el piso y sin carga, para no dejar los bujes torcidos."
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-12-engine-lubrication",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "engine",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 12 — Engine Lubrication",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 12 — Engine Lubrication",
+      "summary": "The lubrication group: oil-pressure service specifications, the lubricants table that gives the oil grade and fill quantity for each engine, and the on-vehicle procedures for checking and changing the oil, replacing the filter and measuring oil pressure. It is also where the special tools for the oil filter and the oil-pressure switch are listed."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 12 — Lubricación del motor",
+      "summary": "El grupo de lubricación: las especificaciones de presión de aceite, la tabla de lubricantes con el grado y la cantidad de llenado de cada motor, y los procedimientos sobre el vehículo para revisar y cambiar el aceite de motor, sustituir el filtro y medir la presión. Ahí mismo se listan las herramientas especiales para el filtro de aceite y para el bulbo de presión."
+    }
+  }
+}
