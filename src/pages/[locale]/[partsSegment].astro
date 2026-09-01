@@ -51,8 +51,8 @@
  */
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ConfidenceCaveat from "../../components/ConfidenceCaveat.astro";
 import {
-  LOCALES,
   LOCALE_BCP47,
   isLocale,
   localeHref,
@@ -64,12 +64,7 @@ import {
   entryRoutePath,
 } from "../../i18n/routes";
 import VehicleFitSummary from "../../components/VehicleFitSummary.astro";
-import {
-  confidenceCaveat,
-  generationLabel,
-  glossarySystemLabel,
-  t,
-} from "../../i18n/ui";
+import { generationLabel, glossarySystemLabel, t } from "../../i18n/ui";
 import { formatCount } from "../../lib/glossary-filter";
 import { needsConfidenceCaveat } from "../../lib/confidence";
 import { isSafetyCritical } from "../../lib/safety";
@@ -91,10 +86,6 @@ if (!isLocale(param)) {
 const locale: Locale = param;
 const strings = t(locale);
 const routes = collectionRoutePaths("parts");
-
-const otherLocale = LOCALES.find((candidate) => candidate !== locale) as Locale;
-/** Page locale first — the handoff's rule for a bilingual-always block. */
-const readingOrder: Locale[] = [locale, otherLocale];
 
 const collator = new Intl.Collator(LOCALE_BCP47[locale], {
   sensitivity: "base",
@@ -178,13 +169,8 @@ const parts = entries
       genLabels: expandGenerations(fitment.gens, taxonomy).map((gen) =>
         isKnownGeneration(gen) ? generationLabel(strings, gen) : gen
       ),
+      confidence,
       showCaveat: needsConfidenceCaveat(confidence),
-      caveatByLocale: Object.fromEntries(
-        readingOrder.map((each) => [
-          each,
-          confidenceCaveat(t(each), confidence),
-        ])
-      ) as Record<Locale, string>,
       title: local.title,
       summary: local.summary,
     };
@@ -323,7 +309,7 @@ const fitmentTable = buildFitmentTable(parts.map((part) => part.fitment));
                 <div class="part__tags">
                   {part.safetyCritical && (
                     <span class="tag tag--safety">
-                      {strings.safetyNoticeLabel}
+                      {strings.safetyCriticalChipLabel}
                     </span>
                   )}
                   {part.quantityPerVehicle !== null && (
@@ -342,19 +328,7 @@ const fitmentTable = buildFitmentTable(parts.map((part) => part.fitment));
                 </div>
 
                 {part.showCaveat && (
-                  <div class="part__caveat">
-                    {readingOrder.map((each, index) => (
-                      <p
-                        class:list={[
-                          "caveat__line",
-                          index === 0 && "caveat__line--primary",
-                        ]}
-                        lang={LOCALE_BCP47[each]}
-                      >
-                        {part.caveatByLocale[each]}
-                      </p>
-                    ))}
-                  </div>
+                  <ConfidenceCaveat locale={locale} tier={part.confidence} />
                 )}
               </li>
             ))}
@@ -488,9 +462,6 @@ const fitmentTable = buildFitmentTable(parts.map((part) => part.fitment));
     --rust-deep: #93441f;
     --green: #3e6b4f;
     --green-tint: #e4efe7;
-    --caveat-bg: #efeae0;
-    --caveat-border: #a99c88;
-    --caveat-text: #55493c;
     --safety-text: #7a2e2e;
     --safety-bg: #f6e3d8;
     --safety-border: #e4c4b0;
@@ -733,32 +704,6 @@ const fitmentTable = buildFitmentTable(parts.map((part) => part.fitment));
     color: var(--safety-text);
     background: var(--safety-bg);
     border: 1px solid var(--safety-border);
-  }
-
-  /* Confidence caveat — the handoff's dashed caveat panel token. */
-  .part__caveat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    background: var(--caveat-bg);
-    border: 1.5px dashed var(--caveat-border);
-    border-radius: 8px;
-    padding: 0.625rem 0.875rem;
-  }
-
-  .caveat__line {
-    margin: 0;
-    color: var(--caveat-text);
-    font-size: 0.8125rem;
-  }
-
-  .caveat__line--primary {
-    font-weight: 600;
-  }
-
-  .caveat__line:not(.caveat__line--primary) {
-    font-size: 0.75rem;
-    opacity: 0.85;
   }
 
   @media (max-width: 48rem) {

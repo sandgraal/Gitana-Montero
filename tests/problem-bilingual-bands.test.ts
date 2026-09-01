@@ -279,7 +279,7 @@ describe("the safety notice is bilingual and conditioned on safety.ts (PRB-03)",
 
       for (const locale of LOCALES) {
         expect(said[locale], `missing ${locale} safety line`).toEqual([
-          t(locale).problemSafetyNoticeBody,
+          t(locale).safetyNoticeBody,
         ]);
       }
     });
@@ -289,7 +289,7 @@ describe("the safety notice is bilingual and conditioned on safety.ts (PRB-03)",
       const strings = t(pageLocale);
 
       expect(doc.querySelector(".safety__title")?.textContent?.trim()).toBe(
-        strings.problemSafetyNoticeTemplate.replace(
+        strings.safetyNoticeLabelTemplate.replace(
           "{system}",
           glossarySystemLabel(strings, "brakes")
         )
@@ -355,7 +355,7 @@ describe("the confidence caveat is bilingual and follows confidence.ts (PRB-04)"
       for (const locale of LOCALES) {
         const strings = t(locale);
         expect(said[locale], `missing ${locale} caveat line`).toEqual([
-          strings.problemConfidenceCaveatTemplate.replace(
+          strings.confidenceCaveatTemplate.replace(
             "{tier}",
             confidenceTierLabel(strings, "anecdotal")
           ),

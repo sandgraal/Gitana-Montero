@@ -578,7 +578,6 @@ export interface UiStrings
   readonly problemDiagnosticsHeading: string;
   readonly problemCausesHeading: string;
   readonly problemFixPathsHeading: string;
-  readonly problemSourcesHeading: string;
   /** Prefixes the causes a diagnostic result implicates. */
   readonly problemRulesInLabel: string;
   /** Prefixes the causes the same result eliminates. */
@@ -600,23 +599,8 @@ export interface UiStrings
   readonly problemCostLabel: string;
   readonly problemPartsLabel: string;
   readonly problemProceduresLabel: string;
-  /** The archived-copy link beside each numbered source. */
-  readonly problemSourceArchiveLabel: string;
   /** Names the triage region for a screen reader; the banner itself is a chip. */
   readonly problemTriageLabel: string;
-  /** `{system}` is a `glossarySystem.*` label. */
-  readonly problemSafetyNoticeTemplate: string;
-  /**
-   * AGENTS.md's "never present the site as a substitute for a qualified
-   * mechanic", as the standing notice PRB-03 requires. Rendered in **both**
-   * languages in one band, page locale first.
-   */
-  readonly problemSafetyNoticeBody: string;
-  /**
-   * PRB-04's visible caveat, rendered in both locales below `tsb`. `{tier}` is
-   * filled with `confidenceTier.<tier>` at render time.
-   */
-  readonly problemConfidenceCaveatTemplate: string;
   /**
    * The provisional-match warning in its **safety-critical** form (T204's
    * binding note on T203 decision (a)): on a page where showing something that
@@ -624,39 +608,66 @@ export interface UiStrings
    * standing `vehicleProvisionalNote` is not prominent enough.
    */
   readonly problemProvisionalSafetyNote: string;
-  /* Evidence framing, shared by every content page — AGENTS.md "Facts" */
-  /**
-   * `{tier}` is filled with `confidenceTier.<tier>` at render time — the
-   * caveat AGENTS.md requires below `tsb` (`src/lib/confidence.ts`).
+  /* ---------------------------------------------------------------------
+   * Evidence and safety framing — shared by every content page.
    *
-   * Unprefixed, and renamed off T703a's `communityConfidenceCaveatTemplate` by
-   * T501 for the reason `GenerationStrings` was renamed off
-   * `communityGeneration.` by T204: the parts pages need this exact sentence,
-   * and a second copy under a `parts…` prefix would be one sentence
-   * translated twice — the failure mode this module exists to prevent.
+   * These seven keys were three prefixed pairs plus a third caveat before the
+   * T501 rebase collapse (2026-09-01): T401 landed `problem…`-prefixed copies
+   * of the caveat, the safety notice and the sources labels, T501 landed
+   * unprefixed ones, and T703a's community page had a caveat of its own. One
+   * sentence translated twice is exactly the failure this module exists to
+   * prevent — and for a safety warning it is worse than duplication, because a
+   * warning that says two slightly different things on two pages is a warning
+   * nobody can quote.
+   *
+   * **The surviving wording is T401's in every case.** It merged first, a
+   * grader renders it (`tests/problem-bilingual-bands.test.ts`), and its safety
+   * sentence carries AGENTS.md's mandated "never a substitute for a qualified
+   * mechanic" framing verbatim while naming what the page *affects* rather
+   * than what it is about — so it stays true for a fault, a part and a job
+   * alike. T501's variants were deleted, not merged.
+   * ------------------------------------------------------------------- */
+  /**
+   * PRB-04's visible caveat, rendered in **both** locales on every content
+   * page whose tier is below `tsb` (`src/lib/confidence.ts` decides which).
+   * `{tier}` is filled with `confidenceTier.<tier>` at render time.
    */
   readonly confidenceCaveatTemplate: string;
   /**
-   * The standing bilingual safety notice AGENTS.md requires on every page
+   * The heading of the standing safety notice AGENTS.md requires on every page
    * about brakes, steering, suspension, fuel, tires, SRS, towing or lifting
    * (`src/lib/safety.ts` decides which entries those are).
    *
-   * Unprefixed for the same reason as `confidenceCaveatTemplate`: PRB-03 and
-   * PRC-02 ask for the same notice on problem and procedure pages, and a
-   * safety warning that says three slightly different things on three pages is
-   * a safety warning nobody can quote.
+   * `{system}` is a `glossarySystem.*` label, so the band names *which* system
+   * it is warning about. Both `problems` and `parts` carry a `system` facet, so
+   * both fill it; `src/components/SafetyNotice.astro` is the only renderer.
    */
-  readonly safetyNoticeLabel: string;
+  readonly safetyNoticeLabelTemplate: string;
   /**
-   * **Subject-neutral on purpose** (T501 review, F4). The first draft said
-   * "This part is part of a system…", which reads as nonsense the moment a
-   * problem or procedure page renders the same key — and this key exists
-   * precisely so PRB-03 and PRC-02 render the *same* warning rather than three
-   * slightly different ones. It names the page, never what the page is about,
-   * so it stays true for a part, a fault and a job alike. Fixed here while
-   * this branch is its only consumer.
+   * The body of that notice — AGENTS.md's "never present the site as a
+   * substitute for a qualified mechanic", as PRB-03 and PRC-02 require it.
+   * Rendered in **both** languages in one band, page locale first.
+   *
+   * Subject-neutral on purpose: it names what the page *affects*, never what
+   * the page is about, so it stays true for a fault, a part and a job alike.
    */
   readonly safetyNoticeBody: string;
+  /**
+   * The short chip form, for a listing card or a page header where the full
+   * band does not fit — the design handoff's "safety-critical chip" token.
+   *
+   * Deliberately **not** `severity.safety-critical`, which carries the same two
+   * words for a different fact: that key renders a `problems` entry's
+   * `severity` field, a value from a closed data vocabulary that a part does
+   * not have. Reusing it would couple the parts pages to `PROBLEM_SEVERITIES`.
+   */
+  readonly safetyCriticalChipLabel: string;
+  /** The heading over a numbered source list, on any content page. */
+  readonly sourcesHeading: string;
+  /** The archived-copy link beside each numbered source. */
+  readonly sourceArchiveLabel: string;
+  /** `{date}` is a source's `accessed` field, formatted by `Intl` at render time. */
+  readonly sourceAccessedTemplate: string;
   /* Parts — T501, PRT-01, PRT-02, PRT-03 */
   readonly navParts: string;
   readonly partsHeading: string;
@@ -692,10 +703,6 @@ export interface UiStrings
   readonly partsCrossReferenceNoteLabel: string;
   readonly partsVendorsHeading: string;
   readonly partsVendorsIntro: string;
-  readonly partsSourcesHeading: string;
-  /** `{date}` is a source's `accessed` field, formatted by `Intl` at render time. */
-  readonly partsSourceAccessedTemplate: string;
-  readonly partsSourceArchiveLabel: string;
   readonly partsBackToIndex: string;
 }
 
@@ -1064,11 +1071,6 @@ const en: UiStrings = {
     "Matched on generation, market, year and engine only. Entries marked provisional also depend on something you have not told us, so some of them will not fit your truck. Narrowing your selection removes the mark.",
   vehicleProvisionalDetailTemplate:
     "This entry also depends on details you have not given: {facets}.",
-  confidenceCaveatTemplate:
-    "Confidence: {tier}. This entry has not been checked against a factory manual or technical bulletin — treat it as a starting point, not a verified fact.",
-  safetyNoticeLabel: "Safety-critical",
-  safetyNoticeBody:
-    "This page covers a system that keeps the truck under control. Have the work checked by a qualified mechanic, and never treat this page as a substitute for one.",
   navParts: "Parts",
   partsHeading: "Parts",
   partsIntro:
@@ -1098,9 +1100,6 @@ const en: UiStrings = {
   partsVendorsHeading: "Where to buy it",
   partsVendorsIntro:
     "Sellers from the community directory. Nobody pays to be listed here, and nothing on this page is an affiliate link.",
-  partsSourcesHeading: "Sources",
-  partsSourceAccessedTemplate: "Read {date}",
-  partsSourceArchiveLabel: "Archived copy",
   partsBackToIndex: "All parts",
   "crossReferenceQuality.oem-supplier": "Same maker as the OEM part",
   "crossReferenceQuality.equivalent": "Reported equivalent",
@@ -1123,7 +1122,8 @@ const en: UiStrings = {
   problemDiagnosticsHeading: "Diagnostic steps",
   problemCausesHeading: "Likely causes",
   problemFixPathsHeading: "Fix paths",
-  problemSourcesHeading: "Sources",
+  sourcesHeading: "Sources",
+  sourceAccessedTemplate: "Read {date}",
   problemRulesInLabel: "Points to",
   problemRulesOutLabel: "Rules out",
   problemNoCauses: "No root cause has been established for this one yet.",
@@ -1134,12 +1134,13 @@ const en: UiStrings = {
   problemCostLabel: "Cost",
   problemPartsLabel: "Parts",
   problemProceduresLabel: "Procedures",
-  problemSourceArchiveLabel: "archived copy",
+  sourceArchiveLabel: "archived copy",
   problemTriageLabel: "Can you drive it?",
-  problemSafetyNoticeTemplate: "Safety notice — {system}.",
-  problemSafetyNoticeBody:
+  safetyNoticeLabelTemplate: "Safety notice — {system}.",
+  safetyCriticalChipLabel: "Safety-critical",
+  safetyNoticeBody:
     "This affects a safety-critical system. Reference material only: for safety-critical work, consult a qualified mechanic.",
-  problemConfidenceCaveatTemplate:
+  confidenceCaveatTemplate:
     "{tier}. This entry is not backed by factory documentation — treat its values and steps as a starting point, not as manual authority.",
   problemProvisionalSafetyNote:
     "This is safety-critical, and the match to your truck is only provisional: it was made on generation, market, year and engine alone. Narrow your selection, and confirm against your own vehicle, before acting on anything here.",
@@ -1540,11 +1541,6 @@ const es: UiStrings = {
     "La coincidencia se hizo solo con generación, mercado, año y motor. Las fichas marcadas como provisionales dependen además de algún dato que usted no nos ha dado, así que algunas no le van a servir a su carro. Si afina su selección, la marca desaparece.",
   vehicleProvisionalDetailTemplate:
     "Esta ficha depende además de datos que usted no ha indicado: {facets}.",
-  confidenceCaveatTemplate:
-    "Nivel de confianza: {tier}. Esta ficha no se ha contrastado con un manual de fábrica ni con un boletín técnico — tómela como punto de partida, no como un dato verificado.",
-  safetyNoticeLabel: "Crítico para la seguridad",
-  safetyNoticeBody:
-    "Esta página trata de un sistema que mantiene el carro bajo control. Haga revisar el trabajo por un mecánico calificado y nunca tome esta página como sustituto de uno.",
   navParts: "Repuestos",
   partsHeading: "Repuestos",
   partsIntro:
@@ -1574,9 +1570,6 @@ const es: UiStrings = {
   partsVendorsHeading: "Dónde conseguirlo",
   partsVendorsIntro:
     "Vendedores tomados del directorio de comunidades. Nadie paga por aparecer aquí y en esta página no hay enlaces de afiliado.",
-  partsSourcesHeading: "Fuentes",
-  partsSourceAccessedTemplate: "Consultada el {date}",
-  partsSourceArchiveLabel: "Copia archivada",
   partsBackToIndex: "Todos los repuestos",
   "crossReferenceQuality.oem-supplier": "Del mismo fabricante que el original",
   "crossReferenceQuality.equivalent": "Reportado como equivalente",
@@ -1599,7 +1592,8 @@ const es: UiStrings = {
   problemDiagnosticsHeading: "Pasos de diagnóstico",
   problemCausesHeading: "Causas probables",
   problemFixPathsHeading: "Rutas de reparación",
-  problemSourcesHeading: "Fuentes",
+  sourcesHeading: "Fuentes",
+  sourceAccessedTemplate: "Consultada el {date}",
   problemRulesInLabel: "Apunta a",
   problemRulesOutLabel: "Descarta",
   problemNoCauses: "Todavía no se ha establecido la causa de fondo.",
@@ -1611,12 +1605,13 @@ const es: UiStrings = {
   problemCostLabel: "Costo",
   problemPartsLabel: "Repuestos",
   problemProceduresLabel: "Procedimientos",
-  problemSourceArchiveLabel: "copia archivada",
+  sourceArchiveLabel: "copia archivada",
   problemTriageLabel: "¿Puede manejarlo?",
-  problemSafetyNoticeTemplate: "Aviso de seguridad — {system}.",
-  problemSafetyNoticeBody:
+  safetyNoticeLabelTemplate: "Aviso de seguridad — {system}.",
+  safetyCriticalChipLabel: "Crítico para la seguridad",
+  safetyNoticeBody:
     "Esto afecta un sistema crítico para la seguridad. Material de referencia únicamente: en trabajos críticos para la seguridad, consulte a un mecánico calificado.",
-  problemConfidenceCaveatTemplate:
+  confidenceCaveatTemplate:
     "{tier}. Esta ficha no se apoya en documentación de fábrica — tome sus valores y sus pasos como punto de partida, no como autoridad del manual.",
   problemProvisionalSafetyNote:
     "Esto es crítico para la seguridad y la coincidencia con su carro es apenas provisional: se hizo solo con generación, mercado, año y motor. Afine su selección, y confirme contra su propio vehículo, antes de actuar con base en esta página.",

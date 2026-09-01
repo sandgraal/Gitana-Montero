@@ -41,12 +41,13 @@ interface Part {
   readonly id: string;
   readonly oemNumber: string;
   readonly supersededBy?: string;
+  readonly vendors?: readonly string[];
 }
 
 const PARTS: readonly Part[] = [
   { id: "test-fork-a", oemNumber: "TEST-F0001", supersededBy: "test-fork-c" },
   { id: "test-fork-b", oemNumber: "TEST-F0002", supersededBy: "test-fork-c" },
-  { id: "test-fork-c", oemNumber: "TEST-F0003" },
+  { id: "test-fork-c", oemNumber: "TEST-F0003", vendors: ["test-shop"] },
   { id: "test-line-a", oemNumber: "TEST-L0001", supersededBy: "test-line-b" },
   { id: "test-line-b", oemNumber: "TEST-L0002" },
   { id: "test-solo", oemNumber: "TEST-S0001" },
@@ -62,6 +63,7 @@ function entryFor(part: Part) {
       ...(part.supersededBy === undefined
         ? {}
         : { supersededBy: part.supersededBy }),
+      ...(part.vendors === undefined ? {} : { vendors: part.vendors }),
       system: "engine",
       confidence: "fsm-confirmed",
       sources: [],
@@ -73,9 +75,27 @@ function entryFor(part: Part) {
   };
 }
 
+/** One `community` seller, so the vendors section has something to resolve. */
+const SELLERS = [
+  {
+    id: "test-shop",
+    data: {
+      id: "test-shop",
+      communityType: "shop",
+      prose: {
+        en: { title: "TEST parts shop" },
+        es: { title: "TIENDA de prueba" },
+      },
+    },
+  },
+];
+
 vi.mock("astro:content", () => ({
-  getCollection: async (name: string) =>
-    name === "parts" ? PARTS.map(entryFor) : [],
+  getCollection: async (name: string) => {
+    if (name === "parts") return PARTS.map(entryFor);
+    if (name === "community") return SELLERS;
+    return [];
+  },
 }));
 
 /**
@@ -250,6 +270,32 @@ describe("both locales are real pages, not translations of one (I18N-01)", () =>
       expect(html).toContain("/en/parts/fork-c/");
       expect(html).toContain("/es/repuestos/es-test-fork-c/");
     }
+  });
+
+  /*
+   * The regression these two pin: `collectionRoutePath` returns a
+   * **locale-independent** route (`/parts/`, `/community/`), and rendering one
+   * straight into an `href` produces a 404. It shipped in the first T501
+   * commit on every internal link of both parts pages, and no CI check saw it
+   * — `check:links`' internal-reference half is owed by T703 and the
+   * collection was empty at build time. The chain links are covered above;
+   * these are the other two exits from the page (T501 review round 1).
+   */
+  it.each(LOCALES)(
+    "localizes the crumb back to the index in %s",
+    async (locale) => {
+      const html = await render("test-fork-c", locale);
+      const segment = locale === "en" ? "parts" : "repuestos";
+      expect(html).toContain(`href="/${locale}/${segment}/"`);
+      expect(html).not.toContain(`href="/${segment}/"`);
+    }
+  );
+
+  it.each(LOCALES)("localizes the vendor link in %s", async (locale) => {
+    const html = await render("test-fork-c", locale);
+    const segment = locale === "en" ? "community" : "comunidad";
+    expect(html).toContain(`href="/${locale}/${segment}/#community-test-shop"`);
+    expect(html).not.toContain(`href="/${segment}/#community-test-shop"`);
   });
 
   it("renders each locale's own prose", async () => {

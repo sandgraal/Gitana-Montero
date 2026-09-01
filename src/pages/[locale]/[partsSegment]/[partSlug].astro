@@ -54,8 +54,9 @@
  */
 import { getCollection } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ConfidenceCaveat from "../../../components/ConfidenceCaveat.astro";
+import SafetyNotice from "../../../components/SafetyNotice.astro";
 import {
-  LOCALES,
   LOCALE_BCP47,
   isLocale,
   localeHref,
@@ -68,10 +69,10 @@ import {
   entryRoutePaths,
 } from "../../../i18n/routes";
 import {
-  confidenceCaveat,
   crossReferenceQualityLabel,
   generationLabel,
   glossarySystemLabel,
+  sourceKindLabel,
   t,
 } from "../../../i18n/ui";
 import { needsConfidenceCaveat } from "../../../lib/confidence";
@@ -117,10 +118,6 @@ if (routes === null) {
       `refs specs/001-foundation`
   );
 }
-
-const otherLocale = LOCALES.find((candidate) => candidate !== locale) as Locale;
-/** Page locale first — the handoff's rule for a bilingual-always block. */
-const readingOrder: Locale[] = [locale, otherLocale];
 
 const data = entry.data;
 const local = data.prose[locale];
@@ -270,7 +267,9 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
         <span class="chip">{glossarySystemLabel(strings, data.system)}</span>
         {
           safetyCritical && (
-            <span class="chip chip--safety">{strings.safetyNoticeLabel}</span>
+            <span class="chip chip--safety">
+              {strings.safetyCriticalChipLabel}
+            </span>
           )
         }
         {
@@ -291,42 +290,20 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
     </header>
 
     {
-      safetyCritical && (
-        /*
-         * A `div`, not an `aside`: `aside` maps to the `complementary`
-         * landmark, and a landmark nested inside this page's `article` is
-         * flagged by axe (`landmark-complementary-is-top-level`). It is also
-         * simply wrong — a safety warning about the part this page is about is
-         * not content "complementary to" the page, it is the page.
-         */
-        <div class="notice notice--safety">
-          {readingOrder.map((each, index) => (
-            <p
-              class:list={["notice__line", index === 0 && "notice__line--lead"]}
-              lang={LOCALE_BCP47[each]}
-            >
-              <strong>{t(each).safetyNoticeLabel}</strong>{" "}
-              {t(each).safetyNoticeBody}
-            </p>
-          ))}
-        </div>
-      )
+      /*
+       * T401's components, not this page's own markup (T501 rebase collapse,
+       * 2026-09-01). PRB-03 and PRC-02 ask for the *same* two bands PRT-01
+       * does, and two templates drawing "the standing bilingual safety notice"
+       * are two warnings that can drift in wording, in colour and in reading
+       * order — the failure the shared UI-strings module exists to prevent,
+       * one layer up. `SafetyNotice` names the system in its heading, which a
+       * part can fill because `parts` carries the same `system` facet
+       * `problems` does.
+       */
+      safetyCritical && <SafetyNotice locale={locale} system={data.system} />
     }
 
-    {
-      showCaveat && (
-        <div class="notice notice--caveat">
-          {readingOrder.map((each, index) => (
-            <p
-              class:list={["notice__line", index === 0 && "notice__line--lead"]}
-              lang={LOCALE_BCP47[each]}
-            >
-              {confidenceCaveat(t(each), data.confidence)}
-            </p>
-          ))}
-        </div>
-      )
-    }
+    {showCaveat && <ConfidenceCaveat locale={locale} tier={data.confidence} />}
 
     <p class="part-page__summary">{local.summary}</p>
 
@@ -457,21 +434,31 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
     {
       data.sources.length > 0 && (
         <section class="section" aria-labelledby="sources-heading">
-          <h2 id="sources-heading">{strings.partsSourcesHeading}</h2>
+          <h2 id="sources-heading">{strings.sourcesHeading}</h2>
           <ol class="sources">
             {data.sources.map((source) => (
               <li>
                 <a href={source.url}>{source.title}</a>
+                {/*
+                 * PRT-01's provenance half, closed by the T501 rebase collapse
+                 * rather than deferred to T502: the confidence tier alone told
+                 * a reader how strong a claim was, never *what kind of
+                 * document* backed it, so an `fsm` citation and a forum thread
+                 * looked identical on a parts page. `sourceKind.*` and
+                 * `sourceKindLabel()` are T401's, minted unprefixed and shared
+                 * — adopted here, never re-minted.
+                 */}
+                <span class="sources__kind">
+                  {sourceKindLabel(strings, source.kind)}
+                </span>
                 <span class="sources__meta datum">
                   <time datetime={source.accessed}>
-                    {strings.partsSourceAccessedTemplate.replace(
+                    {strings.sourceAccessedTemplate.replace(
                       "{date}",
                       formatAccessed(source.accessed)
                     )}
                   </time>
-                  <a href={source.archiveUrl}>
-                    {strings.partsSourceArchiveLabel}
-                  </a>
+                  <a href={source.archiveUrl}>{strings.sourceArchiveLabel}</a>
                 </span>
               </li>
             ))}
@@ -496,12 +483,6 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
     --rust-deep: #93441f;
     --green: #3e6b4f;
     --green-tint: #e4efe7;
-    --caveat-bg: #efeae0;
-    --caveat-border: #a99c88;
-    --caveat-text: #55493c;
-    --safety-bg: #fdf3e4;
-    --safety-border: #b07a1f;
-    --safety-ink: #8a5e14;
     --safety-chip-text: #7a2e2e;
     --safety-chip-bg: #f6e3d8;
     --safety-chip-border: #e4c4b0;
@@ -596,54 +577,10 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
     background: var(--chip);
   }
 
-  .notice {
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-  }
-
-  /* The handoff's safety-notice band: warm background, 1.5px amber border. */
-  .notice--safety {
-    background: var(--safety-bg);
-    border: 1.5px solid var(--safety-border);
-    color: var(--safety-ink);
-  }
-
-  /* The handoff's confidence caveat: dashed, deliberately quieter. */
-  .notice--caveat {
-    background: var(--caveat-bg);
-    border: 1.5px dashed var(--caveat-border);
-    color: var(--caveat-text);
-  }
-
   .notice__line {
     margin: 0;
     font-size: 0.8125rem;
     line-height: 1.55;
-  }
-
-  /*
-   * The other-locale line is *smaller*, and — in the safety band — never
-   * dimmer. Pa11y caught the first draft: `--safety-ink` (#8a5e14) on
-   * `--safety-bg` measures 5.18:1, and 85% opacity blends it toward the
-   * background to 3.85:1, under WCAG AA's 4.5:1. The right fix is not a darker
-   * amber but no dimming at all: AGENTS.md requires the safety notice "in both
-   * languages", and a warning rendered at reduced contrast in the reader's own
-   * language is a warning the site is only pretending to give. Size alone
-   * carries the hierarchy.
-   *
-   * The confidence caveat keeps the dimming (it measures clear of the
-   * threshold, and it is genuinely secondary information rather than a
-   * warning).
-   */
-  .notice__line:not(.notice__line--lead) {
-    font-size: 0.75rem;
-  }
-
-  .notice--caveat .notice__line:not(.notice__line--lead) {
-    opacity: 0.85;
   }
 
   .part-page__summary {
@@ -802,6 +739,19 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
   .vendors a,
   .sources a {
     color: var(--rust-deep);
+  }
+
+  .sources__kind {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted-strong);
+    background: var(--chip);
+    border-radius: 4px;
+    padding: 0.125rem 0.5rem;
   }
 
   .sources__meta {

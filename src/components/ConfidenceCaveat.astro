@@ -38,7 +38,7 @@ const lines = readingOrder.map((each) => {
   const strings = t(each);
   return {
     locale: each,
-    text: strings.problemConfidenceCaveatTemplate.replace(
+    text: strings.confidenceCaveatTemplate.replace(
       "{tier}",
       confidenceTierLabel(strings, tier)
     ),
