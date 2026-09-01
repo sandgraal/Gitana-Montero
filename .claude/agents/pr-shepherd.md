@@ -43,8 +43,14 @@ Poll every ~5 minutes. Block on CI, then:
 
 ```
 gh pr view <n> --json mergeStateStatus,mergeable,reviewDecision,statusCheckRollup
-gh api graphql -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100){nodes{id isResolved isOutdated path line comments(first:20){nodes{author{login} body url}}}}}}}' -f o=sandgraal -f r=monterogarage -F n=<n>
+gh api graphql -f query='query($o:String!,$r:String!,$n:Int!,$a:String){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100,after:$a){totalCount pageInfo{hasNextPage endCursor} nodes{id isResolved isOutdated path line comments(first:20){nodes{author{login} body url}}}}}}}' -f o=sandgraal -f r=monterogarage -F n=<n>
 ```
+
+**If `pageInfo.hasNextPage` is true, keep paging with `-f a=<endCursor>`
+until it is false.** "Zero unresolved" concluded from a truncated first
+page is the same false negative this section exists to prevent, and it
+fails silently — `totalCount` is in the query so the truncation is
+visible rather than inferred.
 
 Handle, in this order:
 
@@ -67,13 +73,20 @@ Handle, in this order:
   and never lease over commits you have not fetched and read.
 - **`mergeStateStatus: BEHIND`** → `gh pr update-branch <n>` or rebase as
   above; wait for CI again.
-- **`BLOCKED` with green checks** → almost always unresolved threads, and
-  they are often *newer than your last look* — a bot re-reviews on each
-  push, so your own fix or rebase can summon the thread that blocks you.
-  Re-query threads before concluding anything; go back to the thread step.
-  Only call it a protection rule you cannot satisfy (`BLOCKED:`) after a
-  fresh thread query comes back empty and the required contexts on the
-  head SHA are all SUCCESS.
+- **`BLOCKED` with green checks** → on this repo, almost always unresolved
+  threads, and they are often *newer than your last look* — a bot
+  re-reviews on each push, so your own fix or rebase can summon the thread
+  that blocks you. Re-query threads (fully paged) before concluding
+  anything; go back to the thread step. **Threads are the first suspect,
+  not the only one:** `BLOCKED` also covers a missing required approval,
+  which shows in `reviewDecision` (today `main` requires no reviews, so
+  this is latent rather than live — protection can change under you), and
+  a stale head, which shows as `BEHIND`. Read the `reviewDecision` your
+  poll command already fetches before assuming threads. Only report
+  `BLOCKED:` after a fully-paged thread query comes back empty, the
+  required contexts on the head SHA are all SUCCESS, `reviewDecision` is
+  not `REVIEW_REQUIRED`, and the branch is not `BEHIND` — otherwise you
+  are escalating something you could have cleared yourself.
 
 ## 3. Merge
 
