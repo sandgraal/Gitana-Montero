@@ -257,9 +257,98 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
 
 ## Phase P3 — Sharing
 
+**Re-scoped 2026-08-31** by spec 002 §10 (typed share grants). SHR-05..09 add a
+second principal to a phase that was written for one, and the instrument work
+that implies is large enough to be its own task — hence T2-401a. T2-404 is new.
+Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
+
+- [ ] **T2-401a [TEST]** The instrument: grade functions and grants, not just
+  policies. Split from T2-401 so it is reviewed as harness work rather than
+  feature work — the T2-201/T2-202 rationale. Depends: T2-302. *(SHR-01, SHR-05..08)*
+  <br>**Why this exists.** The recommended architecture for SHR-07 is a
+  `security definer` function granted to `anon` — the only option that keeps
+  `output: "static"` (001 SCF-01) and keeps the service key out of the repo. It
+  is also the only option that moves enforcement onto a surface **with no
+  graders at all**. `grep -rn "security definer" tests/` returns one hit and it
+  is a comment. A definer function granted to `anon` doing
+  `select * from public.records` produces **zero findings today** — verified by
+  running the real graders against exactly that. This is the situation T2-201
+  was created to end, and it must not be re-entered. **This task lands before
+  any grant RPC exists.**
+  <br>*What it must build:*
+  <br>— a `functions()` parser in `tests/garage/sql.ts` mirroring `policies()`,
+  **including grant replay**: name, signature, `security definer|invoker`,
+  `set search_path`, body, and the **end-state** grant set after replaying every
+  `grant`/`revoke` in file order;
+  <br>— a **closed allow-list**: the set of functions executable by `anon` or
+  `public` must *equal* the named share readers in `contract.ts`. Deny half
+  enumerated, per the `KNOWN_EXTERNAL_PROVIDERS` standard already set in that file;
+  <br>— every `security definer` function carries `set search_path = ''`
+  (codifies what T2-202 already does in all four of its functions);
+  <br>— the token triple as **three separate findings**: compares a hash and
+  never a plaintext column, tests `expires_at`, tests `revoked_at`. Three,
+  because they fail independently — a grant that validates the hash but skips
+  `revoked_at` is a grant that cannot be revoked, and it is the likeliest defect
+  in the whole feature;
+  <br>— column projection, not row projection: reject `select *` and
+  `returns setof public.records` in any anon-granted function;
+  <br>— a probe corpus in `reviewer-probes.test.ts`, mutation-verified to that
+  file's own standard: a definer function with no expiry check, one with no
+  revocation check, one returning `select *`, one comparing the raw token, one
+  missing `set search_path`. Break each rule on purpose; confirm the corpus goes red.
+  <br>**Two live defects in the existing graders, found 2026-08-31, both fixed here.**
+  <br>*(1) `revoke ... from anon` is counted, never replayed.*
+  `rls-deny-by-default.test.ts` counts statements matching
+  `^revoke ... from ... anon` and asserts the count is above zero. It never asks
+  what the ACL is at the end. A directory containing
+  `revoke all on public.records from anon;` followed by
+  `grant select on public.records to anon;` **scores 1 and passes** — verified.
+  `sql.ts` established replay discipline for policies for exactly this reason
+  and it was never applied to grants. Second-order today (forced RLS plus no
+  anon policy still yields zero rows); first-order the moment a grant RPC adds
+  an anon-reachable surface. The `grants()` replay parser above fixes both at once.
+  <br>*(2) Nothing enumerates the tables that actually exist.* Every table-level
+  grader is driven from `contract.ts`; `userTablePolicyIssues` filters to
+  `USER_TABLE_NAMES`. A fifth user table is **invisible** — verified: a `shares`
+  table with `for all to anon using (true)` and no `force` yields zero findings.
+  That contradicts AGENTS.md's "every user table ships with row-level security
+  proven by graders before content flows". Fix with a `createdTables()` sweep
+  cross-checked against `USER_TABLES`, with a named-exemption map in the style
+  of `check-hreflang.mjs`'s `EXEMPT_PAGES`.
+
 - [ ] **T2-401 [TEST]** Sharing graders: private-by-default proofs at the URL
   level, per-record cost masking on public work-logs, showcase toggle
-  round-trip. Depends: T2-302. *(SHR-01..03)*
+  round-trip, **and the typed grants of SHR-05..09**. Depends: T2-401a, T2-302.
+  *(SHR-01..09)*
+  <br>**Re-scoped 2026-08-31 and re-estimated — this is no longer the one-line
+  task it was written as.** It grew from one principal (the world) to two, and
+  it inherits SHR-02's handle work that T2-201 deferred here by name.
+  <br>*Added scope:*
+  <br>— declare `shares` in `USER_TABLES` — **and in the same commit** fix
+  `harness-contract.test.ts`'s hard equality on the four table names and
+  `deletion-cascade.test.ts`'s `CASCADE_HOPS` completeness guard, or the suite
+  goes red for the wrong reason and someone "fixes" it by loosening a guard;
+  <br>— **broaden `sharing-default.test.ts`'s negative sweep, which is
+  name-shaped rather than semantics-shaped.** Its regex needs `is_` *and*
+  `public|shared|visible` *and* `default true` all three, so a capability column
+  like `includes_costs` — or an `is_active` — slips straight through the guard
+  that exists to catch "a fifth flag this file does not know about". Verified
+  both. Invert it: sweep every `boolean not null default true` in the migrations
+  against a named allow-list;
+  <br>— token delivery: no route under `src/pages/` takes a token as a path
+  segment or search param; the client POSTs and never GETs it in a query string;
+  `Referrer-Policy: no-referrer` on the share page (`vercel.json` has no
+  `headers` block today — this is a file edit, not a setting);
+  <br>— receipt signing: the signer never accepts a caller-supplied path; the
+  three-cell matrix (own vehicle, other vehicle same owner, other owner); a
+  signed-URL TTL ceiling of 60–300s, which is the *only* thing bounding a leaked
+  signature; revocation cuts issuance immediately; `includes_receipts = false`
+  refuses independently of `includes_costs`;
+  <br>— SHR-09: a grant must not make a record eligible for GAR-04′ surfacing;
+  <br>— **SHR-02's public handle**, assigned here by name in `contract.ts`:
+  uniqueness under concurrent signup, case folding, whether `admin` and `api`
+  are takeable, and what a handle change does to an already-published URL.
+  *"This file's silence is not permission."*
   <br>**Two blind spots the T2-202 review found in the declaration tier. Both
   are for this task, and both are "verify, do not assume".**
   <br>*(a) An ACL probe.* Tier A reads migration **text**, so it can only see
@@ -289,9 +378,66 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*
+  <br>**Amended 2026-08-31:** the per-record cost-masking logic must be
+  **parameterised by principal**, not written once for "the public". T2-404
+  needs the same masking for a different audience, and a second copy of a
+  privacy rule is a second place for it to drift.
+
+- [ ] **T2-404 [PLATFORM]** Typed share grants: the `shares` table, create and
+  revoke RPCs (authenticated), the anon read RPCs, the Edge Function receipt
+  signer, and the accountless share page at a per-locale slug. Activates the
+  T2-401a and T2-401 grant graders. Depends: **T2-401a merged**, T2-401 merged,
+  T2-402. *(SHR-05..09)*
+  <br>Kept out of T2-402 deliberately: this is a new trust boundary and it gets
+  its own review rather than riding in behind the public pages.
+  <br>*Architecture, decided 2026-08-31 — see 002 §10 and the plan record:*
+  <br>— **`security definer` RPC granted to `anon`**, tables keep
+  `revoke all ... from anon`. No new RLS policy is owner-unscoped, so
+  `rules.ts` needs no amendment. Chosen over a scoped-JWT scheme (which would
+  require loosening `isOwnerScoped`, the most load-bearing function in the
+  harness) and over an SSR route (which would need `@astrojs/vercel`, break
+  001 SCF-01, drop the route out of `dist/` and therefore out of
+  `check-hreflang`, `check-a11y`, and Lighthouse, and require a service key in
+  Vercel that `src/lib/supabase/config.ts` structurally refuses).
+  <br>— **Receipts: an Edge Function that signs and does not decide.** A
+  Postgres function cannot mint a Supabase signed URL — signing is a storage-api
+  operation, which is the same wall T2-202 hit for purging receipt *bytes*. The
+  function takes `{token, receipt_id}`, calls the anon RPC to validate and
+  resolve a path, and signs only that path. Authorization stays in Postgres
+  where the graders reach it. **This is the same Edge Function T2-202's handoff
+  already owes** — one runtime, two jobs, one review. Flips
+  `[edge_runtime] enabled` in `supabase/config.toml`.
+  <br>— **`storage.objects` policies do not change.** `storagePolicyIssues`
+  sweeps every one of them and requires path-derived ownership, so it will
+  reject any attempt to widen storage for shares. That is the grader pushing
+  toward the safer design, not an obstacle to route around.
+  <br>— **Token in the URL fragment**, never the path: a fragment reaches no
+  server, so it appears in no Vercel edge log, no Supabase log, and no
+  `Referer`. A path token also cannot be prerendered, so it would force SSR for
+  no benefit. 256 bits from `extensions.gen_random_bytes(32)` (schema-qualified —
+  every function here runs `set search_path = ''`), stored as
+  `token_hash bytea not null unique` = `digest(token, 'sha256')`. **Plain
+  sha256 is correct and deliberate**: bcrypt and argon2 exist to make
+  low-entropy human secrets expensive to guess, buy nothing against 2^256, and
+  would defeat the index. Do not salt. Put that reasoning in the migration
+  comment — the next reviewer will ask, and "we used sha256" without the
+  argument reads as a shortcut.
+  <br>— **Rate limiting here is a cost and DoS control, not a security
+  control.** Say so plainly rather than dressing it up; against a 256-bit
+  keyspace, guessing is not the threat. What matters and is gradeable: uniform
+  refusal across unknown/expired/revoked (SHR-08), and a failure path no more
+  expensive than the success path.
+
 - [ ] **T2-403 [PLATFORM]** Community evidence surfacing: opt-in per-record
   first-hand evidence on problem pages (001 GAR-04 re-cut). Depends: T2-402,
-  001-T401. *(GAR-04′)*
+  001-T401. *(GAR-04′, SHR-09)*
+  <br>**Scope guard added 2026-08-31 — read this before implementing.** GAR-04′
+  keys eligibility off *"its vehicle's work-log is public"*. Typed grants create
+  a state that did not exist when GAR-04′ was written: a record visible to one
+  grantee and to nobody else. **A share grant does not make a record eligible
+  for community surfacing** (SHR-09). Getting this wrong puts a private
+  work-log on a public problem page, and it will look like a feature working
+  correctly right up until someone notices.
 
 ## Superseded from 001
 

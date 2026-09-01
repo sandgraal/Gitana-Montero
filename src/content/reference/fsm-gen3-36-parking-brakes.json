@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-36-parking-brakes",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "brakes",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 36 — Parking Brakes",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 36 — Parking Brakes",
+      "summary": "The parking-brake group: service specifications, the lever stroke check and adjustment, the switch check, and the removal and installation sequences for the lever, the cables and the drum-in-disc parking brake shoes. Parking-brake work is safety-critical."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 36 — Freno de mano",
+      "summary": "El grupo del freno de mano: especificaciones de servicio, revisión y ajuste del recorrido de la palanca, revisión del interruptor, y las secuencias de desmontaje y montaje de la palanca, los cables y las zapatas de freno del tambor integrado en el disco. El trabajo sobre el freno de mano es crítico para la seguridad."
+    }
+  }
+}

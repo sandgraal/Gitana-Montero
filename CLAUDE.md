@@ -1,29 +1,44 @@
 # CLAUDE.md
 
 Read `AGENTS.md` first — it is the constitution and wins over everything,
-including this file. Then, for the current work: `specs/001-foundation/spec.md`
-(requirements), `specs/001-foundation/plan.md` (build order and separation
-rules), and `specs/001-foundation/tasks.md` (task list — the source of truth
-for progress).
+including this file. Then, for the current work:
+
+- `specs/001-foundation/` — the reference platform. `spec.md` (requirements),
+  `plan.md` (build order and separation rules), `tasks.md` (progress).
+- `specs/002-montero-garage/` — the multi-user pivot, and the active spec for
+  accounts, the garage, and sharing. `§10` carries the 2026-08-31 amendment
+  adding typed share grants (SHR-05..09).
+- `specs/003-shop-tools/` — the mechanic and shop surface: roster,
+  propose-and-accept, shop-side monetization. Gated on 002 Phase P3.
+
+Each spec's own `tasks.md` is the source of truth for its progress.
 
 ## What this repo is
 
-Bilingual (EN / Costa Rican ES) Mitsubishi Montero/Pajero/Shogun reference +
-build log for one 2002 Montero named Gitana. Astro static site, content as
-Zod-typed collections in git, Supabase as a derived read-model (phase 8 only).
-Agents write all site code and content; the main session conducts.
+**Montero Garage** (monterogarage.com): a bilingual (EN / Costa Rican ES)
+platform where any Mitsubishi Montero/Pajero/Shogun owner keeps their truck's
+whole life — vehicle profile, every receipt, every job — private by default,
+shareable by choice, on top of a comprehensive reference covering all
+generations and markets. The owner's 2002 Montero, **Gitana Blanca**, is user
+page #1.
+
+Astro static site; *reference* content as Zod-typed collections in git;
+**Supabase is the auth + user-data + storage layer** (002 MIG-03 — not a
+derived read-model; user data's source of truth is the database, behind RLS).
+Deploy is Vercel. Agents write all site code and content; the main session
+conducts.
 
 ## Commands
 
 - `npm run verify` — every merge-blocking check except link/a11y (CI runs those
   on top); must pass before any commit
 - `npm run dev` / `npm run build` / `npm run check`
-- `npm test` / `npm run lint` (`test:e2e` arrives with T204 — not yet implemented)
+- `npm test` / `npm run lint` / `npm run test:e2e` (Playwright, `tests/e2e/`)
 - `npm run check:locales` / `check:citations` / `check:glossary` / `check:links`
 - `npm run gaps` — generates the content backlog report
-
-Until Phase 1 lands (T101), `package.json` does not exist yet — the harness
-validation is `node scripts/validate-routing.mjs` and `bash -n .claude/hooks/*.sh`.
+- `npm run test:garage` — the user-data graders. Tier A (parses the migration
+  text) runs anywhere; Tier B (hits a real local stack) needs `supabase start`
+  and Docker. CI has no Docker, so Tier A carries the merge gate.
 
 ## Environment — this machine is unusual
 

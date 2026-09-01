@@ -1,0 +1,36 @@
+{
+  "id": "fsm-gen3-52-interior-srs",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "interior",
+  "safetyCritical": true,
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 52 — Interior and Supplemental Restraint System (SRS)",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 52 — Interior and Supplemental Restraint System (SRS)",
+      "summary": "Two parts: 52A interior trim, seats and console, and 52B the supplemental restraint system — airbags, clock spring, impact sensors and the SRS control unit. The manual opens with a standing warning that SRS service must be done only by an authorised dealer, and repeats it in group 00. Read that warning in the manual before touching anything in the airbag circuit."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 52 — Interior y sistema de retención suplementaria (SRS)",
+      "summary": "Dos partes: 52A interior, asientos y consola, y 52B el sistema de retención suplementaria: bolsas de aire, cinta espiral del volante, sensores de impacto y la computadora del SRS. El manual abre con una advertencia permanente de que el servicio del SRS debe hacerlo únicamente un concesionario autorizado, y la repite en el grupo 00. Lea esa advertencia en el manual antes de tocar cualquier cosa del circuito de las bolsas de aire."
+    }
+  }
+}

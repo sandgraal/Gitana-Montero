@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-00-general",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "general",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 00 — General",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 00 — General",
+      "summary": "The opening group of the factory chassis manual. It carries how-to-read guidance, the diagnosis and connector inspection method, vehicle identification (information code plate, model codes, chassis and engine numbers), the major specifications tables, the precautions before service, the lifting and jacking support points and the standard tightening-torque table. This entry is a pointer into the manual: the manual is copyrighted and nothing from it is reproduced on this site."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 00 — Generalidades",
+      "summary": "El grupo que abre el manual de chasis de fábrica. Trae las indicaciones de uso, el método de diagnóstico y de revisión de conectores, la identificación del vehículo (placa de códigos, códigos de modelo, número de chasis y de motor), las tablas de especificaciones principales, las precauciones previas al servicio, los puntos de apoyo para levantar el carro y la tabla de apriete estándar. Esta entrada solo indica dónde buscar: el manual tiene derechos de autor y aquí no se reproduce nada de él."
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-26-front-axle",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "drivetrain",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 26 — Front Axle",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 26 — Front Axle",
+      "summary": "The front axle group: the service specifications for hub, drive shaft and differential, the lubricants and sealants tables, the on-vehicle checks for hub play, gear-oil level and the free-wheel clutch, and the removal and installation sequences for the hub and knuckle, the drive shafts, the inner shaft and housing tube and the differential carrier."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 26 — Eje delantero",
+      "summary": "El grupo del eje delantero: las especificaciones de la maza, del palier y del diferencial, las tablas de lubricantes y de selladores, las revisiones sobre el vehículo del juego de la maza, del nivel de aceite de engranajes y del mecanismo de rueda libre, y las secuencias de desmontaje y montaje de la maza y la muñeca, los palieres, el eje interno con su tubo y el portadiferencial."
+    }
+  }
+}

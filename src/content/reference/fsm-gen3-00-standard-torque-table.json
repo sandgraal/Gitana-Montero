@@ -1,0 +1,36 @@
+{
+  "id": "fsm-gen3-00-standard-torque-table",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "tools",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 00 — General",
+  "subsection": "Standard Part/Tightening-Torque Table",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 00 — standard part tightening-torque table",
+      "summary": "The fallback torque table: the values the factory applies to plain bolts and nuts that carry no torque figure of their own, listed by nominal diameter, thread pitch and head mark, with separate tables for standard and flange fasteners. The manual states the conditions under which the table applies and the cases where it does not, so read those before using it."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 00 — tabla de apriete de tornillería estándar",
+      "summary": "La tabla de apriete de respaldo: los valores que la fábrica aplica a los tornillos y tuercas comunes que no traen su propio par de apriete, ordenados por diámetro nominal, paso de rosca y marca de cabeza, con tablas aparte para tornillería estándar y de brida. El manual indica en qué condiciones aplica la tabla y en cuáles no, así que revise esas condiciones antes de usarla."
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-14-engine-cooling",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "cooling",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 14 — Engine Cooling",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 14 — Engine Cooling",
+      "summary": "The cooling group: radiator performance data, the service specifications for radiator-cap opening pressure, coolant concentration and thermostat opening, the lubricant table with the coolant brand and fill quantity, and the on-vehicle procedures for leak checking, draining and refilling, concentration measurement and work on the cooling fan, thermostat, water pump and radiator."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 14 — Refrigeración del motor",
+      "summary": "El grupo de refrigeración: los datos de rendimiento del radiador, las especificaciones de presión de apertura de la tapa, de concentración del refrigerante y de apertura del termostato, la tabla de lubricantes con la marca y la cantidad de refrigerante, y los procedimientos sobre el vehículo para buscar fugas, drenar y rellenar, medir la concentración y trabajar el ventilador del radiador, el termostato, la bomba de agua y el radiador."
+    }
+  }
+}

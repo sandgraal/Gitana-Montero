@@ -1,0 +1,35 @@
+{
+  "id": "fsm-gen3-35-service-brakes",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["global"],
+    "years": {
+      "from": 1999,
+      "to": 2002
+    }
+  },
+  "kind": "fsm-section",
+  "system": "brakes",
+  "manual": "Mitsubishi Motors, PAJERO Workshop Manual — chassis, Pub. No. PWJE0001, February 2000",
+  "section": "Group 35 — Service Brakes",
+  "confidence": "fsm-confirmed",
+  "sources": [
+    {
+      "title": "Mitsubishi Motors — PAJERO Workshop Manual, chassis, Pub. No. PWJE0001 (February 2000): front matter and group index",
+      "url": "https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "archiveUrl": "https://web.archive.org/web/20260831203131/https://jdmfsm.info/Auto/Japan/Mitsubishi/Pajero-Montero/Manuals/2001%20Pajero/2001-2003%20Pajero%20Service%20Manual/COVER_E.pdf",
+      "accessed": "2026-08-31",
+      "kind": "fsm"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "FSM group 35 — Service Brakes",
+      "summary": "The service-brake group, in two parts: 35A basic brake system and 35B anti-skid braking system for four-wheel-drive models. 35A carries the brake general information and service specifications, pedal checks, booster and hydraulic booster tests, bleeding, pad and disc checks, and the front and rear disc-brake removal and installation sequences. Brake work is safety-critical: have it done by a qualified mechanic."
+    },
+    "es": {
+      "title": "Manual de taller, grupo 35 — Frenos de servicio",
+      "summary": "El grupo de frenos de servicio, en dos partes: 35A sistema de freno básico y 35B sistema antibloqueo para los modelos de doble tracción. En 35A están la información general y las especificaciones de servicio, la revisión del pedal, las pruebas del booster y del booster hidráulico, la purga de frenos, la revisión de pastillas de freno y discos, y el desmontaje y montaje de los frenos delanteros y traseros. El trabajo de frenos es crítico para la seguridad: hágalo con un mecánico calificado."
+    }
+  }
+}
