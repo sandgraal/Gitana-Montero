@@ -68,6 +68,37 @@ export const COLLECTION_ROUTE_SEGMENTS = {
    * `/es/garaje/` would have been the English word wearing a Spanish accent.
    */
   garage: { en: "garage", es: "taller" },
+  /**
+   * T401 — the symptom-driven problem finder (PRB-01…PRB-05).
+   *
+   * **The ES segment is `problemas`, deliberately, and not `fallas`.** The
+   * glossary designates `falla` as the canonical Costa Rican term for a
+   * *fault* (`all-general-falla`, EN headword "fault"), with `avería` as the
+   * peninsular alias to keep out of prose — and `problema` appears nowhere in
+   * that entry's aliases, so nothing in GLO-02 is engaged either way. The
+   * choice was made on three other grounds:
+   *
+   * 1. **They are not the same concept at this level.** A `falla` is the thing
+   *    that failed; a `problems` entry is the documented *case* — symptoms,
+   *    diagnosis, causes, fix paths — of which the fallas are the `causes`
+   *    field. The schema draws that line explicitly, and naming the section
+   *    after its own sub-part would blur it.
+   * 2. **Symmetry (I18N-01).** The glossary's EN headword for `falla` is
+   *    "fault", not "problem". Taking `fallas` in ES while EN stays `problems`
+   *    would narrow the section's meaning in one locale only — the precise
+   *    asymmetry "neither locale privileged" exists to prevent — and the
+   *    honest symmetric alternative, `/en/faults/`, contradicts the spec's own
+   *    collection name.
+   * 3. **The artboard and the spec agree.** I18N-05's worked example is
+   *    `/es/problemas/…`, and the ES problem artboard's breadcrumb reads
+   *    "Problemas".
+   *
+   * Contrast `garage` → `taller` above, where the glossary *did* rule on the
+   * exact concept (`garaje` is a tagged ES/MX alias of the canonical
+   * `taller`). Here it did not, so the deciding argument is the concept
+   * boundary, not the vocabulary.
+   */
+  problems: { en: "problems", es: "problemas" },
 } as const satisfies Readonly<Record<string, Readonly<Record<Locale, string>>>>;
 
 export type CollectionRouteId = keyof typeof COLLECTION_ROUTE_SEGMENTS;

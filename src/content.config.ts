@@ -25,6 +25,7 @@ import { z } from "astro/zod";
 import { defineEntrySchema } from "./schemas/entry";
 import { communitySchema } from "./schemas/community";
 import { glossaryEntrySchema } from "./schemas/glossary";
+import { problemsEntrySchema } from "./schemas/problems";
 import { referenceEntrySchema } from "./schemas/reference";
 import { vehiclesEntrySchema } from "./schemas/vehicles";
 
@@ -156,8 +157,8 @@ export const collections = {
   reference: entryCollection("reference", referenceEntrySchema(baseProse)),
   /** GAR-01…05 — the build log for the truck. */
   garage: entryCollection("garage", baseEntrySchema()),
-  /** PRB-01…06 — the symptom-driven problem finder. */
-  problems: entryCollection("problems", baseEntrySchema()),
+  /** PRB-01…06 — the symptom-driven problem finder. T401 (schema half). */
+  problems: entryCollection("problems", problemsEntrySchema(baseProse)),
   /** PRT-01…03 — parts, fitment, supersession chains. */
   parts: entryCollection("parts", baseEntrySchema()),
   /** PRC-01…03 — step-by-step procedures. */

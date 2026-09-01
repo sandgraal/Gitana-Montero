@@ -27,6 +27,16 @@ const strings = t(locale);
  */
 const navItems = [
   { href: "/", label: strings.navHome },
+  /**
+   * T401 — the problem finder. Second, right after Home, because it is the
+   * artboard's own nav order and because it is the reason most readers arrive
+   * (AGENTS.md: "comprehensive enough that someone with a broken Montero finds
+   * their answer here").
+   */
+  {
+    href: collectionRoutePath("problems", locale),
+    label: strings.navProblems,
+  },
   {
     href: collectionRoutePath("glossary", locale),
     label: strings.navGlossary,
