@@ -56,6 +56,7 @@
  * specs/001-foundation (FIT-01, FIT-03, I18N-01, I18N-08),
  * specs/001-foundation/design/HANDOFF-DESIGN.md (Taller artboard)
  */
+import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {
   LOCALE_BCP47,
@@ -73,6 +74,18 @@ import { SITE_NAME, TRUCK_NAME } from "../../site";
 import { SUPABASE_BROWSER_CONFIG } from "../../lib/supabase/config";
 import { MAX_DISPLAY_NAME_LENGTH } from "../../lib/garage/vehicle";
 import { MAX_PHOTO_BYTES, PHOTO_MIME_TYPES } from "../../lib/garage/photos";
+import {
+  MAX_RECEIPT_BYTES,
+  RECEIPT_MIME_TYPES,
+} from "../../lib/garage/receipt";
+import {
+  MAX_RECORD_BODY_LENGTH,
+  MAX_RECORD_TITLE_LENGTH,
+  RECORD_CURRENCIES,
+  RECORD_KINDS,
+  type ReferenceCatalogue,
+  type ReferenceOption,
+} from "../../lib/garage/record";
 import { GENERATION_IDS, type GenerationId } from "../../schemas/vehicles";
 
 export function getStaticPaths() {
@@ -124,6 +137,107 @@ const generationOptions = GENERATION_IDS.map((id) => ({
   id,
   label: generationLabel(strings, id as GenerationId),
 }));
+
+/**
+ * The record form's other three interpolated figures, formatted here for the
+ * same reason as the two above: a limit is a number, and a number never gets
+ * typed into a locale record (AGENTS.md).
+ */
+const number = new Intl.NumberFormat(LOCALE_BCP47[locale]);
+const titleTooLong = strings.garageRecordIssueTitleLongTemplate.replace(
+  "{max}",
+  number.format(MAX_RECORD_TITLE_LENGTH)
+);
+const notesTooLong = strings.garageRecordIssueNotesLongTemplate.replace(
+  "{max}",
+  number.format(MAX_RECORD_BODY_LENGTH)
+);
+const receiptTooLarge = strings.garageReceiptSizeRejectedTemplate.replace(
+  "{size}",
+  new Intl.NumberFormat(LOCALE_BCP47[locale], {
+    style: "unit",
+    unit: "megabyte",
+    unitDisplay: "short",
+    maximumFractionDigits: 0,
+  }).format(MAX_RECEIPT_BYTES / 1024 / 1024)
+);
+
+/** The four `record_kind` values with the reader's name for each. */
+const kindOptions = RECORD_KINDS.map((id) => ({
+  id,
+  label: {
+    work: strings.garageRecordKindWork,
+    receipt: strings.garageRecordKindReceipt,
+    note: strings.garageRecordKindNote,
+    plan: strings.garageRecordKindPlan,
+  }[id],
+}));
+
+/**
+ * What a record may point at (GAR-02′), read from the built content at build
+ * time.
+ *
+ * This is the "validated against built content at render time" half of the
+ * typed-references decision argued in `src/lib/garage/record.ts`: the ids live
+ * in the record's own `text[]` columns, and the *names* behind them come from
+ * the reference collections — so nothing was added to a content schema, and no
+ * id can be chosen that the site does not ship.
+ *
+ * `prose[locale].title` is the entry's own localized title, which is why this
+ * is built per page rather than shared: `/en/garage/` offers English titles and
+ * `/es/taller/` Spanish ones, from the same ids (I18N-01, I18N-06).
+ *
+ * All three collections are empty today — their pages are 001's T4xx/T5xx — so
+ * this ships as `{"problem":[],"part":[],"procedure":[]}`, the picker says so
+ * in the reader's language, and `astro build` prints its own "does not exist
+ * or is empty" warning per collection. That warning is Astro's, it is a
+ * warning and not an error, and it goes away with the first entry; the
+ * alternative was reading the content through something other than the
+ * content API to keep a log quiet. When entries arrive the picker fills itself with
+ * no change here. When their *pages* arrive, the chips a card renders become
+ * links; they are deliberately not links yet, because a chip pointing at a page
+ * that does not exist is a broken link `check:links` would be right to fail.
+ */
+const collator = new Intl.Collator(LOCALE_BCP47[locale], {
+  sensitivity: "base",
+});
+
+/**
+ * One collection as pickable options: `{ id, title }`, sorted by the reader's
+ * own collation so the list is scannable, and by id after that so two builds
+ * of the same content produce byte-identical markup.
+ */
+async function referenceOptions(
+  collection: "problems" | "parts" | "procedures"
+): Promise<ReferenceOption[]> {
+  const entries = await getCollection(collection);
+  return entries
+    .map((entry) => ({ id: entry.id, title: entry.data.prose[locale].title }))
+    .sort(
+      (left, right) =>
+        collator.compare(left.title, right.title) ||
+        left.id.localeCompare(right.id)
+    );
+}
+
+const referenceCatalogue: ReferenceCatalogue = {
+  problem: await referenceOptions("problems"),
+  part: await referenceOptions("parts"),
+  procedure: await referenceOptions("procedures"),
+};
+/**
+ * `<` is escaped so no title in the payload can close the `<script>` early —
+ * `JSON.stringify` alone does not do it, because legal JSON inside an HTML
+ * `<script>` element is not the same grammar. The same note
+ * `VehicleSelector.astro` carries over the same one-line defence.
+ */
+const referenceCatalogueJson = JSON.stringify(referenceCatalogue).replaceAll(
+  "<",
+  "\\u003c"
+);
+const hasReferences = Object.values(referenceCatalogue).some(
+  (options) => options.length > 0
+);
 ---
 
 <BaseLayout
@@ -162,6 +276,38 @@ const generationOptions = GENERATION_IDS.map((id) => ({
     data-string-browsing={strings.garageUsedForBrowsing}
     data-string-identity-incomplete={strings.garageIdentityIncomplete}
     data-string-unrecorded={strings.garageStatUnrecorded}
+    data-string-record-form-new={strings.garageRecordNewHeading}
+    data-string-record-form-edit={strings.garageRecordEditHeading}
+    data-string-record-delete-confirm={strings.garageRecordDeleteConfirmTemplate}
+    data-string-status-done={strings.garageStatusDone}
+    data-string-status-planned={strings.garageStatusPlanned}
+    data-string-chip-time={strings.garageChipTimeLabel}
+    data-string-chip-cost={strings.garageChipCostLabel}
+    data-string-chip-odometer={strings.garageChipOdometerLabel}
+    data-string-chip-receipts={strings.garageChipReceiptsLabel}
+    data-string-ref-problem={strings.garageReferenceProblemTemplate}
+    data-string-ref-part={strings.garageReferencePartTemplate}
+    data-string-ref-procedure={strings.garageReferenceProcedureTemplate}
+    data-string-ref-unresolved={strings.garageReferenceUnresolved}
+    data-string-record-issue-date={strings.garageRecordIssueDate}
+    data-string-record-issue-date-range={strings.garageRecordIssueDateRange}
+    data-string-record-issue-kind={strings.garageRecordIssueKind}
+    data-string-record-issue-title={strings.garageRecordIssueTitleRequired}
+    data-string-record-issue-title-long={titleTooLong}
+    data-string-record-issue-notes-long={notesTooLong}
+    data-string-record-issue-cost={strings.garageRecordIssueCost}
+    data-string-record-issue-cost-separator={strings.garageRecordIssueCostSeparator}
+    data-string-record-issue-cost-large={strings.garageRecordIssueCostLarge}
+    data-string-record-issue-time={strings.garageRecordIssueTime}
+    data-string-record-issue-time-large={strings.garageRecordIssueTimeLarge}
+    data-string-record-issue-references={strings.garageRecordIssueReferences}
+    data-string-receipt-uploading={strings.garageReceiptUploading}
+    data-string-receipt-type={strings.garageReceiptTypeRejected}
+    data-string-receipt-size={receiptTooLarge}
+    data-string-receipt-remove-confirm={strings.garageReceiptRemoveConfirm}
+    data-string-receipt-vendor-long={strings.garageReceiptIssueVendorLong}
+    data-string-receipt-issue-date={strings.garageReceiptIssueDate}
+    data-string-receipt-untitled={strings.garageReceiptUntitled}
     data-locale={LOCALE_BCP47[locale]}
   >
     <div class="garage__intro">
@@ -318,7 +464,23 @@ const generationOptions = GENERATION_IDS.map((id) => ({
                 tabindex="0"
                 data-garage-panel="timeline"
               >
-                <p class="garage__empty-note">{strings.garageTimelineEmpty}</p>
+                <div class="garage__panel-head">
+                  <p class="garage__fineprint">
+                    {strings.garageRecordsTestimonyNote}
+                  </p>
+                  <button
+                    class="garage__button"
+                    type="button"
+                    data-garage-record-add
+                  >
+                    {strings.garageRecordAdd}
+                  </button>
+                </div>
+
+                <p class="garage__empty-note" data-garage-timeline-empty>
+                  {strings.garageTimelineEmpty}
+                </p>
+                <ol class="garage__timeline" data-garage-timeline />
               </div>
               <div
                 class="garage__tabpanel"
@@ -340,7 +502,18 @@ const generationOptions = GENERATION_IDS.map((id) => ({
                 data-garage-panel="planned"
                 hidden
               >
-                <p class="garage__empty-note">{strings.garagePlannedEmpty}</p>
+                {/*
+                 * The plan records, straight — no grouping, no priority, no
+                 * derivation. GAR-03′'s computed planned *queue* is T2-303's,
+                 * and this is not it: it is the same cards the timeline draws,
+                 * filtered to `kind = 'plan'`, because a panel that said
+                 * "nothing is planned" while a planned card sat on the
+                 * timeline beside it would be the page lying to its owner.
+                 */}
+                <p class="garage__empty-note" data-garage-planned-empty>
+                  {strings.garagePlannedEmpty}
+                </p>
+                <ol class="garage__timeline" data-garage-planned />
               </div>
 
               {/* -------------------------------------------------------- */}
@@ -548,6 +721,398 @@ const generationOptions = GENERATION_IDS.map((id) => ({
               </div>
             </form>
 
+            {/* ---------------------------------------------------------- */}
+            {/* A record: create / edit, and its receipts                    */}
+            {/* ---------------------------------------------------------- */}
+            <form
+              class="garage__panel"
+              data-garage-record-form
+              hidden
+              novalidate
+            >
+              <h2 data-garage-record-heading>
+                {strings.garageRecordNewHeading}
+              </h2>
+              <p class="garage__fineprint">
+                {strings.garageRecordsTestimonyNote}
+              </p>
+
+              <div class="garage__grid">
+                <p class="garage__field">
+                  <label class="garage__label" for="garage-record-date">
+                    {strings.garageRecordDateLabel}
+                  </label>
+                  <input
+                    class="garage__input garage__input--data"
+                    id="garage-record-date"
+                    type="date"
+                    data-garage-record-date
+                  />
+                </p>
+
+                <p class="garage__field">
+                  <label class="garage__label" for="garage-record-kind">
+                    {strings.garageRecordKindLabel}
+                  </label>
+                  <select
+                    class="garage__select"
+                    id="garage-record-kind"
+                    data-garage-record-kind
+                  >
+                    {kindOptions.map((option, index) => (
+                      <option value={option.id} selected={index === 0}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </p>
+              </div>
+
+              <p class="garage__field">
+                <label class="garage__label" for="garage-record-title">
+                  {strings.garageRecordTitleLabel}
+                </label>
+                <input
+                  class="garage__input"
+                  id="garage-record-title"
+                  type="text"
+                  autocomplete="off"
+                  maxlength={MAX_RECORD_TITLE_LENGTH}
+                  aria-describedby="garage-record-title-hint"
+                  data-garage-record-title
+                />
+                <span class="garage__hint" id="garage-record-title-hint">
+                  {strings.garageRecordTitleHint}
+                </span>
+              </p>
+
+              <p class="garage__field">
+                <label class="garage__label" for="garage-record-body">
+                  {strings.garageRecordNotesLabel}
+                </label>
+                <textarea
+                  class="garage__textarea"
+                  id="garage-record-body"
+                  rows="4"
+                  maxlength={MAX_RECORD_BODY_LENGTH}
+                  aria-describedby="garage-record-body-hint"
+                  data-garage-record-body
+                />
+                <span class="garage__hint" id="garage-record-body-hint">
+                  {strings.garageRecordNotesHint}
+                </span>
+              </p>
+
+              <div class="garage__grid">
+                <p class="garage__field">
+                  <label class="garage__label" for="garage-record-cost">
+                    {strings.garageRecordCostLabel}
+                  </label>
+                  <input
+                    class="garage__input garage__input--data"
+                    id="garage-record-cost"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    data-garage-record-cost
+                  />
+                </p>
+
+                <p class="garage__field">
+                  <label class="garage__label" for="garage-record-currency">
+                    {strings.garageRecordCurrencyLabel}
+                  </label>
+                  <select
+                    class="garage__select garage__select--data"
+                    id="garage-record-currency"
+                    data-garage-record-currency
+                  >
+                    {RECORD_CURRENCIES.map((code, index) => (
+                      <option value={code} selected={index === 0}>
+                        {code}
+                      </option>
+                    ))}
+                  </select>
+                </p>
+
+                <p class="garage__field">
+                  <label class="garage__label" for="garage-record-time">
+                    {strings.garageRecordTimeLabel}
+                  </label>
+                  <input
+                    class="garage__input garage__input--data"
+                    id="garage-record-time"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    data-garage-record-time
+                  />
+                </p>
+
+                <p class="garage__field">
+                  <label class="garage__label" for="garage-record-time-unit">
+                    {strings.garageRecordTimeUnitLabel}
+                  </label>
+                  <select
+                    class="garage__select"
+                    id="garage-record-time-unit"
+                    data-garage-record-time-unit
+                  >
+                    <option value="h" selected>
+                      {strings.garageUnitHours}
+                    </option>
+                    <option value="min">{strings.garageUnitMinutes}</option>
+                  </select>
+                </p>
+              </div>
+
+              <p class="garage__field">
+                <label class="garage__label" for="garage-record-odometer">
+                  {strings.garageRecordOdometerLabel}
+                </label>
+                <input
+                  class="garage__input garage__input--data"
+                  id="garage-record-odometer"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  aria-describedby="garage-record-odometer-hint"
+                  data-garage-record-odometer
+                />
+                <span class="garage__hint" id="garage-record-odometer-hint">
+                  {strings.garageRecordOdometerHint}
+                </span>
+              </p>
+
+              <fieldset class="garage__fieldset">
+                <legend class="garage__legend">
+                  {strings.garageReferencesLegend}
+                </legend>
+                {hasReferences ? (
+                  <Fragment>
+                    <p class="garage__hint" id="garage-record-refs-hint">
+                      {strings.garageReferencesHint}
+                    </p>
+                    <div class="garage__grid">
+                      <p class="garage__field">
+                        <label
+                          class="garage__label"
+                          for="garage-record-problems"
+                        >
+                          {strings.garageReferenceProblemsLabel}
+                        </label>
+                        <select
+                          class="garage__select garage__multi"
+                          id="garage-record-problems"
+                          multiple
+                          size="4"
+                          aria-describedby="garage-record-refs-hint"
+                          data-garage-record-problems
+                        >
+                          {referenceCatalogue.problem.map((option) => (
+                            <option value={option.id}>{option.title}</option>
+                          ))}
+                        </select>
+                      </p>
+
+                      <p class="garage__field">
+                        <label class="garage__label" for="garage-record-parts">
+                          {strings.garageReferencePartsLabel}
+                        </label>
+                        <select
+                          class="garage__select garage__multi"
+                          id="garage-record-parts"
+                          multiple
+                          size="4"
+                          aria-describedby="garage-record-refs-hint"
+                          data-garage-record-parts
+                        >
+                          {referenceCatalogue.part.map((option) => (
+                            <option value={option.id}>{option.title}</option>
+                          ))}
+                        </select>
+                      </p>
+
+                      <p class="garage__field">
+                        <label
+                          class="garage__label"
+                          for="garage-record-procedures"
+                        >
+                          {strings.garageReferenceProceduresLabel}
+                        </label>
+                        <select
+                          class="garage__select garage__multi"
+                          id="garage-record-procedures"
+                          multiple
+                          size="4"
+                          aria-describedby="garage-record-refs-hint"
+                          data-garage-record-procedures
+                        >
+                          {referenceCatalogue.procedure.map((option) => (
+                            <option value={option.id}>{option.title}</option>
+                          ))}
+                        </select>
+                      </p>
+                    </div>
+                  </Fragment>
+                ) : (
+                  <p class="garage__hint">{strings.garageReferencesEmpty}</p>
+                )}
+              </fieldset>
+
+              {/* ------------------------------------------------------ */}
+              {/* Receipts (GAR-05′)                                      */}
+              {/* ------------------------------------------------------ */}
+              <div class="garage__receipts">
+                <h3>{strings.garageReceiptsHeading}</h3>
+                <p class="garage__fineprint">
+                  {strings.garageReceiptsPrivateNote}
+                </p>
+
+                {/*
+                 * A receipt hangs off a record id, so there is nothing to
+                 * attach one to until the record exists. Saying so is kinder
+                 * than an upload control that fails on click.
+                 */}
+                <p class="garage__empty-note" data-garage-receipts-need-record>
+                  {strings.garageReceiptsNeedRecord}
+                </p>
+
+                <ul class="garage__receipt-list" data-garage-receipt-list />
+                <p class="garage__empty-note" data-garage-receipts-empty hidden>
+                  {strings.garageReceiptsEmpty}
+                </p>
+
+                <div
+                  class="garage__receipt-form"
+                  data-garage-receipt-form
+                  hidden
+                >
+                  <p class="garage__field">
+                    <label class="garage__label" for="garage-receipt-file">
+                      {strings.garageReceiptFileLabel}
+                    </label>
+                    <input
+                      class="garage__file"
+                      id="garage-receipt-file"
+                      type="file"
+                      accept={RECEIPT_MIME_TYPES.join(",")}
+                      data-garage-receipt-file
+                    />
+                  </p>
+
+                  <div class="garage__grid">
+                    <p class="garage__field">
+                      <label class="garage__label" for="garage-receipt-vendor">
+                        {strings.garageReceiptVendorLabel}
+                      </label>
+                      <input
+                        class="garage__input"
+                        id="garage-receipt-vendor"
+                        type="text"
+                        autocomplete="off"
+                        data-garage-receipt-vendor
+                      />
+                    </p>
+
+                    <p class="garage__field">
+                      <label class="garage__label" for="garage-receipt-date">
+                        {strings.garageReceiptDateLabel}
+                      </label>
+                      <input
+                        class="garage__input garage__input--data"
+                        id="garage-receipt-date"
+                        type="date"
+                        data-garage-receipt-date
+                      />
+                    </p>
+
+                    <p class="garage__field">
+                      <label class="garage__label" for="garage-receipt-amount">
+                        {strings.garageReceiptAmountLabel}
+                      </label>
+                      <input
+                        class="garage__input garage__input--data"
+                        id="garage-receipt-amount"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        data-garage-receipt-amount
+                      />
+                    </p>
+
+                    <p class="garage__field">
+                      <label
+                        class="garage__label"
+                        for="garage-receipt-currency"
+                      >
+                        {strings.garageRecordCurrencyLabel}
+                      </label>
+                      <select
+                        class="garage__select garage__select--data"
+                        id="garage-receipt-currency"
+                        data-garage-receipt-currency
+                      >
+                        {RECORD_CURRENCIES.map((code, index) => (
+                          <option value={code} selected={index === 0}>
+                            {code}
+                          </option>
+                        ))}
+                      </select>
+                    </p>
+                  </div>
+
+                  <div class="garage__actions">
+                    <button
+                      class="garage__button garage__button--alt"
+                      type="button"
+                      data-garage-receipt-attach
+                    >
+                      {strings.garageReceiptAttach}
+                    </button>
+                  </div>
+                  <p
+                    class="garage__message"
+                    data-garage-receipt-message
+                    role="status"
+                    aria-live="polite"
+                  />
+                </div>
+              </div>
+
+              <p
+                class="garage__message"
+                data-garage-record-message
+                role="alert"
+              />
+
+              <div class="garage__actions">
+                <button
+                  class="garage__button"
+                  type="submit"
+                  data-garage-record-save
+                  data-idle={strings.garageRecordSave}
+                >
+                  {strings.garageRecordSave}
+                </button>
+                <button
+                  class="garage__button garage__button--alt"
+                  type="button"
+                  data-garage-record-cancel
+                >
+                  {strings.garageCancel}
+                </button>
+                <button
+                  class="garage__link garage__link--danger"
+                  type="button"
+                  data-garage-record-delete
+                  hidden
+                >
+                  {strings.garageRecordDelete}
+                </button>
+              </div>
+            </form>
+
             <p
               class="garage__message"
               data-garage-message
@@ -584,6 +1149,87 @@ const generationOptions = GENERATION_IDS.map((id) => ({
                 </button>
               </li>
             </template>
+
+            {/*
+             * One entry on the rail: the dot, the `date · odometer` meta line,
+             * and the card — the Taller artboard's timeline, element for
+             * element. Done and planned differ by a class on the item, set by
+             * the script from `kind`, so the two states share one template and
+             * cannot drift apart.
+             */}
+            <template data-garage-entry-template>
+              <li class="garage__entry">
+                <span class="garage__entry-dot" aria-hidden="true" />
+                <span class="garage__entry-meta" data-entry-meta />
+                <div class="garage__card">
+                  <div class="garage__card-head">
+                    <strong class="garage__card-title" data-entry-title />
+                    <span class="garage__badge" data-entry-badge />
+                  </div>
+                  <ul class="garage__chips" data-entry-chips />
+                  <span class="garage__card-body" data-entry-body />
+                  <ul class="garage__links" data-entry-links />
+                  <div class="garage__card-actions">
+                    <button class="garage__link" type="button" data-entry-edit>
+                      {strings.garageRecordEdit}
+                    </button>
+                  </div>
+                </div>
+              </li>
+            </template>
+
+            {/*
+             * A data chip carries a figure and, for anyone not reading the
+             * layout, the word that says which figure it is. The label is real
+             * text placed off-screen rather than an `aria-label`, so it is
+             * translated, selectable and findable — and so a chip is never a
+             * bare "1.2 h" with no context.
+             */}
+            <template data-garage-chip-template>
+              <li class="garage__chip">
+                <span class="garage__sr-only" data-chip-label />
+                <span data-chip-value />
+              </li>
+            </template>
+
+            <template data-garage-link-template>
+              <li class="garage__minichip" data-link />
+            </template>
+
+            <template data-garage-receipt-template>
+              <li class="garage__receipt">
+                <span class="garage__receipt-text" data-receipt-label />
+                <a
+                  class="garage__link"
+                  data-receipt-open
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {strings.garageReceiptOpen}
+                </a>
+                <button
+                  class="garage__link garage__link--danger"
+                  type="button"
+                  data-receipt-remove
+                >
+                  {strings.garageReceiptRemove}
+                </button>
+              </li>
+            </template>
+
+            {/*
+             * What a record may point at (GAR-02′), inlined once per page.
+             * `set:html` on a `<script type="application/json">` is JSON, not
+             * markup: the browser never executes it, and `JSON.stringify`
+             * escapes every value that goes in. The same seam
+             * `VehicleSelector.astro` uses for the taxonomy payload.
+             */}
+            <script
+              type="application/json"
+              data-garage-references
+              is:inline
+              set:html={referenceCatalogueJson}
+            />
           </div>
         </Fragment>
       ) : (
@@ -606,15 +1252,55 @@ const generationOptions = GENERATION_IDS.map((id) => ({
   import { writeVehicleSelection } from "../../lib/vehicle-selection";
   import { SUPABASE_BROWSER_CONFIG } from "../../lib/supabase/config";
   import {
+    createRecord,
     createVehicle,
     currentUserIdIfAny,
+    deleteRecord,
     deleteVehicle,
+    listReceipts,
+    listRecords,
     listVehicles,
+    removeReceipt,
     removeVehiclePhoto,
     signPhotoUrls,
+    signReceiptUrls,
+    updateRecord,
     updateVehicle,
+    uploadReceipt,
     uploadVehiclePhoto,
   } from "../../lib/supabase/garage";
+  import {
+    EMPTY_CATALOGUE,
+    emptyRecordDraft,
+    formatCost,
+    formatDuration,
+    formatRecordDate,
+    isPlanned,
+    plannedRecords,
+    readCurrency,
+    recordCounts,
+    recordDraftFromRow,
+    recordHeadline,
+    recordWriteFromDraft,
+    resolveReferences,
+    timelineOrder,
+    validateRecordDraft,
+    writeCurrency,
+    type RecordDraft,
+    type RecordDraftIssue,
+    type RecordRow,
+    type ReferenceCatalogue,
+    type TimeUnit,
+  } from "../../lib/garage/record";
+  import {
+    EMPTY_RECEIPT_DRAFT,
+    receiptIssue,
+    receiptWriteFromDraft,
+    sortReceipts,
+    validateReceiptDraft,
+    type ReceiptDraft,
+    type ReceiptRow,
+  } from "../../lib/garage/receipt";
   import {
     EMPTY_DRAFT,
     draftFromVehicleRow,
@@ -726,23 +1412,107 @@ const generationOptions = GENERATION_IDS.map((id) => ({
       photosEmpty: query<HTMLElement>("[data-garage-photos-empty]"),
       photoInput: query<HTMLInputElement>("[data-garage-photo-input]"),
       photoMessage: query<HTMLElement>("[data-garage-photo-message]"),
+      timeline: query<HTMLOListElement>("[data-garage-timeline]"),
+      timelineEmpty: query<HTMLElement>("[data-garage-timeline-empty]"),
+      plannedList: query<HTMLOListElement>("[data-garage-planned]"),
+      plannedEmpty: query<HTMLElement>("[data-garage-planned-empty]"),
+      recordAdd: query<HTMLButtonElement>("[data-garage-record-add]"),
+      recordForm: query<HTMLFormElement>("[data-garage-record-form]"),
+      recordHeading: query<HTMLElement>("[data-garage-record-heading]"),
+      recordMessage: query<HTMLElement>("[data-garage-record-message]"),
+      recordDate: query<HTMLInputElement>("[data-garage-record-date]"),
+      recordKind: query<HTMLSelectElement>("[data-garage-record-kind]"),
+      recordTitle: query<HTMLInputElement>("[data-garage-record-title]"),
+      recordBody: query<HTMLTextAreaElement>("[data-garage-record-body]"),
+      recordCost: query<HTMLInputElement>("[data-garage-record-cost]"),
+      recordCurrency: query<HTMLSelectElement>("[data-garage-record-currency]"),
+      recordTime: query<HTMLInputElement>("[data-garage-record-time]"),
+      recordTimeUnit: query<HTMLSelectElement>(
+        "[data-garage-record-time-unit]"
+      ),
+      recordOdometer: query<HTMLInputElement>("[data-garage-record-odometer]"),
+      recordProblems: query<HTMLSelectElement>("[data-garage-record-problems]"),
+      recordParts: query<HTMLSelectElement>("[data-garage-record-parts]"),
+      recordProcedures: query<HTMLSelectElement>(
+        "[data-garage-record-procedures]"
+      ),
+      recordSave: query<HTMLButtonElement>("[data-garage-record-save]"),
+      recordCancel: query<HTMLButtonElement>("[data-garage-record-cancel]"),
+      recordDelete: query<HTMLButtonElement>("[data-garage-record-delete]"),
+      entryTemplate: query<HTMLTemplateElement>("[data-garage-entry-template]"),
+      chipTemplate: query<HTMLTemplateElement>("[data-garage-chip-template]"),
+      linkTemplate: query<HTMLTemplateElement>("[data-garage-link-template]"),
+      receiptTemplate: query<HTMLTemplateElement>(
+        "[data-garage-receipt-template]"
+      ),
+      receiptList: query<HTMLUListElement>("[data-garage-receipt-list]"),
+      receiptsEmpty: query<HTMLElement>("[data-garage-receipts-empty]"),
+      receiptsNeedRecord: query<HTMLElement>(
+        "[data-garage-receipts-need-record]"
+      ),
+      receiptForm: query<HTMLElement>("[data-garage-receipt-form]"),
+      receiptFile: query<HTMLInputElement>("[data-garage-receipt-file]"),
+      receiptVendor: query<HTMLInputElement>("[data-garage-receipt-vendor]"),
+      receiptDate: query<HTMLInputElement>("[data-garage-receipt-date]"),
+      receiptAmount: query<HTMLInputElement>("[data-garage-receipt-amount]"),
+      receiptCurrency: query<HTMLSelectElement>(
+        "[data-garage-receipt-currency]"
+      ),
+      receiptAttach: query<HTMLButtonElement>("[data-garage-receipt-attach]"),
+      receiptMessage: query<HTMLElement>("[data-garage-receipt-message]"),
     };
 
     const payload = readSelectorPayload(document) as SelectorPayload | null;
     const options: VehicleOptions | null =
       payload === null ? null : createVehicleOptions(payload);
 
+    /**
+     * What a record may link to, read from the payload the server inlined.
+     *
+     * A missing or malformed payload degrades to "nothing to link", which is
+     * also what an empty reference side looks like — so a page that cannot
+     * read it renders the same honest state rather than throwing during boot.
+     */
+    const catalogue: ReferenceCatalogue = readCatalogue();
+
+    function readCatalogue(): ReferenceCatalogue {
+      const node = root.querySelector("[data-garage-references]");
+      if (node === null) return EMPTY_CATALOGUE;
+      try {
+        const parsed: unknown = JSON.parse(node.textContent ?? "");
+        if (typeof parsed !== "object" || parsed === null) {
+          return EMPTY_CATALOGUE;
+        }
+        const candidate = parsed as ReferenceCatalogue;
+        if (
+          !Array.isArray(candidate.problem) ||
+          !Array.isArray(candidate.part) ||
+          !Array.isArray(candidate.procedure)
+        ) {
+          return EMPTY_CATALOGUE;
+        }
+        return candidate;
+      } catch {
+        return EMPTY_CATALOGUE;
+      }
+    }
+
     let vehicles: VehicleRow[] = [];
     let editing: VehicleRow | null = null;
     let opened: VehicleRow | null = null;
     let unit: OdometerUnit = readOdometerUnit(window);
+    let records: RecordRow[] = [];
+    let editingRecord: RecordRow | null = null;
+    let receipts: ReceiptRow[] = [];
+    let currency = readCurrency(window, locale);
 
     /* --------------------------------------------------------------- view */
 
-    function show(view: "list" | "detail" | "form"): void {
+    function show(view: "list" | "detail" | "form" | "record"): void {
       els.listView.hidden = view !== "list";
       els.detailView.hidden = view !== "detail";
       els.form.hidden = view !== "form";
+      if (els.recordForm) els.recordForm.hidden = view !== "record";
     }
 
     /**
@@ -1040,10 +1810,10 @@ const generationOptions = GENERATION_IDS.map((id) => ({
           ? (text.stringUnrecorded ?? "")
           : formatOdometer(row.odometer_km, unit, locale)
       );
-      // T2-302 owns records; until then the counts are honestly zero rather
-      // than absent, and the tab panels say so in the reader's language.
-      say(els.statEntries, new Intl.NumberFormat(locale).format(0));
-      say(els.statPlanned, new Intl.NumberFormat(locale).format(0));
+      // Zero until the records arrive, rather than the previous vehicle's
+      // figures sitting under the new vehicle's name for a beat.
+      records = [];
+      paintRecords(new Map());
       say(els.browseNote, "");
       if (els.browse) {
         els.browse.disabled = vehicleSelectionOf(row) === null;
@@ -1053,6 +1823,7 @@ const generationOptions = GENERATION_IDS.map((id) => ({
       }
       show("detail");
       void paintPhotos(row).catch(() => unreachable(els.photoMessage));
+      void loadRecords(row).catch(() => unreachable(els.message));
     }
 
     async function paintPhotos(row: VehicleRow): Promise<void> {
@@ -1092,6 +1863,521 @@ const generationOptions = GENERATION_IDS.map((id) => ({
         });
         els.gallery.append(item);
       }
+    }
+
+    /* ------------------------------------------------------------ records */
+
+    /** The reader's word for a kind, from the `<select>` the server built. */
+    function kindLabel(kind: string): string {
+      const option = els.recordKind?.querySelector<HTMLOptionElement>(
+        `option[value="${kind}"]`
+      );
+      return option?.textContent ?? kind;
+    }
+
+    /** One data chip: an off-screen label, then the figure. */
+    function chip(label: string, value: string): HTMLElement | null {
+      const item = els.chipTemplate?.content.firstElementChild?.cloneNode(
+        true
+      ) as HTMLElement | null;
+      if (!item) return null;
+      say(item.querySelector<HTMLElement>("[data-chip-label]"), label);
+      say(item.querySelector<HTMLElement>("[data-chip-value]"), value);
+      return item;
+    }
+
+    /**
+     * Draw a list of records onto one of the two rails.
+     *
+     * Every string here is the server's: the meta line is `Intl` formatting
+     * stored figures, the badge and the chip labels come from `data-string-*`,
+     * and the title and body are the user's own words, set as `textContent`
+     * and never composed into a sentence this script wrote.
+     */
+    function paintEntries(
+      target: HTMLOListElement | null,
+      empty: HTMLElement | null,
+      rows: readonly RecordRow[],
+      countsByRecord: ReadonlyMap<string, number>
+    ): void {
+      if (!target) return;
+      target.replaceChildren();
+      if (empty) empty.hidden = rows.length > 0;
+
+      for (const row of rows) {
+        const item = els.entryTemplate?.content.firstElementChild?.cloneNode(
+          true
+        ) as HTMLElement | null;
+        if (!item) continue;
+
+        const planned = isPlanned(row);
+        item.classList.toggle("garage__entry--planned", planned);
+
+        const meta = [formatRecordDate(row.occurred_on, locale)];
+        if (row.odometer_km !== null) {
+          meta.push(formatOdometer(row.odometer_km, unit, locale));
+        }
+        say(
+          item.querySelector<HTMLElement>("[data-entry-meta]"),
+          meta.join(" · ")
+        );
+        say(
+          item.querySelector<HTMLElement>("[data-entry-title]"),
+          recordHeadline(row, kindLabel(row.kind))
+        );
+        say(
+          item.querySelector<HTMLElement>("[data-entry-badge]"),
+          (planned ? text.stringStatusPlanned : text.stringStatusDone) ?? ""
+        );
+        say(
+          item.querySelector<HTMLElement>("[data-entry-body]"),
+          row.body ?? ""
+        );
+
+        const chips =
+          item.querySelector<HTMLUListElement>("[data-entry-chips]");
+        if (chips) {
+          const built: (HTMLElement | null)[] = [];
+          if (row.time_minutes !== null) {
+            built.push(
+              chip(
+                text.stringChipTime ?? "",
+                formatDuration(row.time_minutes, locale)
+              )
+            );
+          }
+          if (row.cost_amount !== null && row.cost_currency !== null) {
+            built.push(
+              chip(
+                text.stringChipCost ?? "",
+                formatCost(row.cost_amount, row.cost_currency, locale)
+              )
+            );
+          }
+          if (row.odometer_km !== null) {
+            built.push(
+              chip(
+                text.stringChipOdometer ?? "",
+                formatOdometer(row.odometer_km, unit, locale)
+              )
+            );
+          }
+          const attached = countsByRecord.get(row.id) ?? 0;
+          if (attached > 0) {
+            built.push(
+              chip(
+                text.stringChipReceipts ?? "",
+                new Intl.NumberFormat(locale).format(attached)
+              )
+            );
+          }
+          chips.replaceChildren(
+            ...built.filter((node): node is HTMLElement => node !== null)
+          );
+          chips.hidden = chips.childElementCount === 0;
+        }
+
+        const links =
+          item.querySelector<HTMLUListElement>("[data-entry-links]");
+        if (links) {
+          const templates: Record<string, string | undefined> = {
+            problem: text.stringRefProblem,
+            part: text.stringRefPart,
+            procedure: text.stringRefProcedure,
+          };
+          for (const reference of resolveReferences(row, catalogue)) {
+            const node = els.linkTemplate?.content.firstElementChild?.cloneNode(
+              true
+            ) as HTMLElement | null;
+            if (!node) continue;
+            // An id the site can no longer resolve keeps its own text: this is
+            // the owner's record, and tidying a dangling link away would be
+            // deleting part of it.
+            const name = reference.title ?? reference.id;
+            say(
+              node,
+              (templates[reference.kind] ?? "{name}").replace("{name}", name)
+            );
+            if (reference.title === null) {
+              node.classList.add("garage__minichip--unresolved");
+              node.title = text.stringRefUnresolved ?? "";
+            }
+            links.append(node);
+          }
+          links.hidden = links.childElementCount === 0;
+        }
+
+        const edit = item.querySelector<HTMLButtonElement>("[data-entry-edit]");
+        // The record's own line goes on the accessible name rather than into a
+        // sentence this script would have had to compose, so a rail of "Edit"
+        // buttons is still distinguishable.
+        edit?.setAttribute(
+          "aria-label",
+          `${edit.textContent} — ${recordHeadline(row, kindLabel(row.kind))}`
+        );
+        edit?.addEventListener("click", () => {
+          void openRecordForm(row).catch(() => unreachable(els.recordMessage));
+        });
+
+        target.append(item);
+      }
+    }
+
+    /** Both rails and the two counts, from one array of records. */
+    function paintRecords(countsByRecord: ReadonlyMap<string, number>): void {
+      paintEntries(
+        els.timeline,
+        els.timelineEmpty,
+        timelineOrder(records),
+        countsByRecord
+      );
+      paintEntries(
+        els.plannedList,
+        els.plannedEmpty,
+        plannedRecords(records),
+        countsByRecord
+      );
+      const counts = recordCounts(records);
+      say(
+        els.statEntries,
+        new Intl.NumberFormat(locale).format(counts.entries)
+      );
+      say(
+        els.statPlanned,
+        new Intl.NumberFormat(locale).format(counts.planned)
+      );
+    }
+
+    /**
+     * Load one vehicle's records and the receipt counts that go on their
+     * cards.
+     *
+     * Two requests, both scoped by the policies rather than by these
+     * arguments: the records of a vehicle, then every receipt attached to any
+     * of them. A failure paints nothing and says so — an empty rail with an
+     * error beside it is honest; an empty rail alone would read as "you have
+     * never recorded anything".
+     */
+    async function loadRecords(vehicle: VehicleRow): Promise<void> {
+      const result = await listRecords(vehicle.id);
+      if (!result.ok) {
+        records = [];
+        paintRecords(new Map());
+        say(els.message, text.stringError ?? "");
+        return;
+      }
+      if (opened?.id !== vehicle.id) return;
+      records = result.value;
+
+      const attached = await listReceipts(records.map((row) => row.id));
+      if (opened?.id !== vehicle.id) return;
+      const counts = new Map<string, number>();
+      if (attached.ok) {
+        for (const receipt of attached.value) {
+          counts.set(
+            receipt.record_id,
+            (counts.get(receipt.record_id) ?? 0) + 1
+          );
+        }
+      }
+      paintRecords(counts);
+    }
+
+    function currentRecordDraft(): RecordDraft {
+      const chosen = (select: HTMLSelectElement | null): string[] =>
+        select === null
+          ? []
+          : [...select.selectedOptions].map((option) => option.value);
+      return {
+        occurredOn: els.recordDate?.value ?? "",
+        kind: els.recordKind?.value ?? "",
+        title: els.recordTitle?.value ?? "",
+        body: els.recordBody?.value ?? "",
+        cost: els.recordCost?.value ?? "",
+        currency: els.recordCurrency?.value ?? currency,
+        time: els.recordTime?.value ?? "",
+        timeUnit: (els.recordTimeUnit?.value === "min"
+          ? "min"
+          : "h") as TimeUnit,
+        odometer: els.recordOdometer?.value ?? "",
+        odometerUnit: unit,
+        problemIds: chosen(els.recordProblems),
+        partIds: chosen(els.recordParts),
+        procedureIds: chosen(els.recordProcedures),
+      };
+    }
+
+    /** The first issue's message — one sentence a reader can act on. */
+    function recordIssueMessage(issues: readonly RecordDraftIssue[]): string {
+      const first = issues[0];
+      if (!first) return "";
+      if (first.field === "occurredOn") {
+        return first.code === "out-of-range"
+          ? (text.stringRecordIssueDateRange ?? "")
+          : (text.stringRecordIssueDate ?? "");
+      }
+      if (first.field === "kind") return text.stringRecordIssueKind ?? "";
+      if (first.field === "title") {
+        return first.code === "required"
+          ? (text.stringRecordIssueTitle ?? "")
+          : (text.stringRecordIssueTitleLong ?? "");
+      }
+      if (first.field === "body") {
+        return text.stringRecordIssueNotesLong ?? "";
+      }
+      if (first.field === "cost" || first.field === "currency") {
+        if (first.field === "cost" && first.code === "ambiguous-separator") {
+          return text.stringRecordIssueCostSeparator ?? "";
+        }
+        if (first.field === "cost" && first.code === "too-large") {
+          return text.stringRecordIssueCostLarge ?? "";
+        }
+        return text.stringRecordIssueCost ?? "";
+      }
+      if (first.field === "time") {
+        return first.code === "too-large"
+          ? (text.stringRecordIssueTimeLarge ?? "")
+          : (text.stringRecordIssueTime ?? "");
+      }
+      if (first.field === "odometer") {
+        return first.code === "too-large"
+          ? (text.stringIssueOdometerLarge ?? "")
+          : (text.stringIssueOdometer ?? "");
+      }
+      return text.stringRecordIssueReferences ?? "";
+    }
+
+    function applyRecordDraft(draft: RecordDraft): void {
+      if (els.recordDate) els.recordDate.value = draft.occurredOn;
+      if (els.recordKind) els.recordKind.value = draft.kind;
+      if (els.recordTitle) els.recordTitle.value = draft.title;
+      if (els.recordBody) els.recordBody.value = draft.body;
+      if (els.recordCost) els.recordCost.value = draft.cost;
+      if (els.recordCurrency) {
+        els.recordCurrency.value =
+          draft.currency === "" ? currency : draft.currency;
+      }
+      if (els.recordTime) els.recordTime.value = draft.time;
+      if (els.recordTimeUnit) els.recordTimeUnit.value = draft.timeUnit;
+      if (els.recordOdometer) els.recordOdometer.value = draft.odometer;
+      const restore = (
+        select: HTMLSelectElement | null,
+        ids: readonly string[]
+      ): void => {
+        if (!select) return;
+        for (const option of select.options) {
+          option.selected = ids.includes(option.value);
+        }
+      };
+      restore(els.recordProblems, draft.problemIds);
+      restore(els.recordParts, draft.partIds);
+      restore(els.recordProcedures, draft.procedureIds);
+    }
+
+    /**
+     * Open the record form on a row, or on a blank draft.
+     *
+     * Async because an existing record's receipts are fetched and signed here:
+     * the whole of a receipt's private surface — the row, the URL, the remove
+     * button — exists only while its record is open in front of its owner.
+     */
+    async function openRecordForm(row: RecordRow | null): Promise<void> {
+      editingRecord = row;
+      receipts = [];
+      say(els.recordMessage, "");
+      say(els.receiptMessage, "");
+      say(
+        els.recordHeading,
+        (row === null ? text.stringRecordFormNew : text.stringRecordFormEdit) ??
+          ""
+      );
+      if (els.recordDelete) els.recordDelete.hidden = row === null;
+      if (els.receiptsNeedRecord) els.receiptsNeedRecord.hidden = row !== null;
+      if (els.receiptForm) els.receiptForm.hidden = row === null;
+      if (els.receiptsEmpty) els.receiptsEmpty.hidden = true;
+      els.receiptList?.replaceChildren();
+      clearReceiptDraft();
+
+      applyRecordDraft(
+        row === null
+          ? emptyRecordDraft({
+              today: todayLocal(),
+              currency,
+              odometerUnit: unit,
+            })
+          : recordDraftFromRow(row, {
+              odometerUnit: unit,
+              timeUnit: (els.recordTimeUnit?.value === "min"
+                ? "min"
+                : "h") as TimeUnit,
+            })
+      );
+
+      show("record");
+      els.recordTitle?.focus();
+
+      if (row !== null) await paintReceipts(row);
+    }
+
+    /**
+     * Today, as the `date` input and the `date` column both spell it.
+     *
+     * The reader's own local day rather than UTC's: a record written at nine
+     * in the evening in Costa Rica is dated that evening, not tomorrow.
+     * `toISOString` would do the opposite, which is why the parts are read one
+     * at a time.
+     */
+    function todayLocal(): string {
+      const now = new Date();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      return `${now.getFullYear()}-${month}-${day}`;
+    }
+
+    /* ----------------------------------------------------------- receipts */
+
+    function currentReceiptDraft(): ReceiptDraft {
+      return {
+        vendor: els.receiptVendor?.value ?? "",
+        issuedOn: els.receiptDate?.value ?? "",
+        amount: els.receiptAmount?.value ?? "",
+        currency: els.receiptCurrency?.value ?? currency,
+      };
+    }
+
+    function clearReceiptDraft(): void {
+      if (els.receiptFile) els.receiptFile.value = "";
+      if (els.receiptVendor)
+        els.receiptVendor.value = EMPTY_RECEIPT_DRAFT.vendor;
+      if (els.receiptDate) els.receiptDate.value = EMPTY_RECEIPT_DRAFT.issuedOn;
+      if (els.receiptAmount)
+        els.receiptAmount.value = EMPTY_RECEIPT_DRAFT.amount;
+      if (els.receiptCurrency) els.receiptCurrency.value = currency;
+    }
+
+    /** `Repuestos La Uruca · 12 Jul 2026 · ₡38 500`, or as much as is known. */
+    function receiptLabel(receipt: ReceiptRow): string {
+      const parts: string[] = [];
+      if (receipt.vendor !== null && receipt.vendor.trim() !== "") {
+        parts.push(receipt.vendor);
+      }
+      if (receipt.issued_on !== null) {
+        parts.push(formatRecordDate(receipt.issued_on, locale));
+      }
+      if (receipt.amount !== null && receipt.currency !== null) {
+        parts.push(formatCost(receipt.amount, receipt.currency, locale));
+      }
+      return parts.length === 0
+        ? (text.stringReceiptUntitled ?? "")
+        : parts.join(" · ");
+    }
+
+    async function paintReceipts(row: RecordRow): Promise<void> {
+      if (!els.receiptList) return;
+      const listed = await listReceipts([row.id]);
+      // The form moved on while the request was in flight.
+      if (editingRecord?.id !== row.id) return;
+      if (!listed.ok) {
+        say(els.receiptMessage, text.stringError ?? "");
+        return;
+      }
+      receipts = sortReceipts(listed.value);
+      els.receiptList.replaceChildren();
+      if (els.receiptsEmpty) els.receiptsEmpty.hidden = receipts.length > 0;
+      if (receipts.length === 0) return;
+
+      const urls = await signReceiptUrls(
+        receipts.map((receipt) => receipt.storage_path)
+      );
+      if (editingRecord?.id !== row.id) return;
+
+      for (const receipt of receipts) {
+        const item = els.receiptTemplate?.content.firstElementChild?.cloneNode(
+          true
+        ) as HTMLElement | null;
+        if (!item) continue;
+        const label = receiptLabel(receipt);
+        say(item.querySelector<HTMLElement>("[data-receipt-label]"), label);
+
+        const open = item.querySelector<HTMLAnchorElement>(
+          "[data-receipt-open]"
+        );
+        const url = urls.get(receipt.storage_path);
+        if (open) {
+          if (url === undefined) {
+            // Nothing to link to: a signature that could not be issued is not
+            // a link that should sit there returning nothing when clicked.
+            open.remove();
+          } else {
+            open.href = url;
+            open.setAttribute("aria-label", `${open.textContent} — ${label}`);
+          }
+        }
+
+        const drop = item.querySelector<HTMLButtonElement>(
+          "[data-receipt-remove]"
+        );
+        drop?.setAttribute("aria-label", `${drop.textContent} — ${label}`);
+        drop?.addEventListener("click", () => {
+          if (!window.confirm(text.stringReceiptRemoveConfirm ?? "")) return;
+          void dropReceipt(row, receipt).catch(() =>
+            unreachable(els.receiptMessage)
+          );
+        });
+
+        els.receiptList.append(item);
+      }
+    }
+
+    async function dropReceipt(
+      row: RecordRow,
+      receipt: ReceiptRow
+    ): Promise<void> {
+      say(els.receiptMessage, "");
+      const result = await removeReceipt(receipt);
+      if (!result.ok) {
+        say(els.receiptMessage, text.stringError ?? "");
+        return;
+      }
+      await paintReceipts(row);
+      if (opened !== null) await loadRecords(opened);
+    }
+
+    async function attachReceipt(row: RecordRow, file: File): Promise<void> {
+      const draft = currentReceiptDraft();
+      const issues = validateReceiptDraft(draft);
+      if (issues.length > 0) {
+        const first = issues[0];
+        say(
+          els.receiptMessage,
+          (first?.field === "vendor"
+            ? text.stringReceiptVendorLong
+            : first?.field === "issuedOn"
+              ? text.stringReceiptIssueDate
+              : first?.code === "ambiguous-separator"
+                ? text.stringRecordIssueCostSeparator
+                : text.stringRecordIssueCost) ?? ""
+        );
+        return;
+      }
+
+      say(els.receiptMessage, text.stringReceiptUploading ?? "");
+      const result = await uploadReceipt(row.id, file, (path) =>
+        receiptWriteFromDraft(row.id, path, draft)
+      );
+      if (!result.ok) {
+        say(
+          els.receiptMessage,
+          (result.reason === "rejected"
+            ? text.stringReceiptType
+            : text.stringError) ?? ""
+        );
+        return;
+      }
+      say(els.receiptMessage, "");
+      clearReceiptDraft();
+      await paintReceipts(row);
+      if (opened !== null) await loadRecords(opened);
     }
 
     /* ------------------------------------------------------------ requests */
@@ -1272,6 +2558,134 @@ const generationOptions = GENERATION_IDS.map((id) => ({
           show("list");
         })
         .catch(() => unreachable(els.formMessage));
+    });
+
+    /* ------------------------------------------------- events: records */
+
+    els.recordAdd?.addEventListener("click", () => {
+      if (opened === null) return;
+      void openRecordForm(null).catch(() => unreachable(els.recordMessage));
+    });
+
+    els.recordCancel?.addEventListener("click", () => {
+      editingRecord = null;
+      show(opened === null ? "list" : "detail");
+    });
+
+    els.recordCurrency?.addEventListener("change", () => {
+      const chosen = els.recordCurrency?.value ?? "";
+      if (chosen === "CRC" || chosen === "USD") {
+        currency = chosen;
+        writeCurrency(currency, window);
+      }
+    });
+
+    els.recordTimeUnit?.addEventListener("change", () => {
+      // Re-render the field from the stored row in the newly chosen unit, so
+      // switching units never re-parses an already-converted figure — the
+      // odometer's lesson, applied to the second figure that has two units.
+      const previous = editingRecord;
+      if (previous === null || !els.recordTime) return;
+      const chosen = (els.recordTimeUnit?.value === "min" ? "min" : "h") as
+        "h" | "min";
+      els.recordTime.value = recordDraftFromRow(previous, {
+        odometerUnit: unit,
+        timeUnit: chosen,
+      }).time;
+    });
+
+    els.recordDelete?.addEventListener("click", () => {
+      if (editingRecord === null || opened === null) return;
+      const target = editingRecord;
+      const vehicle = opened;
+      const confirmed = window.confirm(
+        (text.stringRecordDeleteConfirm ?? "").replace(
+          "{title}",
+          recordHeadline(target, kindLabel(target.kind))
+        )
+      );
+      if (!confirmed) return;
+      say(els.recordMessage, text.stringDeleting ?? "");
+      void deleteRecord(target.id)
+        .then(async (result) => {
+          if (!result.ok) {
+            say(els.recordMessage, text.stringError ?? "");
+            return;
+          }
+          editingRecord = null;
+          show("detail");
+          await loadRecords(vehicle);
+        })
+        .catch(() => unreachable(els.recordMessage));
+    });
+
+    els.receiptAttach?.addEventListener("click", () => {
+      const file = els.receiptFile?.files?.[0];
+      if (!file || editingRecord === null) return;
+      const issue = receiptIssue(file);
+      if (issue !== null) {
+        say(
+          els.receiptMessage,
+          (issue === "too-large"
+            ? text.stringReceiptSize
+            : text.stringReceiptType) ?? ""
+        );
+        return;
+      }
+      void attachReceipt(editingRecord, file).catch(() =>
+        unreachable(els.receiptMessage)
+      );
+    });
+
+    els.recordForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (opened === null) return;
+      const vehicle = opened;
+      const draft = currentRecordDraft();
+      const issues = validateRecordDraft(draft, catalogue);
+      if (issues.length > 0) {
+        say(els.recordMessage, recordIssueMessage(issues));
+        return;
+      }
+      const write = recordWriteFromDraft(
+        vehicle.id,
+        draft,
+        catalogue,
+        editingRecord
+      );
+      if (write === null) {
+        say(els.recordMessage, text.stringError ?? "");
+        return;
+      }
+
+      if (els.recordSave) {
+        els.recordSave.disabled = true;
+        els.recordSave.textContent = text.stringSaving ?? "";
+      }
+      const request =
+        editingRecord === null
+          ? createRecord(write)
+          : updateRecord(editingRecord.id, write);
+
+      void request
+        .then(async (result) => {
+          if (!result.ok) {
+            say(els.recordMessage, text.stringError ?? "");
+            return;
+          }
+          say(els.message, text.stringSaved ?? "");
+          // Straight back to the form on the saved row, so a new record's
+          // receipts can be attached without hunting for it on the rail.
+          await openRecordForm(result.value);
+          await loadRecords(vehicle);
+        })
+        .catch(() => unreachable(els.recordMessage))
+        .finally(() => {
+          if (els.recordSave) {
+            els.recordSave.disabled = false;
+            els.recordSave.textContent = els.recordSave.dataset.idle ?? "";
+          }
+        });
     });
 
     els.form.addEventListener("submit", (event) => {
@@ -1622,6 +3036,249 @@ const generationOptions = GENERATION_IDS.map((id) => ({
     margin: 0;
     font-size: 0.9375rem;
     line-height: 1.6;
+    color: var(--muted-strong);
+  }
+
+  /* ---------------------------------------------------------------------
+   * The timeline (HANDOFF-DESIGN, Taller artboard)
+   *
+   * A vertical `line` rail with a dot per entry: filled rust for what
+   * happened, hollow for what is planned. The planned card is `panel-soft`
+   * with a dashed border and an amber badge; a done card is `panel` with a
+   * solid one and a green badge. Every difference between the two is driven
+   * by one class on the `<li>`, set from `kind`.
+   *
+   * One deliberate departure from the artboard: the `date · odometer` meta
+   * line is `--muted` rather than `--faint`. `#A99C88` on the panel is about
+   * 2.2:1, and this site holds itself to WCAG 2.1 AA, where body text needs
+   * 4.5:1. The artboard's *hierarchy* is kept — the meta line is still the
+   * quietest thing in the card — at a colour a reader can actually read.
+   * ------------------------------------------------------------------- */
+
+  .garage__timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 1.75rem;
+    list-style: none;
+  }
+
+  .garage__timeline:empty {
+    display: none;
+  }
+
+  .garage__timeline::before {
+    content: "";
+    position: absolute;
+    left: 0.4rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 2px;
+    background: var(--line);
+  }
+
+  .garage__entry {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .garage__entry-dot {
+    position: absolute;
+    left: -1.75rem;
+    top: 0.25rem;
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    background: var(--rust);
+    border: 3px solid var(--paper);
+    box-sizing: border-box;
+  }
+
+  .garage__entry--planned .garage__entry-dot {
+    background: var(--panel);
+    border-color: var(--rust);
+  }
+
+  .garage__entry-meta {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .garage__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.125rem 1.25rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .garage__entry--planned .garage__card {
+    background: var(--panel-soft);
+    border: 1.5px dashed #c9bfaf;
+  }
+
+  .garage__card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .garage__card-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+
+  .garage__badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.625rem;
+    border-radius: 4px;
+    color: #2f5e3f;
+    background: #e4efe7;
+  }
+
+  .garage__entry--planned .garage__badge {
+    color: #7a5210;
+    background: #fdf3e4;
+  }
+
+  .garage__chips,
+  .garage__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .garage__chips[hidden],
+  .garage__links[hidden] {
+    display: none;
+  }
+
+  .garage__chip {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.75rem;
+    color: var(--muted-strong);
+    background: var(--chip);
+    border-radius: 4px;
+    padding: 0.1875rem 0.5rem;
+  }
+
+  .garage__minichip {
+    font-size: 0.75rem;
+    color: var(--muted-strong);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.1875rem 0.5rem;
+  }
+
+  .garage__minichip--unresolved {
+    color: var(--muted);
+    border-style: dashed;
+  }
+
+  .garage__card-body {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--muted-strong);
+    /* The user's own notes, written in lines, kept in lines. */
+    white-space: pre-wrap;
+  }
+
+  .garage__card-body:empty {
+    display: none;
+  }
+
+  .garage__card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /*
+   * Real text, off-screen: it is translated, selectable and read aloud, which
+   * an `aria-label` on a list item is not reliably any of.
+   */
+  .garage__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .garage__textarea {
+    font: inherit;
+    font-size: 1rem;
+    padding: 0.625rem 0.75rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    resize: vertical;
+  }
+
+  .garage__textarea:focus-visible,
+  .garage__multi:focus-visible {
+    outline: 2px solid var(--rust);
+    outline-offset: 1px;
+  }
+
+  .garage__multi {
+    min-height: 6rem;
+    padding: 0.375rem;
+  }
+
+  .garage__receipts,
+  .garage__receipt-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .garage__receipt-form[hidden] {
+    display: none;
+  }
+
+  .garage__receipt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .garage__receipt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    background: var(--panel-soft);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+
+  .garage__receipt-text {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.8125rem;
     color: var(--muted-strong);
   }
 

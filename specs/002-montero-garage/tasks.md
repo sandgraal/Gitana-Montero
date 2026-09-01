@@ -263,9 +263,51 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   T2-202's applied migration was tried first and reverted — a migration is a
   record of what ran, so an edit to one already pushed changes what a *fresh*
   database gets and nothing about the one that exists.
-- [ ] **T2-302 [PLATFORM]** Records + receipts: dated typed records, cost/time/
+- [x] **T2-302 [PLATFORM]** Records + receipts: dated typed records, cost/time/
   odometer, attachment upload to private storage, vendor/date/amount fields,
   typed references into reference collections. Depends: T2-301. *(GAR-02′, GAR-05′)*
+  <br>**No column was added and none was needed** — every field came from
+  T2-202's schema as `tests/garage/contract.ts` pins it. Done-versus-planned is
+  `record_kind`'s fourth value, so the artboard's filled/hollow dot, dashed
+  card and amber badge are one class driven by `kind`; a status column would
+  have been a second way to say the same thing and a second way for the two to
+  disagree.
+  <br>**Typed references (GAR-02′) are the record's own `text[]` columns,
+  validated against built content at render time** — nothing was added to a
+  content schema. The page reads `getCollection("problems"|"parts"|
+  "procedures")` at build time, inlines `{id, title}` per locale as one JSON
+  payload (the `VehicleSelector.astro` seam), and the picker offers only what
+  the site ships. Modelling it from the reference end would have put a private
+  row's existence in a public git file. An id the site can no longer resolve
+  renders as itself in a dashed chip rather than being dropped: a reference
+  entry can be retired after a record was written, and tidying the link away
+  would delete part of somebody's record. The chips are **not links yet** —
+  problem/part/procedure pages are 001's T4xx/T5xx, and a chip pointing at a
+  page that does not exist is a broken link `check:links` would be right to
+  fail.
+  <br>**Cost is the one figure that cannot follow "store it once, render per
+  reader".** A currency is not a display unit, so `cost_amount` +
+  `cost_currency` are stored as the user chose and never converted. The parse
+  refuses rather than guesses: `1.500` is fifteen hundred in one locale and one
+  and a half in the other, so a lone separator with three digits after it
+  returns `ambiguous-separator` and the page asks for it again without
+  separators. Getting that wrong moves somebody's money by a factor of a
+  thousand.
+  <br>**Two things left open, deliberately.** (a) The Planned tab renders the
+  same cards filtered to `kind = 'plan'` — *not* GAR-03′'s computed queue,
+  which is T2-303's; a panel saying "nothing is planned" beside a planned card
+  on the timeline would have been the page lying to its owner. (b) The
+  Current-state tab is untouched, T2-303's entirely.
+  <br>**Found, not fixed — receipts have no delete-trigger belt.**
+  `on_vehicle_deleted` sweeps `vehicle-photos` by `<owner>/<vehicle>/` prefix;
+  receipt objects are `<owner>/<file>` (the contract's shape), so no prefix
+  identifies one vehicle's receipts and no trigger can find them without
+  reading the rows it is cascading away. `deleteVehicle` and `deleteRecord`
+  therefore remove the objects through the Storage API *before* the row delete
+  that destroys the index, and a browser closed mid-request strands bytes until
+  the account purge (which is prefix-by-owner and does cover them, ACC-03). A
+  belt would be a `before delete` trigger collecting paths through the join —
+  a migration, which this task did not authorise. Flagged for T2-303/T2-401.
 - [ ] **T2-303 [PLATFORM]** Derived views per vehicle: current-state sheet +
   planned queue, computed. Depends: T2-302. *(GAR-03′)*
 - [ ] **T2-304 [CONTENT+DESIGN]** Gitana Blanca seed — user page #1: owner
