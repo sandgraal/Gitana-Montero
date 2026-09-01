@@ -1,0 +1,1819 @@
+---
+/**
+ * The garage — a user's vehicles and their profiles (T2-301, GAR-01′).
+ *
+ * > **GAR-01′** A user SHALL create vehicle profiles with a display name,
+ * > taxonomy identity resolved by the 001 fitment engine, photos, and
+ * > odometer.
+ *
+ * `/en/garage/` and `/es/taller/` are built from this one file by the same
+ * `getStaticPaths` seam the glossary, community and sign-in pages use. The ES
+ * segment is `taller`, which is the glossary's ruling rather than a
+ * preference — see `src/i18n/routes.ts`.
+ *
+ * ## Static shell, user data in the browser
+ *
+ * This is a statically built site and the content of this page is one person's
+ * private rows. So the server renders the *shell* — every word, in this
+ * locale, laid out and styled — and the browser fills it from Supabase after
+ * the session is known. Nothing user-specific is ever in `dist/`.
+ *
+ * That gives the page four states, and it renders all four honestly:
+ *
+ * | state | what the reader gets |
+ * |---|---|
+ * | no project configured at build | a notice saying accounts are not on here |
+ * | no JavaScript | the sign-in prompt and an explanation |
+ * | signed out | the sign-in prompt, never an error |
+ * | signed in | the garage |
+ *
+ * The signed-out prompt is what a visitor gets *by default*, because with no
+ * script we cannot know better and a wrong guess must fail toward "here is how
+ * to sign in". Once scripting is available, `html.js` (set by `BaseLayout`
+ * before first paint) swaps the default to a "opening your garage" line, so a
+ * signed-in reader is never told they are signed out while the session
+ * resolves. Same CSS-not-`hidden` reasoning as the vehicle selector: revealing
+ * a block after hydration is a layout shift against SCF-06.
+ *
+ * ## Every string is the server's
+ *
+ * The script below composes no prose. Templates and messages are handed to it
+ * through `data-string-*` attributes and `<template>` elements the server
+ * already localized (I18N-08) — the same pattern `[authSegment].astro`
+ * established. The two figures that appear inside sentences (the display-name
+ * limit, the photo size limit) are interpolated here from their constants, so
+ * neither is written down in a locale (AGENTS.md).
+ *
+ * ## The fitment engine, not a second copy of it
+ *
+ * The identity controls are filled from `createVehicleOptions` reading the
+ * taxonomy payload `VehicleSelector.astro` already inlines on every page —
+ * the same module, the same data, no second request and no forked narrowing
+ * logic. "Could this combination have existed" is asked of `src/lib/fitment/`
+ * and nowhere else (FIT-01).
+ *
+ * refs specs/002-montero-garage (GAR-01′, ACC-02, SHR-01, MIG-03),
+ * specs/001-foundation (FIT-01, FIT-03, I18N-01, I18N-08),
+ * specs/001-foundation/design/HANDOFF-DESIGN.md (Taller artboard)
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  LOCALE_BCP47,
+  isLocale,
+  localeHref,
+  type Locale,
+} from "../../i18n/routing";
+import {
+  collectionRouteParams,
+  collectionRoutePath,
+  collectionRoutePaths,
+} from "../../i18n/routes";
+import { generationLabel, t } from "../../i18n/ui";
+import { SITE_NAME, TRUCK_NAME } from "../../site";
+import { SUPABASE_BROWSER_CONFIG } from "../../lib/supabase/config";
+import { MAX_DISPLAY_NAME_LENGTH } from "../../lib/garage/vehicle";
+import { MAX_PHOTO_BYTES, PHOTO_MIME_TYPES } from "../../lib/garage/photos";
+import { GENERATION_IDS, type GenerationId } from "../../schemas/vehicles";
+
+export function getStaticPaths() {
+  return collectionRouteParams("garage", "garageSegment");
+}
+
+const { locale: param } = Astro.params;
+if (!isLocale(param)) {
+  throw new Error(`Unknown locale segment: ${String(param)}`);
+}
+const locale: Locale = param;
+const strings = t(locale);
+const routes = collectionRoutePaths("garage");
+const configured = SUPABASE_BROWSER_CONFIG !== null;
+const signInHref = localeHref(locale, collectionRoutePath("signIn", locale));
+
+/**
+ * The two figures that appear inside a sentence, formatted once here.
+ *
+ * `MAX_PHOTO_BYTES` is bytes in code and megabytes to a person, and `Intl`
+ * knows the unit's name in both locales — so the sentence carries `{size}` and
+ * this fills it, rather than "10 MB" being typed into two locale records.
+ */
+const maxPhotoSize = new Intl.NumberFormat(LOCALE_BCP47[locale], {
+  style: "unit",
+  unit: "megabyte",
+  unitDisplay: "short",
+  maximumFractionDigits: 0,
+}).format(MAX_PHOTO_BYTES / 1024 / 1024);
+
+const nameTooLong = strings.garageIssueNameTooLongTemplate.replace(
+  "{max}",
+  new Intl.NumberFormat(LOCALE_BCP47[locale]).format(MAX_DISPLAY_NAME_LENGTH)
+);
+const photoTooLarge = strings.garagePhotoSizeRejectedTemplate.replace(
+  "{size}",
+  maxPhotoSize
+);
+
+/**
+ * The generation options, server-rendered.
+ *
+ * A `<select>` rather than the selector's button row: this is a form field
+ * inside a form of six, not the site chrome's headline control, and it sits in
+ * the same column as market/year/engine. The labels are the same
+ * `generation.*` strings T204 uses — one translation of "Gen 3", not two.
+ */
+const generationOptions = GENERATION_IDS.map((id) => ({
+  id,
+  label: generationLabel(strings, id as GenerationId),
+}));
+---
+
+<BaseLayout
+  locale={locale}
+  routePathByLocale={routes}
+  title={`${strings.garageHeading} — ${SITE_NAME}`}
+  description={strings.garageIntro}
+>
+  <section
+    class="garage"
+    data-garage
+    data-garage-state="boot"
+    data-string-error={strings.garageError}
+    data-string-unreachable={strings.garageUnreachable}
+    data-string-saving={strings.garageSaving}
+    data-string-saved={strings.garageSaved}
+    data-string-deleting={strings.garageDeleting}
+    data-string-delete-confirm={strings.garageDeleteConfirmTemplate}
+    data-string-uploading={strings.garagePhotosUploading}
+    data-string-photo-alt={strings.garagePhotoAltTemplate}
+    data-string-photo-type={strings.garagePhotoTypeRejected}
+    data-string-photo-size={photoTooLarge}
+    data-string-form-new={strings.garageFormNewHeading}
+    data-string-form-edit={strings.garageFormEditHeading}
+    data-string-issue-name-required={strings.garageIssueNameRequired}
+    data-string-issue-name-long={nameTooLong}
+    data-string-issue-generation={strings.garageIssueGenerationRequired}
+    data-string-issue-identity={strings.garageIssueIdentityUnknown}
+    data-string-issue-year={strings.garageIssueYearRange}
+    data-string-issue-odometer={strings.garageIssueOdometerNumber}
+    data-string-issue-odometer-large={strings.garageIssueOdometerLarge}
+    data-string-facet-unknown={strings.garageFacetUnknown}
+    data-string-no-engines={strings.vehicleSelectorNoEngines}
+    data-string-engines-recorded={strings.vehicleSelectorEnginesRecorded}
+    data-string-engines-unrecorded={strings.vehicleSelectorEnginesUnrecorded}
+    data-string-browsing={strings.garageUsedForBrowsing}
+    data-string-identity-incomplete={strings.garageIdentityIncomplete}
+    data-string-unrecorded={strings.garageStatUnrecorded}
+    data-locale={LOCALE_BCP47[locale]}
+  >
+    <div class="garage__intro">
+      <h1>{strings.garageHeading}</h1>
+      <p>{strings.garageIntro}</p>
+    </div>
+
+    {
+      configured ? (
+        <Fragment>
+          {/*
+           * Present from the first paint when scripting is available, so the
+           * signed-out prompt below is never shown to a reader who does in
+           * fact have a session.
+           */}
+          <p
+            class="garage__boot"
+            data-garage-boot
+            role="status"
+            aria-live="polite"
+          >
+            {strings.garageLoading}
+          </p>
+
+          <div class="garage__gate" data-garage-gate>
+            <h2>{strings.garageSignedOutHeading}</h2>
+            <p>{strings.garageSignedOutBody}</p>
+            <p>
+              <a class="garage__cta" href={signInHref}>
+                {strings.garageSignInLink}
+              </a>
+            </p>
+            <noscript>
+              <p class="garage__notice">{strings.garageScriptRequired}</p>
+            </noscript>
+          </div>
+
+          <div class="garage__app" data-garage-app hidden>
+            {/* ---------------------------------------------------------- */}
+            {/* The list of vehicles                                       */}
+            {/* ---------------------------------------------------------- */}
+            <div class="garage__panel" data-garage-list-view>
+              <div class="garage__panel-head">
+                <h2>{strings.garageVehiclesHeading}</h2>
+                <button class="garage__button" type="button" data-garage-add>
+                  {strings.garageAddVehicle}
+                </button>
+              </div>
+
+              <p class="garage__empty" data-garage-empty hidden>
+                <strong>{strings.garageEmptyHeading}</strong>
+                <span>{strings.garageEmptyBody}</span>
+              </p>
+
+              <ul class="garage__list" data-garage-list />
+            </div>
+
+            {/* ---------------------------------------------------------- */}
+            {/* One vehicle: the Taller artboard's dashboard shell          */}
+            {/* ---------------------------------------------------------- */}
+            <div class="garage__panel" data-garage-detail-view hidden>
+              <p>
+                <button class="garage__link" type="button" data-garage-back>
+                  {strings.garageBackToVehicles}
+                </button>
+              </p>
+
+              <div class="garage__detail-head">
+                <p class="garage__detail-name" data-garage-detail-name />
+                <p class="garage__identity" data-garage-detail-identity />
+              </div>
+
+              <dl class="garage__stats">
+                <div class="garage__stat">
+                  <dt>{strings.garageOdometerLabel}</dt>
+                  <dd data-garage-stat-odometer />
+                </div>
+                <div class="garage__stat">
+                  <dt>{strings.garageStatEntries}</dt>
+                  <dd data-garage-stat-entries />
+                </div>
+                <div class="garage__stat">
+                  <dt>{strings.garageStatPlanned}</dt>
+                  <dd data-garage-stat-planned />
+                </div>
+              </dl>
+
+              <div class="garage__actions">
+                <button class="garage__button" type="button" data-garage-edit>
+                  {strings.garageEditVehicle}
+                </button>
+                <button
+                  class="garage__button garage__button--alt"
+                  type="button"
+                  data-garage-browse
+                >
+                  {strings.garageUseForBrowsing}
+                </button>
+              </div>
+              <p
+                class="garage__note"
+                data-garage-browse-note
+                role="status"
+                aria-live="polite"
+              />
+
+              <div
+                class="garage__tabs"
+                role="tablist"
+                aria-label={strings.garageTabsLabel}
+              >
+                <button
+                  class="garage__tab"
+                  type="button"
+                  role="tab"
+                  id="garage-tab-timeline"
+                  aria-controls="garage-panel-timeline"
+                  aria-selected="true"
+                  data-garage-tab="timeline"
+                >
+                  {strings.garageTabTimeline}
+                </button>
+                <button
+                  class="garage__tab"
+                  type="button"
+                  role="tab"
+                  id="garage-tab-current"
+                  aria-controls="garage-panel-current"
+                  aria-selected="false"
+                  tabindex="-1"
+                  data-garage-tab="current"
+                >
+                  {strings.garageTabCurrent}
+                </button>
+                <button
+                  class="garage__tab"
+                  type="button"
+                  role="tab"
+                  id="garage-tab-planned"
+                  aria-controls="garage-panel-planned"
+                  aria-selected="false"
+                  tabindex="-1"
+                  data-garage-tab="planned"
+                >
+                  {strings.garageTabPlanned}
+                </button>
+              </div>
+
+              <div
+                class="garage__tabpanel"
+                role="tabpanel"
+                id="garage-panel-timeline"
+                aria-labelledby="garage-tab-timeline"
+                tabindex="0"
+                data-garage-panel="timeline"
+              >
+                <p class="garage__empty-note">{strings.garageTimelineEmpty}</p>
+              </div>
+              <div
+                class="garage__tabpanel"
+                role="tabpanel"
+                id="garage-panel-current"
+                aria-labelledby="garage-tab-current"
+                tabindex="0"
+                data-garage-panel="current"
+                hidden
+              >
+                <p class="garage__empty-note">{strings.garageCurrentEmpty}</p>
+              </div>
+              <div
+                class="garage__tabpanel"
+                role="tabpanel"
+                id="garage-panel-planned"
+                aria-labelledby="garage-tab-planned"
+                tabindex="0"
+                data-garage-panel="planned"
+                hidden
+              >
+                <p class="garage__empty-note">{strings.garagePlannedEmpty}</p>
+              </div>
+
+              {/* -------------------------------------------------------- */}
+              {/* Photos                                                    */}
+              {/* -------------------------------------------------------- */}
+              <div class="garage__photos">
+                <h3>{strings.garagePhotosHeading}</h3>
+                <p class="garage__fineprint">
+                  {strings.garagePhotosPrivateNote}
+                </p>
+
+                <ul class="garage__gallery" data-garage-gallery />
+                <p class="garage__empty-note" data-garage-photos-empty>
+                  {strings.garagePhotosEmpty}
+                </p>
+
+                <p class="garage__field">
+                  <label class="garage__label" for="garage-photo">
+                    {strings.garagePhotosAdd}
+                  </label>
+                  <input
+                    class="garage__file"
+                    id="garage-photo"
+                    type="file"
+                    accept={PHOTO_MIME_TYPES.join(",")}
+                    data-garage-photo-input
+                  />
+                </p>
+                <p
+                  class="garage__message"
+                  data-garage-photo-message
+                  role="status"
+                  aria-live="polite"
+                />
+              </div>
+            </div>
+
+            {/* ---------------------------------------------------------- */}
+            {/* Create / edit                                              */}
+            {/* ---------------------------------------------------------- */}
+            <form class="garage__panel" data-garage-form hidden novalidate>
+              <h2 data-garage-form-heading>{strings.garageFormNewHeading}</h2>
+
+              <p class="garage__field">
+                <label class="garage__label" for="garage-name">
+                  {strings.garageNameLabel}
+                </label>
+                <input
+                  class="garage__input"
+                  id="garage-name"
+                  name="display_name"
+                  type="text"
+                  autocomplete="off"
+                  maxlength={MAX_DISPLAY_NAME_LENGTH}
+                  placeholder={TRUCK_NAME}
+                  aria-describedby="garage-name-hint"
+                  data-garage-name
+                />
+                <span class="garage__hint" id="garage-name-hint">
+                  {strings.garageNameHint}
+                </span>
+              </p>
+
+              <fieldset class="garage__fieldset">
+                <legend class="garage__legend">
+                  {strings.garageIdentityLegend}
+                </legend>
+                <p class="garage__hint" id="garage-identity-hint">
+                  {strings.garageIdentityHint}
+                </p>
+
+                <div class="garage__grid">
+                  <p class="garage__field">
+                    <label class="garage__label" for="garage-generation">
+                      {strings.vehicleSelectorGenerationLabel}
+                    </label>
+                    <select
+                      class="garage__select"
+                      id="garage-generation"
+                      aria-describedby="garage-identity-hint"
+                      data-garage-generation
+                    >
+                      {generationOptions.map((option, index) => (
+                        <option value={option.id} selected={index === 0}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </p>
+
+                  <p class="garage__field">
+                    <label class="garage__label" for="garage-market">
+                      {strings.vehicleSelectorMarketLabel}
+                    </label>
+                    <select
+                      class="garage__select"
+                      id="garage-market"
+                      data-garage-market
+                    >
+                      <option value="" selected>
+                        {strings.garageFacetUnknown}
+                      </option>
+                    </select>
+                  </p>
+
+                  <p class="garage__field">
+                    <label class="garage__label" for="garage-year">
+                      {strings.vehicleSelectorYearLabel}
+                    </label>
+                    <select
+                      class="garage__select garage__select--data"
+                      id="garage-year"
+                      data-garage-year
+                    >
+                      <option value="" selected>
+                        {strings.garageFacetUnknown}
+                      </option>
+                    </select>
+                  </p>
+
+                  <p class="garage__field">
+                    <label class="garage__label" for="garage-engine">
+                      {strings.vehicleSelectorEngineLabel}
+                    </label>
+                    <select
+                      class="garage__select garage__select--data"
+                      id="garage-engine"
+                      data-garage-engine
+                    >
+                      <option value="" selected>
+                        {strings.garageFacetUnknown}
+                      </option>
+                    </select>
+                  </p>
+                </div>
+              </fieldset>
+
+              <div class="garage__grid">
+                <p class="garage__field">
+                  <label class="garage__label" for="garage-odometer">
+                    {strings.garageOdometerLabel}
+                  </label>
+                  <input
+                    class="garage__input garage__input--data"
+                    id="garage-odometer"
+                    name="odometer"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    aria-describedby="garage-odometer-hint"
+                    data-garage-odometer
+                  />
+                  <span class="garage__hint" id="garage-odometer-hint">
+                    {strings.garageOdometerHint}
+                  </span>
+                </p>
+
+                <p class="garage__field">
+                  <label class="garage__label" for="garage-odometer-unit">
+                    {strings.garageOdometerUnitLabel}
+                  </label>
+                  <select
+                    class="garage__select"
+                    id="garage-odometer-unit"
+                    data-garage-odometer-unit
+                  >
+                    <option value="km" selected>
+                      {strings.garageUnitKilometres}
+                    </option>
+                    <option value="mi">{strings.garageUnitMiles}</option>
+                  </select>
+                </p>
+              </div>
+
+              <p
+                class="garage__message"
+                data-garage-form-message
+                role="alert"
+              />
+
+              <div class="garage__actions">
+                <button
+                  class="garage__button"
+                  type="submit"
+                  data-garage-save
+                  data-idle={strings.garageSave}
+                >
+                  {strings.garageSave}
+                </button>
+                <button
+                  class="garage__button garage__button--alt"
+                  type="button"
+                  data-garage-cancel
+                >
+                  {strings.garageCancel}
+                </button>
+                <button
+                  class="garage__link garage__link--danger"
+                  type="button"
+                  data-garage-delete
+                  hidden
+                >
+                  {strings.garageDelete}
+                </button>
+              </div>
+            </form>
+
+            <p
+              class="garage__message"
+              data-garage-message
+              role="status"
+              aria-live="polite"
+            />
+
+            {/* ---------------------------------------------------------- */}
+            {/* Templates: markup the script clones, text the server wrote  */}
+            {/* ---------------------------------------------------------- */}
+            <template data-garage-row-template>
+              <li class="garage__row">
+                <div class="garage__row-text">
+                  <span class="garage__row-name" data-row-name />
+                  <span class="garage__row-identity" data-row-identity />
+                </div>
+                <div class="garage__row-actions">
+                  <button class="garage__button" type="button" data-row-open>
+                    {strings.garageOpenVehicle}
+                  </button>
+                </div>
+              </li>
+            </template>
+
+            <template data-garage-photo-template>
+              <li class="garage__photo">
+                <img class="garage__photo-image" data-photo-image alt="" />
+                <button
+                  class="garage__link garage__link--danger"
+                  type="button"
+                  data-photo-remove
+                >
+                  {strings.garagePhotoRemove}
+                </button>
+              </li>
+            </template>
+          </div>
+        </Fragment>
+      ) : (
+        <p class="garage__notice">{strings.garageUnavailable}</p>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<script>
+  import {
+    createVehicleOptions,
+    selectionIsOfferable,
+    type EngineChoice,
+    type SelectorTaxonomyData,
+    type VehicleOptions,
+  } from "../../lib/vehicle-options";
+  import { readSelectorPayload } from "../../lib/vehicle-taxonomy";
+  import { vehicleChipLabel } from "../../lib/vehicle-labels";
+  import { writeVehicleSelection } from "../../lib/vehicle-selection";
+  import { SUPABASE_BROWSER_CONFIG } from "../../lib/supabase/config";
+  import {
+    createVehicle,
+    currentUserIdIfAny,
+    deleteVehicle,
+    listVehicles,
+    removeVehiclePhoto,
+    signPhotoUrls,
+    updateVehicle,
+    uploadVehiclePhoto,
+  } from "../../lib/supabase/garage";
+  import {
+    EMPTY_DRAFT,
+    draftFromVehicleRow,
+    sortVehicles,
+    validateVehicleDraft,
+    vehiclePhotoPaths,
+    vehicleSelectionOf,
+    vehicleWriteFromDraft,
+    type VehicleDraft,
+    type VehicleDraftIssue,
+    type VehicleRow,
+  } from "../../lib/garage/vehicle";
+  import {
+    formatOdometer,
+    readOdometerUnit,
+    writeOdometerUnit,
+    type OdometerUnit,
+  } from "../../lib/garage/odometer";
+  import { photoIssue } from "../../lib/garage/photos";
+
+  interface SelectorPayload extends SelectorTaxonomyData {
+    labels: {
+      generation: Record<string, string>;
+      market: Record<string, string>;
+      engine: Record<string, string>;
+    };
+  }
+
+  /**
+   * DOM wiring only. Every decision worth testing is a pure function in
+   * `src/lib/garage/` or `src/lib/vehicle-options.ts`, and every string was
+   * localized by the server — this file never composes prose.
+   */
+  function enhance(root: HTMLElement): void {
+    const text = root.dataset;
+    const locale = text.locale ?? "en";
+
+    const query = <T extends Element>(selector: string): T | null =>
+      root.querySelector<T>(selector);
+
+    const boot = query<HTMLElement>("[data-garage-boot]");
+    const gate = query<HTMLElement>("[data-garage-gate]");
+    const app = query<HTMLElement>("[data-garage-app]");
+    const listView = query<HTMLElement>("[data-garage-list-view]");
+    const detailView = query<HTMLElement>("[data-garage-detail-view]");
+    const form = query<HTMLFormElement>("[data-garage-form]");
+    const list = query<HTMLUListElement>("[data-garage-list]");
+    const empty = query<HTMLElement>("[data-garage-empty]");
+    const message = query<HTMLElement>("[data-garage-message]");
+    const rowTemplate = query<HTMLTemplateElement>(
+      "[data-garage-row-template]"
+    );
+    const photoTemplate = query<HTMLTemplateElement>(
+      "[data-garage-photo-template]"
+    );
+    if (
+      !boot ||
+      !gate ||
+      !app ||
+      !listView ||
+      !detailView ||
+      !form ||
+      !list ||
+      !empty ||
+      !message ||
+      !rowTemplate ||
+      !photoTemplate
+    ) {
+      return;
+    }
+
+    // Bound after the guard so the handlers below see non-null elements
+    // without a non-null assertion at every use.
+    const els = {
+      boot,
+      gate,
+      app,
+      listView,
+      detailView,
+      form,
+      list,
+      empty,
+      message,
+      rowTemplate,
+      photoTemplate,
+      formHeading: query<HTMLElement>("[data-garage-form-heading]"),
+      formMessage: query<HTMLElement>("[data-garage-form-message]"),
+      name: query<HTMLInputElement>("[data-garage-name]"),
+      generation: query<HTMLSelectElement>("[data-garage-generation]"),
+      market: query<HTMLSelectElement>("[data-garage-market]"),
+      year: query<HTMLSelectElement>("[data-garage-year]"),
+      engine: query<HTMLSelectElement>("[data-garage-engine]"),
+      odometer: query<HTMLInputElement>("[data-garage-odometer]"),
+      odometerUnit: query<HTMLSelectElement>("[data-garage-odometer-unit]"),
+      save: query<HTMLButtonElement>("[data-garage-save]"),
+      cancel: query<HTMLButtonElement>("[data-garage-cancel]"),
+      remove: query<HTMLButtonElement>("[data-garage-delete]"),
+      add: query<HTMLButtonElement>("[data-garage-add]"),
+      back: query<HTMLButtonElement>("[data-garage-back]"),
+      edit: query<HTMLButtonElement>("[data-garage-edit]"),
+      browse: query<HTMLButtonElement>("[data-garage-browse]"),
+      browseNote: query<HTMLElement>("[data-garage-browse-note]"),
+      detailName: query<HTMLElement>("[data-garage-detail-name]"),
+      detailIdentity: query<HTMLElement>("[data-garage-detail-identity]"),
+      statOdometer: query<HTMLElement>("[data-garage-stat-odometer]"),
+      statEntries: query<HTMLElement>("[data-garage-stat-entries]"),
+      statPlanned: query<HTMLElement>("[data-garage-stat-planned]"),
+      gallery: query<HTMLUListElement>("[data-garage-gallery]"),
+      photosEmpty: query<HTMLElement>("[data-garage-photos-empty]"),
+      photoInput: query<HTMLInputElement>("[data-garage-photo-input]"),
+      photoMessage: query<HTMLElement>("[data-garage-photo-message]"),
+    };
+
+    const payload = readSelectorPayload(document) as SelectorPayload | null;
+    const options: VehicleOptions | null =
+      payload === null ? null : createVehicleOptions(payload);
+
+    let vehicles: VehicleRow[] = [];
+    let editing: VehicleRow | null = null;
+    let opened: VehicleRow | null = null;
+    let unit: OdometerUnit = readOdometerUnit(window);
+
+    /* --------------------------------------------------------------- view */
+
+    function show(view: "list" | "detail" | "form"): void {
+      els.listView.hidden = view !== "list";
+      els.detailView.hidden = view !== "detail";
+      els.form.hidden = view !== "form";
+    }
+
+    /**
+     * Leave the boot state. `boot` is what the CSS reads to keep the sign-in
+     * prompt down while the session resolves; after this the prompt is an
+     * ordinary block governed by its own `hidden`.
+     */
+    function settle(gateVisible: boolean): void {
+      root.dataset.garageState = gateVisible ? "signed-out" : "signed-in";
+      els.gate.hidden = !gateVisible;
+    }
+
+    function say(node: HTMLElement | null, value: string): void {
+      if (node) node.textContent = value;
+    }
+
+    /**
+     * The last resort: a promise in this file rejected.
+     *
+     * Every request here already returns an outcome rather than throwing, so
+     * a rejection means the *code* did not arrive — `getSupabaseClient()`
+     * dynamically imports the client, and that import fails when a deploy
+     * rotates the chunk hash under an open tab, when the network drops
+     * mid-fetch, or when an extension or a CSP blocks it.
+     *
+     * Without this the page had a much worse failure than an error message:
+     * the boot promise never settled, so `data-garage-state` stayed `boot`
+     * forever and a returning signed-in owner sat on the opening line with no
+     * garage, no prompt, and nothing to click, in both locales (T2-301 review
+     * F1, reproduced with puppeteer).
+     *
+     * So it says what happened and leaves the sign-in prompt up: reloading is
+     * the only thing that helps, and if the session did expire, signing in is
+     * the action that fixes it. Never silent — a caught rejection that
+     * displays nothing is the same stall wearing a `catch`.
+     */
+    function unreachable(node: HTMLElement | null = els.message): void {
+      settle(true);
+      say(node, text.stringUnreachable ?? "");
+    }
+
+    /* ------------------------------------------------------------ options */
+
+    function option(value: string, label: string): HTMLOptionElement {
+      const element = document.createElement("option");
+      element.value = value;
+      element.textContent = label;
+      return element;
+    }
+
+    function unknownOption(): HTMLOptionElement {
+      return option("", text.stringFacetUnknown ?? "");
+    }
+
+    /**
+     * Rebuild market, year and engine from the chosen generation down.
+     *
+     * The narrowing itself is `createVehicleOptions` — the selector's module,
+     * reading the selector's payload. Nothing here decides what may be
+     * offered; a combination the taxonomy calls impossible is absent because
+     * `enginesFor` left it out (FIT-01).
+     */
+    function refillIdentity(
+      keep: {
+        market?: string;
+        year?: string;
+        engine?: string;
+      } = {}
+    ): void {
+      if (
+        !options ||
+        !els.generation ||
+        !els.market ||
+        !els.year ||
+        !els.engine
+      ) {
+        return;
+      }
+      const gen = els.generation.value;
+
+      const markets = options.marketsFor(gen);
+      els.market.replaceChildren(
+        unknownOption(),
+        ...markets.map((entry) =>
+          option(
+            entry.id,
+            `${payload?.labels.market[entry.id] ?? entry.id} — ${entry.name}`
+          )
+        )
+      );
+      els.market.value = markets.some((entry) => entry.id === keep.market)
+        ? (keep.market ?? "")
+        : "";
+
+      const years = options.yearsFor(gen);
+      els.year.replaceChildren(
+        unknownOption(),
+        ...years.map((value) => option(String(value), String(value)))
+      );
+      els.year.value = years.some((value) => String(value) === keep.year)
+        ? (keep.year ?? "")
+        : "";
+
+      refillEngines(keep.engine);
+    }
+
+    function refillEngines(keep?: string): void {
+      if (
+        !options ||
+        !els.market ||
+        !els.year ||
+        !els.engine ||
+        !els.generation
+      ) {
+        return;
+      }
+      const gen = els.generation.value;
+      const market = els.market.value;
+      const year = Number.parseInt(els.year.value, 10);
+
+      // An engine list needs a market and a year to narrow against. Until
+      // both are answered the only honest option is "not sure yet" — the
+      // alternative would be offering every engine in the corpus.
+      const choices: readonly EngineChoice[] =
+        market === "" || Number.isNaN(year)
+          ? []
+          : options.enginesFor(gen, market, year);
+
+      const children: HTMLElement[] = [unknownOption()];
+      const groups: [string, EngineChoice[]][] = [
+        [
+          text.stringEnginesRecorded ?? "",
+          choices.filter((choice) => choice.recorded),
+        ],
+        [
+          text.stringEnginesUnrecorded ?? "",
+          choices.filter((choice) => !choice.recorded),
+        ],
+      ];
+      for (const [label, members] of groups) {
+        if (members.length === 0) continue;
+        const group = document.createElement("optgroup");
+        group.label = label;
+        for (const choice of members) {
+          group.append(
+            option(
+              choice.option.id,
+              payload?.labels.engine[choice.option.id] ?? choice.option.id
+            )
+          );
+        }
+        children.push(group);
+      }
+      if (choices.length === 0 && market !== "" && !Number.isNaN(year)) {
+        const none = option("", text.stringNoEngines ?? "");
+        none.disabled = true;
+        children.push(none);
+      }
+
+      els.engine.replaceChildren(...children);
+      els.engine.value = choices.some((choice) => choice.option.id === keep)
+        ? (keep ?? "")
+        : "";
+    }
+
+    /* ------------------------------------------------------------- labels */
+
+    /** `Gen 3 · US · 2002 · 6G74 SOHC`, or as much of it as is known. */
+    function identityLabel(row: VehicleRow): string {
+      const generation =
+        payload?.labels.generation[row.generation_id] ?? row.generation_id;
+      const selection = vehicleSelectionOf(row);
+      if (selection === null || payload === null) return generation;
+      return vehicleChipLabel({
+        generationLabel: generation,
+        market: selection.market,
+        year: selection.year,
+        engine:
+          payload.engines.find((entry) => entry.id === selection.engine) ??
+          null,
+      });
+    }
+
+    /* --------------------------------------------------------------- draft */
+
+    function currentDraft(): VehicleDraft {
+      return {
+        displayName: els.name?.value ?? "",
+        gen: els.generation?.value ?? "",
+        market: els.market?.value ?? "",
+        year: els.year?.value ?? "",
+        engine: els.engine?.value ?? "",
+        odometer: els.odometer?.value ?? "",
+        odometerUnit: unit,
+      };
+    }
+
+    /** The first issue's message — one sentence a reader can act on. */
+    function issueMessage(issues: readonly VehicleDraftIssue[]): string {
+      const first = issues[0];
+      if (!first) return "";
+      if (first.field === "displayName") {
+        return first.code === "required"
+          ? (text.stringIssueNameRequired ?? "")
+          : (text.stringIssueNameLong ?? "");
+      }
+      if (first.field === "gen") {
+        return first.code === "required"
+          ? (text.stringIssueGeneration ?? "")
+          : (text.stringIssueIdentity ?? "");
+      }
+      if (first.field === "year") return text.stringIssueYear ?? "";
+      if (first.field === "odometer") {
+        return first.code === "too-large"
+          ? (text.stringIssueOdometerLarge ?? "")
+          : (text.stringIssueOdometer ?? "");
+      }
+      return text.stringIssueIdentity ?? "";
+    }
+
+    function openForm(row: VehicleRow | null): void {
+      editing = row;
+      say(els.formMessage, "");
+      say(
+        els.formHeading,
+        (row === null ? text.stringFormNew : text.stringFormEdit) ?? ""
+      );
+      if (els.remove) els.remove.hidden = row === null;
+
+      const draft = row === null ? EMPTY_DRAFT : draftFromVehicleRow(row, unit);
+      if (els.name) els.name.value = draft.displayName;
+      if (els.odometer) els.odometer.value = draft.odometer;
+      if (els.odometerUnit) els.odometerUnit.value = unit;
+      if (els.generation) {
+        els.generation.value =
+          draft.gen === ""
+            ? (els.generation.options[0]?.value ?? "")
+            : draft.gen;
+      }
+      refillIdentity({
+        market: draft.market,
+        year: draft.year,
+        engine: draft.engine,
+      });
+
+      show("form");
+      els.name?.focus();
+    }
+
+    /* --------------------------------------------------------------- paint */
+
+    function paintList(): void {
+      els.list.replaceChildren();
+      els.empty.hidden = vehicles.length > 0;
+
+      for (const row of sortVehicles(vehicles, locale)) {
+        const item = els.rowTemplate.content.firstElementChild?.cloneNode(
+          true
+        ) as HTMLElement | null;
+        if (!item) continue;
+        const name = item.querySelector<HTMLElement>("[data-row-name]");
+        const identity = item.querySelector<HTMLElement>("[data-row-identity]");
+        const open = item.querySelector<HTMLButtonElement>("[data-row-open]");
+        say(name, row.display_name);
+        say(identity, identityLabel(row));
+        // The button's own words came from the server; the truck's name is
+        // the user's, so it goes on the accessible name rather than into a
+        // sentence this script would have had to compose.
+        open?.setAttribute(
+          "aria-label",
+          `${open.textContent} — ${row.display_name}`
+        );
+        open?.addEventListener("click", () => openDetail(row));
+        els.list.append(item);
+      }
+    }
+
+    function openDetail(row: VehicleRow): void {
+      opened = row;
+      say(els.detailName, row.display_name);
+      /*
+       * The vehicle's name is the heading of this panel, and it is the user's
+       * word, so it cannot be server-rendered. Shipping an empty `<h2>` for
+       * the script to fill is what a11y tooling calls "heading tag with no
+       * content" (WCAG2AA H42.2) — correctly: an empty heading is a landmark
+       * that announces nothing. So the element ships as a paragraph and
+       * becomes a heading at the moment it has something to head.
+       */
+      els.detailName?.setAttribute("role", "heading");
+      els.detailName?.setAttribute("aria-level", "2");
+      say(els.detailIdentity, identityLabel(row));
+      say(
+        els.statOdometer,
+        row.odometer_km === null
+          ? (text.stringUnrecorded ?? "")
+          : formatOdometer(row.odometer_km, unit, locale)
+      );
+      // T2-302 owns records; until then the counts are honestly zero rather
+      // than absent, and the tab panels say so in the reader's language.
+      say(els.statEntries, new Intl.NumberFormat(locale).format(0));
+      say(els.statPlanned, new Intl.NumberFormat(locale).format(0));
+      say(els.browseNote, "");
+      if (els.browse) {
+        els.browse.disabled = vehicleSelectionOf(row) === null;
+        if (els.browse.disabled) {
+          say(els.browseNote, text.stringIdentityIncomplete ?? "");
+        }
+      }
+      show("detail");
+      void paintPhotos(row).catch(() => unreachable(els.photoMessage));
+    }
+
+    async function paintPhotos(row: VehicleRow): Promise<void> {
+      if (!els.gallery) return;
+      const paths = vehiclePhotoPaths(row);
+      els.gallery.replaceChildren();
+      if (els.photosEmpty) els.photosEmpty.hidden = paths.length > 0;
+      if (paths.length === 0) return;
+
+      const urls = await signPhotoUrls(paths);
+      // A vehicle opened, then closed, then another opened while the signing
+      // request was in flight would otherwise paint the wrong gallery.
+      if (opened?.id !== row.id) return;
+
+      for (const path of paths) {
+        const url = urls.get(path);
+        if (url === undefined) continue;
+        const item = els.photoTemplate.content.firstElementChild?.cloneNode(
+          true
+        ) as HTMLElement | null;
+        if (!item) continue;
+        const image =
+          item.querySelector<HTMLImageElement>("[data-photo-image]");
+        const drop = item.querySelector<HTMLButtonElement>(
+          "[data-photo-remove]"
+        );
+        if (image) {
+          image.src = url;
+          image.loading = "lazy";
+          image.alt = (text.stringPhotoAlt ?? "").replace(
+            "{name}",
+            row.display_name
+          );
+        }
+        drop?.addEventListener("click", () => {
+          void dropPhoto(row, path).catch(() => unreachable(els.photoMessage));
+        });
+        els.gallery.append(item);
+      }
+    }
+
+    /* ------------------------------------------------------------ requests */
+
+    function replace(row: VehicleRow): void {
+      const index = vehicles.findIndex((entry) => entry.id === row.id);
+      if (index === -1) vehicles = [...vehicles, row];
+      else
+        vehicles = vehicles.map((entry) => (entry.id === row.id ? row : entry));
+      if (opened?.id === row.id) opened = row;
+      paintList();
+    }
+
+    async function load(): Promise<void> {
+      const result = await listVehicles();
+      if (!result.ok) {
+        // A request that failed for any other reason leaves the prompt up and
+        // says so: "sign in" is the only action a reader can take from here,
+        // and it is the right one if the session turned out to be stale.
+        settle(true);
+        if (result.reason !== "signed-out") {
+          say(els.message, text.stringError ?? "");
+        }
+        return;
+      }
+      vehicles = result.value;
+      settle(false);
+      els.app.hidden = false;
+      paintList();
+      show("list");
+    }
+
+    async function dropPhoto(row: VehicleRow, path: string): Promise<void> {
+      say(els.photoMessage, "");
+      const result = await removeVehiclePhoto(row, path);
+      if (!result.ok) {
+        say(els.photoMessage, text.stringError ?? "");
+        return;
+      }
+      replace(result.value);
+      await paintPhotos(result.value);
+    }
+
+    /* ------------------------------------------------------------- events */
+
+    els.add?.addEventListener("click", () => openForm(null));
+    els.cancel?.addEventListener("click", () => {
+      show(opened === null ? "list" : "detail");
+    });
+    els.back?.addEventListener("click", () => {
+      opened = null;
+      show("list");
+    });
+    els.edit?.addEventListener("click", () => {
+      if (opened !== null) openForm(opened);
+    });
+
+    els.generation?.addEventListener("change", () => refillIdentity());
+    els.market?.addEventListener("change", () => refillEngines());
+    els.year?.addEventListener("change", () => refillEngines());
+
+    els.odometerUnit?.addEventListener("change", () => {
+      const chosen = els.odometerUnit?.value === "mi" ? "mi" : "km";
+      if (chosen === unit) return;
+      // Re-render the field in the newly chosen unit from the stored row, so
+      // switching units never re-parses a converted figure (see
+      // `vehicleWriteFromDraft`'s note on the odometer that walks).
+      const previous = editing;
+      unit = chosen;
+      writeOdometerUnit(unit, window);
+      if (previous !== null && els.odometer) {
+        els.odometer.value = draftFromVehicleRow(previous, unit).odometer;
+      }
+    });
+
+    els.browse?.addEventListener("click", () => {
+      if (opened === null) return;
+      const selection = vehicleSelectionOf(opened);
+      if (selection === null) return;
+      // The seam `src/lib/vehicle-selection.ts` predicted: a signed-in
+      // visitor's garage vehicle is a better source than a dropdown, and it
+      // is written through the same function the selector writes through, so
+      // every listing on the site re-filters on the same event.
+      if (options !== null && !selectionIsOfferable(selection, options)) return;
+      writeVehicleSelection(selection, window);
+      say(els.browseNote, text.stringBrowsing ?? "");
+    });
+
+    for (const tab of root.querySelectorAll<HTMLButtonElement>(
+      "[data-garage-tab]"
+    )) {
+      tab.addEventListener("click", () => selectTab(tab));
+      tab.addEventListener("keydown", (event) => {
+        const step =
+          event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+        if (step === 0) return;
+        event.preventDefault();
+        const tabs = [
+          ...root.querySelectorAll<HTMLButtonElement>("[data-garage-tab]"),
+        ];
+        const next =
+          tabs[(tabs.indexOf(tab) + step + tabs.length) % tabs.length];
+        if (next) {
+          selectTab(next);
+          next.focus();
+        }
+      });
+    }
+
+    function selectTab(chosen: HTMLButtonElement): void {
+      for (const tab of root.querySelectorAll<HTMLButtonElement>(
+        "[data-garage-tab]"
+      )) {
+        const active = tab === chosen;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+      }
+      for (const panel of root.querySelectorAll<HTMLElement>(
+        "[data-garage-panel]"
+      )) {
+        panel.hidden = panel.dataset.garagePanel !== chosen.dataset.garageTab;
+      }
+    }
+
+    els.photoInput?.addEventListener("change", () => {
+      const file = els.photoInput?.files?.[0];
+      if (!file || opened === null) return;
+      const issue = photoIssue(file);
+      if (issue !== null) {
+        say(
+          els.photoMessage,
+          (issue === "too-large"
+            ? text.stringPhotoSize
+            : text.stringPhotoType) ?? ""
+        );
+        if (els.photoInput) els.photoInput.value = "";
+        return;
+      }
+      const target = opened;
+      say(els.photoMessage, text.stringUploading ?? "");
+      void uploadVehiclePhoto(target, file)
+        .then(async (result) => {
+          if (els.photoInput) els.photoInput.value = "";
+          if (!result.ok) {
+            say(
+              els.photoMessage,
+              (result.reason === "rejected"
+                ? text.stringPhotoType
+                : text.stringError) ?? ""
+            );
+            return;
+          }
+          say(els.photoMessage, "");
+          replace(result.value);
+          await paintPhotos(result.value);
+        })
+        .catch(() => unreachable(els.photoMessage));
+    });
+
+    els.remove?.addEventListener("click", () => {
+      if (editing === null) return;
+      const target = editing;
+      const confirmed = window.confirm(
+        (text.stringDeleteConfirm ?? "").replace("{name}", target.display_name)
+      );
+      if (!confirmed) return;
+      say(els.formMessage, text.stringDeleting ?? "");
+      void deleteVehicle(target.id)
+        .then((result) => {
+          if (!result.ok) {
+            say(els.formMessage, text.stringError ?? "");
+            return;
+          }
+          vehicles = vehicles.filter((entry) => entry.id !== target.id);
+          editing = null;
+          opened = null;
+          paintList();
+          show("list");
+        })
+        .catch(() => unreachable(els.formMessage));
+    });
+
+    els.form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const draft = currentDraft();
+      const issues = validateVehicleDraft(draft);
+      if (issues.length > 0) {
+        say(els.formMessage, issueMessage(issues));
+        return;
+      }
+      const write = vehicleWriteFromDraft(draft, editing);
+      if (write === null) {
+        say(els.formMessage, text.stringError ?? "");
+        return;
+      }
+
+      if (els.save) {
+        els.save.disabled = true;
+        els.save.textContent = text.stringSaving ?? "";
+      }
+      const request =
+        editing === null
+          ? createVehicle(write)
+          : updateVehicle(editing.id, write);
+
+      void request
+        .then((result) => {
+          if (!result.ok) {
+            say(els.formMessage, text.stringError ?? "");
+            return;
+          }
+          replace(result.value);
+          say(els.message, text.stringSaved ?? "");
+          openDetail(result.value);
+          editing = null;
+        })
+        .catch(() => unreachable(els.formMessage))
+        .finally(() => {
+          if (els.save) {
+            els.save.disabled = false;
+            els.save.textContent = els.save.dataset.idle ?? "";
+          }
+        });
+    });
+
+    /* --------------------------------------------------------------- boot */
+
+    void currentUserIdIfAny(window)
+      .then((userId) => {
+        if (userId === null) {
+          settle(true);
+          return;
+        }
+        return load();
+      })
+      .catch(() => unreachable());
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-garage]");
+  // No project configured means no client, no chunk fetched, and nothing on
+  // this page to wire up — the notice the server rendered is the whole page.
+  if (root && SUPABASE_BROWSER_CONFIG) enhance(root);
+</script>
+
+<style>
+  /*
+   * Tokens from specs/001-foundation/design/HANDOFF-DESIGN.md's Taller
+   * artboard, scoped to this page — the same note the sign-in, glossary and
+   * community pages carry: site-wide chrome tokens belong to the task that
+   * restyles the chrome.
+   */
+  .garage {
+    --paper: #f7f4ee;
+    --panel: #ffffff;
+    --panel-soft: #fbf9f4;
+    --ink: #2b2620;
+    --muted: #6e6559;
+    --muted-strong: #55493c;
+    --faint: #a99c88;
+    --line: #e4ddd1;
+    --chip: #efe9dd;
+    --rust: #b0532a;
+    --rust-deep: #93441f;
+    --rust-tint: #fbeee6;
+    --rust-tint-border: #e9cdbb;
+
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 52rem;
+  }
+
+  .garage__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .garage__intro h1 {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  .garage__intro p {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--muted-strong);
+  }
+
+  /*
+   * The boot line exists only where scripting does, and the sign-in prompt is
+   * what a scriptless visitor gets — so the swap happens in CSS, before first
+   * paint, rather than by revealing a block after hydration. Same reasoning as
+   * the vehicle selector: a block revealed late pushes the page around.
+   */
+  .garage__boot {
+    display: none;
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--muted-strong);
+  }
+
+  :global(html.js) .garage[data-garage-state="boot"] .garage__boot {
+    display: block;
+  }
+
+  /*
+   * While the session is still being resolved, and only where scripting can
+   * resolve it, the sign-in prompt stands down. A scriptless visitor never
+   * leaves `boot` — but never gets the `html.js` class either, so for them the
+   * prompt is simply the page.
+   */
+  :global(html.js) .garage[data-garage-state="boot"] .garage__gate {
+    display: none;
+  }
+
+  /*
+   * An author `display: flex` silently overrides the user-agent `[hidden]`
+   * rule; without this the prompt would still be on screen behind a signed-in
+   * garage. Same bug the glossary and community toolbars shipped once.
+   */
+  .garage__gate[hidden] {
+    display: none;
+  }
+
+  .garage__gate {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .garage__gate h2 {
+    margin: 0;
+    font-size: 1.1875rem;
+    font-weight: 700;
+  }
+
+  .garage__gate p {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--muted-strong);
+  }
+
+  .garage__cta {
+    display: inline-block;
+    min-height: 44px;
+    padding: 0.625rem 1rem;
+    color: #ffffff;
+    background: var(--rust);
+    border: 1px solid var(--rust);
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .garage__cta:hover {
+    background: var(--rust-deep);
+    border-color: var(--rust-deep);
+  }
+
+  .garage__app {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .garage__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .garage__panel-head,
+  .garage__detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .garage__panel h2,
+  .garage__panel h3,
+  .garage__detail-name {
+    margin: 0;
+    font-size: 1.1875rem;
+    font-weight: 700;
+  }
+
+  .garage__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .garage__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    background: var(--panel-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .garage__row-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .garage__row-name {
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+
+  /* Every datum renders in Plex Mono (HANDOFF-DESIGN typography). */
+  .garage__row-identity,
+  .garage__identity,
+  .garage__stat dd,
+  .garage__input--data,
+  .garage__select--data {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+
+  .garage__row-identity,
+  .garage__identity {
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .garage__identity {
+    margin: 0;
+  }
+
+  .garage__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 1rem;
+    background: var(--panel-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .garage__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .garage__stat dt {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .garage__stat dd {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+
+  .garage__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .garage__tab {
+    font: inherit;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    color: var(--muted-strong);
+    background: var(--panel-soft);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .garage__tab[aria-selected="true"] {
+    color: var(--paper);
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .garage__tabpanel {
+    padding-left: 1rem;
+    border-left: 1px solid var(--line);
+  }
+
+  .garage__empty-note,
+  .garage__note,
+  .garage__hint,
+  .garage__fineprint {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .garage__empty {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--muted-strong);
+  }
+
+  .garage__photos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .garage__gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .garage__photo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .garage__photo-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: var(--chip);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+
+  .garage__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    margin: 0;
+  }
+
+  .garage__fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .garage__legend {
+    padding: 0 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .garage__label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .garage__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .garage__input,
+  .garage__select,
+  .garage__file {
+    font: inherit;
+    font-size: 1rem;
+    min-height: 44px;
+    padding: 0.625rem 0.75rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+
+  .garage__input:focus-visible,
+  .garage__select:focus-visible,
+  .garage__file:focus-visible,
+  .garage__tab:focus-visible,
+  .garage__button:focus-visible,
+  .garage__link:focus-visible,
+  .garage__cta:focus-visible,
+  .garage__tabpanel:focus-visible {
+    outline: 2px solid var(--rust);
+    outline-offset: 1px;
+  }
+
+  .garage__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .garage__button {
+    font: inherit;
+    font-weight: 600;
+    min-height: 44px;
+    padding: 0.625rem 1rem;
+    color: #ffffff;
+    background: var(--rust);
+    border: 1px solid var(--rust);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .garage__button:hover {
+    background: var(--rust-deep);
+    border-color: var(--rust-deep);
+  }
+
+  .garage__button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .garage__button--alt {
+    color: var(--rust-deep);
+    background: var(--rust-tint);
+    border-color: var(--rust-tint-border);
+  }
+
+  .garage__button--alt:hover:not(:disabled) {
+    color: #ffffff;
+  }
+
+  .garage__link {
+    font: inherit;
+    min-height: 44px;
+    padding: 0;
+    color: var(--rust);
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .garage__link:hover {
+    color: var(--rust-deep);
+  }
+
+  .garage__link--danger {
+    color: #a32c2c;
+  }
+
+  .garage__link--danger:hover {
+    color: #5a1f1f;
+  }
+
+  /*
+   * Kept in the layout at all times, empty or not: a live region that is
+   * `display: none` when empty is not in the accessibility tree, so the first
+   * message it ever receives is the one nobody hears.
+   */
+  .garage__message {
+    min-height: 0;
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--muted-strong);
+  }
+
+  .garage__notice {
+    margin: 0;
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--muted-strong);
+    background: var(--rust-tint);
+    border: 1px solid var(--rust-tint-border);
+    border-radius: 8px;
+  }
+
+  @media (max-width: 40rem) {
+    .garage__intro h1 {
+      font-size: 1.5rem;
+    }
+
+    .garage__grid,
+    .garage__stats {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

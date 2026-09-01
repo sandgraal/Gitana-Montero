@@ -206,7 +206,7 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
 
 ## Phase P2 — The garage
 
-- [ ] **T2-301 [PLATFORM]** Vehicle profile: create/edit, display name,
+- [x] **T2-301 [PLATFORM]** Vehicle profile: create/edit, display name,
   taxonomy identity via the 001 fitment engine, photos, odometer. Garage
   dashboard per HANDOFF-DESIGN.md's timeline direction. Depends: T2-202, 001-T203. *(GAR-01′)*
   <br>**The photos storage contract is graded ahead of you in
@@ -245,6 +245,24 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   without a signed URL, which expires. Long-lived signatures, a render-time
   proxy, or an opt-in public bucket are all sharing decisions — they belong to
   T2-401/T2-402, and pinning one here would have been inventing the answer.
+  <br>`/en/garage/` + `/es/taller/` (ES segment is the glossary's canonical
+  term — `garaje` is a Spain/Mexico alias on `all-general-taller`). Identity is
+  picked with T204's own `createVehicleOptions` reading the taxonomy payload
+  `VehicleSelector.astro` already inlines — no fork, no second request. Photos
+  live in the private `vehicle-photos` bucket; the owner's garage renders them
+  through short-lived signed URLs, and how a *public* showcase page does it is
+  still T2-401/402's open question, untouched here.
+  <br>**Two things the odometer forced:** the display unit is a
+  `localStorage` reader preference (the schema stores `odometer_km` once), and
+  `vehicleWriteFromDraft` takes the previous row so an untouched figure is
+  never re-converted — 247 500 km renders as 153 789 mi and converts back to
+  247 499, which would walk a stored odometer a kilometre per save.
+  <br>**The purge is replaced forward, not edited backward:**
+  `purge_expired_accounts` named only the receipts bucket, so ACC-03's "stored
+  files" stopped at photos. The new migration `create or replace`s it. Editing
+  T2-202's applied migration was tried first and reverted — a migration is a
+  record of what ran, so an edit to one already pushed changes what a *fresh*
+  database gets and nothing about the one that exists.
 - [ ] **T2-302 [PLATFORM]** Records + receipts: dated typed records, cost/time/
   odometer, attachment upload to private storage, vendor/date/amount fields,
   typed references into reference collections. Depends: T2-301. *(GAR-02′, GAR-05′)*

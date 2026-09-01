@@ -244,6 +244,87 @@ export interface UiStrings
    */
   readonly signInUnavailable: string;
   readonly signInScriptRequired: string;
+  /* Garage — 002 T2-301, GAR-01′, ACC-02, SHR-01 */
+  readonly navGarage: string;
+  readonly garageHeading: string;
+  readonly garageIntro: string;
+  /** Shown when this build has no Supabase project — the sign-in page's rule. */
+  readonly garageUnavailable: string;
+  readonly garageScriptRequired: string;
+  readonly garageSignedOutHeading: string;
+  readonly garageSignedOutBody: string;
+  readonly garageSignInLink: string;
+  readonly garageLoading: string;
+  readonly garageError: string;
+  /**
+   * Shown when the garage's own JavaScript could not finish loading — a
+   * deploy rotated the chunk hash under an open tab, the network dropped, or
+   * an extension or CSP blocked it. Distinct from `garageError`, which is a
+   * request that failed: this one is "the page itself did not arrive", and
+   * the only action that helps is reloading.
+   */
+  readonly garageUnreachable: string;
+  readonly garageVehiclesHeading: string;
+  readonly garageEmptyHeading: string;
+  readonly garageEmptyBody: string;
+  readonly garageAddVehicle: string;
+  readonly garageOpenVehicle: string;
+  readonly garageEditVehicle: string;
+  readonly garageFormNewHeading: string;
+  readonly garageFormEditHeading: string;
+  readonly garageNameLabel: string;
+  readonly garageNameHint: string;
+  readonly garageIdentityLegend: string;
+  readonly garageIdentityHint: string;
+  /** The "leave this facet unanswered" option on market / year / engine. */
+  readonly garageFacetUnknown: string;
+  readonly garageOdometerLabel: string;
+  readonly garageOdometerHint: string;
+  readonly garageOdometerUnitLabel: string;
+  readonly garageUnitKilometres: string;
+  readonly garageUnitMiles: string;
+  readonly garageSave: string;
+  readonly garageSaving: string;
+  readonly garageSaved: string;
+  readonly garageCancel: string;
+  readonly garageDelete: string;
+  readonly garageDeleting: string;
+  /** `{name}` is the vehicle's own display name, never stored per locale. */
+  readonly garageDeleteConfirmTemplate: string;
+  readonly garageIssueNameRequired: string;
+  /** `{max}` is `MAX_DISPLAY_NAME_LENGTH`, interpolated — never typed here. */
+  readonly garageIssueNameTooLongTemplate: string;
+  readonly garageIssueGenerationRequired: string;
+  readonly garageIssueIdentityUnknown: string;
+  readonly garageIssueYearRange: string;
+  readonly garageIssueOdometerNumber: string;
+  readonly garageIssueOdometerLarge: string;
+  readonly garageBackToVehicles: string;
+  readonly garageStatEntries: string;
+  readonly garageStatPlanned: string;
+  /** The stat row's value when a figure has not been given (GAR-01′). */
+  readonly garageStatUnrecorded: string;
+  readonly garageTabsLabel: string;
+  readonly garageTabTimeline: string;
+  readonly garageTabCurrent: string;
+  readonly garageTabPlanned: string;
+  readonly garageTimelineEmpty: string;
+  readonly garageCurrentEmpty: string;
+  readonly garagePlannedEmpty: string;
+  readonly garagePhotosHeading: string;
+  readonly garagePhotosEmpty: string;
+  readonly garagePhotosAdd: string;
+  readonly garagePhotosUploading: string;
+  /** `{name}` is the vehicle's display name — the alt text of every photo. */
+  readonly garagePhotoAltTemplate: string;
+  readonly garagePhotoRemove: string;
+  readonly garagePhotoTypeRejected: string;
+  /** `{size}` is `MAX_PHOTO_BYTES`, formatted by `Intl` at render time. */
+  readonly garagePhotoSizeRejectedTemplate: string;
+  readonly garagePhotosPrivateNote: string;
+  readonly garageUseForBrowsing: string;
+  readonly garageUsedForBrowsing: string;
+  readonly garageIdentityIncomplete: string;
   /* Vehicle selector — T204, FIT-03 */
   readonly vehicleSelectorLabel: string;
   readonly vehicleSelectorIdle: string;
@@ -415,6 +496,89 @@ const en: UiStrings = {
     "Accounts are not switched on yet on this deployment. The reference side of the site works without one.",
   signInScriptRequired:
     "Signing in needs JavaScript. Everything else on this site works without it.",
+  navGarage: "Garage",
+  garageHeading: "Your garage",
+  garageIntro:
+    "Every truck you keep here, with its photos and its odometer. Nobody else can see any of it unless you publish it.",
+  garageUnavailable:
+    "Accounts are not switched on yet on this deployment, so there is no garage to open. The reference side of the site works without one.",
+  garageScriptRequired:
+    "Your garage needs JavaScript: it is your own data, and your browser fetches it after you sign in. Everything else on this site works without it.",
+  garageSignedOutHeading: "Sign in to open your garage",
+  garageSignedOutBody:
+    "A garage belongs to an account. Signing in takes one link sent to your email — there is no password to choose.",
+  garageSignInLink: "Go to the sign-in page",
+  garageLoading: "Opening your garage…",
+  garageError:
+    "That did not go through. Try again in a moment; nothing was changed.",
+  garageUnreachable:
+    "Your garage could not be opened — the connection dropped, or something in this browser blocked part of the page. Reload to try again; nothing you have saved is affected.",
+  garageVehiclesHeading: "Your vehicles",
+  garageEmptyHeading: "No vehicles yet",
+  garageEmptyBody: `Add your Montero, Pajero or Shogun and give it a name. The truck this site was built around is called ${TRUCK_NAME}.`,
+  garageAddVehicle: "Add a vehicle",
+  garageOpenVehicle: "Open",
+  garageEditVehicle: "Edit",
+  garageFormNewHeading: "A new vehicle",
+  garageFormEditHeading: "Edit this vehicle",
+  garageNameLabel: "What you call it",
+  garageNameHint:
+    "The name you use for this truck. It is yours; nobody else sees it until you publish something.",
+  garageIdentityLegend: "Which truck it is",
+  garageIdentityHint:
+    "This is what lets parts, procedures and problems be matched to your truck. Only the generation is needed — leave the rest unanswered if you are not sure.",
+  garageFacetUnknown: "Not sure yet",
+  garageOdometerLabel: "Odometer",
+  garageOdometerHint:
+    "The reading as it stands today. It is stored once and shown back in whichever unit you pick.",
+  garageOdometerUnitLabel: "Odometer unit",
+  garageUnitKilometres: "Kilometres",
+  garageUnitMiles: "Miles",
+  garageSave: "Save vehicle",
+  garageSaving: "Saving…",
+  garageSaved: "Saved.",
+  garageCancel: "Cancel",
+  garageDelete: "Delete this vehicle",
+  garageDeleting: "Deleting…",
+  garageDeleteConfirmTemplate:
+    "Delete {name}? Its photos and everything recorded on it go with it, and that cannot be undone.",
+  garageIssueNameRequired: "Give the vehicle a name.",
+  garageIssueNameTooLongTemplate: "That name is longer than {max} characters.",
+  garageIssueGenerationRequired: "Choose the generation.",
+  garageIssueIdentityUnknown:
+    "That is not a combination the taxonomy knows. Choose again from the lists.",
+  garageIssueYearRange: "Choose a year from the list.",
+  garageIssueOdometerNumber:
+    "Write the odometer in digits, or leave the field empty.",
+  garageIssueOdometerLarge:
+    "That reading is higher than any odometer this site accepts.",
+  garageBackToVehicles: "All vehicles",
+  garageStatEntries: "Entries",
+  garageStatPlanned: "Planned",
+  garageStatUnrecorded: "Not recorded",
+  garageTabsLabel: "Garage views",
+  garageTabTimeline: "Timeline",
+  garageTabCurrent: "Current state",
+  garageTabPlanned: "Planned work",
+  garageTimelineEmpty: "Nothing has been recorded on this vehicle yet.",
+  garageCurrentEmpty:
+    "The current-state sheet is worked out from what you record, so it fills in as you go.",
+  garagePlannedEmpty: "Nothing is planned on this vehicle yet.",
+  garagePhotosHeading: "Photos",
+  garagePhotosEmpty: "No photos yet.",
+  garagePhotosAdd: "Add a photo",
+  garagePhotosUploading: "Uploading…",
+  garagePhotoAltTemplate: "Photo of {name}",
+  garagePhotoRemove: "Remove this photo",
+  garagePhotoTypeRejected:
+    "That file is not an image this site stores. JPEG, PNG, WebP, AVIF and HEIC all work.",
+  garagePhotoSizeRejectedTemplate: "That photo is larger than {size}.",
+  garagePhotosPrivateNote:
+    "Photos are held in private storage. Nobody without your session can open one, and the links this page uses expire on their own.",
+  garageUseForBrowsing: "Browse the site as this truck",
+  garageUsedForBrowsing: "The site is filtered to this truck.",
+  garageIdentityIncomplete:
+    "Name the market, the year and the engine to filter the site with this truck.",
   vehicleSelectorLabel: "Your vehicle",
   vehicleSelectorIdle: "Browsing all vehicles",
   vehicleSelectorOpen: "Select your vehicle",
@@ -589,6 +753,89 @@ const es: UiStrings = {
     "Las cuentas todavía no están activas en este despliegue. La parte de referencia del sitio funciona sin cuenta.",
   signInScriptRequired:
     "Para ingresar se necesita JavaScript. Todo lo demás en este sitio funciona sin él.",
+  navGarage: "Taller",
+  garageHeading: "Su taller",
+  garageIntro:
+    "Cada carro que guarde aquí, con sus fotos y su kilometraje. Nadie más lo ve, salvo que usted lo publique.",
+  garageUnavailable:
+    "Las cuentas todavía no están activas en este despliegue, así que no hay taller que abrir. La parte de referencia del sitio funciona sin cuenta.",
+  garageScriptRequired:
+    "Su taller necesita JavaScript: son datos suyos y el navegador los trae después de que usted ingrese. Todo lo demás en este sitio funciona sin él.",
+  garageSignedOutHeading: "Ingrese para abrir su taller",
+  garageSignedOutBody:
+    "El taller pertenece a una cuenta. Para ingresar basta con un enlace enviado a su correo: no hay contraseña que escoger.",
+  garageSignInLink: "Ir a la página de ingreso",
+  garageLoading: "Abriendo su taller…",
+  garageError:
+    "No se pudo completar. Inténtelo de nuevo en un momento; no se cambió nada.",
+  garageUnreachable:
+    "No se pudo abrir su taller: se cayó la conexión, o algo en este navegador bloqueó una parte de la página. Recargue para volver a intentarlo; nada de lo que usted haya guardado se ve afectado.",
+  garageVehiclesHeading: "Sus carros",
+  garageEmptyHeading: "Todavía no hay carros",
+  garageEmptyBody: `Agregue su Montero, Pajero o Shogun y póngale nombre. Al carro alrededor del cual se armó este sitio se le dice ${TRUCK_NAME}.`,
+  garageAddVehicle: "Agregar un carro",
+  garageOpenVehicle: "Abrir",
+  garageEditVehicle: "Editar",
+  garageFormNewHeading: "Un carro nuevo",
+  garageFormEditHeading: "Edite este carro",
+  garageNameLabel: "Cómo le dice usted",
+  garageNameHint:
+    "El nombre con el que usted llama a este carro. Es suyo: nadie más lo ve hasta que usted publique algo.",
+  garageIdentityLegend: "Cuál carro es",
+  garageIdentityHint:
+    "Es lo que permite que los repuestos, los procedimientos y las fallas se ajusten a su carro. Solo hace falta la generación; si no está seguro, deje lo demás sin responder.",
+  garageFacetUnknown: "Todavía no lo sé",
+  garageOdometerLabel: "Kilometraje",
+  garageOdometerHint:
+    "La lectura tal como está hoy. Se guarda una sola vez y se muestra en la unidad que usted escoja.",
+  garageOdometerUnitLabel: "Unidad del kilometraje",
+  garageUnitKilometres: "Kilómetros",
+  garageUnitMiles: "Millas",
+  garageSave: "Guardar el carro",
+  garageSaving: "Guardando…",
+  garageSaved: "Guardado.",
+  garageCancel: "Cancelar",
+  garageDelete: "Eliminar este carro",
+  garageDeleting: "Eliminando…",
+  garageDeleteConfirmTemplate:
+    "¿Eliminar {name}? Se van con él sus fotos y todo lo que tenga anotado, y eso no se puede deshacer.",
+  garageIssueNameRequired: "Póngale un nombre al carro.",
+  garageIssueNameTooLongTemplate: "Ese nombre pasa de {max} caracteres.",
+  garageIssueGenerationRequired: "Escoja la generación.",
+  garageIssueIdentityUnknown:
+    "Esa no es una combinación que la taxonomía conozca. Escoja de nuevo en las listas.",
+  garageIssueYearRange: "Escoja un año de la lista.",
+  garageIssueOdometerNumber:
+    "Escriba el kilometraje en dígitos, o deje el campo vacío.",
+  garageIssueOdometerLarge:
+    "Esa lectura pasa de cualquier kilometraje que el sitio acepte.",
+  garageBackToVehicles: "Todos los carros",
+  garageStatEntries: "Fichas",
+  garageStatPlanned: "Pendiente",
+  garageStatUnrecorded: "Sin registrar",
+  garageTabsLabel: "Vistas del taller",
+  garageTabTimeline: "Bitácora",
+  garageTabCurrent: "Estado actual",
+  garageTabPlanned: "Trabajo pendiente",
+  garageTimelineEmpty: "Todavía no hay nada anotado en este carro.",
+  garageCurrentEmpty:
+    "La hoja de estado actual se calcula con lo que usted anote, así que se va llenando sola.",
+  garagePlannedEmpty: "Todavía no hay nada pendiente en este carro.",
+  garagePhotosHeading: "Fotos",
+  garagePhotosEmpty: "Todavía no hay fotos.",
+  garagePhotosAdd: "Agregar una foto",
+  garagePhotosUploading: "Subiendo…",
+  garagePhotoAltTemplate: "Foto de {name}",
+  garagePhotoRemove: "Quite esta foto",
+  garagePhotoTypeRejected:
+    "Ese archivo no es una imagen de las que el sitio guarda. Sirven JPEG, PNG, WebP, AVIF y HEIC.",
+  garagePhotoSizeRejectedTemplate: "Esa foto pasa de {size}.",
+  garagePhotosPrivateNote:
+    "Las fotos quedan en almacenamiento privado. Nadie sin su sesión puede abrir una, y los enlaces que usa esta página se vencen solos.",
+  garageUseForBrowsing: "Ver el sitio como este carro",
+  garageUsedForBrowsing: "El sitio está filtrado para este carro.",
+  garageIdentityIncomplete:
+    "Indique el mercado, el año y el motor para filtrar el sitio con este carro.",
   vehicleSelectorLabel: "Su vehículo",
   vehicleSelectorIdle: "Está viendo todos los vehículos",
   vehicleSelectorOpen: "Elija su vehículo",

@@ -60,7 +60,7 @@ supabase db push                     # applies supabase/migrations/ in order
 `<ref>` is the twenty-character project reference, also visible in the project
 URL. `db push` will ask for the database password from Step 1.
 
-It should print four migrations applied, in this order:
+It should print five migrations applied, in this order:
 
 | Migration | What it creates |
 | --- | --- |
@@ -68,6 +68,31 @@ It should print four migrations applied, in this order:
 | `20260830120100_receipts_storage.sql` | the private `receipts` bucket and four path-scoped policies on `storage.objects` |
 | `20260830120200_account_lifecycle.sql` | the profile trigger, `request_account_deletion()`, `purge_expired_accounts(p_now)` |
 | `20260830120300_no_password_auth.sql` | `deny_password_login()`, the hook that refuses every password sign-in |
+| `20260831120000_vehicle_photos_storage.sql` | the private `vehicle-photos` bucket, its four path-scoped policies, and `handle_vehicle_deleted()` + its trigger |
+
+**T2-301 replaces `purge_expired_accounts`, and nothing else about T2-202.**
+That routine deleted storage rows for `bucket_id = 'receipts'`, which was the
+whole truth while receipts were the only bucket. ACC-03 says "all vehicles,
+records, and **stored files**", and a photo is a stored file, so the fifth
+migration replaces the routine with one that names both buckets.
+
+It is a `create or replace` in the **new** migration rather than an edit to
+`20260830120200`, deliberately: once you have run `supabase db push` that
+migration is marked applied and is never read again, so editing it would change
+what a *fresh* database gets and nothing at all about the one you have. This
+way the fix reaches both, and it does not matter whether you have pushed yet.
+
+Step 5's "assert it once, by hand" check gains a line: after the purge runs,
+the deleted account's objects must be gone from **both** `receipts` and
+`vehicle-photos`. To confirm which body is live before trusting it:
+
+```sql
+select prosrc like '%vehicle-photos%' as reaches_photos
+  from pg_proc where proname = 'purge_expired_accounts';
+```
+
+**Verify in the dashboard:** `Storage` now lists two buckets, `receipts` and
+`vehicle-photos`, and **neither** is marked public.
 
 **Do not run `supabase config push`.** It pushes `supabase/config.toml`
 *verbatim*, and that file is the **local** stack's configuration: its

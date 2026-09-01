@@ -182,13 +182,13 @@ function vehicleDeleteCleanupBody(sql: string): string {
  * ====================================================================== */
 
 describe("the vehicle-photos bucket is created private", () => {
-  it.fails("creates a private bucket and never flips it public", () => {
+  it("creates a private bucket and never flips it public", () => {
     expect(bucketPrivacyIssues(migrationSql(), VEHICLE_PHOTOS_BUCKET)).toEqual(
       []
     );
   });
 
-  it.fails("polices the bucket, on all four commands, scoped by path", () => {
+  it("polices the bucket, on all four commands, scoped by path", () => {
     // `bucketPolicyIssues` rather than `storagePolicyIssues`: the whole-table
     // rule is satisfied today by receipts alone, and would stay satisfied if
     // the photos bucket shipped with no policy whatsoever.
@@ -197,7 +197,7 @@ describe("the vehicle-photos bucket is created private", () => {
     );
   });
 
-  it.fails("grants no vehicle-photos policy to anon", () => {
+  it("grants no vehicle-photos policy to anon", () => {
     // Both halves matter. Filtering for "granted to" alone would pass
     // vacuously today — there are no photo policies, so there are no policies
     // granted to anon — which is a grader that reports success because the
@@ -210,7 +210,7 @@ describe("the vehicle-photos bucket is created private", () => {
     );
   });
 
-  it.fails("restricts the bucket to image MIME types", () => {
+  it("restricts the bucket to image MIME types", () => {
     // Not fussiness: an un-typed bucket is a general-purpose file host that
     // happens to be attached to a truck, and the first thing a private
     // general-purpose file host attracts is content nobody signed up to store.
@@ -242,7 +242,7 @@ describe("ACC-03 reaches photos, not just receipts", () => {
     expect(deletionReachesBucket(body, "receipts")).toBe(true);
   });
 
-  it.fails("purge_expired_accounts deletes vehicle-photos objects", () => {
+  it("purge_expired_accounts deletes vehicle-photos objects", () => {
     // The gap. T2-301 must generalise this function or extend it; ACC-03 says
     // "all vehicles, records, and stored files", and a photo is a stored file.
     const body = functionBody(migrationSql(), "purge_expired_accounts");
@@ -250,7 +250,7 @@ describe("ACC-03 reaches photos, not just receipts", () => {
     expect(deletionReachesBucket(body, VEHICLE_PHOTOS_BUCKET)).toBe(true);
   });
 
-  it.fails("deleting one vehicle reaches its photo objects", () => {
+  it("deleting one vehicle reaches its photo objects", () => {
     // No foreign key can do this: a storage object is not a row in `public`,
     // so `on delete cascade` has nothing to hang from. It needs a trigger on
     // `vehicles` — and the two-segment path convention is what makes the
@@ -262,7 +262,7 @@ describe("ACC-03 reaches photos, not just receipts", () => {
     ).toBeDefined();
   });
 
-  it.fails("the vehicle-delete cleanup targets the photos bucket", () => {
+  it("the vehicle-delete cleanup targets the photos bucket", () => {
     // Separate from the trigger existing, because a trigger that fires and
     // deletes nothing is the failure this whole file is about.
     //
@@ -417,7 +417,7 @@ async function createVehicleWithPhoto(
 describe.skipIf(!live.available)(
   liveTitle("a vehicle photo has no public URL", live),
   () => {
-    it.fails("the public object route does not serve a photo", async () => {
+    it("the public object route does not serve a photo", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const { photoPath } = await createVehicleWithPhoto(
@@ -438,7 +438,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("an unauthenticated direct read does not serve it", async () => {
+    it("an unauthenticated direct read does not serve it", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const { photoPath } = await createVehicleWithPhoto(
@@ -459,7 +459,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("anon cannot list the photos bucket", async () => {
+    it("anon cannot list the photos bucket", async () => {
       // A photo path is `<owner uuid>/<vehicle id>/<file>`, so a listing
       // hands out the owner id, the vehicle id, and the filename at once.
       const scenario = await provisionScenario(stackOf(live));
@@ -479,37 +479,34 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "POSITIVE CONTROL: the owner reads their own photo back",
-      async () => {
-        // Every denial above is satisfied by a bucket that does not exist.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const { photoPath } = await createVehicleWithPhoto(
-            scenario,
-            scenario.ownerA
-          );
+    it("POSITIVE CONTROL: the owner reads their own photo back", async () => {
+      // Every denial above is satisfied by a bucket that does not exist.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const { photoPath } = await createVehicleWithPhoto(
+          scenario,
+          scenario.ownerA
+        );
 
-          const ownerRead = await downloadObject(
-            scenario,
-            scenario.ownerA,
-            photoPath,
-            VEHICLE_PHOTOS_BUCKET
-          );
+        const ownerRead = await downloadObject(
+          scenario,
+          scenario.ownerA,
+          photoPath,
+          VEHICLE_PHOTOS_BUCKET
+        );
 
-          expect(ownerRead.ok).toBe(true);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(ownerRead.ok).toBe(true);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
   }
 );
 
 describe.skipIf(!live.available)(
   liveTitle("one owner's photos are their own", live),
   () => {
-    it.fails("owner B cannot read owner A's photo", async () => {
+    it("owner B cannot read owner A's photo", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const { photoPath } = await createVehicleWithPhoto(
@@ -530,7 +527,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("owner B cannot sign for owner A's photo", async () => {
+    it("owner B cannot sign for owner A's photo", async () => {
       // The refusal has to happen at signing: a signed URL is a bearer token,
       // and once issued nothing downstream asks who asked for it.
       const scenario = await provisionScenario(stackOf(live));
@@ -554,7 +551,7 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails("owner B cannot upload into owner A's prefix", async () => {
+    it("owner B cannot upload into owner A's prefix", async () => {
       // An attacker who can write under someone else's prefix can also
       // replace a photo with something else entirely.
       const scenario = await provisionScenario(stackOf(live));
@@ -579,45 +576,42 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "POSITIVE CONTROL: the owner's signed URL works without credentials",
-      async () => {
-        // The feature has to work: a signed URL nobody can follow would
-        // satisfy every denial above and ship a garage where no photo ever
-        // renders.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const { photoPath } = await createVehicleWithPhoto(
-            scenario,
-            scenario.ownerA
-          );
+    it("POSITIVE CONTROL: the owner's signed URL works without credentials", async () => {
+      // The feature has to work: a signed URL nobody can follow would
+      // satisfy every denial above and ship a garage where no photo ever
+      // renders.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const { photoPath } = await createVehicleWithPhoto(
+          scenario,
+          scenario.ownerA
+        );
 
-          const signed = await signObject(
-            scenario,
-            scenario.ownerA,
-            photoPath,
-            VEHICLE_PHOTOS_BUCKET
-          );
-          expect(signed.ok).toBe(true);
+        const signed = await signObject(
+          scenario,
+          scenario.ownerA,
+          photoPath,
+          VEHICLE_PHOTOS_BUCKET
+        );
+        expect(signed.ok).toBe(true);
 
-          const url = (signed.body as { signedURL?: string }).signedURL ?? "";
-          expect(url).toBeTruthy();
+        const url = (signed.body as { signedURL?: string }).signedURL ?? "";
+        expect(url).toBeTruthy();
 
-          const followed = await followSignedUrl(stackOf(live), url);
+        const followed = await followSignedUrl(stackOf(live), url);
 
-          expect(followed.ok).toBe(true);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(followed.ok).toBe(true);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
   }
 );
 
 describe.skipIf(!live.available)(
   liveTitle("deleting reaches the objects", live),
   () => {
-    it.fails("deleting a vehicle removes its photo objects", async () => {
+    it("deleting a vehicle removes its photo objects", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const { vehicleId, photoPath } = await createVehicleWithPhoto(
@@ -646,38 +640,35 @@ describe.skipIf(!live.available)(
       }
     });
 
-    it.fails(
-      "deleting one vehicle leaves another vehicle's photos alone",
-      async () => {
-        // The over-reach direction, which is the same defect wearing the
-        // opposite coat and much harder to notice in production.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const keep = await createVehicleWithPhoto(scenario, scenario.ownerA);
-          const drop = await createVehicleWithPhoto(scenario, scenario.ownerA);
+    it("deleting one vehicle leaves another vehicle's photos alone", async () => {
+      // The over-reach direction, which is the same defect wearing the
+      // opposite coat and much harder to notice in production.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const keep = await createVehicleWithPhoto(scenario, scenario.ownerA);
+        const drop = await createVehicleWithPhoto(scenario, scenario.ownerA);
 
-          await deleteRows(
-            scenario,
-            scenario.ownerA,
-            "vehicles",
-            `id=eq.${drop.vehicleId}`
-          );
+        await deleteRows(
+          scenario,
+          scenario.ownerA,
+          "vehicles",
+          `id=eq.${drop.vehicleId}`
+        );
 
-          const survivor = await downloadObject(
-            scenario,
-            scenario.ownerA,
-            keep.photoPath,
-            VEHICLE_PHOTOS_BUCKET
-          );
+        const survivor = await downloadObject(
+          scenario,
+          scenario.ownerA,
+          keep.photoPath,
+          VEHICLE_PHOTOS_BUCKET
+        );
 
-          expect(survivor.ok).toBe(true);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(survivor.ok).toBe(true);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
 
-    it.fails("the account purge removes photo objects too", async () => {
+    it("the account purge removes photo objects too", async () => {
       // ACC-03's "all vehicles, records, and stored files". Photos are stored
       // files, and today's purge names only the receipts bucket.
       const scenario = await provisionScenario(stackOf(live));
