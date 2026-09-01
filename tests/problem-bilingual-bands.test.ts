@@ -313,6 +313,28 @@ describe("the safety notice is bilingual and conditioned on safety.ts (PRB-03)",
     expect(doc.querySelector(".safety")).not.toBeNull();
   });
 
+  it("labels the band with a heading id derived from the system", async () => {
+    // Not the constant `"safety-heading"` it defaulted to (PR #72, Copilot):
+    // a second consumer on one page — T502's procedures template is planned —
+    // would emit two elements with one id, and `aria-labelledby` resolves to
+    // the first, so one notice would announce the other's system.
+    const doc = await renderPage("en", { system: "brakes" });
+    const band = doc.querySelector(".safety");
+    const heading = doc.querySelector(".safety__title");
+
+    expect(heading?.id).toBe("safety-notice-brakes");
+    expect(band?.getAttribute("aria-labelledby")).toBe(heading?.id);
+  });
+
+  it("gives two systems two different ids", async () => {
+    const brakes = await renderPage("en", { system: "brakes" });
+    const fuel = await renderPage("en", { system: "fuel" });
+
+    expect(brakes.querySelector(".safety__title")?.id).not.toBe(
+      fuel.querySelector(".safety__title")?.id
+    );
+  });
+
   it("stays off an entry that is not safety-critical", async () => {
     expect(isSafetyCritical({ system: "hvac" })).toBe(false);
     const doc = await renderPage("en", { system: "hvac" });

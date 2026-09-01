@@ -19,6 +19,24 @@
  * the band — a page that renders it conditionally on something it derived
  * itself would be a second answer to a safety question.
  *
+ * ## The heading id is derived from the system, not a constant
+ *
+ * `aria-labelledby` needs an id, and the id has to be unique in the document.
+ * The first version defaulted it to the literal `"safety-heading"`, which was
+ * correct only for as long as this component had exactly one consumer: a second
+ * one on the same page (T502's procedures template is already planned, and
+ * PRC-02 routes it straight here) would emit two elements with one id, and
+ * `aria-labelledby` resolves to the *first* — so one of the two notices would
+ * silently announce the other's system (PR #72, Copilot).
+ *
+ * Deriving it from `system` fixes that for every case worth having: a page
+ * showing notices for the brakes and for the fuel system gets two distinct ids,
+ * with no burden on the call site and no id that changes between builds. A
+ * generated counter would also be unique, but it would depend on render order
+ * and make the built HTML churn between builds for no gain. The remaining
+ * collision — two notices for the *same* system on one page, which is a
+ * rendering mistake rather than a use case — is what the optional prop is for.
+ *
  * ## Both languages, in one band, page locale first
  *
  * "Bilingual" is the requirement's own word, so like the triage banner this is
@@ -37,10 +55,14 @@ interface Props {
   locale: Locale;
   /** Named in the heading, in each locale's own vocabulary. */
   system: GlossarySystem;
+  /**
+   * Overrides the derived id. Only needed for the one case the default cannot
+   * cover — two notices for the *same* system on one page.
+   */
   headingId?: string;
 }
 
-const { locale, system, headingId = "safety-heading" } = Astro.props;
+const { locale, system, headingId = `safety-notice-${system}` } = Astro.props;
 
 const readingOrder: Locale[] = [
   locale,

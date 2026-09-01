@@ -105,16 +105,58 @@ export function problemRoutePath(segment: string, slug: string): string {
  * ---------------------------------------------------------------------- */
 
 /**
+ * The rank an *unrecognised* drivability sorts at: past the end of
+ * {@link DRIVABILITY_STATES}, i.e. **more restrictive than `tow-only`**.
+ *
+ * `compareProblems` orders by descending drivability rank, so this is what puts
+ * an unassessed problem at the **top** of a triage listing. The doctrine is the
+ * repo's own unknown-vs-zero rule pointed at ordering: a value nobody has
+ * assessed is not a value nobody needs to worry about. A reader scanning a list
+ * to decide whether to drive must not find the one entry whose triage is
+ * unknown sitting at the bottom, below "drive normally", where it reads as the
+ * least of their concerns.
+ *
+ * Deliberately not `-1`, which is what `indexOf` returns and what this
+ * function used to hand back: under a descending comparator `-1` sorts *last*,
+ * which is the exact inversion of the intent the docstring had always claimed
+ * (PR #72, Copilot).
+ */
+export const UNKNOWN_DRIVABILITY_RANK = DRIVABILITY_STATES.length;
+
+/**
  * Position of a drivability state in {@link DRIVABILITY_STATES}, i.e. how
- * restrictive it is. `-1` for anything unrecognised, which sorts before
- * everything — a value the schema cannot produce, so this only ever guards a
- * caller that built its own object.
+ * restrictive it is — `0` for `drive-normally`, and highest for `tow-only`.
+ *
+ * ## The unknown branch is unreachable through the schema, and kept anyway
+ *
+ * `drivability` is a required closed enum (`drivabilitySchema` in
+ * `src/schemas/problems.ts` — no `.optional()`, no `.default()`), so a parsed
+ * collection entry can never carry a value that is not in the list: the build
+ * fails first, naming the field. The branch therefore only ever guards a caller
+ * that hand-built a `ProblemOrderable` — a test fixture, or a future listing
+ * assembled from something other than the collection.
+ *
+ * It is kept, and aligned to {@link UNKNOWN_DRIVABILITY_RANK}, because the cost
+ * of the two outcomes is not symmetric. If the branch is never taken it costs
+ * one comparison; if it is ever taken because some future caller loosened the
+ * shape, the alternative was silently filing an unassessed problem below
+ * "drive normally".
  */
 export function drivabilityRank(state: DrivabilityState): number {
-  return DRIVABILITY_STATES.indexOf(state);
+  const index = DRIVABILITY_STATES.indexOf(state);
+  return index === -1 ? UNKNOWN_DRIVABILITY_RANK : index;
 }
 
-/** Position in {@link PROBLEM_SEVERITIES}; 0 is `safety-critical`. */
+/**
+ * Position in {@link PROBLEM_SEVERITIES}; `0` is `safety-critical`.
+ *
+ * Unknown sorts first here too, and gets there without a branch: this ladder is
+ * ordered worst-first and `compareProblems` sorts it *ascending*, so
+ * `indexOf`'s `-1` already lands an unrecognised severity above
+ * `safety-critical`. Same doctrine as {@link UNKNOWN_DRIVABILITY_RANK}, same
+ * unreachability (`problemSeveritySchema` is a required closed enum) — only the
+ * arithmetic differs, because the two ladders run in opposite directions.
+ */
 export function severityRank(severity: ProblemSeverity): number {
   return PROBLEM_SEVERITIES.indexOf(severity);
 }
@@ -139,6 +181,11 @@ export interface ProblemOrderable {
  *
  * Deterministic to the last comparison: two entries never compare equal unless
  * all three keys match, so a listing does not reshuffle between builds.
+ *
+ * Both rank functions put an *unassessed* value first — see
+ * {@link UNKNOWN_DRIVABILITY_RANK}. Neither is reachable from parsed content;
+ * both are aligned so that if one ever is, the listing errs loud rather than
+ * quiet.
  */
 export function compareProblems(
   a: ProblemOrderable,

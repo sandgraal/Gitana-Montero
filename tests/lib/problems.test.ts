@@ -24,6 +24,7 @@ import {
   problemRoutePath,
   problemSlugRegistry,
   severityRank,
+  UNKNOWN_DRIVABILITY_RANK,
 } from "../../src/lib/problems.ts";
 import {
   COST_BANDS,
@@ -98,6 +99,95 @@ describe("triage ordering", () => {
   it("ranks `safety-critical` as the worst severity", () => {
     expect(severityRank("safety-critical")).toBe(0);
     expect(severityRank("cosmetic")).toBe(PROBLEM_SEVERITIES.length - 1);
+  });
+
+  /*
+   * The unknown-vs-zero doctrine, pointed at ordering (PR #72, Copilot).
+   *
+   * `drivability` and `severity` are required closed enums, so neither value
+   * below can come out of the collection — `astro build` fails on it first,
+   * naming the field. These fixtures are therefore **non-survivable**: they are
+   * hand-built `ProblemOrderable`s, cast past the compiler, which is exactly
+   * the caller the defensive branch exists for. What they pin is the
+   * *direction* of the branch, and the direction is the whole point: the
+   * comparator used to sort an unassessed problem LAST, below "drive
+   * normally", while the docstring claimed it sorted first.
+   */
+  const unassessed = {
+    severity: "degrading",
+    drivability: "not-a-triage-state",
+    title: "a",
+  } as unknown as Parameters<typeof compareProblems>[0];
+
+  it("ranks an unassessed drivability past the most restrictive state", () => {
+    expect(UNKNOWN_DRIVABILITY_RANK).toBe(DRIVABILITY_STATES.length);
+    expect(
+      drivabilityRank(
+        "not-a-triage-state" as unknown as Parameters<typeof drivabilityRank>[0]
+      )
+    ).toBe(UNKNOWN_DRIVABILITY_RANK);
+    // Never -1: under a descending comparator that sorts it last, which is the
+    // inversion this grader exists to prevent.
+    expect(drivabilityRank("tow-only")).toBeLessThan(UNKNOWN_DRIVABILITY_RANK);
+  });
+
+  it("sorts an unassessed problem FIRST, above tow-only", () => {
+    const towOnly = {
+      severity: "safety-critical" as const,
+      drivability: "tow-only" as const,
+      title: "z",
+    };
+    expect(compareProblems(unassessed, towOnly, collator)).toBeLessThan(0);
+    expect(compareProblems(towOnly, unassessed, collator)).toBeGreaterThan(0);
+  });
+
+  it("sorts an unassessed problem above every recognised state", () => {
+    for (const state of DRIVABILITY_STATES) {
+      const known = {
+        severity: "safety-critical" as const,
+        drivability: state,
+        title: "z",
+      };
+      expect(
+        compareProblems(unassessed, known, collator),
+        `unassessed must precede ${state}`
+      ).toBeLessThan(0);
+    }
+  });
+
+  it("sorts an unassessed severity first too, by the same doctrine", () => {
+    const unknownSeverity = {
+      severity: "not-a-severity",
+      drivability: "drive-normally",
+      title: "a",
+    } as unknown as Parameters<typeof compareProblems>[0];
+    const worst = {
+      severity: "safety-critical" as const,
+      drivability: "drive-normally" as const,
+      title: "a",
+    };
+    expect(compareProblems(unknownSeverity, worst, collator)).toBeLessThan(0);
+  });
+
+  it("leaves a whole listing with the unassessed entry at the top", () => {
+    // The property a reader actually experiences: sort the list, look at row
+    // one. A rank sign error is invisible in a pairwise test that only ever
+    // compares two knowns.
+    const rows = [
+      {
+        severity: "cosmetic" as const,
+        drivability: "drive-normally" as const,
+        title: "a",
+      },
+      unassessed,
+      {
+        severity: "safety-critical" as const,
+        drivability: "tow-only" as const,
+        title: "b",
+      },
+    ];
+    const sorted = [...rows].sort((a, b) => compareProblems(a, b, collator));
+    expect(sorted[0]).toBe(unassessed);
   });
 
   it("puts the truck you must not drive above the one you may", () => {
