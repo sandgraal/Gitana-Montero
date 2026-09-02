@@ -219,11 +219,15 @@ Stop and ask before any of these:
   on the task's own `tasks.md` line — never silently. The record states what
   independent assurance was substituted (a mutation-battery count, an
   audit pass) and counts against a standing debt the conductor is
-  responsible for working down, not letting grow unchecked. As of
-  2026-09-01 that debt was T207, T208, T401, and T501, addressed the same
-  day via independent audit passes (see the 2026-09-01 harness
-  retrospective). The next occurrence should close debt, not add to it,
-  without a deliberate, stated reason to do otherwise.
+  responsible for working down, not letting grow unchecked. The
+  2026-09-01 debt (T207, T208, T401, T501) is **fully closed as of
+  2026-09-02**: each got an independent audit pass, each audit found real
+  gaps, and every finding has a merged `[TEST]` backfill plus a merged
+  `[PLATFORM]` activation fix (T207 additionally required and received the
+  safety-critical double-review, since its F3 finding was towing/jacking
+  derivation). The ledger is at zero. The next occurrence should close
+  debt, not add to it, without a deliberate, stated reason to do
+  otherwise.
 - A clean fact-check, a clean bilingual edit, and all required branch-protection
   checks authorize the `pr-shepherd` to merge without another confirmation.
 - Never `--no-verify`, never a bare force-push, never `gh pr merge --admin`,

@@ -396,16 +396,38 @@ would make that pass mechanical.
 
 ### 5.4 New standing risk — the two `[TEST]`-less halves (T207, T208)
 
-Recorded as F4 and flagged for this audit; confirmed at §1/E12. Both
+> **CLOSED 2026-09-02** (harness retrospective, 2026-09-01/02) — both
+> `[TEST]`-less schema surfaces named below now have an independent grader
+> pass. `fix/001-t207-audit-graders` and `fix/001-t208-audit-graders`
+> (test-writer-authored, derived from spec only, not from the existing
+> implementation) merged first; each found real gaps the implementer's own
+> mutant battery had not caught (T207: dimension sign scoping leaked across
+> unit families, the FSM anti-reproduction cap read only half the prose
+> object, no ratchet existed for safety-critical subjects lacking a
+> `GLOSSARY_SYSTEMS` id; T208: two more findings, addressed in the same
+> wave).
+> Each finding then got an independent `[PLATFORM]` activation fix from a
+> *different* implementer instance than the one who wrote the original
+> code, with T207's safety-critical F3 finding additionally receiving the
+> mandatory double independent-review pass. All landed on `main`. The
+> recommendation below — an explicit `[TEST]` back-fill before T501 — was
+> not followed in that order (T501 itself later needed the same backfill
+> treatment, discovered by the same retrospective), but the debt named
+> here is fully retired; see `AGENTS.md`'s `[TEST]`-debt paragraph.
+
+As originally written (before the 2026-09-02 closure above), this audit found:
+recorded as F4 and flagged for this audit; confirmed at §1/E12. Both
 `src/schemas/reference.ts` (the `reference` collection, five kinds) and its T208
 extension (three decoder kinds) shipped with **no independent grader author** —
-`src/schemas/reference.test.ts` has only implementer commits. A mutant battery
-run by the reviewer is a real control, but it is the *same lineage* checking its
-own work, which is the thing the separation rule exists to prevent.
+`src/schemas/reference.test.ts` had only implementer commits. A mutant battery
+run by the reviewer was a real control, but it was the *same lineage* checking
+its own work, which is the thing the separation rule exists to prevent.
 
-This is now the largest schema surface in the repo without an independent test
-pass, and Phase 5 (`T501` parts, `T502` procedures) depends on it. Recommend an
-explicit `[TEST]` back-fill task before T501 rather than after.
+This was, at the time, the largest schema surface in the repo without an
+independent test pass, and Phase 5 (`T501` parts, `T502` procedures) depended
+on it. This audit recommended an explicit `[TEST]` back-fill task before T501
+rather than after — not followed in that order, per the closure note above,
+but the underlying risk this section named is retired regardless of sequence.
 
 ### 5.5 New standing risk — 66 security graders are skipped by default and are not run in CI
 
