@@ -53,6 +53,13 @@ the user's own record and is not fact-checked by the site.
 
 - **GAR-01′** A user SHALL create vehicle profiles with a display name,
   taxonomy identity resolved by the 001 fitment engine, photos, and odometer.
+  A user SHALL be able to designate one uploaded photo as the vehicle's
+  **cover photo** (owner-approved addition, 2026-09-02), rendered wherever
+  the vehicle is shown as a single item — the garage vehicle list, and any
+  future showcase-page card (SHR-02). Removing the designated cover photo
+  SHALL leave the vehicle with no cover rather than silently promoting
+  another one; a vehicle with photos but no cover renders its existing
+  no-photo placeholder.
 - **GAR-02′** A user SHALL add records to their vehicle: dated, typed (work /
   receipt / note / plan), with optional cost, time, odometer, attachments, and
   typed references to reference entries (problems, parts, procedures).
