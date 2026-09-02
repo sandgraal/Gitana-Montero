@@ -77,12 +77,25 @@ function withFileIndex(error: unknown, entries: readonly LoadedEntry[]): Error {
     return error instanceof Error ? error : new Error(String(error));
   }
 
-  const fileById = new Map<string, string>();
+  /**
+   * `id -> every file that declares it`, not just the first (PR #75,
+   * r3910083212).
+   *
+   * The first version kept one file per id, which is wrong for exactly the
+   * issue that most needs the information: a `duplicate-entry-id` failure is
+   * *by definition* about two or more files sharing one id, and a report that
+   * named only the first one sent the author to the file that is as likely as
+   * not the correct one. One id can legitimately map to several files here —
+   * that is the bug being reported, so the index has to be able to represent
+   * it.
+   */
+  const filesById = new Map<string, string[]>();
   for (const entry of entries) {
     const { id } = (entry.data ?? {}) as { id?: unknown };
-    if (typeof id === "string" && !fileById.has(id)) {
-      fileById.set(id, entry.file);
-    }
+    if (typeof id !== "string") continue;
+    const files = filesById.get(id) ?? [];
+    files.push(entry.file);
+    filesById.set(id, files);
   }
 
   const mentioned = (issue: PartIssue): string[] => [
@@ -92,10 +105,9 @@ function withFileIndex(error: unknown, entries: readonly LoadedEntry[]): Error {
 
   const named = [...new Set(error.issues.flatMap(mentioned))]
     .sort()
-    .flatMap((id) => {
-      const file = fileById.get(id);
-      return file === undefined ? [] : [`  ${id} → ${file}`];
-    });
+    .flatMap((id) =>
+      [...(filesById.get(id) ?? [])].sort().map((file) => `  ${id} → ${file}`)
+    );
 
   if (named.length === 0) return error;
 

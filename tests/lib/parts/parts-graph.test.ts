@@ -132,6 +132,48 @@ describe("PRT-03 — one OEM number is one part is one page", () => {
     // the id it starts from means two things — one mistake, one error.
     expect(codes(issues)).toEqual(["duplicate-entry-id"]);
   });
+
+  /*
+   * PR #75, r3910083275. `relatedEntryIds` used to be `group.map(p => p.id)`,
+   * i.e. the *same* id repeated once per colliding file — noise that made a
+   * two-file collision read as though two ids were involved. Every entry in
+   * the group declares the same id by construction, so there is no other id to
+   * name; the files are the build caller's to add.
+   */
+  it("names no other entry id for a collision that is about one id", () => {
+    const issues = findPartIssues([
+      part("test-parts-alpha", "TEST-A0001"),
+      part("test-parts-alpha", "TEST-A0002"),
+      part("test-parts-alpha", "TEST-A0003"),
+    ]);
+
+    expect(issues).toHaveLength(1);
+    const [issue] = issues;
+    expect(issue?.entryId).toBe("test-parts-alpha");
+    expect(issue?.relatedEntryIds).toEqual([]);
+    // The count still carries how many files are involved.
+    expect(issue?.message).toContain("3 parts entries");
+  });
+
+  it("keeps relatedEntryIds distinct and free of the entry it is reported on", () => {
+    for (const issues of [
+      findPartIssues([
+        part("test-parts-alpha", "TEST-A0001"),
+        part("test-parts-alpha", "TEST-A0002"),
+      ]),
+      findPartIssues([
+        part("test-parts-alpha", "TEST-A0001"),
+        part("test-parts-beta", "TEST-A0001"),
+        part("test-parts-gamma", "TEST-A0001"),
+      ]),
+    ]) {
+      for (const issue of issues) {
+        const related = issue.relatedEntryIds;
+        expect(new Set(related).size, issue.code).toBe(related.length);
+        expect(related, issue.code).not.toContain(issue.entryId);
+      }
+    }
+  });
 });
 
 describe("PRT-02 — supersession pointers resolve and terminate", () => {

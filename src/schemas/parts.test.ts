@@ -23,6 +23,8 @@
  *
  * refs specs/001-foundation (PRT-01, PRT-02, PRT-03)
  */
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { issuePaths } from "../../tests/helpers/schema-outcome.ts";
 import {
@@ -175,6 +177,89 @@ describe("supersession pointers (PRT-02)", () => {
     const entry = makePart();
     expect("supersededBy" in entry).toBe(false);
     expect(partsSchema.safeParse(entry).success).toBe(true);
+  });
+});
+
+/**
+ * PR #75, r3910083246. The cross-reference dedup key used a NUL (U+0000) as
+ * its brand/number delimiter — the standard guaranteed-safe-separator trick,
+ * and a correct one — but it went into the source as a **raw byte** rather
+ * than an escape sequence. It was therefore invisible in every editor and
+ * every diff, and neither Prettier nor ESLint objected; it survived a full
+ * review round and two rebases unnoticed.
+ *
+ * The key is a nested map now, so there is no delimiter to get wrong. These
+ * two pin both halves: the shape cannot conflate two distinct pairs, and the
+ * source cannot carry an invisible control character again.
+ */
+describe("the cross-reference pair key (PR #75, r3910083246)", () => {
+  const OWNED = [
+    "./parts.ts",
+    "../lib/parts/index.ts",
+    "../lib/parts/filter.ts",
+    "../lib/parts/part-numbers.ts",
+    "../integrations/validate-parts.ts",
+  ];
+
+  it.each(OWNED)(
+    "keeps %s free of invisible control characters",
+    (relative) => {
+      const source = readFileSync(
+        fileURLToPath(new URL(relative, import.meta.url)),
+        "utf8"
+      );
+      // NUL and the C0 range, minus tab/newline/carriage return.
+      // eslint-disable-next-line no-control-regex
+      expect(source).not.toMatch(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/);
+    }
+  );
+
+  it("does not conflate two pairs that differ only at the brand/number boundary", () => {
+    const issues = refineIssues(
+      makePart({
+        crossReferences: [
+          {
+            ref: "a",
+            brand: "TESTBRAND",
+            partNumber: "X1",
+            quality: "equivalent",
+          },
+          {
+            ref: "b",
+            brand: "TESTBRANDX",
+            partNumber: "1",
+            quality: "equivalent",
+          },
+        ],
+      })
+    );
+    // Two different brands, two different numbers, two legitimate rows. A key
+    // built by joining the halves with a character either half may contain
+    // would report these as duplicates of each other.
+    expect(issues).toEqual([]);
+  });
+
+  it("still catches a genuine duplicate pair", () => {
+    const issues = refineIssues(
+      makePart({
+        crossReferences: [
+          {
+            ref: "a",
+            brand: "TESTBRAND",
+            partNumber: "TEST-X0001",
+            quality: "equivalent",
+          },
+          {
+            ref: "b",
+            brand: "testbrand",
+            partNumber: "TESTX0001",
+            quality: "equivalent",
+          },
+        ],
+      })
+    );
+    // Same brand modulo case, same number modulo hyphens.
+    expect(issues.map((issue) => issue.path)).toContain("crossReferences.1");
   });
 });
 

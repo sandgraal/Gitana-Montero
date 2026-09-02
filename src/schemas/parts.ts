@@ -562,19 +562,47 @@ function checkCrossReferenceRefsAreUnique(
   }
 }
 
-/** The same brand may not list the same number twice. */
+/**
+ * The same brand may not list the same number twice.
+ *
+ * ## Why the index is nested rather than keyed by a joined string
+ *
+ * The pair `(brand, partNumber)` is the identity here, and the obvious
+ * `` `${brand}${SEP}${number}` `` needs a separator that can never occur in
+ * either half — otherwise `("A B", "C")` and `("A", "B C")` collapse into one
+ * key and a real duplicate goes unreported (or, worse, two distinct rows are
+ * reported as duplicates of each other).
+ *
+ * The first version solved that with a NUL (U+0000) delimiter, which is the
+ * standard trick and *was* correct — but it went into the file as a **raw NUL
+ * byte** rather than an escape sequence, so it was invisible in every editor
+ * and diff, and neither Prettier nor ESLint objected (PR #75, r3910083246).
+ * A safety property nobody can see is a safety property nobody can maintain.
+ *
+ * Nesting the maps removes the question instead of documenting it: with one
+ * map per brand there is no delimiter to collide on, no character to escape,
+ * and nothing invisible in the source. It also stops depending on a rule that
+ * lives in another module — today `PART_NUMBER_PATTERN` forbids spaces, which
+ * is what would have made a plain `" "` separator safe, and a future
+ * loosening of that pattern would have silently broken this function.
+ */
 function checkCrossReferencePairsAreUnique(
   entry: PartsEntryShape,
   ctx: PartsRefineContext
 ): void {
-  const seen = new Map<string, number>();
+  /** `brand -> normalized part number -> the index that claimed it first`. */
+  const seen = new Map<string, Map<string, number>>();
 
   for (const { brand, partNumber, index } of readCrossReferences(entry)) {
     if (brand === undefined || partNumber === undefined) continue;
-    const key = `${brand.trim().toLowerCase()} ${normalizePartNumber(partNumber)}`;
-    const first = seen.get(key);
+
+    const brandKey = brand.trim().toLowerCase();
+    const numberKey = normalizePartNumber(partNumber);
+    const byNumber = seen.get(brandKey) ?? new Map<string, number>();
+    const first = byNumber.get(numberKey);
     if (first === undefined) {
-      seen.set(key, index);
+      byNumber.set(numberKey, index);
+      seen.set(brandKey, byNumber);
       continue;
     }
 

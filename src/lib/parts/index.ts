@@ -378,12 +378,26 @@ function duplicateEntryIdIssues(parts: readonly PartIdentity[]): PartIssue[] {
       code: "duplicate-entry-id" as const,
       entryId: id,
       field: "id",
-      relatedEntryIds: group.map((part) => part.id),
+      /**
+       * Empty, and that is the honest answer (PR #75, r3910083275).
+       *
+       * Every entry in this group declares *this* id — that is what makes it a
+       * group — so there is no *other* entry id to name. The first version
+       * listed `group.map((part) => part.id)`, which was the same string
+       * repeated once per colliding file: it told a reader nothing, and it
+       * made a two-file collision look like it involved two ids.
+       *
+       * What actually distinguishes the colliding entries is their **file**,
+       * which this module cannot see. `withFileIndex` in
+       * `src/integrations/validate-parts.ts` resolves the id to *every* file
+       * that declares it, so the build error names all of them.
+       */
+      relatedEntryIds: [],
       message:
         `${group.length} parts entries declare \`id: "${id}"\`. Entry ids are ` +
         `how \`supersededBy\` and every other typed reference name a part, so ` +
-        `a duplicated id makes every pointer to it ambiguous. ` +
-        `refs specs/001-foundation (PRT-02)`,
+        `a duplicated id makes every pointer to it ambiguous. The files are ` +
+        `listed below. refs specs/001-foundation (PRT-02)`,
     }));
 }
 
@@ -411,7 +425,14 @@ function duplicateOemNumberIssues(parts: readonly PartIdentity[]): PartIssue[] {
         code: "duplicate-oem-number" as const,
         entryId: first.id,
         field: "oemNumber",
-        relatedEntryIds: rest.map((part) => part.id),
+        /**
+         * The *other* claimants, distinct and never including `entryId`.
+         * `findPartIssues` short-circuits on a duplicated entry id, so `rest`
+         * cannot repeat one today — the `Set` is a cheap guarantee that this
+         * stays true if that staging ever changes, and it is what lets the
+         * build caller turn the list into one file line per entry.
+         */
+        relatedEntryIds: [...new Set(rest.map((part) => part.id))],
         message:
           `${sorted.length} parts entries claim OEM number ` +
           `${spellings.map((number) => `\`${number}\``).join(" / ")}: ` +
