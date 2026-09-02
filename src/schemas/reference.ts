@@ -387,6 +387,19 @@ export const VIN_LENGTH = 17;
 export const VIN_EXCLUDED_LETTERS = ["I", "O", "Q"] as const;
 
 /**
+ * The VIN model-year cipher's period: the ten digits and the letters ISO 3779
+ * leaves usable cycle every thirty model years (49 CFR 565.25 Table XIII), so
+ * `2` stands for 1982, 2012 **and** 2042 with nothing in the character itself
+ * to tell them apart.
+ *
+ * A `fitment.years` window resolves that ambiguity **iff** it cannot hold two
+ * years thirty apart — for integer bounds, exactly `to - from < 30` with both
+ * bounds stated. Used only by the `decodesTo.modelYear` rule: `fitment.years`
+ * everywhere else is legitimately half-open.
+ */
+const YEAR_CIPHER_PERIOD = 30;
+
+/**
  * What a range of VIN positions encodes.
  *
  * Closed for the reason every vocabulary in this module is closed: `mdl-year`,
@@ -1292,19 +1305,34 @@ function checkDecodedMeaning(
   const from = typeof years?.from === "number" ? years.from : null;
   const to = typeof years?.to === "number" ? years.to : null;
 
-  if (from !== null && modelYear >= from && (to === null || modelYear <= to)) {
+  // A window disambiguates the cipher **iff** it can hold only one of a
+  // thirty-apart pair, which for integer bounds is exactly: both bounds
+  // stated, and `to - from < 30`. A half-open window holds every repeat on
+  // its open side, so `{ to: 2021 }` reads `1982` and `2012` alike — the very
+  // ambiguity the message below exists to refuse. Deliberately scoped to rows
+  // that state `decodesTo.modelYear`: `fitment.years` at large is still free
+  // to be half-open, and real entries rely on that.
+  if (
+    from !== null &&
+    to !== null &&
+    to - from < YEAR_CIPHER_PERIOD &&
+    modelYear >= from &&
+    modelYear <= to
+  ) {
     return;
   }
-  if (from === null && to !== null && modelYear <= to) return;
 
   ctx.addIssue({
     code: "custom",
     path: ["decodesTo", "modelYear"],
     message:
       `the VIN's year cipher repeats every thirty years — \`${modelYear}\` is ` +
-      `also ${modelYear - 30} and ${modelYear + 30} — so a row that decodes a ` +
-      `year states the window it decodes it in: \`fitment.years\` must ` +
-      `contain ${modelYear}` +
+      `also ${modelYear - YEAR_CIPHER_PERIOD} and ` +
+      `${modelYear + YEAR_CIPHER_PERIOD} — so a row that decodes a ` +
+      `year states a window that can only be read one way: \`fitment.years\` ` +
+      `must state BOTH \`from\` and \`to\`, span fewer than ` +
+      `${YEAR_CIPHER_PERIOD} years (\`to - from < ${YEAR_CIPHER_PERIOD}\`), ` +
+      `and contain ${modelYear}` +
       (years === null ? `, and this entry states no year window` : "") +
       `. refs specs/001-foundation (REF-01)`,
   });

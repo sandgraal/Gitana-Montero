@@ -1498,33 +1498,30 @@ describe("F3 — a decoded model year needs a window that DISAMBIGUATES it", () 
     expect(JSON.stringify(outcome)).toMatch(/thirty years/);
   };
 
-  it.fails("REJECTS a half-open `{ to: 2021 }` window decoding 1982", () => {
+  it("REJECTS a half-open `{ to: 2021 }` window decoding 1982", () => {
     rejects(yearRow(1982, { to: 2021 }));
   });
 
-  it.fails("REJECTS the same `{ to: 2021 }` window decoding 2012", () => {
+  it("REJECTS the same `{ to: 2021 }` window decoding 2012", () => {
     // Paired with the case above on purpose: one window, two readings thirty
     // years apart, both accepted — the window disambiguates nothing.
     rejects(yearRow(2012, { to: 2021 }));
   });
 
-  it.fails(
-    "REJECTS an open-ended `{ from: 1982 }` window decoding 1982",
-    () => {
-      rejects(yearRow(1982, { from: 1982 }));
-    }
-  );
+  it("REJECTS an open-ended `{ from: 1982 }` window decoding 1982", () => {
+    rejects(yearRow(1982, { from: 1982 }));
+  });
 
-  it.fails("REJECTS the same `{ from: 1982 }` window decoding 2012", () => {
+  it("REJECTS the same `{ from: 1982 }` window decoding 2012", () => {
     rejects(yearRow(2012, { from: 1982 }));
   });
 
-  it.fails("REJECTS the whole production run as a window (1982–2021)", () => {
+  it("REJECTS the whole production run as a window (1982–2021)", () => {
     // Thirty-nine years. Closed, in range, and still holds 1982 and 2012.
     rejects(yearRow(2002, { from: 1982, to: 2021 }));
   });
 
-  it.fails("REJECTS a window exactly as wide as the cipher (1990–2020)", () => {
+  it("REJECTS a window exactly as wide as the cipher (1990–2020)", () => {
     // The boundary: `to - from === 30` holds both 1990 and 2020.
     rejects(yearRow(1990, { from: 1990, to: 2020 }));
   });
