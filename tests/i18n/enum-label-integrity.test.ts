@@ -96,8 +96,12 @@ function coverageIssues(
   const keys = Object.keys(table);
 
   for (const member of members) {
-    const present = keys.filter((key) => key === member);
-    if (present.length !== 1) {
+    // An own-property check, not a scan of `keys`: object keys are unique, so
+    // filtering them for one member could only ever return 0 or 1 and the
+    // "exactly one" it appeared to assert was never a real condition.
+    // `hasOwnProperty` rather than `in` so an inherited name (`constructor`,
+    // `toString`) can never read as a translated label.
+    if (!Object.prototype.hasOwnProperty.call(table, member)) {
       issues.push(`no label for enum member \`${member}\``);
     }
   }
