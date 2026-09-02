@@ -120,6 +120,18 @@ local `HEAD`, which can be stale — from GitHub's own record of the PR:
       -f merge_method=squash -f sha="$sha" \
       -f commit_title='<type(scope): …, refs specs/…>' -f commit_message='<body>'
 
+**The custom body field is `commit_message`, exactly as written above —
+nothing else.** `-f body=...` and `-F body_file=@...` are NOT valid fields
+on this endpoint; the API accepts them without complaint (unknown fields
+are silently ignored, not rejected) and falls back to GitHub's default
+squash message, so the failure is invisible until someone reads the
+squash commit afterward. This has happened twice in one session, on two
+different PRs, with two different wrong field names — read the line
+above character-for-character rather than guessing a plausible name.
+Verify after merging: `git log origin/main -1 --format=%B` should show
+your intended body, not an auto-concatenation of the source commits'
+messages.
+
 Do NOT use `gh pr merge` (and never `--admin`, never bypass protection):
 `gh pr merge` checks out the base branch locally after merging — from a
 worktree it hard-fails ("'main' is already used by worktree …"), and from
