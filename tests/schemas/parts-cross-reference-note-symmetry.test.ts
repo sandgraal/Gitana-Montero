@@ -136,11 +136,41 @@ function refineIssues(entry: unknown): { path: string; message: string }[] {
 }
 
 /**
+ * A locale code as a **whole word**, not as a substring.
+ *
+ * `message.toContain("es")` is not an assertion that a message names the ES
+ * locale — it is an assertion that the message contains the letters `e` and
+ * `s` adjacently, which ordinary English prose does constantly ("requires",
+ * "notes", "needs"). Likewise `"en"` in "entry", "when", "evidence". A review
+ * of this file proved the point by hand: a message naming *neither* locale
+ * satisfied all eighteen tests (T501 review, F-A).
+ *
+ * `\ben\b` / `\bes\b` still matches every spelling a real message would use —
+ * bare `es`, backticked `` `es` ``, parenthesised `(es)`, and the dotted
+ * `prose.es` path — because none of the surrounding characters are word
+ * characters. It does not match a letter pair inside an English word.
+ */
+function namesLocale(locale: Locale): RegExp {
+  return new RegExp(`\\b${locale}\\b`);
+}
+
+/** The path an asymmetry for `ref` must be reported against. */
+function notePath(locale: Locale): string {
+  return `prose.${locale}.crossReferenceNotes.${REF}`;
+}
+
+/**
  * Asserts that a note present only in `presentIn` is reported against the
- * *other* locale, and that the message **names that locale** — per
- * `.claude/GRADER-PRINCIPLES.md`, "rejected for the stated reason", not just
- * "it threw". A rejection an author cannot act on sends them reading the
+ * *other* locale, exactly once, and that the message **names that locale** —
+ * per `.claude/GRADER-PRINCIPLES.md`, "rejected for the stated reason", not
+ * just "it threw". A rejection an author cannot act on sends them reading the
  * schema instead of writing the missing sentence.
+ *
+ * The "exactly once" half is the module's own invariant, stated in
+ * `src/schemas/parts.ts`: one mistake produces one error. A symmetry rule
+ * written naively over all four qualities double-reports an `avoid` row
+ * alongside `checkAvoidRowsCarryEvidence`, and a `toContain` assertion cannot
+ * see that (T501 review, F-B).
  */
 function expectAsymmetryReported(
   quality: CrossReferenceQuality,
@@ -150,18 +180,29 @@ function expectAsymmetryReported(
   const issues = refineIssues(partWithNoteIn(quality, [presentIn]));
   const paths = issues.map((issue) => issue.path);
 
-  expect(paths).toContain(`prose.${missing}.crossReferenceNotes.${REF}`);
+  expect(paths).toContain(notePath(missing));
   // Never reported against the locale that did its job.
-  expect(paths).not.toContain(`prose.${presentIn}.crossReferenceNotes.${REF}`);
+  expect(paths).not.toContain(notePath(presentIn));
+  // One mistake, one error.
+  expect(paths.filter((path) => path === notePath(missing))).toHaveLength(1);
 
-  const reported = issues.find(
-    (issue) => issue.path === `prose.${missing}.crossReferenceNotes.${REF}`
-  );
-  expect(reported?.message).toContain(missing);
+  const reported = issues.find((issue) => issue.path === notePath(missing));
+  expect(reported?.message).toMatch(namesLocale(missing));
+}
+
+/** The message reported against `missing` when only `presentIn` has the note. */
+function messageFor(
+  quality: CrossReferenceQuality,
+  presentIn: Locale
+): string | undefined {
+  const missing = presentIn === "en" ? "es" : "en";
+  return refineIssues(partWithNoteIn(quality, [presentIn])).find(
+    (issue) => issue.path === notePath(missing)
+  )?.message;
 }
 
 /* -------------------------------------------------------------------------
- * The gap (F1) — six markers, one per case. Delete the marker on a test as
+ * The gap (F1) — seven markers, one per case. Delete the marker on a test as
  * the schema starts enforcing that case.
  * ---------------------------------------------------------------------- */
 
@@ -188,6 +229,26 @@ describe("a quality note ships in both locales or in neither (F1)", () => {
 
   it.fails("rejects an `equivalent` note written only in es", () => {
     expectAsymmetryReported("equivalent", "es");
+  });
+
+  /*
+   * The spelling-agnostic backstop for the "names the locale" requirement,
+   * and the one assertion here that cannot be satisfied by prose that happens
+   * to contain the right two letters (T501 review, F-A).
+   *
+   * The two directions are the *same* mistake mirrored, so a message that
+   * names neither locale — "write the missing note", "both locales, always" —
+   * is byte-for-byte identical in both. Any message that actually identifies
+   * which half is missing differs. This holds whatever wording, punctuation
+   * or interpolation order the fix chooses.
+   */
+  it.fails("reports a different message in each direction", () => {
+    const missingEs = messageFor("lower-grade", "en");
+    const missingEn = messageFor("lower-grade", "es");
+
+    expect(missingEs).toBeTypeOf("string");
+    expect(missingEn).toBeTypeOf("string");
+    expect(missingEs).not.toBe(missingEn);
   });
 });
 
@@ -232,8 +293,8 @@ describe("`avoid` still demands the note outright (existing rule)", () => {
       partWithNoteIn(CROSS_REFERENCE_QUALITY_AVOID, ["en"])
     ).map((issue) => issue.path);
 
-    expect(paths).toContain(`prose.es.crossReferenceNotes.${REF}`);
-    expect(paths).not.toContain(`prose.en.crossReferenceNotes.${REF}`);
+    expect(paths).toContain(notePath("es"));
+    expect(paths).not.toContain(notePath("en"));
   });
 
   it("reports the missing locale when only es carries the note", () => {
@@ -241,8 +302,8 @@ describe("`avoid` still demands the note outright (existing rule)", () => {
       partWithNoteIn(CROSS_REFERENCE_QUALITY_AVOID, ["es"])
     ).map((issue) => issue.path);
 
-    expect(paths).toContain(`prose.en.crossReferenceNotes.${REF}`);
-    expect(paths).not.toContain(`prose.es.crossReferenceNotes.${REF}`);
+    expect(paths).toContain(notePath("en"));
+    expect(paths).not.toContain(notePath("es"));
   });
 
   it("reports both locales when the note is missing from both", () => {
@@ -251,19 +312,72 @@ describe("`avoid` still demands the note outright (existing rule)", () => {
     ).map((issue) => issue.path);
 
     for (const locale of LOCALES) {
-      expect(paths).toContain(`prose.${locale}.crossReferenceNotes.${REF}`);
+      expect(paths).toContain(notePath(locale));
     }
   });
 
-  it("names the locale in the message it reports", () => {
+  /*
+   * One mistake, one error — `src/schemas/parts.ts`' own words, stated as a
+   * module invariant on `checkAvoidRowsCarryEvidence` ("this rule reports
+   * 'the note is missing' and never re-reports 'the locale is missing' …
+   * one mistake should produce one error").
+   *
+   * Nothing enforced it. A symmetry rule written naively across all four
+   * qualities fires *alongside* the avoid rule and emits two issues at one
+   * path for one missing sentence; the author then gets the same complaint
+   * twice, and every `toContain`-shaped assertion in this file stays green
+   * (T501 review, F-B). This is the assertion that makes the invariant real,
+   * and it is the one an F1 implementer should expect to see red first if
+   * they take the naive route.
+   */
+  it.each(LOCALES)(
+    "emits exactly one issue when only %s carries the note",
+    (presentIn) => {
+      const missing: Locale = presentIn === "en" ? "es" : "en";
+      const paths = refineIssues(
+        partWithNoteIn(CROSS_REFERENCE_QUALITY_AVOID, [presentIn])
+      ).map((issue) => issue.path);
+
+      expect(paths.filter((path) => path === notePath(missing))).toHaveLength(
+        1
+      );
+    }
+  );
+
+  it("emits exactly one issue per locale when neither carries the note", () => {
+    const paths = refineIssues(
+      partWithNoteIn(CROSS_REFERENCE_QUALITY_AVOID, [])
+    ).map((issue) => issue.path);
+
+    for (const locale of LOCALES) {
+      expect(paths.filter((path) => path === notePath(locale))).toHaveLength(1);
+    }
+  });
+
+  /*
+   * Deliberately *not* `toContain("locale")`, which any English sentence
+   * about locales satisfies and which a generic replacement message would
+   * also satisfy (T501 review, F-A, second instance).
+   *
+   * Note the asymmetry with F1's new rule, and why it is correct rather than
+   * an oversight: this message does not name `en` or `es`, because the rule
+   * is per-locale and the *path* carries the identity. F1's rule is about a
+   * relationship *between* the two locales, so its message has to say which
+   * one is missing. If a future round decides both should name the locale,
+   * that is a one-line widening — and this assertion, not a substring match,
+   * is what would have to change.
+   */
+  it("reports a message specific to this rule, not generic prose", () => {
     const issues = refineIssues(
       partWithNoteIn(CROSS_REFERENCE_QUALITY_AVOID, ["en"])
     );
-    const reported = issues.find(
-      (issue) => issue.path === `prose.es.crossReferenceNotes.${REF}`
-    );
+    const reported = issues.find((issue) => issue.path === notePath("es"));
+
     expect(reported?.message).toBeTypeOf("string");
-    expect(reported?.message).toContain("locale");
+    // The verdict it is about, the row it is about, and the bilingual rule.
+    expect(reported?.message).toContain(CROSS_REFERENCE_QUALITY_AVOID);
+    expect(reported?.message).toMatch(/index 0/);
+    expect(reported?.message).toMatch(/both locales/i);
   });
 });
 

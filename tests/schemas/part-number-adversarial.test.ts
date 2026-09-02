@@ -28,14 +28,21 @@
  * flag and a Unicode property class, allowing whitespace, switching to a
  * `\S`-based rule) turns this file red instead of shipping silently.
  *
- * ## Relationship to `fix/001-control-char-sweep`
+ * ## Relationship to the repo-wide control-character sweep
  *
- * That branch (unmerged at the time of writing) generalizes
+ * `tests/repo-hygiene/no-control-characters.test.ts` and
+ * `scripts/lib/control-char-scan.mjs` (merged as `507079b`) generalize
  * `src/schemas/parts.test.ts`' "PR #75, r3910083246" regression into a
  * repo-wide raw-byte scan of hand-authored **source files**. This file is a
  * different layer: it grades whether *content values* carrying such a
  * character are refused, and whether the corpus-level identity comparison
  * still holds if one ever got through. The intent overlaps; no code does.
+ *
+ * The two meet at `src/content/**`, which that scanner also walks — so a
+ * control byte in a published part number is caught twice over: as a raw
+ * byte by the sweep, and as an invalid value by the rules below. That is the
+ * intended overlap and not duplication; they fail with different messages at
+ * different times, and only this one can speak about *identity*.
  *
  * One convention is deliberately shared with that branch, because it is the
  * right one: **no control character is written into this file as a raw

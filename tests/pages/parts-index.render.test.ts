@@ -212,6 +212,24 @@ beforeAll(async () => {
     });
 });
 
+/**
+ * A `data-*` attribute matched at its own boundaries, never as a substring.
+ *
+ * `html.toContain("data-parts-toolbar")` also matches a renamed
+ * `data-parts-toolbarx` or `data-parts-toolbar-v2`, so it cannot tell "the
+ * hook is here" from "something that starts the same way is here". This is
+ * the same trap as asserting a locale name with `toContain("es")`, and it
+ * bit this file too: the first version of the positive control below
+ * survived renaming both attributes.
+ *
+ * Identical construction, and identical reasoning, to
+ * `tests/e2e/hidden-guard.spec.ts`' configured-page markers — which spell out
+ * why `.includes()` is not safe for exactly this shape of check.
+ */
+function attr(name: string): RegExp {
+  return new RegExp(`(?<![\\w-])${name}(?![\\w-])`);
+}
+
 /** The rendered text with tags and entities flattened, for phrase matching. */
 function text(html: string): string {
   return html
@@ -503,6 +521,33 @@ describe("the page around the listing", () => {
   });
 
   /**
+   * The hooks the empty-state guard below is asserted to be *missing*.
+   *
+   * Without this, that guard is a pair of negative assertions with no
+   * positive control: rename `data-parts-toolbar` and `data-parts-list` in
+   * the template — which breaks the facet filter, the count and the vehicle
+   * dimming, since the page script queries every one of them by exactly
+   * these names — and both `not.toContain` calls keep passing forever. A
+   * review of this file proved it by renaming both and watching the whole
+   * suite stay green (T501 review, F-C).
+   *
+   * `data-parts-none` is in the list for a second reason: it is the one
+   * `[hidden]` element on this page, so it is also what makes the two
+   * `/en/parts/` + `/es/repuestos/` rows added to
+   * `tests/e2e/hidden-guard.spec.ts` non-vacuous once T503 lands.
+   */
+  it.each(LOCALES)(
+    "wires the toolbar, the list and the no-results line in %s",
+    async (locale) => {
+      const html = await render(locale);
+      expect(html).toMatch(attr("data-parts-toolbar"));
+      expect(html).toMatch(attr("data-parts-list"));
+      expect(html).toMatch(attr("data-parts-count"));
+      expect(html).toMatch(attr("data-parts-none"));
+    }
+  );
+
+  /**
    * The state this page actually ships in until T503 authors entries: the
    * heading, the intro and `partsEmpty` — no toolbar, no dead controls, no
    * count of zero.
@@ -515,8 +560,10 @@ describe("the page around the listing", () => {
       try {
         const html = await render(locale);
         expect(text(html)).toContain(strings.partsEmpty);
-        expect(html).not.toContain("data-parts-toolbar");
-        expect(html).not.toContain("data-parts-list");
+        expect(html).not.toMatch(attr("data-parts-toolbar"));
+        expect(html).not.toMatch(attr("data-parts-list"));
+        expect(html).not.toMatch(attr("data-parts-count"));
+        expect(html).not.toMatch(attr("data-parts-none"));
       } finally {
         corpus = FIXTURES;
       }
