@@ -75,6 +75,24 @@ const EXPECT_CONFIGURED = process.env["E2E_EXPECT_CONFIGURED"] === "1";
 /**
  * Pages that never branch on Supabase configuration — their `[hidden]`
  * elements are real on any build, so these run unconditionally.
+ *
+ * **This list is the whole scope of the sweep** (`.claude/GRADER-PRINCIPLES.md`,
+ * "a known-pages sweep is only as complete as its list"). Adding a page that
+ * lays anything out with `display: flex`/`grid` and hides it with `hidden`
+ * means adding it here; nothing scans for the omission.
+ *
+ * The parts pages are the proof of that: `/en/parts/` and `/es/repuestos/`
+ * were missed when T401's problems pages were added the same day, even though
+ * `[partsSegment].astro` has both halves of the defect class (a
+ * `display: grid` list of `display: flex` cards that the filter script hides
+ * with `hidden`, and a `[data-parts-none]` paragraph). They are listed here
+ * from the T501 audit follow-up onward.
+ *
+ * A note for whoever runs this next: the `parts` collection is empty until
+ * T503, so `/en/parts/` currently renders its empty state and carries **no**
+ * `[hidden]` element at all — these two rows pass vacuously today and start
+ * checking something real the moment the first parts entry lands. That is the
+ * right time to have added them, not a reason to wait.
  */
 const UNCONDITIONAL_PAGES = [
   { locale: "en", path: "/en/glossary/" },
@@ -83,6 +101,8 @@ const UNCONDITIONAL_PAGES = [
   { locale: "es", path: "/es/comunidad/" },
   { locale: "en", path: "/en/problems/" },
   { locale: "es", path: "/es/problemas/" },
+  { locale: "en", path: "/en/parts/" },
+  { locale: "es", path: "/es/repuestos/" },
 ] as const;
 
 /**
