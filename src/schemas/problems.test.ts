@@ -96,6 +96,102 @@ function proseBlock(locale: string) {
   };
 }
 
+/* -------------------------------------------------------------------------
+ * The four id-bearing lists, one spec each.
+ *
+ * `checkProblemEntry` sweeps `["symptoms", "causes", "diagnosticSteps",
+ * "fixPaths"]` for duplicate ids. Each spec below says how to build one row of
+ * that list and one phrase for it in a locale, so the same two graders — the
+ * duplicate is rejected, a distinct second row is accepted — run over every
+ * field rather than over whichever one happened to get written first.
+ * ---------------------------------------------------------------------- */
+
+interface IdListSpec {
+  /** The shared-data field, and the prose sub-object that mirrors it. */
+  readonly field: "symptoms" | "causes" | "diagnosticSteps" | "fixPaths";
+  /** The id `entry()`'s own single row already uses. */
+  readonly id: string;
+  /** A second, distinct id — the positive control. */
+  readonly secondId: string;
+  /** One row of shared data under `id`. */
+  readonly row: (id: string) => unknown;
+  /** That row's phrase in `locale` — a string, or an object for fix paths. */
+  readonly phrase: (id: string, locale: string) => unknown;
+  /** Where `checkDuplicateIds` must report the collision. */
+  readonly duplicatePath: string;
+}
+
+const DUPLICATE_ID_FIELDS: readonly IdListSpec[] = [
+  {
+    field: "symptoms",
+    id: "test-symptom",
+    secondId: "test-symptom-2",
+    // Symptoms are bare strings, so the issue path carries no `.id` segment.
+    row: (id) => id,
+    phrase: (id, locale) => `TEST symptom ${id} (${locale})`,
+    duplicatePath: "symptoms.1",
+  },
+  {
+    field: "causes",
+    id: "test-cause",
+    secondId: "test-cause-2",
+    row: (id) => ({ id }),
+    phrase: (id, locale) => `TEST cause ${id} (${locale})`,
+    duplicatePath: "causes.1.id",
+  },
+  {
+    field: "diagnosticSteps",
+    id: "test-step",
+    secondId: "test-step-2",
+    row: (id) => ({ id, rulesIn: ["test-cause"] }),
+    phrase: (id, locale) => `TEST step ${id} (${locale})`,
+    duplicatePath: "diagnosticSteps.1.id",
+  },
+  {
+    field: "fixPaths",
+    id: "test-fix",
+    secondId: "test-fix-2",
+    row: (id) => ({
+      ...(entry().fixPaths[0] as Record<string, unknown>),
+      id,
+    }),
+    phrase: (id, locale) => ({ title: `TEST fix ${id} (${locale})` }),
+    duplicatePath: "fixPaths.1.id",
+  },
+];
+
+/**
+ * `entry()` with one extra row appended to `spec.field`, and that row's phrase
+ * added to both prose locales.
+ *
+ * Passing `spec.id` yields the duplicate fixture (the phrase patch is then a
+ * no-op rewrite of the existing key) and `spec.secondId` yields the clean one
+ * — the two differ by nothing but the id, which is what makes the pair a real
+ * control rather than two unrelated fixtures.
+ */
+function withExtraRow(spec: IdListSpec, id: string) {
+  const base = entry() as Record<string, unknown>;
+  const rows = [...(base[spec.field] as unknown[]), spec.row(id)];
+
+  const prose = Object.fromEntries(
+    (["en", "es"] as const).map((locale) => {
+      const block = proseBlock(locale) as Record<string, unknown>;
+      return [
+        locale,
+        {
+          ...block,
+          [spec.field]: {
+            ...(block[spec.field] as Record<string, unknown>),
+            [id]: spec.phrase(id, locale),
+          },
+        },
+      ];
+    })
+  );
+
+  return { ...base, [spec.field]: rows, prose };
+}
+
 /** `entry()` with one prose locale replaced wholesale. */
 function withProse(locale: "en" | "es", block: Record<string, unknown>) {
   const base = entry();
@@ -343,13 +439,98 @@ describe("diagnostic steps state what a result means — PRB-01", () => {
     expect(issuePaths(outcome)).toContain("fixPaths.0.addresses.0");
   });
 
-  it("refuses two rows in one list sharing an id", () => {
+  /*
+   * The duplicate-id sweep runs over all four id-bearing lists
+   * (`checkProblemEntry`'s `for (const field of ["symptoms", "causes",
+   * "diagnosticSteps", "fixPaths"])`), but this grader used to name only
+   * `causes`. Narrowing the implementation's loop back to `["causes"]` left
+   * the suite green — three of the four fields were correct and ungraded, so
+   * nothing stopped a later edit from dropping them. One case per field, from
+   * the constant's own membership.
+   */
+  it.each(DUPLICATE_ID_FIELDS)(
+    "refuses two rows in `$field` sharing an id",
+    (spec) => {
+      const outcome = schema.safeParse(withExtraRow(spec, spec.id));
+      expect(issuePaths(outcome)).toContain(spec.duplicatePath);
+    }
+  );
+
+  it.each(DUPLICATE_ID_FIELDS)(
+    "accepts a second row in `$field` under an id of its own",
+    (spec) => {
+      // The positive control: the same fixture shape, one character of the id
+      // apart. Without it the rule above could be over-strict — rejecting any
+      // second row — and nothing here would say so.
+      const outcome = schema.safeParse(withExtraRow(spec, spec.secondId));
+      expect(outcome.success, JSON.stringify(issuePaths(outcome))).toBe(true);
+    }
+  );
+});
+
+/**
+ * A diagnostic step is a claim about causes, and a claim that contradicts
+ * itself is not a diagnostic — PRB-01's "each stating what a result rules in
+ * or out".
+ *
+ * **`it.fails` is the marker.** The schema does not make either of these
+ * checks today; the implementer activates a grader by deleting exactly that
+ * one marker line. The seam is `checkDiagnostics` in `src/schemas/problems.ts`
+ * — see the note above each case for the issue path it must report.
+ *
+ * refs specs/001-foundation (PRB-01)
+ */
+describe("a diagnostic step may not contradict itself — PRB-01", () => {
+  /** Two declared causes, so a step can rule one in and the other out. */
+  function twoCauses() {
+    const causes = DUPLICATE_ID_FIELDS.find((spec) => spec.field === "causes");
+    if (causes === undefined) throw new Error("no `causes` spec");
+    return withExtraRow(causes, causes.secondId);
+  }
+
+  /** `twoCauses()` with its single diagnostic step replaced. */
+  function withStep(step: Record<string, unknown>) {
+    return { ...twoCauses(), diagnosticSteps: [{ id: "test-step", ...step }] };
+  }
+
+  it("accepts a step that rules one cause in and a different one out", () => {
+    // Positive control for both `it.fails` cases below: it proves the fixture
+    // itself is well-formed, so when one of them goes red after the fix it is
+    // red for the contradiction and not for a broken entry.
     const outcome = schema.safeParse(
-      entry({
-        causes: [{ id: "test-cause" }, { id: "test-cause" }],
-      })
+      withStep({ rulesIn: ["test-cause"], rulesOut: ["test-cause-2"] })
     );
-    expect(issuePaths(outcome)).toContain("causes.1.id");
+    expect(outcome.success, JSON.stringify(issuePaths(outcome))).toBe(true);
+  });
+
+  it.fails("refuses a step that rules the same cause both in and out", () => {
+    // "Rules in: worn bushing" and "rules out: worn bushing" on one step is
+    // an authoring contradiction, not a diagnostic: whichever way the result
+    // goes, the reader is told the opposite thing at the same time. Both ids
+    // are declared causes, so every rule the schema has today is satisfied.
+    // Report it on the `rulesOut` position — the later of the two, and the
+    // half an author most often pasted in by mistake.
+    const outcome = schema.safeParse(
+      withStep({ rulesIn: ["test-cause"], rulesOut: ["test-cause"] })
+    );
+    expect(issuePaths(outcome)).toContain("diagnosticSteps.0.rulesOut.0");
+  });
+
+  it.fails("refuses one cause named twice inside a step's rulesIn", () => {
+    // `checkDuplicateIds` sweeps the four top-level lists only; the id lists
+    // *inside* a step are not swept, so `["test-cause", "test-cause"]` passes
+    // today. Same rule, one level down: an id is a key, and keys are unique.
+    const outcome = schema.safeParse(
+      withStep({ rulesIn: ["test-cause", "test-cause"] })
+    );
+    expect(issuePaths(outcome)).toContain("diagnosticSteps.0.rulesIn.1");
+  });
+
+  it.fails("refuses one cause named twice inside a step's rulesOut", () => {
+    const outcome = schema.safeParse(
+      withStep({ rulesOut: ["test-cause", "test-cause"] })
+    );
+    expect(issuePaths(outcome)).toContain("diagnosticSteps.0.rulesOut.1");
   });
 });
 
