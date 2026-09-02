@@ -7,6 +7,11 @@ dist-configured/
 coverage/
 playwright-report/
 test-results/
+# Runtime scratch dir for tests/repo-hygiene/no-control-characters.test.ts's
+# mutation-test-the-probe-corpus cases, which write and remove real control
+# bytes on disk inside the scanned tree. Cleaned up by the test itself
+# (afterEach) even on failure; ignored here as a second line of defense.
+tests/repo-hygiene/__scratch__/
 
 # Vercel CLI scratch: `.vercel/project.json` carries the org and project IDs
 # this checkout is linked to, plus pulled environment values. Never committed.
