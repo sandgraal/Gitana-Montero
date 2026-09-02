@@ -32,6 +32,7 @@
  */
 import { LOCALES, type Locale, type LocalizedRoutePaths } from "./routing";
 import { validateSlugRegistry } from "../schemas/slugs";
+import { entrySlugs, slugRegistryIds } from "./entry-slugs";
 
 /**
  * Collection id → the path segment it is served under, per locale.
@@ -99,6 +100,25 @@ export const COLLECTION_ROUTE_SEGMENTS = {
    * boundary, not the vocabulary.
    */
   problems: { en: "problems", es: "problemas" },
+  /**
+   * T501 — the parts index and, under it, one page per part number
+   * (PRT-01…03).
+   *
+   * The ES segment is **`repuestos`**, and that is the glossary's ruling
+   * rather than a preference. `all-general-repuestos` is the canonical Costa
+   * Rican term — AGENTS.md names it in the same breath as `taller` and
+   * `llanta` — and it files `refacción`/`refacciones` (MX),
+   * `recambio`/`recambios` (ES) and `autoparte`/`autopartes` (CO, MX) as
+   * *aliases*: regional variants that live in the glossary's search index and
+   * never in prose, which includes never in a URL. `/es/partes/` would have
+   * been the English word wearing a Spanish accent, and `/es/refacciones/`
+   * would have been Mexico's word in a Costa Rican site's address bar.
+   *
+   * Plural on both sides, matching `glossary`/`glosario` and
+   * `community`/`comunidad`: the segment names the section, and the section is
+   * a list.
+   */
+  parts: { en: "parts", es: "repuestos" },
 } as const satisfies Readonly<Record<string, Readonly<Record<Locale, string>>>>;
 
 export type CollectionRouteId = keyof typeof COLLECTION_ROUTE_SEGMENTS;
@@ -162,4 +182,79 @@ export function collectionRouteParams(
       [segmentParam]: COLLECTION_ROUTE_SEGMENTS[collection][locale],
     },
   }));
+}
+
+/* -------------------------------------------------------------------------
+ * Entry pages — the two registries composed (I18N-01, I18N-04, I18N-05)
+ *
+ * A per-entry URL is this module's segment plus `src/i18n/entry-slugs.ts`'
+ * slug: `/` + `repuestos` + `/` + `bomba-de-agua-6g74` + `/`. Composing them
+ * here rather than in a page means the two registries meet in exactly one
+ * place, and a page cannot accidentally build an ES URL out of an EN slug.
+ * ---------------------------------------------------------------------- */
+
+/** One entry's route in `locale`, or `null` when it has no slug row. */
+export function entryRoutePath(
+  collection: CollectionRouteId,
+  entryId: string,
+  locale: Locale
+): string | null {
+  const slug = entrySlugs(collection, entryId)?.[locale];
+  if (slug === undefined) return null;
+  return `${collectionRoutePath(collection, locale)}${slug}/`;
+}
+
+/**
+ * Every locale's route for one entry page, ready for
+ * `localizedAlternateLinks` and the locale switcher — so switching language on
+ * `/en/parts/water-pump-6g74/` lands on `/es/repuestos/bomba-de-agua-6g74/`
+ * and not on a 404 (I18N-03, I18N-04).
+ *
+ * `null` when the entry has no registry row, which is the state the build
+ * check turns into a named error rather than a silently missing page.
+ */
+export function entryRoutePaths(
+  collection: CollectionRouteId,
+  entryId: string
+): LocalizedRoutePaths | null {
+  const slugs = entrySlugs(collection, entryId);
+  if (slugs === null) return null;
+
+  return Object.fromEntries(
+    LOCALES.map((locale) => [
+      locale,
+      `${collectionRoutePath(collection, locale)}${slugs[locale]}/`,
+    ])
+  ) as LocalizedRoutePaths;
+}
+
+/**
+ * `getStaticPaths` rows for a collection's entry pages: one per locale per
+ * registered entry, each carrying that locale's own segment and slug, with the
+ * entry id passed through as a prop so the page never has to reverse a slug
+ * back into an id.
+ *
+ * Returns `[]` while the registry is empty — which is a page that builds
+ * nothing, not a build error. The collection's *index* still builds, so
+ * `/en/parts/` and `/es/repuestos/` exist (and are audited) from the day the
+ * template lands.
+ */
+export function entryRouteParams(
+  collection: CollectionRouteId,
+  segmentParam: string,
+  slugParam: string
+): { params: Record<string, string>; props: { entryId: string } }[] {
+  return slugRegistryIds(collection).flatMap((entryId) => {
+    const slugs = entrySlugs(collection, entryId);
+    if (slugs === null) return [];
+
+    return LOCALES.map((locale) => ({
+      params: {
+        locale,
+        [segmentParam]: COLLECTION_ROUTE_SEGMENTS[collection][locale],
+        [slugParam]: slugs[locale],
+      },
+      props: { entryId },
+    }));
+  });
 }

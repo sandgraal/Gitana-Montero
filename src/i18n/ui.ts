@@ -29,6 +29,7 @@ import type {
   DrivabilityState,
   ProblemSeverity,
 } from "../schemas/problems";
+import type { CrossReferenceQuality } from "../schemas/parts";
 import type { DriveType, GenerationId } from "../schemas/vehicles";
 import type { OptionalSelectionFacet } from "../lib/fitment";
 import {
@@ -162,6 +163,19 @@ export type CostBandStrings = {
   readonly [Band in CostBand as `costBand.${Band}`]: string;
 };
 
+/**
+ * One flat key per `CROSS_REFERENCE_QUALITY` value — the verdict column of a
+ * parts page's cross-reference table (PRT-01). Derived from the constant, for
+ * the reason every mapped type here is: adding a verdict without translating
+ * it is a type error, not an untranslated cell in a table a reader is using to
+ * decide what to buy.
+ */
+export type CrossReferenceQualityStrings = {
+  readonly [
+    Quality in CrossReferenceQuality as `crossReferenceQuality.${Quality}`
+  ]: string;
+};
+
 export interface UiStrings
   extends
     GlossarySystemStrings,
@@ -175,7 +189,8 @@ export interface UiStrings
     SourceKindStrings,
     ProblemSeverityStrings,
     DrivabilityStrings,
-    CostBandStrings {
+    CostBandStrings,
+    CrossReferenceQualityStrings {
   readonly siteTagline: string;
   readonly skipToContent: string;
   readonly navHome: string;
@@ -251,11 +266,6 @@ export interface UiStrings
   readonly communityCountTemplate: string;
   /** `{date}` is `activityAssessed`, shared data interpolated in, never retyped. */
   readonly communityActivityAssessedTemplate: string;
-  /**
-   * `{tier}` is filled with `confidenceTier.<tier>` at render time — the
-   * caveat AGENTS.md requires below `tsb` (`src/lib/confidence.ts`).
-   */
-  readonly communityConfidenceCaveatTemplate: string;
   /* Sign-in / account page — 002 T2-202, ACC-01, ACC-02 */
   readonly navSignIn: string;
   readonly signInHeading: string;
@@ -568,7 +578,6 @@ export interface UiStrings
   readonly problemDiagnosticsHeading: string;
   readonly problemCausesHeading: string;
   readonly problemFixPathsHeading: string;
-  readonly problemSourcesHeading: string;
   /** Prefixes the causes a diagnostic result implicates. */
   readonly problemRulesInLabel: string;
   /** Prefixes the causes the same result eliminates. */
@@ -590,23 +599,8 @@ export interface UiStrings
   readonly problemCostLabel: string;
   readonly problemPartsLabel: string;
   readonly problemProceduresLabel: string;
-  /** The archived-copy link beside each numbered source. */
-  readonly problemSourceArchiveLabel: string;
   /** Names the triage region for a screen reader; the banner itself is a chip. */
   readonly problemTriageLabel: string;
-  /** `{system}` is a `glossarySystem.*` label. */
-  readonly problemSafetyNoticeTemplate: string;
-  /**
-   * AGENTS.md's "never present the site as a substitute for a qualified
-   * mechanic", as the standing notice PRB-03 requires. Rendered in **both**
-   * languages in one band, page locale first.
-   */
-  readonly problemSafetyNoticeBody: string;
-  /**
-   * PRB-04's visible caveat, rendered in both locales below `tsb`. `{tier}` is
-   * filled with `confidenceTier.<tier>` at render time.
-   */
-  readonly problemConfidenceCaveatTemplate: string;
   /**
    * The provisional-match warning in its **safety-critical** form (T204's
    * binding note on T203 decision (a)): on a page where showing something that
@@ -614,6 +608,102 @@ export interface UiStrings
    * standing `vehicleProvisionalNote` is not prominent enough.
    */
   readonly problemProvisionalSafetyNote: string;
+  /* ---------------------------------------------------------------------
+   * Evidence and safety framing — shared by every content page.
+   *
+   * These seven keys were three prefixed pairs plus a third caveat before the
+   * T501 rebase collapse (2026-09-01): T401 landed `problem…`-prefixed copies
+   * of the caveat, the safety notice and the sources labels, T501 landed
+   * unprefixed ones, and T703a's community page had a caveat of its own. One
+   * sentence translated twice is exactly the failure this module exists to
+   * prevent — and for a safety warning it is worse than duplication, because a
+   * warning that says two slightly different things on two pages is a warning
+   * nobody can quote.
+   *
+   * **The surviving wording is T401's in every case.** It merged first, a
+   * grader renders it (`tests/problem-bilingual-bands.test.ts`), and its safety
+   * sentence carries AGENTS.md's mandated "never a substitute for a qualified
+   * mechanic" framing verbatim while naming what the page *affects* rather
+   * than what it is about — so it stays true for a fault, a part and a job
+   * alike. T501's variants were deleted, not merged.
+   * ------------------------------------------------------------------- */
+  /**
+   * PRB-04's visible caveat, rendered in **both** locales on every content
+   * page whose tier is below `tsb` (`src/lib/confidence.ts` decides which).
+   * `{tier}` is filled with `confidenceTier.<tier>` at render time.
+   */
+  readonly confidenceCaveatTemplate: string;
+  /**
+   * The heading of the standing safety notice AGENTS.md requires on every page
+   * about brakes, steering, suspension, fuel, tires, SRS, towing or lifting
+   * (`src/lib/safety.ts` decides which entries those are).
+   *
+   * `{system}` is a `glossarySystem.*` label, so the band names *which* system
+   * it is warning about. Both `problems` and `parts` carry a `system` facet, so
+   * both fill it; `src/components/SafetyNotice.astro` is the only renderer.
+   */
+  readonly safetyNoticeLabelTemplate: string;
+  /**
+   * The body of that notice — AGENTS.md's "never present the site as a
+   * substitute for a qualified mechanic", as PRB-03 and PRC-02 require it.
+   * Rendered in **both** languages in one band, page locale first.
+   *
+   * Subject-neutral on purpose: it names what the page *affects*, never what
+   * the page is about, so it stays true for a fault, a part and a job alike.
+   */
+  readonly safetyNoticeBody: string;
+  /**
+   * The short chip form, for a listing card or a page header where the full
+   * band does not fit — the design handoff's "safety-critical chip" token.
+   *
+   * Deliberately **not** `severity.safety-critical`, which carries the same two
+   * words for a different fact: that key renders a `problems` entry's
+   * `severity` field, a value from a closed data vocabulary that a part does
+   * not have. Reusing it would couple the parts pages to `PROBLEM_SEVERITIES`.
+   */
+  readonly safetyCriticalChipLabel: string;
+  /** The heading over a numbered source list, on any content page. */
+  readonly sourcesHeading: string;
+  /** The archived-copy link beside each numbered source. */
+  readonly sourceArchiveLabel: string;
+  /** `{date}` is a source's `accessed` field, formatted by `Intl` at render time. */
+  readonly sourceAccessedTemplate: string;
+  /* Parts — T501, PRT-01, PRT-02, PRT-03 */
+  readonly navParts: string;
+  readonly partsHeading: string;
+  readonly partsIntro: string;
+  readonly partsEmpty: string;
+  readonly partsNoResults: string;
+  /** `{shown}` / `{total}`, computed and interpolated — see `glossaryCountTemplate`. */
+  readonly partsCountTemplate: string;
+  readonly partsFilterSystemLabel: string;
+  readonly partsFilterSystemAll: string;
+  readonly partsOemNumberLabel: string;
+  /** `{count}` is `quantityPerVehicle`, shared data interpolated in, never retyped. */
+  readonly partsQuantityTemplate: string;
+  readonly partsFitsLabel: string;
+  /** The badge on the number a reader should order today (PRT-02). */
+  readonly partsCurrentBadge: string;
+  readonly partsSupersededBadge: string;
+  readonly partsSupersessionHeading: string;
+  readonly partsSupersessionIntro: string;
+  readonly partsSupersessionOldestLabel: string;
+  readonly partsSupersessionCurrentLabel: string;
+  /**
+   * Shown when several older numbers were consolidated into one current
+   * number, so the chain is a tree rather than a line — see
+   * `supersessionChain` in `src/lib/parts/index.ts` for why the page says so
+   * instead of drawing one branch and calling it the chain.
+   */
+  readonly partsSupersessionForkNote: string;
+  readonly partsCrossReferencesHeading: string;
+  readonly partsCrossReferenceBrandLabel: string;
+  readonly partsCrossReferenceNumberLabel: string;
+  readonly partsCrossReferenceQualityLabel: string;
+  readonly partsCrossReferenceNoteLabel: string;
+  readonly partsVendorsHeading: string;
+  readonly partsVendorsIntro: string;
+  readonly partsBackToIndex: string;
 }
 
 const en: UiStrings = {
@@ -693,8 +783,6 @@ const en: UiStrings = {
   communityAlsoOnLabel: "Also on",
   communityCountTemplate: "{shown} of {total} communities",
   communityActivityAssessedTemplate: "Checked {date}",
-  communityConfidenceCaveatTemplate:
-    "Confidence: {tier}. This entry has not been checked against a factory manual or technical bulletin — treat it as a starting point, not a verified fact.",
   "communityType.forum": "Forum",
   "communityType.facebook-group": "Facebook group",
   "communityType.whatsapp-group": "WhatsApp group",
@@ -805,7 +893,7 @@ const en: UiStrings = {
   garageIssueOdometerLarge:
     "That reading is higher than any odometer this site accepts.",
   garageBackToVehicles: "All vehicles",
-  garageStatEntries: "Entries",
+  garageStatEntries: "Records",
   garageStatPlanned: "Planned",
   garageStatUnrecorded: "Not recorded",
   garageTabsLabel: "Garage views",
@@ -983,6 +1071,40 @@ const en: UiStrings = {
     "Matched on generation, market, year and engine only. Entries marked provisional also depend on something you have not told us, so some of them will not fit your truck. Narrowing your selection removes the mark.",
   vehicleProvisionalDetailTemplate:
     "This entry also depends on details you have not given: {facets}.",
+  navParts: "Parts",
+  partsHeading: "Parts",
+  partsIntro:
+    "Part numbers for the Montero, Pajero and Shogun, with the numbers that replaced them, the aftermarket equivalents worth knowing about, and where the numbers came from.",
+  partsEmpty: "No part numbers have been published yet.",
+  partsNoResults: "No parts match these filters.",
+  partsCountTemplate: "{shown} of {total} parts",
+  partsFilterSystemLabel: "Filter by system",
+  partsFilterSystemAll: "All systems",
+  partsOemNumberLabel: "OEM part number",
+  partsQuantityTemplate: "{count} per vehicle",
+  partsFitsLabel: "Fits",
+  partsCurrentBadge: "Order this one",
+  partsSupersededBadge: "Replaced",
+  partsSupersessionHeading: "Supersession chain",
+  partsSupersessionIntro:
+    "Each number was replaced by the one after it. Only the last one can still be ordered.",
+  partsSupersessionOldestLabel: "Oldest number",
+  partsSupersessionCurrentLabel: "Current number",
+  partsSupersessionForkNote:
+    "Several older numbers were replaced by the same number, so the chain below is one branch of several. These other numbers join it at the same point:",
+  partsCrossReferencesHeading: "Aftermarket cross-references",
+  partsCrossReferenceBrandLabel: "Brand",
+  partsCrossReferenceNumberLabel: "Their number",
+  partsCrossReferenceQualityLabel: "Verdict",
+  partsCrossReferenceNoteLabel: "What we know",
+  partsVendorsHeading: "Where to buy it",
+  partsVendorsIntro:
+    "Sellers from the community directory. Nobody pays to be listed here, and nothing on this page is an affiliate link.",
+  partsBackToIndex: "All parts",
+  "crossReferenceQuality.oem-supplier": "Same maker as the OEM part",
+  "crossReferenceQuality.equivalent": "Reported equivalent",
+  "crossReferenceQuality.lower-grade": "Works, reported to wear out sooner",
+  "crossReferenceQuality.avoid": "Avoid",
   "drive.2wd": "Two-wheel drive",
   "drive.4wd": "Four-wheel drive",
   "fitmentFacet.transmission": "transmission",
@@ -1000,7 +1122,8 @@ const en: UiStrings = {
   problemDiagnosticsHeading: "Diagnostic steps",
   problemCausesHeading: "Likely causes",
   problemFixPathsHeading: "Fix paths",
-  problemSourcesHeading: "Sources",
+  sourcesHeading: "Sources",
+  sourceAccessedTemplate: "Read {date}",
   problemRulesInLabel: "Points to",
   problemRulesOutLabel: "Rules out",
   problemNoCauses: "No root cause has been established for this one yet.",
@@ -1011,13 +1134,14 @@ const en: UiStrings = {
   problemCostLabel: "Cost",
   problemPartsLabel: "Parts",
   problemProceduresLabel: "Procedures",
-  problemSourceArchiveLabel: "archived copy",
+  sourceArchiveLabel: "archived copy",
   problemTriageLabel: "Can you drive it?",
-  problemSafetyNoticeTemplate: "Safety notice — {system}.",
-  problemSafetyNoticeBody:
+  safetyNoticeLabelTemplate: "Safety notice — {system}.",
+  safetyCriticalChipLabel: "Safety-critical",
+  safetyNoticeBody:
     "This affects a safety-critical system. Reference material only: for safety-critical work, consult a qualified mechanic.",
-  problemConfidenceCaveatTemplate:
-    "{tier}. This entry is not backed by factory documentation — treat its values and steps as a starting point, not as manual authority.",
+  confidenceCaveatTemplate:
+    "{tier}. This entry is not backed by factory documentation — treat its values and steps as a starting point, not as if they came from the factory manual.",
   problemProvisionalSafetyNote:
     "This is safety-critical, and the match to your truck is only provisional: it was made on generation, market, year and engine alone. Narrow your selection, and confirm against your own vehicle, before acting on anything here.",
   "sourceKind.fsm": "Factory Service Manual",
@@ -1114,14 +1238,12 @@ const es: UiStrings = {
   communityFilterActivityLabel: "Filtre por actividad",
   communityFilterActivityAll: "Todos los niveles de actividad",
   communityNoResults: "Ninguna comunidad coincide con estos filtros.",
-  communityEmpty: "El directorio de comunidades todavía no tiene fichas.",
+  communityEmpty: "El directorio de comunidades todavía no tiene entradas.",
   communityGoodForLabel: "Bueno para",
   communityVisitLabel: "Visitar",
   communityAlsoOnLabel: "También en",
   communityCountTemplate: "{shown} de {total} comunidades",
   communityActivityAssessedTemplate: "Revisado el {date}",
-  communityConfidenceCaveatTemplate:
-    "Nivel de confianza: {tier}. Esta ficha no se ha contrastado con un manual de fábrica ni con un boletín técnico — tómela como punto de partida, no como un dato verificado.",
   "communityType.forum": "Foro",
   "communityType.facebook-group": "Grupo de Facebook",
   "communityType.whatsapp-group": "Grupo de WhatsApp",
@@ -1416,9 +1538,43 @@ const es: UiStrings = {
   vehicleDoesNotFitLabel: "No le sirve al vehículo que usted eligió",
   vehicleProvisionalLabel: "Coincidencia provisional",
   vehicleProvisionalNote:
-    "La coincidencia se hizo solo con generación, mercado, año y motor. Las fichas marcadas como provisionales dependen además de algún dato que usted no nos ha dado, así que algunas no le van a servir a su carro. Si afina su selección, la marca desaparece.",
+    "La coincidencia se hizo solo con generación, mercado, año y motor. Las entradas marcadas como provisionales dependen además de algún dato que usted no nos ha dado, así que algunas no le van a servir a su carro. Si afina su selección, la marca desaparece.",
   vehicleProvisionalDetailTemplate:
-    "Esta ficha depende además de datos que usted no ha indicado: {facets}.",
+    "Esta entrada depende además de datos que usted no ha indicado: {facets}.",
+  navParts: "Repuestos",
+  partsHeading: "Repuestos",
+  partsIntro:
+    "Números de parte para la Montero, la Pajero y la Shogun, con los números que los reemplazaron, los equivalentes de otras marcas que vale la pena conocer y de dónde salió cada número.",
+  partsEmpty: "Todavía no se ha publicado ningún número de parte.",
+  partsNoResults: "Ningún repuesto coincide con estos filtros.",
+  partsCountTemplate: "{shown} de {total} repuestos",
+  partsFilterSystemLabel: "Filtre por sistema",
+  partsFilterSystemAll: "Todos los sistemas",
+  partsOemNumberLabel: "Número de parte original",
+  partsQuantityTemplate: "{count} por carro",
+  partsFitsLabel: "Le sirve a",
+  partsCurrentBadge: "Pida este",
+  partsSupersededBadge: "Reemplazado",
+  partsSupersessionHeading: "Cadena de reemplazos",
+  partsSupersessionIntro:
+    "Cada número fue reemplazado por el siguiente. Solo el último se puede pedir hoy.",
+  partsSupersessionOldestLabel: "Número más viejo",
+  partsSupersessionCurrentLabel: "Número vigente",
+  partsSupersessionForkNote:
+    "Varios números viejos fueron reemplazados por el mismo número, así que la cadena de abajo es una rama entre varias. Estos otros números se unen en el mismo punto:",
+  partsCrossReferencesHeading: "Equivalentes de otras marcas",
+  partsCrossReferenceBrandLabel: "Marca",
+  partsCrossReferenceNumberLabel: "Número de la marca",
+  partsCrossReferenceQualityLabel: "Veredicto",
+  partsCrossReferenceNoteLabel: "Lo que sabemos",
+  partsVendorsHeading: "Dónde conseguirlo",
+  partsVendorsIntro:
+    "Vendedores tomados del directorio de comunidades. Nadie paga por aparecer aquí y en esta página no hay enlaces de afiliado.",
+  partsBackToIndex: "Todos los repuestos",
+  "crossReferenceQuality.oem-supplier": "Del mismo fabricante que el original",
+  "crossReferenceQuality.equivalent": "Reportado como equivalente",
+  "crossReferenceQuality.lower-grade": "Sirve, pero reportan que dura menos",
+  "crossReferenceQuality.avoid": "Evítelo",
   "drive.2wd": "Tracción sencilla",
   "drive.4wd": "Doble tracción",
   "fitmentFacet.transmission": "la transmisión",
@@ -1428,7 +1584,7 @@ const es: UiStrings = {
   navProblems: "Problemas",
   problemsHeading: "Problemas",
   problemsIntro:
-    "Empiece por lo que está haciendo el carro. Cada ficha dice qué se puede hacer con seguridad en este momento, qué revisar, cuál suele ser la causa y qué implica la reparación.",
+    "Empiece por lo que está haciendo el carro. Cada entrada dice qué se puede hacer con seguridad en este momento, qué revisar, cuál suele ser la causa y qué implica la reparación.",
   problemsEmpty: "Todavía no hay problemas documentados.",
   problemsCountTemplate: "{shown} de {total} problemas",
   problemBreadcrumbLabel: "Ruta de navegación",
@@ -1436,7 +1592,8 @@ const es: UiStrings = {
   problemDiagnosticsHeading: "Pasos de diagnóstico",
   problemCausesHeading: "Causas probables",
   problemFixPathsHeading: "Rutas de reparación",
-  problemSourcesHeading: "Fuentes",
+  sourcesHeading: "Fuentes",
+  sourceAccessedTemplate: "Consultada el {date}",
   problemRulesInLabel: "Apunta a",
   problemRulesOutLabel: "Descarta",
   problemNoCauses: "Todavía no se ha establecido la causa de fondo.",
@@ -1448,20 +1605,21 @@ const es: UiStrings = {
   problemCostLabel: "Costo",
   problemPartsLabel: "Repuestos",
   problemProceduresLabel: "Procedimientos",
-  problemSourceArchiveLabel: "copia archivada",
+  sourceArchiveLabel: "copia archivada",
   problemTriageLabel: "¿Puede manejarlo?",
-  problemSafetyNoticeTemplate: "Aviso de seguridad — {system}.",
-  problemSafetyNoticeBody:
+  safetyNoticeLabelTemplate: "Aviso de seguridad — {system}.",
+  safetyCriticalChipLabel: "Crítico para la seguridad",
+  safetyNoticeBody:
     "Esto afecta un sistema crítico para la seguridad. Material de referencia únicamente: en trabajos críticos para la seguridad, consulte a un mecánico calificado.",
-  problemConfidenceCaveatTemplate:
-    "{tier}. Esta ficha no se apoya en documentación de fábrica — tome sus valores y sus pasos como punto de partida, no como autoridad del manual.",
+  confidenceCaveatTemplate:
+    "{tier}. Esta entrada no se apoya en documentación de fábrica — tome los valores y los pasos como punto de partida, no como si vinieran del manual de fábrica.",
   problemProvisionalSafetyNote:
     "Esto es crítico para la seguridad y la coincidencia con su carro es apenas provisional: se hizo solo con generación, mercado, año y motor. Afine su selección, y confirme contra su propio vehículo, antes de actuar con base en esta página.",
   "sourceKind.fsm": "Manual de servicio de fábrica",
   "sourceKind.tsb": "Boletín de servicio",
-  "sourceKind.manufacturer": "Literatura de fábrica",
+  "sourceKind.manufacturer": "Documentación del fabricante",
   "sourceKind.forum": "Foro de dueños",
-  "sourceKind.video": "Video de reparación o armado",
+  "sourceKind.video": "Video de reparación o de preparación",
   "sourceKind.vendor": "Catálogo de proveedor",
   "sourceKind.reference": "Obra de referencia",
   "sourceKind.first-hand": "De primera mano",
@@ -1583,6 +1741,37 @@ export function confidenceTierLabel(
   tier: ConfidenceTier
 ): string {
   return strings[`confidenceTier.${tier}`];
+}
+
+/**
+ * The label for a cross-reference verdict (PRT-01) — the only supported way to
+ * read one, so the `crossReferenceQuality.` prefix exists in one place.
+ */
+export function crossReferenceQualityLabel(
+  strings: UiStrings,
+  quality: CrossReferenceQuality
+): string {
+  return strings[`crossReferenceQuality.${quality}`];
+}
+
+/**
+ * The confidence caveat AGENTS.md requires below `tsb`, in `strings`' own
+ * locale, with the tier's translated name interpolated.
+ *
+ * A function rather than a `.replace()` at each call site: the caveat is
+ * rendered in *both* locales on every page that shows it (the rule is
+ * textual — "a visible caveat in both languages" — not page-scoped), so the
+ * interpolation happens at least twice per entry and every caller has to get
+ * the tier label from the same locale as the sentence around it.
+ */
+export function confidenceCaveat(
+  strings: UiStrings,
+  tier: ConfidenceTier
+): string {
+  return strings.confidenceCaveatTemplate.replace(
+    "{tier}",
+    confidenceTierLabel(strings, tier)
+  );
 }
 
 /**

@@ -73,11 +73,11 @@ const lines = readingOrder.map((each) => {
   const strings = t(each);
   return {
     locale: each,
-    heading: strings.problemSafetyNoticeTemplate.replace(
+    heading: strings.safetyNoticeLabelTemplate.replace(
       "{system}",
       glossarySystemLabel(strings, system)
     ),
-    body: strings.problemSafetyNoticeBody,
+    body: strings.safetyNoticeBody,
   };
 });
 ---

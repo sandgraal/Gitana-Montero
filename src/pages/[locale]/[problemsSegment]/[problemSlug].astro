@@ -402,7 +402,7 @@ const causePhrase = new Map(
     {
       data.sources.length > 0 && (
         <section class="sources">
-          <h2 class="panel__title">{strings.problemSourcesHeading}</h2>
+          <h2 class="panel__title">{strings.sourcesHeading}</h2>
           <ol class="sources__list">
             {data.sources.map((source) => (
               <li>
@@ -417,7 +417,7 @@ const causePhrase = new Map(
                   href={source.archiveUrl}
                   rel="nofollow noopener"
                 >
-                  {strings.problemSourceArchiveLabel}
+                  {strings.sourceArchiveLabel}
                 </a>
                 <time datetime={source.accessed}>{source.accessed}</time>
               </li>

@@ -109,7 +109,7 @@ import {
   communityActivityLabel,
   communityLinkKindLabel,
   communityTypeLabel,
-  confidenceTierLabel,
+  confidenceCaveat,
   generationLabel,
   t,
 } from "../../i18n/ui";
@@ -173,11 +173,7 @@ function regionLabelFor(code: string): string {
 
 /** The bilingual confidence-caveat sentence, in `each` locale's own words. */
 function caveatSentence(each: Locale, tier: ConfidenceTier): string {
-  const localized = t(each);
-  return localized.communityConfidenceCaveatTemplate.replace(
-    "{tier}",
-    confidenceTierLabel(localized, tier)
-  );
+  return confidenceCaveat(t(each), tier);
 }
 
 /**
