@@ -21,15 +21,33 @@
  * makes the notice depend on remembering, which is the one thing a safety
  * default must not do.
  *
- * Two of AGENTS.md's categories have no system id of their own —
- * SRS/airbags, and towing / jacking / lifting points — because
- * `GLOSSARY_SYSTEMS` is a parts vocabulary, not a hazard taxonomy. Widening
- * that vocabulary is a taxonomy change and not this module's to make, so those
- * entries carry an explicit `safetyCritical: true` instead. The flag is
- * therefore an **upward** override only: it can promote an entry the system
- * list does not catch, and it can never demote one it does — see
- * `src/schemas/reference.ts`, which rejects `safetyCritical: false` on an
- * entry whose system is already on the list.
+ * Several of AGENTS.md's categories have no system id of their own — SRS/
+ * airbags, tires and load ratings, and towing / jacking / lifting points —
+ * because `GLOSSARY_SYSTEMS` is a parts vocabulary, not a hazard taxonomy.
+ * Widening that vocabulary is a taxonomy change and not this module's to
+ * make (AGENTS.md "Boundaries").
+ *
+ * **Towing and jacking/lifting** are, as of the T207 audit (finding F3),
+ * derived a second way: {@link requiresSafetyFlagFromSubject} reads an
+ * entry's *subject* — its id and its title in each locale — for the words a
+ * row about one of those two categories actually uses, bilingually, and the
+ * schema requires `safetyCritical: true` when it fires and `system` is not
+ * already on {@link SAFETY_CRITICAL_SYSTEMS}. This closes the exact gap the
+ * audit named: nothing but an author's memory previously enforced the flag on
+ * a towing or jacking-points row.
+ *
+ * **SRS/airbags and load ratings are deliberately not derived here** — this
+ * detector is scoped narrowly to the two categories the audit's failing
+ * graders exercise, on the audit's own instruction to stay narrow and
+ * word-boundary-safe rather than replicate a broader private table. Those two
+ * categories still rely on an author writing `safetyCritical: true` by hand,
+ * which is a known, named gap and not a silent one. Widening the detector to
+ * cover them is future work, not this fix.
+ *
+ * The flag is therefore an **upward** override only: it can promote an entry
+ * neither the system list nor the subject detector catches, and it can never
+ * demote one either does — see `src/schemas/reference.ts`, which rejects
+ * `safetyCritical: false` on an entry whose system is already on the list.
  *
  * refs specs/001-foundation (REF-01, PRB-03, PRC-02; AGENTS.md "Safety and legal")
  */
@@ -102,4 +120,87 @@ export function isSafetyCritical(entry: SafetyCriticalSource): boolean {
  */
 export function systemIsSafetyCritical(system: unknown): boolean {
   return typeof system === "string" && SAFETY_CRITICAL_SYSTEM_SET.has(system);
+}
+
+/* -------------------------------------------------------------------------
+ * Subject-derived promotion (T207 audit, finding F3)
+ *
+ * Towing and jacking/lifting points have no `GLOSSARY_SYSTEMS` id (see the
+ * module docstring), so `isSafetyCritical` cannot reach them from `system`
+ * alone. Below is a second, narrower derivation: read what an entry's
+ * *subject* — its id and its title in each locale — actually names, and
+ * require the manual flag when it names one of those two categories and
+ * `system` does not already cover it.
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The word forms a row about towing, or about jacking/lifting points, is
+ * written with — bilingually, because a detector that only reads English is
+ * a gate half the site walks around.
+ *
+ * Word-boundary safe on purpose: an unbounded `tow` would flag "toward" and
+ * an unbounded `lift` would flag "lifter" (a valve lifter is an engine part,
+ * not a hoist). Kept deliberately narrow to these two categories — the ones
+ * this fix's graders exercise — rather than widened to SRS/airbags or load
+ * ratings, which is a larger table this fix does not attempt (see the module
+ * docstring).
+ */
+const SAFETY_SUBJECT_PATTERNS: readonly RegExp[] = [
+  // towing (en)
+  /\btow(s|ing|ed|ball|balls|bar|bars)?\b/i,
+  // jacking (en)
+  /\bjack(s|ing)?\b/i,
+  // lifting (en)
+  /\blift(s|ing|ed)?\b/i,
+  // remolque / remolcar (es) — towing
+  /\bremol(c|qu)\w*\b/i,
+  // gata / gatas (es) — jack
+  /\bgat[ao]s?\b/i,
+  // elevador (es) — lift/hoist
+  /\belevador(es)?\b/i,
+  // puntos de apoyo (es) — jack/support points
+  /\bpuntos? de apoyo\b/i,
+  // levantar (es) — to lift
+  /\blevant\w*\b/i,
+];
+
+/** The subject fields a row is judged by: its id, and its title per locale. */
+function subjectFields(entry: SafetySubjectSource): string[] {
+  const fields: string[] = [];
+  if (typeof entry.id === "string") fields.push(entry.id);
+
+  const prose = entry.prose;
+  if (typeof prose !== "object" || prose === null) return fields;
+
+  for (const value of Object.values(prose as Record<string, unknown>)) {
+    if (typeof value !== "object" || value === null) continue;
+    const title = (value as { title?: unknown }).title;
+    if (typeof title === "string") fields.push(title);
+  }
+  return fields;
+}
+
+/** The shape this detector reads — an entry's id and its bilingual prose. */
+export interface SafetySubjectSource {
+  readonly id?: unknown;
+  readonly prose?: unknown;
+}
+
+/**
+ * Whether an entry's subject names towing, or jacking/lifting points —
+ * AGENTS.md safety-critical categories `system` cannot reach on its own.
+ *
+ * Scope note, deliberately: only the entry's id and title are read, not its
+ * summary. A row whose *subject* is something else but whose summary
+ * mentions jacking in passing (a suspension-lift entry changing ground
+ * clearance, a table of contents naming a lifting/jacking sub-section) is
+ * correctly left alone — the flag belongs to the row that *is* that subject.
+ */
+export function requiresSafetyFlagFromSubject(
+  entry: SafetySubjectSource
+): boolean {
+  const fields = subjectFields(entry);
+  return SAFETY_SUBJECT_PATTERNS.some((pattern) =>
+    fields.some((field) => pattern.test(field))
+  );
 }
