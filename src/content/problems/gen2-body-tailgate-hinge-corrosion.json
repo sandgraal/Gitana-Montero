@@ -1,0 +1,186 @@
+{
+  "id": "gen2-body-tailgate-hinge-corrosion",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "markets": ["us"],
+    "years": {
+      "from": 1992,
+      "to": 1999
+    }
+  },
+  "system": "body",
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "tailgate-drops-as-it-opens",
+    "gate-has-to-be-lifted-to-latch",
+    "rust-staining-around-the-hinges",
+    "gate-rattles-and-lets-in-water-and-dust",
+    "gap-around-the-gate-no-longer-even"
+  ],
+  "causes": [
+    { "id": "corroded-tailgate-hinges" },
+    { "id": "corroded-hinge-mounting-panel" },
+    { "id": "worn-latch-and-striker" },
+    { "id": "blocked-tailgate-drains" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "support-the-gate-and-watch-the-hinges",
+      "rulesIn": ["corroded-tailgate-hinges"],
+      "rulesOut": ["worn-latch-and-striker"]
+    },
+    {
+      "id": "press-around-the-hinge-panel",
+      "rulesIn": ["corroded-hinge-mounting-panel"],
+      "rulesOut": ["corroded-tailgate-hinges"]
+    },
+    {
+      "id": "close-the-gate-on-a-strip-of-paper",
+      "rulesIn": ["worn-latch-and-striker"],
+      "rulesOut": ["corroded-hinge-mounting-panel"]
+    },
+    {
+      "id": "check-the-drains-in-the-bottom-of-the-gate",
+      "rulesIn": ["blocked-tailgate-drains"],
+      "rulesOut": ["worn-latch-and-striker"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-hinges",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": ["corroded-tailgate-hinges"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "repair-the-hinge-panel-first",
+      "difficulty": 5,
+      "cost": { "from": "significant" },
+      "addresses": ["corroded-hinge-mounting-panel"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "adjust-or-replace-the-latch-and-striker",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["worn-latch-and-striker"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "clear-the-drains-and-seal-the-gate",
+      "difficulty": 1,
+      "cost": { "from": "minimal" },
+      "addresses": ["blocked-tailgate-drains"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA owner complaint database — 1996 Mitsubishi Montero (structure complaints including rear door hinge rusting and needing replacement)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "archiveUrl": "https://web.archive.org/web/20260902205122/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: rear arches, sills, body mounts and frames rot on this generation",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Tailgate hinges rust and the gate drops",
+      "summary": "Owner reports filed with the United States road safety agency for this generation include rear door hinges corroding badly enough to need replacing. It is a small fault next to most of what is on this site, and it earns its place because of what it tells you rather than what it costs. The tailgate carries a heavy spare wheel on a side-hinged door, and those hinges are bolted to a panel that sits at the back of the truck collecting everything the rear wheels throw at it. When the hinges have gone, the water that killed them has been sitting there for years, which means the panel behind them and the bottom of the gate itself are worth looking at before anyone orders parts. The trap is ordering hinges for a truck whose problem is the panel they bolt to: new hinges on soft metal sag again in a season and the money is gone. There is a genuinely cheap version of this and it is worth trying first — a gate that has dropped a little often latches again after the striker is adjusted, and a gate whose drains are clear stops feeding the rust that started all of it.",
+      "slug": "tailgate-hinges-rust",
+      "symptoms": {
+        "tailgate-drops-as-it-opens": "The tailgate drops at the outer edge as it swings open",
+        "gate-has-to-be-lifted-to-latch": "The gate has to be lifted before it will latch",
+        "rust-staining-around-the-hinges": "Rust staining and flaking around the hinges and their bolts",
+        "gate-rattles-and-lets-in-water-and-dust": "The gate rattles on rough roads and lets water or dust into the load space",
+        "gap-around-the-gate-no-longer-even": "The gap around the closed gate is no longer even from top to bottom"
+      },
+      "causes": {
+        "corroded-tailgate-hinges": "Corroded tailgate hinges",
+        "corroded-hinge-mounting-panel": "Corroded panel the hinges bolt to",
+        "worn-latch-and-striker": "Worn or misadjusted latch and striker",
+        "blocked-tailgate-drains": "Blocked drains in the bottom of the gate"
+      },
+      "diagnosticSteps": {
+        "support-the-gate-and-watch-the-hinges": "Take the weight of the open gate on your hands or a support and watch each hinge for movement, wear at the pin and flaking around the knuckle",
+        "press-around-the-hinge-panel": "Press firmly around the panel the hinges bolt to, inside and out, and feel for metal that flexes or crumbles rather than resisting",
+        "close-the-gate-on-a-strip-of-paper": "Close the gate on a strip of paper at several points around the seal and compare how hard each one is to pull out",
+        "check-the-drains-in-the-bottom-of-the-gate": "Find the drain holes in the bottom edge of the gate, clear them, and pour water in at the top to prove it runs out"
+      },
+      "fixPaths": {
+        "replace-the-hinges": {
+          "title": "Replace the tailgate hinges",
+          "detail": "Straightforward once the panel behind them is known to be sound. Support the gate before the last bolt comes out — it is heavy with a spare wheel on it, and it will go somewhere unhelpful the moment it is free."
+        },
+        "repair-the-hinge-panel-first": {
+          "title": "Repair the hinge mounting panel before fitting hinges",
+          "detail": "If the panel is soft, hinges are not the repair. Rotten metal is cut out and replaced with new before anything is bolted to it, because a hinge is only as good as what it is bolted through."
+        },
+        "adjust-or-replace-the-latch-and-striker": {
+          "title": "Adjust or replace the latch and striker",
+          "detail": "The cheapest thing to try, and it fixes a surprising number of gates that have only dropped a little. Adjust the striker rather than forcing the gate, and check the seal is seating evenly afterwards."
+        },
+        "clear-the-drains-and-seal-the-gate": {
+          "title": "Clear the drains and seal the gate",
+          "detail": "Free, and it is what stops this coming back. Water standing inside the gate is what rots it from the inside, and a gate that drains dries out between showers instead of living wet."
+        }
+      }
+    },
+    "es": {
+      "title": "Las bisagras de la puerta trasera se oxidan y la puerta se cae",
+      "summary": "Los reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos para esta generación incluyen bisagras de puerta trasera corroídas al punto de tener que cambiarse. Es una falla pequeña al lado de casi todo lo que hay en este sitio, y se gana su lugar por lo que le dice a uno más que por lo que cuesta. La puerta trasera carga una llanta de repuesto pesada en una puerta con bisagras laterales, y esas bisagras van atornilladas a un panel que está en la parte de atrás del carro recogiendo todo lo que las ruedas traseras le tiran. Cuando las bisagras ya se fueron, el agua que las mató lleva años ahí, y eso significa que el panel detrás de ellas y el fondo de la puerta misma merecen una revisada antes de que alguien encargue repuestos. La trampa es encargar bisagras para un carro cuyo problema es el panel al que se atornillan: bisagras nuevas sobre lámina blanda se vuelven a caer en una temporada y la plata se fue. Hay una versión de verdad barata de esto y vale la pena probarla primero: una puerta que se cayó un poco muchas veces vuelve a cerrar después de ajustar el cerradero, y una puerta con los drenajes destapados deja de alimentar el óxido que empezó todo.",
+      "slug": "bisagras-de-puerta-trasera-oxidadas",
+      "symptoms": {
+        "tailgate-drops-as-it-opens": "La puerta trasera se cae por el borde de afuera cuando se abre",
+        "gate-has-to-be-lifted-to-latch": "Hay que levantar la puerta para que enganche",
+        "rust-staining-around-the-hinges": "Manchas de óxido y escamas alrededor de las bisagras y sus tornillos",
+        "gate-rattles-and-lets-in-water-and-dust": "La puerta cascabelea en camino disparejo y deja entrar agua o polvo al maletero",
+        "gap-around-the-gate-no-longer-even": "La luz alrededor de la puerta cerrada ya no es pareja de arriba abajo"
+      },
+      "causes": {
+        "corroded-tailgate-hinges": "Bisagras de la puerta trasera corroídas",
+        "corroded-hinge-mounting-panel": "Panel donde se atornillan las bisagras corroído",
+        "worn-latch-and-striker": "Cerradura y cerradero gastados o mal ajustados",
+        "blocked-tailgate-drains": "Drenajes del fondo de la puerta tapados"
+      },
+      "diagnosticSteps": {
+        "support-the-gate-and-watch-the-hinges": "Sostenga el peso de la puerta abierta con las manos o con un apoyo y observe cada bisagra buscando movimiento, desgaste en el perno y escamas alrededor del nudillo",
+        "press-around-the-hinge-panel": "Presione con firmeza alrededor del panel donde se atornillan las bisagras, por dentro y por fuera, y sienta si hay lámina que cede o se desmorona en vez de resistir",
+        "close-the-gate-on-a-strip-of-paper": "Cierre la puerta sobre una tira de papel en varios puntos del empaque y compare cuánto cuesta sacar cada una",
+        "check-the-drains-in-the-bottom-of-the-gate": "Ubique los huecos de drenaje del borde inferior de la puerta, destápelos, y eche agua por arriba para comprobar que sale"
+      },
+      "fixPaths": {
+        "replace-the-hinges": {
+          "title": "Cambiar las bisagras de la puerta trasera",
+          "detail": "Es sencillo una vez que se sabe que el panel detrás está sano. Sostenga la puerta antes de sacar el último tornillo: pesa, más con una llanta de repuesto montada, y se va a ir para donde no conviene apenas quede suelta."
+        },
+        "repair-the-hinge-panel-first": {
+          "title": "Reparar el panel de las bisagras antes de montar bisagras",
+          "detail": "Si el panel está blando, las bisagras no son la reparación. La lámina podrida se corta y se reemplaza con lámina nueva antes de atornillarle nada, porque una bisagra vale lo que vale aquello a lo que está atornillada."
+        },
+        "adjust-or-replace-the-latch-and-striker": {
+          "title": "Ajustar o cambiar la cerradura y el cerradero",
+          "detail": "Es lo más barato de probar, y arregla una cantidad sorprendente de puertas que solo se cayeron un poco. Ajuste el cerradero en vez de forzar la puerta, y después compruebe que el empaque asienta parejo."
+        },
+        "clear-the-drains-and-seal-the-gate": {
+          "title": "Destapar los drenajes y sellar la puerta",
+          "detail": "Es gratis, y es lo que evita que esto vuelva. El agua parada dentro de la puerta es lo que la pudre desde adentro, y una puerta que drena se seca entre aguaceros en vez de vivir mojada."
+        }
+      }
+    }
+  }
+}

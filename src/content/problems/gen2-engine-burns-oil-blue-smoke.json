@@ -1,0 +1,192 @@
+{
+  "id": "gen2-engine-burns-oil-blue-smoke",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "engine",
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "blue-smoke-on-start-up",
+    "puff-of-smoke-after-idling-in-traffic",
+    "oil-level-falls-with-no-visible-leak",
+    "oily-film-inside-the-intake-pipe",
+    "smells-of-burnt-oil-behind-the-truck"
+  ],
+  "causes": [
+    { "id": "worn-valve-stem-seals" },
+    { "id": "blocked-crankcase-breather" },
+    { "id": "worn-piston-rings-or-bores" },
+    { "id": "leaking-turbo-shaft-seals" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "note-when-the-smoke-appears",
+      "rulesIn": ["worn-valve-stem-seals"],
+      "rulesOut": ["worn-piston-rings-or-bores"]
+    },
+    {
+      "id": "open-the-breather-and-look-inside",
+      "rulesIn": ["blocked-crankcase-breather"],
+      "rulesOut": ["worn-valve-stem-seals"]
+    },
+    {
+      "id": "check-the-intake-tract-for-oil",
+      "rulesIn": ["leaking-turbo-shaft-seals", "blocked-crankcase-breather"],
+      "rulesOut": ["worn-valve-stem-seals"]
+    },
+    {
+      "id": "run-a-compression-and-leakdown-test",
+      "rulesIn": ["worn-piston-rings-or-bores"],
+      "rulesOut": ["blocked-crankcase-breather"]
+    },
+    {
+      "id": "check-the-turbo-shaft-for-play",
+      "rulesIn": ["leaking-turbo-shaft-seals"],
+      "rulesOut": ["worn-piston-rings-or-bores"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-valve-stem-seals",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["worn-valve-stem-seals"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "clean-the-breather-system",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["blocked-crankcase-breather"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "live-with-it-and-watch-the-level",
+      "difficulty": 1,
+      "cost": { "from": "minimal" },
+      "addresses": ["worn-valve-stem-seals", "worn-piston-rings-or-bores"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "rebuild-or-replace-the-turbo",
+      "difficulty": 4,
+      "cost": { "from": "significant" },
+      "addresses": ["leaking-turbo-shaft-seals"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "CarsGuide — 1999 Mitsubishi Pajero problems: oil burning attributed to valve stem seals as the engine ages",
+      "url": "https://www.carsguide.com.au/mitsubishi/pajero/problems/1999",
+      "archiveUrl": "http://web.archive.org/web/20210802014316/https://www.carsguide.com.au/mitsubishi/pajero/problems/1999",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "Mitsubishi Pajero Owners Club — thread: blue smoke, using oil with no visible leaks (1995 Pajero, 2.8)",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=154945",
+      "archiveUrl": "https://web.archive.org/web/20260902180100/https://www.pocuk.com/forums/viewtopic.php?t=154945",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Burns oil, blue smoke, no leak to find",
+      "summary": "A motoring publication answering owner questions about the late trucks of this generation puts it plainly: these engines tend to burn oil as the distance climbs, and the usual reason is the valve stem seals rather than anything structural — the same answer says it is not regarded as a serious fault. An owners' club thread about a mid-1990s truck losing oil with no visible leak reaches the same list from the other end, with the club's members naming valve stem seals first and then the breather system and turbo shaft wear as the alternatives worth eliminating. The two together are the shape of this problem: it is an ageing-engine trait, not a defect, and its main cost is that it is easy to ignore until the level is low enough to matter. The tell that points at the seals is timing. Oil that seeps past a stem seal collects while the engine sits, so the smoke comes on the first start of the day or after a long wait at lights, and then clears. Oil getting past the rings burns all the time, so the smoke stays. Check the level often, decide what you are willing to spend, and remember that an engine that uses oil and is never topped up is an engine that stops being fixable.",
+      "slug": "burns-oil-blue-smoke",
+      "symptoms": {
+        "blue-smoke-on-start-up": "A cloud of blue smoke on the first start of the day, which then clears",
+        "puff-of-smoke-after-idling-in-traffic": "A puff of smoke when you pull away after idling in traffic",
+        "oil-level-falls-with-no-visible-leak": "The oil level falls between services with nothing dripping under the truck",
+        "oily-film-inside-the-intake-pipe": "An oily film inside the intake pipe or the air filter housing",
+        "smells-of-burnt-oil-behind-the-truck": "A burnt-oil smell behind the truck at a stop"
+      },
+      "causes": {
+        "worn-valve-stem-seals": "Worn valve stem seals",
+        "blocked-crankcase-breather": "Blocked crankcase breather drawing oil into the intake",
+        "worn-piston-rings-or-bores": "Worn piston rings or bores",
+        "leaking-turbo-shaft-seals": "Leaking turbo shaft seals, on turbocharged engines"
+      },
+      "diagnosticSteps": {
+        "note-when-the-smoke-appears": "Note exactly when the smoke shows: on the first start, on pulling away after idling, or continuously under load",
+        "open-the-breather-and-look-inside": "Take off the breather hose and look inside it and inside the rocker cover port for sludge, and check the hose is clear end to end",
+        "check-the-intake-tract-for-oil": "Open the intake pipe between the air filter and the engine and feel inside for standing oil rather than a light film",
+        "run-a-compression-and-leakdown-test": "Have a compression and leak-down test done on all cylinders and note where the air escapes to",
+        "check-the-turbo-shaft-for-play": "With the intake pipe off, hold the compressor wheel and check for shaft play in and out and side to side, and look for oil in the housing"
+      },
+      "fixPaths": {
+        "replace-the-valve-stem-seals": {
+          "title": "Replace the valve stem seals",
+          "detail": "The seals themselves are inexpensive; the labour is the cost, because getting to them means work at the top of the engine. Worth doing at the same time as anything else that opens the same area, and worth pairing with a look at the guides — new seals on worn guides is a repair that comes back."
+        },
+        "clean-the-breather-system": {
+          "title": "Clean out the breather system",
+          "detail": "The cheapest thing on the list and the first to try. A blocked breather pressurises the crankcase and pushes oil past seals that would otherwise have been fine, so this can be the whole fault rather than a contributing one."
+        },
+        "live-with-it-and-watch-the-level": {
+          "title": "Live with it and manage the oil level",
+          "detail": "A legitimate answer on an old engine, and the one the cited publication effectively gives. Carry oil, check the level at every fuel stop rather than at every service, and write down how much it uses over a known distance so you can tell steady consumption from consumption that is getting worse."
+        },
+        "rebuild-or-replace-the-turbo": {
+          "title": "Rebuild or replace the turbocharger",
+          "detail": "Only where a turbo is fitted and the shaft has play or the housing is wet with oil. Find out why it failed — an oil feed that was starved or blocked will kill the replacement the same way."
+        }
+      }
+    },
+    "es": {
+      "title": "Quema aceite, humo azul y no aparece la fuga",
+      "summary": "Una publicación de motores que responde preguntas de dueños sobre los carros tardíos de esta generación lo dice sin rodeos: estos motores tienden a quemar aceite conforme sube el kilometraje, y la razón de siempre son los sellos de las guías de válvula y no algo estructural; la misma respuesta agrega que no se considera una falla grave. Un hilo de un club de dueños sobre un carro de mediados de los noventa que perdía aceite sin fuga visible llega a la misma lista por el otro lado, con los miembros del club nombrando primero los sellos de válvula y luego el sistema de ventilación del cárter y el desgaste del eje del turbo como las alternativas que hay que descartar. Los dos juntos dan la forma de este problema: es un rasgo de motor envejecido, no un defecto, y su costo principal es que es fácil de ignorar hasta que el nivel baja lo suficiente para importar. La pista que apunta a los sellos es el momento. El aceite que se cuela por un sello de guía se junta mientras el motor está parado, así que el humo sale en el primer arranque del día o después de una espera larga en un semáforo, y luego se limpia. El aceite que se pasa por los anillos se quema todo el tiempo, así que el humo se queda. Revise el nivel seguido, decida cuánto está dispuesto a gastar, y recuerde que un motor que consume aceite y nunca se rellena es un motor que deja de tener arreglo.",
+      "slug": "quema-aceite-humo-azul",
+      "symptoms": {
+        "blue-smoke-on-start-up": "Una nube de humo azul en el primer arranque del día, que después se limpia",
+        "puff-of-smoke-after-idling-in-traffic": "Una bocanada de humo al arrancar después de estar en marcha mínima en presa",
+        "oil-level-falls-with-no-visible-leak": "El nivel de aceite de motor baja entre servicios y no hay nada goteando debajo del carro",
+        "oily-film-inside-the-intake-pipe": "Una película aceitosa por dentro del tubo de admisión o de la caja del filtro de aire",
+        "smells-of-burnt-oil-behind-the-truck": "Olor a aceite quemado detrás del carro cuando está parado"
+      },
+      "causes": {
+        "worn-valve-stem-seals": "Sellos de las guías de válvula gastados",
+        "blocked-crankcase-breather": "Ventilación del cárter tapada, que jala aceite hacia la admisión",
+        "worn-piston-rings-or-bores": "Anillos de pistón o cilindros gastados",
+        "leaking-turbo-shaft-seals": "Sellos del eje del turbo con fuga, en motores turboalimentados"
+      },
+      "diagnosticSteps": {
+        "note-when-the-smoke-appears": "Anote exactamente cuándo aparece el humo: en el primer arranque, al arrancar después de estar en marcha mínima, o de manera continua con carga",
+        "open-the-breather-and-look-inside": "Quite la manguera de ventilación del cárter y revise por dentro de ella y del puerto de la tapa de válvulas buscando lodo, y compruebe que la manguera esté libre de punta a punta",
+        "check-the-intake-tract-for-oil": "Abra el tubo de admisión entre el filtro de aire y el motor y palpe por dentro buscando aceite acumulado y no una película liviana",
+        "run-a-compression-and-leakdown-test": "Mande a hacer una prueba de compresión y de fuga en todos los cilindros y anote por dónde se escapa el aire",
+        "check-the-turbo-shaft-for-play": "Con el tubo de admisión afuera, sujete la rueda del compresor y compruebe si el eje tiene juego hacia adentro, hacia afuera y de lado, y busque aceite dentro de la carcasa"
+      },
+      "fixPaths": {
+        "replace-the-valve-stem-seals": {
+          "title": "Cambiar los sellos de las guías de válvula",
+          "detail": "Los sellos en sí son baratos; la mano de obra es el costo, porque llegar a ellos significa trabajar en la parte de arriba del motor. Vale la pena hacerlo junto con cualquier otra cosa que abra esa misma zona, y vale la pena revisar las guías de una vez: sellos nuevos sobre guías gastadas es una reparación que vuelve."
+        },
+        "clean-the-breather-system": {
+          "title": "Limpiar el sistema de ventilación del cárter",
+          "detail": "Es lo más barato de la lista y lo primero que hay que probar. Una ventilación tapada presuriza el cárter y empuja aceite por sellos que de otro modo habrían estado bien, así que esto puede ser toda la falla y no solo un agravante."
+        },
+        "live-with-it-and-watch-the-level": {
+          "title": "Convivir con eso y manejar el nivel de aceite",
+          "detail": "Es una respuesta legítima en un motor viejo, y es la que da en el fondo la publicación citada. Cargue aceite, revise el nivel en cada tanqueada en vez de en cada servicio, y anote cuánto consume en una distancia conocida para poder distinguir un consumo estable de uno que va empeorando."
+        },
+        "rebuild-or-replace-the-turbo": {
+          "title": "Reparar o cambiar el turbo",
+          "detail": "Solo cuando hay turbo montado y el eje tiene juego o la carcasa está mojada de aceite. Averigüe por qué falló: una alimentación de aceite escasa o tapada mata el turbo de repuesto de la misma manera."
+        }
+      }
+    }
+  }
+}

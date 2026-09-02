@@ -1,0 +1,198 @@
+{
+  "id": "gen2-engine-crankshaft-pulley-bolt",
+  "fitment": {
+    "gens": ["gen2"],
+    "markets": ["us"],
+    "years": {
+      "from": 1992,
+      "to": 1996
+    }
+  },
+  "system": "engine",
+  "safetyCritical": true,
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "knock-or-rattle-from-the-front-of-the-engine",
+    "wobbling-crank-pulley",
+    "steering-suddenly-goes-heavy",
+    "charge-and-temperature-lamps-together",
+    "belts-thrown-off"
+  ],
+  "causes": [
+    { "id": "loose-crankshaft-pulley-bolt" },
+    { "id": "damaged-crankshaft-snout-or-keyway" },
+    { "id": "delaminated-harmonic-damper" },
+    { "id": "seized-accessory-pulley" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "watch-the-pulley-at-idle",
+      "rulesIn": [
+        "loose-crankshaft-pulley-bolt",
+        "delaminated-harmonic-damper"
+      ],
+      "rulesOut": ["seized-accessory-pulley"]
+    },
+    {
+      "id": "check-the-timing-mark-for-wander",
+      "rulesIn": ["delaminated-harmonic-damper"],
+      "rulesOut": ["loose-crankshaft-pulley-bolt"]
+    },
+    {
+      "id": "check-the-bolt-torque-and-the-washer-face",
+      "rulesIn": ["loose-crankshaft-pulley-bolt"],
+      "rulesOut": ["delaminated-harmonic-damper"]
+    },
+    {
+      "id": "pull-the-pulley-and-inspect-the-snout",
+      "rulesIn": ["damaged-crankshaft-snout-or-keyway"],
+      "rulesOut": ["loose-crankshaft-pulley-bolt"]
+    },
+    {
+      "id": "spin-each-accessory-by-hand",
+      "rulesIn": ["seized-accessory-pulley"],
+      "rulesOut": ["damaged-crankshaft-snout-or-keyway"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "retorque-with-the-improved-bolt",
+      "difficulty": 4,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["loose-crankshaft-pulley-bolt"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-damper",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": [
+        "delaminated-harmonic-damper",
+        "loose-crankshaft-pulley-bolt"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "repair-or-replace-the-crankshaft",
+      "difficulty": 5,
+      "cost": { "from": "significant", "to": "major" },
+      "addresses": ["damaged-crankshaft-snout-or-keyway"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "tsb",
+  "sources": [
+    {
+      "title": "NHTSA safety recall 00V311001 (Mitsubishi) — crankshaft pulley bolt can loosen and the pulley can fall off, with loss of power steering assist",
+      "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=00V311001",
+      "archiveUrl": "https://web.archive.org/web/20260902174544/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=00V311001",
+      "accessed": "2026-09-02",
+      "kind": "tsb"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1995 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1995",
+      "archiveUrl": "http://web.archive.org/web/20260902175019/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1995",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
+      "archiveUrl": "https://web.archive.org/web/20260902175240/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1999 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "archiveUrl": "https://web.archive.org/web/20260902175310/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Crankshaft pulley bolt loosens and the pulley departs",
+      "summary": "This is the defining mechanical failure of the second-generation Montero and the one worth knowing before anything else on the engine. Mitsubishi's United States recall states that the bolt securing the crankshaft pulley can work loose and that the pulley can then fall off the vehicle, and it names the consequence in plain terms: loss of power steering assist, with an increased risk of a crash. The pulley is what drives every belt on the front of the engine, so when it leaves, the steering pump, the alternator and the water pump all stop at once — heavy steering, no charging and a rising temperature gauge, arriving together and without warning. Owner reports filed with the same agency are unusually numerous for this component and they add two things the campaign does not: some describe the bolt loosening again after it was tightened, and several describe the crankshaft nose itself being chewed out, which turns a fastener job into an engine. The recall covers a defined range of United States trucks; a great many owners reported the identical failure on trucks outside it. Treat a knock or a visible wobble at the front of the engine as this fault until it is proven otherwise, and do not drive the truck to find out.",
+      "slug": "crankshaft-pulley-bolt-loosens",
+      "symptoms": {
+        "knock-or-rattle-from-the-front-of-the-engine": "A knock or rattle from the front of the engine that changes with engine speed",
+        "wobbling-crank-pulley": "The bottom pulley visibly wobbles or moves in and out while the engine idles",
+        "steering-suddenly-goes-heavy": "The steering suddenly goes heavy while driving",
+        "charge-and-temperature-lamps-together": "The charge warning lamp lights and the temperature gauge climbs at the same moment",
+        "belts-thrown-off": "The drive belts are thrown off the engine"
+      },
+      "causes": {
+        "loose-crankshaft-pulley-bolt": "The crankshaft pulley bolt has loosened",
+        "damaged-crankshaft-snout-or-keyway": "The crankshaft nose or its keyway is already chewed out",
+        "delaminated-harmonic-damper": "The rubber ring inside the harmonic damper has separated",
+        "seized-accessory-pulley": "A seized accessory pulley or idler is dragging on the belt"
+      },
+      "diagnosticSteps": {
+        "watch-the-pulley-at-idle": "With the engine idling and the bonnet open, watch the bottom pulley from the side and from the front for in-and-out movement or a visible wobble — stand clear of the belts",
+        "check-the-timing-mark-for-wander": "Aim a timing light at the mark on the pulley rim and watch whether it holds still or drifts around the scale",
+        "check-the-bolt-torque-and-the-washer-face": "With the engine off, check the bolt against the factory torque figure and look at the washer face and the pulley for fretting or bright metal",
+        "pull-the-pulley-and-inspect-the-snout": "Remove the pulley and inspect the crankshaft nose, the keyway and the key for rounding, steps or gall",
+        "spin-each-accessory-by-hand": "With the belts off, turn the alternator, the steering pump, the water pump and each idler by hand and feel for roughness or drag"
+      },
+      "fixPaths": {
+        "retorque-with-the-improved-bolt": {
+          "title": "Fit the improved bolt and torque it correctly",
+          "detail": "This is the campaign's own remedy where the pulley and the crankshaft nose are undamaged: the improved bolt, tightened to the factory figure with a torque wrench, and the mating faces clean and dry. Guessing at this fastener is how the failure repeats — several owner reports describe exactly that."
+        },
+        "replace-the-damper": {
+          "title": "Replace the crankshaft pulley and damper",
+          "detail": "Once the rubber ring has separated, the outer rim runs out of time with the hub, the timing mark wanders and the belts see a pulley that is no longer round to them. A damper is replaced, never welded or bonded back together."
+        },
+        "repair-or-replace-the-crankshaft": {
+          "title": "Repair or replace the crankshaft",
+          "detail": "If the nose or keyway is chewed out there is nothing left for the bolt to clamp against, and this stops being a bolt job. Owner reports describe getting to the point of needing the engine replaced. Have a machine shop or a qualified mechanic judge whether the nose can be saved before anything else is bought."
+        }
+      }
+    },
+    "es": {
+      "title": "Se afloja el perno de la polea del cigüeñal y la polea se sale",
+      "summary": "Esta es la falla mecánica que define al Montero de segunda generación y la primera que conviene conocer del motor. El llamado a revisión de Mitsubishi en Estados Unidos dice que el perno que sujeta la polea del cigüeñal se puede aflojar y que después la polea se puede salir del carro, y nombra la consecuencia sin rodeos: pérdida de la asistencia de la dirección hidráulica, con mayor riesgo de choque. Esa polea es la que mueve todas las fajas del frente del motor, así que cuando se va se detienen de un solo golpe la bomba de la dirección hidráulica, el alternador y la bomba de agua: dirección pesada, sin carga y con la aguja de temperatura subiendo, todo junto y sin aviso. Los reportes de dueños presentados ante la misma agencia son llamativamente numerosos para esta pieza y agregan dos cosas que la campaña no dice: algunos describen que el perno se volvió a aflojar después de haberlo apretado, y varios describen que la punta del cigüeñal quedó comida, lo que convierte un trabajo de tornillería en un motor. El llamado a revisión cubre un rango definido de carros estadounidenses; muchísimos dueños reportaron la falla idéntica en carros fuera de ese rango. Trate cualquier golpeteo o bamboleo visible en el frente del motor como esta falla mientras no se demuestre otra cosa, y no maneje el carro para salir de dudas.",
+      "slug": "perno-de-polea-del-ciguenal-flojo",
+      "symptoms": {
+        "knock-or-rattle-from-the-front-of-the-engine": "Un golpeteo o cascabeleo en el frente del motor que cambia con las revoluciones",
+        "wobbling-crank-pulley": "La polea de abajo bambolea o se mueve para adentro y para afuera con el motor en marcha mínima",
+        "steering-suddenly-goes-heavy": "La dirección se pone pesada de repente mientras usted maneja",
+        "charge-and-temperature-lamps-together": "Se enciende la luz de advertencia de carga y al mismo tiempo sube la aguja de temperatura",
+        "belts-thrown-off": "Las fajas se salen del motor"
+      },
+      "causes": {
+        "loose-crankshaft-pulley-bolt": "El perno de la polea del cigüeñal se aflojó",
+        "damaged-crankshaft-snout-or-keyway": "La punta del cigüeñal o su chavetero ya están comidos",
+        "delaminated-harmonic-damper": "Se despegó el anillo de hule dentro del amortiguador armónico",
+        "seized-accessory-pulley": "Una polea de accesorio o una polea loca está pegada y frena la faja"
+      },
+      "diagnosticSteps": {
+        "watch-the-pulley-at-idle": "Con el motor en marcha mínima y el capó abierto, observe la polea de abajo de lado y de frente buscando movimiento hacia adentro y hacia afuera o un bamboleo visible; manténgase lejos de las fajas",
+        "check-the-timing-mark-for-wander": "Apunte una lámpara de tiempo a la marca del borde de la polea y vea si se queda quieta o si se pasea por la escala",
+        "check-the-bolt-torque-and-the-washer-face": "Con el motor apagado, compruebe el perno contra el valor de torque de fábrica y revise la cara de la arandela y la polea buscando desgaste por vibración o metal brillante",
+        "pull-the-pulley-and-inspect-the-snout": "Saque la polea y revise la punta del cigüeñal, el chavetero y la chaveta buscando redondeo, escalones o metal arrastrado",
+        "spin-each-accessory-by-hand": "Con las fajas afuera, gire con la mano el alternador, la bomba de la dirección hidráulica, la bomba de agua y cada polea loca, y sienta si hay aspereza o resistencia"
+      },
+      "fixPaths": {
+        "retorque-with-the-improved-bolt": {
+          "title": "Poner el perno mejorado y apretarlo al torque correcto",
+          "detail": "Este es el remedio de la propia campaña cuando la polea y la punta del cigüeñal están sanas: el perno mejorado, apretado al valor de fábrica con llave de torque, y las caras de apoyo limpias y secas. Apretar este perno a puro cálculo es como la falla se repite, y varios reportes de dueños describen exactamente eso."
+        },
+        "replace-the-damper": {
+          "title": "Cambiar la polea del cigüeñal con su amortiguador",
+          "detail": "Una vez que el anillo de hule se despegó, el aro exterior gira desfasado del centro, la marca de tiempo se pasea y las fajas ven una polea que ya no les corre redonda. Un amortiguador armónico se cambia, nunca se suelda ni se pega de nuevo."
+        },
+        "repair-or-replace-the-crankshaft": {
+          "title": "Reparar o cambiar el cigüeñal",
+          "detail": "Si la punta o el chavetero están comidos, ya no queda contra qué apriete el perno, y esto deja de ser un trabajo de tornillería. Hay reportes de dueños que describen haber llegado al punto de tener que cambiar el motor. Deje que un taller de rectificación o un mecánico calificado juzgue si la punta se puede salvar antes de comprar nada."
+        }
+      }
+    }
+  }
+}

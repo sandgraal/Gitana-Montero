@@ -1,0 +1,197 @@
+{
+  "id": "gen2-transfer-case-front-axle-will-not-engage",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "transferCases": ["super-select"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "transfer-case",
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "front-wheel-indicator-blinks-and-never-settles",
+    "lever-moves-but-no-front-drive",
+    "spins-a-rear-wheel-with-four-wheel-drive-selected",
+    "clunk-from-under-the-passenger-side-is-missing"
+  ],
+  "causes": [
+    { "id": "failed-freewheel-clutch-solenoid" },
+    { "id": "split-or-disconnected-vacuum-hose" },
+    { "id": "seized-front-axle-actuator" },
+    { "id": "failed-position-switch-or-wiring" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "watch-the-indicator-through-a-mode-change",
+      "rulesIn": [
+        "failed-position-switch-or-wiring",
+        "seized-front-axle-actuator"
+      ],
+      "rulesOut": ["split-or-disconnected-vacuum-hose"]
+    },
+    {
+      "id": "find-and-inspect-the-solenoid-pack",
+      "rulesIn": [
+        "split-or-disconnected-vacuum-hose",
+        "failed-freewheel-clutch-solenoid"
+      ],
+      "rulesOut": ["failed-position-switch-or-wiring"]
+    },
+    {
+      "id": "apply-vacuum-to-the-actuator-by-hand",
+      "rulesIn": ["failed-freewheel-clutch-solenoid"],
+      "rulesOut": ["seized-front-axle-actuator"]
+    },
+    {
+      "id": "check-the-actuator-rod-moves",
+      "rulesIn": ["seized-front-axle-actuator"],
+      "rulesOut": ["failed-freewheel-clutch-solenoid"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-freewheel-clutch-solenoid",
+      "difficulty": 2,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "time": { "value": 5, "unit": "min" },
+      "addresses": ["failed-freewheel-clutch-solenoid"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-vacuum-hoses",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["split-or-disconnected-vacuum-hose"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "free-or-replace-the-actuator",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": ["seized-front-axle-actuator"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "repair-the-switch-circuit",
+      "difficulty": 3,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["failed-position-switch-or-wiring"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — Montero Gen 2 / 2.5 / 3 freewheel clutch control solenoid (Mitsubishi MR430381, MB620532, MR263723): blinking front-wheel indicators mean the front axle is having trouble engaging or disengaging",
+      "url": "https://lusooverland.com/VP-LO-MR430381",
+      "archiveUrl": "https://web.archive.org/web/20260902175735/https://lusooverland.com/VP-LO-MR430381",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Opinautos — fallas de 4x4 reportadas por dueños de Mitsubishi Montero (luces delanteras que parpadean, sensores de vacío junto a la caja de transferencia, conectores flojos)",
+      "url": "https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
+      "archiveUrl": "https://web.archive.org/web/20260902205429/https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: check Super Select across all modes; flashing lights indicate actuator or position switch faults",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front axle will not engage and the indicator blinks",
+      "summary": "On Super Select trucks the front axle is locked and unlocked by a vacuum-operated clutch, and the dash indicator only settles when the transfer lever and the front axle agree about which mode the truck is in. When they disagree, the indicator blinks — which is why a blinking front-wheel display is not a fault in the display. A specialist supplier of parts for these trucks states the same thing on its own product page for the control solenoid: blinking front-wheel lights mean the front axle is having trouble engaging or disengaging. A buyer's guide for this generation tells buyers to try every mode and treats flashing lights as an actuator or position-switch fault. Owner reports in Spanish add the two failures that are easiest to miss: vacuum switching parts near the transfer case that clean up and work again, and connectors under the truck that have simply worked loose. This entry is the half where the front axle never comes in. It is a lost capability rather than a hazard: the truck drives and stops exactly as it always did on the rear axle, and nothing is being damaged. The half where the axle will not release is a different problem and has its own entry, because that one does damage things.",
+      "slug": "front-axle-will-not-engage",
+      "symptoms": {
+        "front-wheel-indicator-blinks-and-never-settles": "The front-wheel indicator on the dash blinks and never settles",
+        "lever-moves-but-no-front-drive": "The transfer lever moves into the four-wheel-drive position but there is no front drive",
+        "spins-a-rear-wheel-with-four-wheel-drive-selected": "On a loose surface it still spins a rear wheel with four-wheel drive selected",
+        "clunk-from-under-the-passenger-side-is-missing": "The soft clunk from under the truck when four-wheel drive engages no longer happens"
+      },
+      "causes": {
+        "failed-freewheel-clutch-solenoid": "Failed freewheel clutch control solenoid",
+        "split-or-disconnected-vacuum-hose": "Split, blocked or disconnected vacuum hose",
+        "seized-front-axle-actuator": "Seized front axle actuator",
+        "failed-position-switch-or-wiring": "Failed position switch or its wiring"
+      },
+      "diagnosticSteps": {
+        "watch-the-indicator-through-a-mode-change": "Move the lever through every mode, driving a short distance in each, and note which modes the indicator settles in and which it blinks in",
+        "find-and-inspect-the-solenoid-pack": "Find the vacuum solenoid pack on the frame rail and check every hose to it for splits, hardening and disconnection, and check that its connector is clean and seated",
+        "apply-vacuum-to-the-actuator-by-hand": "Apply and release vacuum at the actuator with a hand pump and see whether the axle engages and disengages on command",
+        "check-the-actuator-rod-moves": "Watch the actuator rod itself while vacuum is applied and confirm it travels its full stroke rather than part of it"
+      },
+      "fixPaths": {
+        "replace-the-freewheel-clutch-solenoid": {
+          "title": "Replace the freewheel clutch control solenoid",
+          "detail": "The supplier cited describes this as an easy-access part, and the time shown here is that source's own figure for the swap rather than an estimate. Note how the hoses are routed on the old unit before it comes off, because putting them back in the wrong order gives you the same fault with a new part fitted."
+        },
+        "renew-the-vacuum-hoses": {
+          "title": "Renew the vacuum hoses",
+          "detail": "Decades-old rubber under a truck goes hard and splits at the ends where it stretches over a spigot. Renew the run rather than patching the piece you found, and route it away from the exhaust."
+        },
+        "free-or-replace-the-actuator": {
+          "title": "Free off or replace the front axle actuator",
+          "detail": "If the actuator will not move under hand vacuum, the fault is at the axle rather than in the control side. Check the rod and its linkage for corrosion before buying an actuator, because a mechanism that is simply seized with rust sometimes comes back with cleaning and grease."
+        },
+        "repair-the-switch-circuit": {
+          "title": "Repair the position switch circuit",
+          "detail": "The indicator compares the lever position with the axle position, so a switch or connector that reports the wrong thing makes the dash blink while the mechanism is doing exactly as it is told. Owner reports describe loose connectors under the truck as a real and common version of this."
+        }
+      }
+    },
+    "es": {
+      "title": "El eje delantero no entra y el indicador parpadea",
+      "summary": "En los carros con Super Select el eje delantero se bloquea y se desbloquea con un embrague accionado por vacío, y el indicador del tablero solo se queda fijo cuando la palanca de transferencia y el eje delantero coinciden en cuál modo está el carro. Cuando no coinciden, el indicador parpadea, y por eso unas luces delanteras parpadeando no son una falla de las luces. Un proveedor especializado en repuestos para estos carros dice lo mismo en la página de su propio solenoide de control: las luces de las ruedas delanteras parpadeando significan que el eje delantero está teniendo problemas para entrar o para salir. Una guía de compra de esta generación le dice al comprador que pruebe todos los modos y trata las luces parpadeando como una falla del actuador o del interruptor de posición. Reportes de dueños en español agregan las dos fallas más fáciles de pasar por alto: piezas de conmutación de vacío junto a la caja de transferencia que se limpian y vuelven a servir, y conectores debajo del carro que simplemente se aflojaron. Esta entrada es la mitad en que el eje delantero nunca entra. Es una capacidad perdida y no un peligro: el carro anda y frena igual que siempre sobre el eje trasero, y no se está dañando nada. La mitad en que el eje no quiere salir es otro problema y tiene su propia entrada, porque esa sí daña cosas.",
+      "slug": "el-eje-delantero-no-entra",
+      "symptoms": {
+        "front-wheel-indicator-blinks-and-never-settles": "El indicador de ruedas delanteras del tablero parpadea y nunca se queda fijo",
+        "lever-moves-but-no-front-drive": "La palanca de transferencia entra en la posición de doble tracción pero no hay tracción adelante",
+        "spins-a-rear-wheel-with-four-wheel-drive-selected": "En piso suelto sigue patinando una rueda trasera con la doble tracción puesta",
+        "clunk-from-under-the-passenger-side-is-missing": "Ya no se oye el golpecito por debajo del carro cuando entra la doble tracción"
+      },
+      "causes": {
+        "failed-freewheel-clutch-solenoid": "Solenoide de control del embrague de rueda libre dañado",
+        "split-or-disconnected-vacuum-hose": "Manguera de vacío rajada, tapada o desconectada",
+        "seized-front-axle-actuator": "Actuador del eje delantero pegado",
+        "failed-position-switch-or-wiring": "Interruptor de posición dañado, o su cableado"
+      },
+      "diagnosticSteps": {
+        "watch-the-indicator-through-a-mode-change": "Pase la palanca por todos los modos, manejando un tramo corto en cada uno, y anote en cuáles el indicador se queda fijo y en cuáles parpadea",
+        "find-and-inspect-the-solenoid-pack": "Ubique el bloque de solenoides de vacío en el chasis y revise cada manguera que llega a él buscando rajaduras, endurecimiento y desconexiones, y compruebe que su conector esté limpio y bien puesto",
+        "apply-vacuum-to-the-actuator-by-hand": "Aplique y suelte vacío en el actuador con una bomba de mano y vea si el eje entra y sale cuando se le ordena",
+        "check-the-actuator-rod-moves": "Observe la varilla del actuador mientras hay vacío aplicado y confirme que recorre todo su trayecto y no solo una parte"
+      },
+      "fixPaths": {
+        "replace-the-freewheel-clutch-solenoid": {
+          "title": "Cambiar el solenoide de control del embrague de rueda libre",
+          "detail": "El proveedor citado describe esta pieza como de acceso fácil, y el tiempo que aparece aquí es la cifra de esa misma fuente para el cambio y no un cálculo nuestro. Anote cómo van enrutadas las mangueras en la unidad vieja antes de sacarla, porque volverlas a poner en el orden equivocado le deja la misma falla con una pieza nueva montada."
+        },
+        "renew-the-vacuum-hoses": {
+          "title": "Renovar las mangueras de vacío",
+          "detail": "El hule de décadas debajo de un carro se endurece y se raja en las puntas, donde se estira sobre una espiga. Renueve el tramo completo en vez de parchar el pedazo que encontró, y enrútelo lejos del escape."
+        },
+        "free-or-replace-the-actuator": {
+          "title": "Liberar o cambiar el actuador del eje delantero",
+          "detail": "Si el actuador no se mueve con vacío de mano, la falla está en el eje y no en el lado de control. Revise la varilla y su articulación buscando corrosión antes de comprar un actuador, porque un mecanismo que solo está pegado de óxido a veces vuelve con limpieza y grasa."
+        },
+        "repair-the-switch-circuit": {
+          "title": "Reparar el circuito del interruptor de posición",
+          "detail": "El indicador compara la posición de la palanca con la del eje, así que un interruptor o un conector que reporte lo que no es hace parpadear el tablero mientras el mecanismo hace exactamente lo que se le pidió. Los reportes de dueños describen conectores flojos debajo del carro como una versión real y frecuente de esto."
+        }
+      }
+    }
+  }
+}

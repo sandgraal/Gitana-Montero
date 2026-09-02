@@ -1,0 +1,192 @@
+{
+  "id": "gen2-steering-wander-and-play",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "markets": ["us"],
+    "years": {
+      "from": 1992,
+      "to": 1999
+    }
+  },
+  "system": "steering",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "dead-spot-at-the-straight-ahead",
+    "truck-wanders-and-needs-constant-correction",
+    "column-moves-in-and-out",
+    "vague-feel-that-got-worse-slowly"
+  ],
+  "causes": [
+    { "id": "worn-idler-arm" },
+    { "id": "worn-tie-rod-end-joints" },
+    { "id": "steering-box-sector-shaft-wear" },
+    { "id": "worn-pitman-arm" },
+    { "id": "loose-column-or-coupler-fasteners" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "measure-free-play-at-the-rim",
+      "rulesIn": [
+        "steering-box-sector-shaft-wear",
+        "worn-idler-arm",
+        "worn-tie-rod-end-joints"
+      ],
+      "rulesOut": ["loose-column-or-coupler-fasteners"]
+    },
+    {
+      "id": "watch-the-box-and-the-arms-with-a-helper",
+      "rulesIn": ["steering-box-sector-shaft-wear", "worn-pitman-arm"],
+      "rulesOut": ["worn-idler-arm"]
+    },
+    {
+      "id": "grab-the-idler-arm-and-lift",
+      "rulesIn": ["worn-idler-arm"],
+      "rulesOut": ["steering-box-sector-shaft-wear"]
+    },
+    {
+      "id": "check-each-rod-end-for-vertical-play",
+      "rulesIn": ["worn-tie-rod-end-joints"],
+      "rulesOut": ["worn-pitman-arm"]
+    },
+    {
+      "id": "pull-and-push-the-column",
+      "rulesIn": ["loose-column-or-coupler-fasteners"],
+      "rulesOut": ["worn-tie-rod-end-joints"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "renew-the-linkage-joints",
+      "difficulty": 3,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": [
+        "worn-idler-arm",
+        "worn-tie-rod-end-joints",
+        "worn-pitman-arm"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "adjust-or-rebuild-the-steering-box",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["steering-box-sector-shaft-wear"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "retighten-the-column-and-coupler",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["loose-column-or-coupler-fasteners"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA owner complaint database — 1993 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1993",
+      "archiveUrl": "https://web.archive.org/web/20260902174904/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1993",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1996 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "archiveUrl": "https://web.archive.org/web/20260902205122/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1999 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "archiveUrl": "https://web.archive.org/web/20260902175310/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Loose, wandering steering with a dead spot",
+      "summary": "Steering that has gone vague is the most ordinary complaint on a truck of this age and the easiest one to live with until it is not. Owner reports filed with the United States road safety agency across this generation describe the whole range of it: a truck that drifts and needs constant small corrections, a wheel with a dead area either side of straight ahead, and in one report a column with enough front-to-back movement to be measured in inches. This truck steers through a recirculating-ball box, a pitman arm, a long relay rod and an idler arm on the other side, and every one of those is a wear point in series with the others. That is why the fault creeps: no single joint is badly worn, but five slightly worn joints add up into a wheel that does nothing for the first part of its travel. The reason to treat it as more than an annoyance is that free play hides the joint that is actually failing — a linkage with a lot of slop everywhere is a linkage where nobody can tell which part is nearly out. This entry is written from owner reports in aggregate; the ranking of causes is a starting order, not a diagnosis for your truck.",
+      "slug": "loose-wandering-steering",
+      "symptoms": {
+        "dead-spot-at-the-straight-ahead": "The wheel moves through a dead area either side of straight ahead before anything happens",
+        "truck-wanders-and-needs-constant-correction": "The truck wanders in its lane and needs constant small corrections",
+        "column-moves-in-and-out": "The column itself moves in and out or up and down when pulled",
+        "vague-feel-that-got-worse-slowly": "Steering feel that got vaguer so slowly nobody noticed a day it changed"
+      },
+      "causes": {
+        "worn-idler-arm": "Worn idler arm",
+        "worn-tie-rod-end-joints": "Worn tie rod end joints",
+        "steering-box-sector-shaft-wear": "Wear in the steering box, at the sector shaft",
+        "worn-pitman-arm": "Worn pitman arm joint",
+        "loose-column-or-coupler-fasteners": "Loose steering column or coupler fasteners"
+      },
+      "diagnosticSteps": {
+        "measure-free-play-at-the-rim": "With the truck on the ground and the engine running, turn the wheel gently to the point where the front wheels just start to move each way, and measure how far the rim travelled in between",
+        "watch-the-box-and-the-arms-with-a-helper": "Have someone rock the wheel through that free play while you watch the steering box output and the pitman arm for the shaft moving without the arm following",
+        "grab-the-idler-arm-and-lift": "With the front raised and supported, grip the idler arm near its joint and lift and push down, watching for vertical movement at the pivot",
+        "check-each-rod-end-for-vertical-play": "Take each rod end in turn and try to lift it in its taper while a helper rocks the wheel, watching for the stud rising in the housing",
+        "pull-and-push-the-column": "Pull and push the wheel along the column and try to lift it, then look at the coupler joints between the column and the box"
+      },
+      "fixPaths": {
+        "renew-the-linkage-joints": {
+          "title": "Renew the worn linkage joints together",
+          "detail": "Joints in this linkage are replaced in groups rather than one at a time: replacing the worst one just moves the complaint to the next one, and the alignment has to be reset either way. Split pins and torque figures are not optional on steering."
+        },
+        "adjust-or-rebuild-the-steering-box": {
+          "title": "Adjust or rebuild the steering box",
+          "detail": "A box with wear in the middle of its travel can sometimes be taken up on its adjustment, but only if the wear really is in the centre — winding the adjuster in on a worn shaft makes the ends of the travel tight, which is worse than the slop. Have someone who has done it before make that judgement."
+        },
+        "retighten-the-column-and-coupler": {
+          "title": "Retighten or replace the column and coupler fasteners",
+          "detail": "This is the cheapest thing on the list and one owner report describes a column bolt having simply fallen out. Check it before anything is bought, and use new fasteners where a lock is designed into them."
+        }
+      }
+    },
+    "es": {
+      "title": "Dirección floja, que se pasea y con punto muerto",
+      "summary": "Una dirección que se puso imprecisa es la queja más corriente en un carro de esta edad y la más fácil de aguantar hasta que deja de serlo. Los reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos a lo largo de esta generación describen todo el rango: un carro que se pasea y pide correcciones chiquitas todo el tiempo, un volante con una zona muerta a cada lado del centro, y en un reporte una columna con tanto movimiento hacia adelante y hacia atrás que se pudo medir. Este carro dirige por una caja de dirección de bolas recirculantes, un brazo pitman, una barra larga de mando y un brazo loco del otro lado, y cada uno de esos es un punto de desgaste en serie con los demás. Por eso la falla se arrastra: ninguna articulación está muy gastada, pero cinco articulaciones un poco gastadas suman un volante que no hace nada en la primera parte de su recorrido. La razón para tratarlo como algo más que una molestia es que el juego libre tapa la articulación que de verdad se está acabando: un varillaje con holgura por todos lados es un varillaje donde nadie puede decir cuál pieza está por soltarse. Esta entrada está escrita a partir de reportes de dueños en conjunto; el orden de las causas es un punto de partida, no un diagnóstico para su carro.",
+      "slug": "direccion-floja-que-se-pasea",
+      "symptoms": {
+        "dead-spot-at-the-straight-ahead": "El volante recorre una zona muerta a cada lado del centro antes de que pase algo",
+        "truck-wanders-and-needs-constant-correction": "El carro se pasea dentro del carril y pide correcciones chiquitas todo el tiempo",
+        "column-moves-in-and-out": "La columna misma se mueve hacia adentro y hacia afuera, o de arriba abajo, cuando uno la jala",
+        "vague-feel-that-got-worse-slowly": "Un tacto de dirección que se fue poniendo impreciso tan despacio que nadie notó el día en que cambió"
+      },
+      "causes": {
+        "worn-idler-arm": "Brazo loco gastado",
+        "worn-tie-rod-end-joints": "Terminales de dirección gastados",
+        "steering-box-sector-shaft-wear": "Desgaste en la caja de dirección, en el eje del sector",
+        "worn-pitman-arm": "Articulación del brazo pitman gastada",
+        "loose-column-or-coupler-fasteners": "Tornillería floja en la columna de dirección o en su acople"
+      },
+      "diagnosticSteps": {
+        "measure-free-play-at-the-rim": "Con el carro en el piso y el motor encendido, gire el volante suave hasta el punto donde las ruedas delanteras apenas empiezan a moverse hacia cada lado, y mida cuánto recorrió el aro del volante entre esos dos puntos",
+        "watch-the-box-and-the-arms-with-a-helper": "Pida que alguien mueva el volante dentro de ese juego libre mientras usted observa la salida de la caja de dirección y el brazo pitman, buscando que el eje se mueva sin que el brazo lo siga",
+        "grab-the-idler-arm-and-lift": "Con el frente levantado y apoyado sobre soportes de seguridad, agarre el brazo loco cerca de su articulación y levántelo y empújelo hacia abajo, observando si hay movimiento vertical en el pivote",
+        "check-each-rod-end-for-vertical-play": "Tome cada terminal de dirección por turno e intente levantarlo en su cono mientras un ayudante mueve el volante, observando si el perno sube dentro de su alojamiento",
+        "pull-and-push-the-column": "Jale y empuje el volante a lo largo de la columna e intente levantarlo; después revise las juntas del acople entre la columna y la caja de dirección"
+      },
+      "fixPaths": {
+        "renew-the-linkage-joints": {
+          "title": "Renovar juntas las articulaciones gastadas del varillaje",
+          "detail": "Las articulaciones de este varillaje se cambian en grupo y no de una en una: cambiar la peor solo le pasa la queja a la siguiente, y de todos modos hay que rehacer el alineamiento. En dirección, las chavetas y los valores de torque no son opcionales."
+        },
+        "adjust-or-rebuild-the-steering-box": {
+          "title": "Ajustar o reparar la caja de dirección",
+          "detail": "Una caja con desgaste en el centro de su recorrido a veces se puede recuperar con su ajuste, pero solo si el desgaste de verdad está en el centro: meterle ajuste a un eje gastado deja duras las puntas del recorrido, y eso es peor que la holgura. Deje que ese juicio lo haga alguien que ya lo haya hecho antes."
+        },
+        "retighten-the-column-and-coupler": {
+          "title": "Reapretar o cambiar la tornillería de la columna y el acople",
+          "detail": "Es lo más barato de la lista y hay un reporte de dueño que describe un tornillo de columna que simplemente se cayó. Revíselo antes de comprar nada, y use tornillería nueva donde el diseño lleve un seguro."
+        }
+      }
+    }
+  }
+}

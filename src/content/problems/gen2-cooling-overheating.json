@@ -1,0 +1,221 @@
+{
+  "id": "gen2-cooling-overheating",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "cooling",
+  "severity": "damaging",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "gauge-climbs-in-traffic-or-on-a-climb",
+    "gauge-normal-on-the-open-road-only",
+    "coolant-loss-with-no-puddle",
+    "heater-blows-cold-when-the-gauge-is-high",
+    "sweet-smell-and-steam-at-the-front"
+  ],
+  "causes": [
+    { "id": "clogged-or-split-radiator" },
+    { "id": "tired-viscous-fan-coupling" },
+    { "id": "stuck-thermostat" },
+    { "id": "perished-hoses-or-weak-cap" },
+    { "id": "failing-water-pump" },
+    { "id": "combustion-gas-in-the-coolant" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "note-when-the-gauge-rises",
+      "rulesIn": ["tired-viscous-fan-coupling", "clogged-or-split-radiator"],
+      "rulesOut": ["stuck-thermostat"]
+    },
+    {
+      "id": "feel-the-radiator-across-its-face",
+      "rulesIn": ["clogged-or-split-radiator"],
+      "rulesOut": ["perished-hoses-or-weak-cap"]
+    },
+    {
+      "id": "check-the-fan-drag-when-hot",
+      "rulesIn": ["tired-viscous-fan-coupling"],
+      "rulesOut": ["clogged-or-split-radiator"]
+    },
+    {
+      "id": "watch-the-upper-hose-warm-up",
+      "rulesIn": ["stuck-thermostat"],
+      "rulesOut": ["failing-water-pump"]
+    },
+    {
+      "id": "pressure-test-the-system-and-the-cap",
+      "rulesIn": ["perished-hoses-or-weak-cap", "failing-water-pump"],
+      "rulesOut": ["stuck-thermostat"]
+    },
+    {
+      "id": "test-the-coolant-for-combustion-gas",
+      "rulesIn": ["combustion-gas-in-the-coolant"],
+      "rulesOut": ["perished-hoses-or-weak-cap"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-radiator-and-service-the-system",
+      "difficulty": 3,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["clogged-or-split-radiator", "perished-hoses-or-weak-cap"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-fan-coupling",
+      "difficulty": 2,
+      "cost": { "from": "moderate" },
+      "addresses": ["tired-viscous-fan-coupling"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-thermostat-and-refill-properly",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["stuck-thermostat"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-water-pump",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["failing-water-pump"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "investigate-the-head-before-anything-else",
+      "difficulty": 5,
+      "cost": { "from": "significant", "to": "major" },
+      "addresses": ["combustion-gas-in-the-coolant"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: cooling neglect, clogged radiators and viscous fans, and diesel head cracking or warpage",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1992 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1992",
+      "archiveUrl": "https://web.archive.org/web/20260902205108/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1992",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Runs hot in traffic or on a long climb",
+      "summary": "A buyer's guide written for this exact generation calls the cooling system one of the two things that decide whether a truck is worth buying at all, and it says why in one line: old radiators, old hoses and tired viscous fans cause overheating, and on the diesels the bill that arrives afterwards is a cracked or warped cylinder head. That is the whole reason this entry carries the severity it does. Overheating is not itself an expensive fault — a radiator, a fan coupling and a thermostat are ordinary parts. What is expensive is the head that was cooked while somebody drove another few kilometres hoping the gauge would come down. It does not come down, and the damage is done in that few kilometres rather than over the following month. The pattern of when the gauge rises is most of the diagnosis and it costs nothing to observe: hot only in traffic and at low speed points at airflow, which means the fan; hot only when working hard on the open road points at the radiator's ability to shed heat; hot everywhere and quickly points at circulation. Stop, let it cool, and do not open a hot system — the coolant in there is above its boiling point and held down only by the cap.",
+      "slug": "runs-hot",
+      "symptoms": {
+        "gauge-climbs-in-traffic-or-on-a-climb": "The temperature gauge climbs in traffic or on a long climb and falls again when you get moving",
+        "gauge-normal-on-the-open-road-only": "Normal on the open road, high whenever the truck is worked or slowed",
+        "coolant-loss-with-no-puddle": "The coolant level keeps falling with nothing on the ground",
+        "heater-blows-cold-when-the-gauge-is-high": "The heater blows cold at exactly the moment the gauge reads high",
+        "sweet-smell-and-steam-at-the-front": "A sweet smell and steam from the front of the truck"
+      },
+      "causes": {
+        "clogged-or-split-radiator": "Radiator core blocked, or a split end tank",
+        "tired-viscous-fan-coupling": "Viscous fan coupling no longer locking up when hot",
+        "stuck-thermostat": "Thermostat stuck shut, or an air lock behind it",
+        "perished-hoses-or-weak-cap": "Perished hoses or a cap that no longer holds pressure",
+        "failing-water-pump": "Water pump no longer moving coolant properly",
+        "combustion-gas-in-the-coolant": "Combustion gas leaking into the coolant"
+      },
+      "diagnosticSteps": {
+        "note-when-the-gauge-rises": "Write down when the gauge rises — in traffic, on a climb, at speed, or all the time — and what makes it fall again",
+        "feel-the-radiator-across-its-face": "With the engine warm and the truck safely parked, feel across the radiator face for cold patches, and look through the core from the front for bent fins and packed mud",
+        "check-the-fan-drag-when-hot": "With the engine hot and switched off, turn the fan by hand and compare how much drag it has against how it felt cold",
+        "watch-the-upper-hose-warm-up": "From a cold start, hold the upper hose and note whether it warms gradually or stays cold until the gauge is already high",
+        "pressure-test-the-system-and-the-cap": "Have the system and the cap pressure-tested cold, and watch where the pressure goes",
+        "test-the-coolant-for-combustion-gas": "Have the coolant tested for combustion gas with a chemical block tester before spending money on parts"
+      },
+      "fixPaths": {
+        "replace-the-radiator-and-service-the-system": {
+          "title": "Replace the radiator and renew the hoses and cap with it",
+          "detail": "A radiator with a blocked core or a split plastic end tank is replaced rather than patched. Hoses, the cap and fresh coolant go on at the same time, because they have all aged together and because a new radiator behind a cap that no longer holds pressure boils at a lower temperature than it should."
+        },
+        "replace-the-fan-coupling": {
+          "title": "Replace the viscous fan coupling",
+          "detail": "A coupling that no longer stiffens when hot moves far less air than it should at exactly the moment the truck needs it, and there is nothing to see from outside. If the truck only overheats when it is slow, start here."
+        },
+        "replace-the-thermostat-and-refill-properly": {
+          "title": "Replace the thermostat and refill the system without an air lock",
+          "detail": "The cheapest part on the list. The part that matters is the refill: an air pocket sitting against the thermostat gives exactly the same symptom as a failed one, so the system is filled slowly with the front raised and then bled and rechecked warm."
+        },
+        "replace-the-water-pump": {
+          "title": "Replace the water pump",
+          "detail": "Weeping from the pump's drain hole or play at the shaft is the end of the pump. On engines where the pump is driven by the timing belt, the belt and its tensioner come out with it, so the two jobs are done together or not at all."
+        },
+        "investigate-the-head-before-anything-else": {
+          "title": "Investigate the cylinder head before replacing anything",
+          "detail": "If combustion gas is in the coolant, no radiator will fix it and fitting one wastes the money. The cited buyer's guide names cracked and warped diesel heads as the destination of neglected cooling on this generation. This is a qualified mechanic's job and the decision it leads to is a big one."
+        }
+      }
+    },
+    "es": {
+      "title": "Se calienta en presa o en una subida larga",
+      "summary": "Una guía de compra escrita para esta misma generación llama al sistema de refrigeración una de las dos cosas que deciden si un carro vale la pena comprarlo, y explica por qué en una línea: radiadores viejos, mangueras viejas y ventiladores viscosos acabados provocan sobrecalentamiento, y en los motores diésel la cuenta que llega después es un cabezote rajado o pandeado. Esa es toda la razón de la severidad que lleva esta entrada. El sobrecalentamiento en sí no es una falla cara: un radiador, un acople de ventilador y un termostato son piezas corrientes. Lo caro es el cabezote que se cocinó mientras alguien manejaba unos kilómetros más esperando que la aguja bajara. No baja, y el daño se hace en esos pocos kilómetros y no en el mes siguiente. El patrón de cuándo sube la aguja es casi todo el diagnóstico y no cuesta nada observarlo: caliente solo en presa y a poca velocidad apunta al flujo de aire, o sea al ventilador; caliente solo cuando el carro trabaja en carretera abierta apunta a la capacidad del radiador para botar calor; caliente en todo lado y rápido apunta a la circulación. Pare, deje que enfríe, y no abra un sistema caliente: el refrigerante ahí adentro está por encima de su punto de ebullición y lo único que lo contiene es la tapa.",
+      "slug": "se-calienta",
+      "symptoms": {
+        "gauge-climbs-in-traffic-or-on-a-climb": "La aguja de temperatura sube en presa o en una subida larga y baja otra vez cuando el carro agarra camino",
+        "gauge-normal-on-the-open-road-only": "Normal en carretera abierta, alta cada vez que el carro trabaja o va despacio",
+        "coolant-loss-with-no-puddle": "El nivel de refrigerante sigue bajando y no hay nada en el suelo",
+        "heater-blows-cold-when-the-gauge-is-high": "La calefacción bota aire frío justo cuando la aguja marca alto",
+        "sweet-smell-and-steam-at-the-front": "Olor dulce y vapor saliendo del frente del carro"
+      },
+      "causes": {
+        "clogged-or-split-radiator": "Panal del radiador tapado, o un tanque lateral partido",
+        "tired-viscous-fan-coupling": "Acople viscoso del ventilador del radiador que ya no engrana cuando está caliente",
+        "stuck-thermostat": "Termostato pegado cerrado, o una bolsa de aire detrás de él",
+        "perished-hoses-or-weak-cap": "Mangueras cristalizadas o una tapa que ya no sostiene presión",
+        "failing-water-pump": "Bomba de agua que ya no mueve bien el refrigerante",
+        "combustion-gas-in-the-coolant": "Gases de combustión pasando al refrigerante"
+      },
+      "diagnosticSteps": {
+        "note-when-the-gauge-rises": "Anote cuándo sube la aguja —en presa, en subida, a velocidad, o siempre— y qué hace que vuelva a bajar",
+        "feel-the-radiator-across-its-face": "Con el motor tibio y el carro bien parqueado, palpe toda la cara del radiador buscando zonas frías, y mire el panal desde el frente buscando aletas dobladas y barro pegado",
+        "check-the-fan-drag-when-hot": "Con el motor caliente y apagado, gire el ventilador del radiador con la mano y compare cuánta resistencia tiene contra cómo se sentía en frío",
+        "watch-the-upper-hose-warm-up": "Desde arranque en frío, sostenga la manguera superior y note si se va calentando de a poco o si se queda fría hasta que la aguja ya está alta",
+        "pressure-test-the-system-and-the-cap": "Mande a hacer una prueba de presión al sistema y a la tapa en frío, y observe a dónde se va la presión",
+        "test-the-coolant-for-combustion-gas": "Mande a probar el refrigerante con un detector químico de gases de combustión antes de gastar en piezas"
+      },
+      "fixPaths": {
+        "replace-the-radiator-and-service-the-system": {
+          "title": "Cambiar el radiador y renovar con él las mangueras y la tapa",
+          "detail": "Un radiador con el panal tapado o con un tanque plástico partido se cambia, no se parcha. Las mangueras, la tapa y refrigerante nuevo van al mismo tiempo, porque todo eso envejeció junto y porque un radiador nuevo detrás de una tapa que ya no sostiene presión hierve a menor temperatura de la que debería."
+        },
+        "replace-the-fan-coupling": {
+          "title": "Cambiar el acople viscoso del ventilador",
+          "detail": "Un acople que ya no endurece en caliente mueve mucho menos aire justo cuando el carro lo necesita, y desde afuera no se ve nada. Si el carro solo se calienta cuando va despacio, empiece por aquí."
+        },
+        "replace-the-thermostat-and-refill-properly": {
+          "title": "Cambiar el termostato y rellenar el sistema sin bolsas de aire",
+          "detail": "La pieza más barata de la lista. Lo que importa es el relleno: una bolsa de aire pegada al termostato da exactamente el mismo síntoma que uno dañado, así que el sistema se llena despacio con el frente levantado y después se purga y se vuelve a comprobar en caliente."
+        },
+        "replace-the-water-pump": {
+          "title": "Cambiar la bomba de agua",
+          "detail": "Que sude por el hueco de drenaje de la bomba o que el eje tenga juego es el final de la bomba. En los motores donde la bomba la mueve la faja de distribución, la faja y su tensor salen con ella, así que los dos trabajos se hacen juntos o no se hacen."
+        },
+        "investigate-the-head-before-anything-else": {
+          "title": "Investigar el cabezote antes de cambiar nada",
+          "detail": "Si hay gases de combustión en el refrigerante, ningún radiador lo va a arreglar y ponerlo es botar la plata. La guía de compra citada nombra los cabezotes diésel rajados y pandeados como el destino de una refrigeración descuidada en esta generación. Esto es trabajo de un mecánico calificado y la decisión a la que lleva es grande."
+        }
+      }
+    }
+  }
+}

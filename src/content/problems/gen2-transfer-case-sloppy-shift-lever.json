@@ -1,0 +1,159 @@
+{
+  "id": "gen2-transfer-case-sloppy-shift-lever",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "transfer-case",
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "lever-flops-side-to-side",
+    "cannot-find-the-mode-you-want",
+    "lever-feels-notchy-then-nothing",
+    "rattle-from-the-lever-over-rough-ground"
+  ],
+  "causes": [
+    { "id": "disintegrated-fulcrum-ball" },
+    { "id": "worn-linkage-bushings-at-the-transfer-case" },
+    { "id": "seized-shift-rail-inside-the-case" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "feel-where-the-slop-lives",
+      "rulesIn": [
+        "disintegrated-fulcrum-ball",
+        "worn-linkage-bushings-at-the-transfer-case"
+      ],
+      "rulesOut": ["seized-shift-rail-inside-the-case"]
+    },
+    {
+      "id": "lift-the-console-trim-and-look-at-the-base",
+      "rulesIn": ["disintegrated-fulcrum-ball"],
+      "rulesOut": ["worn-linkage-bushings-at-the-transfer-case"]
+    },
+    {
+      "id": "move-the-lever-at-the-case-itself",
+      "rulesIn": ["seized-shift-rail-inside-the-case"],
+      "rulesOut": ["disintegrated-fulcrum-ball"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-fulcrum-ball",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["disintegrated-fulcrum-ball"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-linkage-bushings",
+      "difficulty": 3,
+      "cost": { "from": "minimal" },
+      "addresses": ["worn-linkage-bushings-at-the-transfer-case"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "free-the-shift-rail",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["seized-shift-rail-inside-the-case"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — Montero Gen 2 / 2.5 transfer case shifter fulcrum ball (Mitsubishi MD701605): a sloppy lever with side-to-side movement, or trouble shifting between modes, usually means the original ball inside the lever has disintegrated",
+      "url": "https://lusooverland.com/VP-MMC-MD701605",
+      "archiveUrl": "https://web.archive.org/web/20260902175657/https://lusooverland.com/VP-MMC-MD701605",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Opinautos — fallas de 4x4 reportadas por dueños de Mitsubishi Montero, incluida la palanca de 4x4 trabada y una pieza de la palanca fabricada de nuevo por desgaste",
+      "url": "https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
+      "archiveUrl": "https://web.archive.org/web/20260902205429/https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Sloppy transfer case lever that will not select",
+      "summary": "The transfer lever pivots on a ball at its base, and a specialist supplier of parts for these trucks says plainly what happens to it: a lever that has a lot of side-to-side movement, or that gives trouble shifting between modes, usually has an original ball that has disintegrated. They name it as most common on the later trucks of the run. Owner reports in Spanish describe the same complaint from the driver's seat — the lever jammed, refusing to go where it is asked — and one describes having a replacement part machined because the original had broken up. This is the cheapest fault on this whole set, and it disguises itself as the most expensive one. A lever that will not select four-wheel drive feels exactly like a transfer case that will not engage it, and the difference is a plastic ball the size of a thumb joint against a gearbox out of the truck. So the useful thing here is the order of checking: prove the lever is actually moving the mechanism before anyone opens anything. Nothing about this fault is dangerous and nothing is wearing out because of it — but a truck whose four-wheel drive cannot be selected is a truck that has lost the reason most people bought it.",
+      "slug": "sloppy-transfer-case-lever",
+      "symptoms": {
+        "lever-flops-side-to-side": "The lever flops from side to side well beyond where it should stop",
+        "cannot-find-the-mode-you-want": "You cannot find the mode you want, or it lands in the wrong one",
+        "lever-feels-notchy-then-nothing": "The lever feels notchy for part of its travel and then goes slack",
+        "rattle-from-the-lever-over-rough-ground": "The lever rattles in its housing over rough ground"
+      },
+      "causes": {
+        "disintegrated-fulcrum-ball": "The fulcrum ball at the base of the lever has disintegrated",
+        "worn-linkage-bushings-at-the-transfer-case": "Worn linkage bushings between the lever and the transfer case",
+        "seized-shift-rail-inside-the-case": "Seized shift rail inside the transfer case"
+      },
+      "diagnosticSteps": {
+        "feel-where-the-slop-lives": "Hold the lever and move it across its travel: note whether the play is at the lever itself before anything else moves, or whether the linkage below is moving too",
+        "lift-the-console-trim-and-look-at-the-base": "Take off the centre console trim and look at the base of the lever where it enters the transfer case, checking the pivot for broken plastic and debris",
+        "move-the-lever-at-the-case-itself": "From underneath, with the truck safely raised and supported, move the shift arm at the transfer case by hand and see whether the modes select there"
+      },
+      "fixPaths": {
+        "replace-the-fulcrum-ball": {
+          "title": "Replace the shifter fulcrum ball",
+          "detail": "A small part reached from inside the truck after the console trim comes off. It is worth doing on its own merits before anything under the truck is disturbed, because it is the cause the cited supplier names first and the cheapest one to eliminate."
+        },
+        "renew-the-linkage-bushings": {
+          "title": "Renew the linkage bushings at the transfer case",
+          "detail": "Rubber and plastic bushings in the linkage below the floor take road water and dirt for decades. Slop distributed across several of them adds up to a lever that never quite arrives, even with a good fulcrum ball."
+        },
+        "free-the-shift-rail": {
+          "title": "Free off the shift mechanism in the transfer case",
+          "detail": "Only where the modes will not select even when the arm is moved by hand at the case. This is inside the transfer case and it means draining it, so it is the last thing to reach for and the point at which a qualified mechanic is the sensible answer."
+        }
+      }
+    },
+    "es": {
+      "title": "Palanca de la caja de transferencia floja que no engancha",
+      "summary": "La palanca de transferencia pivotea sobre una bola en su base, y un proveedor especializado en repuestos para estos carros dice sin rodeos qué le pasa: una palanca con mucho movimiento de lado a lado, o que da problemas para cambiar entre modos, normalmente tiene la bola original deshecha. La señalan como más común en los carros tardíos de la serie. Reportes de dueños en español describen la misma queja desde el asiento del conductor —la palanca trabada, negándose a ir donde se le pide— y uno describe haber mandado a hacer en la tornería una pieza de repuesto porque la original se había roto. Esta es la falla más barata de todo este conjunto, y se disfraza de la más cara. Una palanca que no engancha la doble tracción se siente igualito que una caja de transferencia que no la quiere meter, y la diferencia es una bola plástica del tamaño de un nudillo contra una caja fuera del carro. Así que lo útil acá es el orden de revisión: pruebe que la palanca de verdad está moviendo el mecanismo antes de que alguien abra algo. Nada de esta falla es peligroso y nada se está gastando por su culpa, pero un carro al que no se le puede meter la doble tracción es un carro que perdió la razón por la que la mayoría de la gente lo compró.",
+      "slug": "palanca-de-transferencia-floja",
+      "symptoms": {
+        "lever-flops-side-to-side": "La palanca se bambolea de lado a lado mucho más allá de donde debería topar",
+        "cannot-find-the-mode-you-want": "Usted no encuentra el modo que quiere, o cae en el equivocado",
+        "lever-feels-notchy-then-nothing": "La palanca se siente con topes en parte de su recorrido y después queda floja",
+        "rattle-from-the-lever-over-rough-ground": "La palanca cascabelea en su alojamiento en camino disparejo"
+      },
+      "causes": {
+        "disintegrated-fulcrum-ball": "La bola de pivote en la base de la palanca se deshizo",
+        "worn-linkage-bushings-at-the-transfer-case": "Bujes del varillaje entre la palanca y la caja de transferencia gastados",
+        "seized-shift-rail-inside-the-case": "Riel de cambio pegado dentro de la caja de transferencia"
+      },
+      "diagnosticSteps": {
+        "feel-where-the-slop-lives": "Sujete la palanca y muévala por todo su recorrido: note si el juego está en la palanca misma antes de que se mueva algo más, o si el varillaje de abajo también se mueve",
+        "lift-the-console-trim-and-look-at-the-base": "Quite el forro de la consola central y observe la base de la palanca donde entra a la caja de transferencia, revisando el pivote en busca de plástico quebrado y restos",
+        "move-the-lever-at-the-case-itself": "Desde abajo, con el carro levantado y apoyado sobre soportes de seguridad, mueva a mano el brazo de cambio en la caja de transferencia y vea si ahí sí entran los modos"
+      },
+      "fixPaths": {
+        "replace-the-fulcrum-ball": {
+          "title": "Cambiar la bola de pivote de la palanca",
+          "detail": "Es una pieza pequeña a la que se llega desde adentro del carro después de quitar el forro de la consola. Vale la pena hacerlo por su propio mérito antes de tocar nada debajo del carro, porque es la causa que el proveedor citado nombra de primero y la más barata de descartar."
+        },
+        "renew-the-linkage-bushings": {
+          "title": "Renovar los bujes del varillaje en la caja de transferencia",
+          "detail": "Los bujes de hule y plástico del varillaje por debajo del piso aguantan agua del camino y tierra por décadas. La holgura repartida entre varios de ellos suma una palanca que nunca termina de llegar, incluso con una bola de pivote buena."
+        },
+        "free-the-shift-rail": {
+          "title": "Liberar el mecanismo de cambio de la caja de transferencia",
+          "detail": "Solo cuando los modos no entran ni moviendo el brazo a mano en la caja. Esto es por dentro de la caja de transferencia y significa vaciarla, así que es lo último a lo que hay que recurrir y el punto en el que un mecánico calificado es la respuesta sensata."
+        }
+      }
+    }
+  }
+}

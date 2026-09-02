@@ -1,0 +1,177 @@
+{
+  "id": "gen2-body-structural-corrosion",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "body",
+  "safetyCritical": true,
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "bubbling-paint-along-the-rear-arches",
+    "flaking-scale-on-the-sills",
+    "rust-blooming-around-a-body-mount",
+    "dull-thud-instead-of-a-ring-when-tapped",
+    "fresh-underseal-hiding-the-underside"
+  ],
+  "causes": [
+    { "id": "corroded-rear-arches-and-sills" },
+    { "id": "corroded-body-mounts" },
+    { "id": "corroded-frame-rails-and-rear-crossmember" },
+    { "id": "trapped-water-from-blocked-drains" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "tap-along-the-sills-and-arches",
+      "rulesIn": ["corroded-rear-arches-and-sills"],
+      "rulesOut": ["corroded-frame-rails-and-rear-crossmember"]
+    },
+    {
+      "id": "inspect-every-body-mount-from-below",
+      "rulesIn": ["corroded-body-mounts"],
+      "rulesOut": ["corroded-rear-arches-and-sills"]
+    },
+    {
+      "id": "work-along-the-frame-rails-to-the-rear-crossmember",
+      "rulesIn": ["corroded-frame-rails-and-rear-crossmember"],
+      "rulesOut": ["corroded-body-mounts"]
+    },
+    {
+      "id": "clear-and-test-every-drain",
+      "rulesIn": ["trapped-water-from-blocked-drains"],
+      "rulesOut": ["corroded-frame-rails-and-rear-crossmember"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "cut-out-and-replace-the-affected-metal",
+      "difficulty": 5,
+      "cost": { "from": "significant", "to": "major" },
+      "addresses": [
+        "corroded-rear-arches-and-sills",
+        "corroded-body-mounts",
+        "corroded-frame-rails-and-rear-crossmember"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "clear-the-drains-and-treat-early-corrosion",
+      "difficulty": 2,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": [
+        "trapped-water-from-blocked-drains",
+        "corroded-rear-arches-and-sills"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "decide-whether-this-truck-is-worth-saving",
+      "difficulty": 1,
+      "cost": { "from": "minimal" },
+      "addresses": ["corroded-frame-rails-and-rear-crossmember"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: rear arches, sills, body mounts and frames rot, and repairs quickly exceed savings; inspection points include frame rails, rear crossmember, body mounts, sills and floor pans",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1996 Mitsubishi Montero (structure complaints including rear door hinge corrosion)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "archiveUrl": "https://web.archive.org/web/20260902205122/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Structural corrosion at arches, sills, body mounts and frame",
+      "summary": "A buyer's guide written for this generation names corrosion as one of the two things that decide whether a truck is worth buying, and lists exactly where to look: rear arches, sills, body mounts and the frame itself, with the frame rails, the rear crossmember and the floor pans called out as inspection points. It adds the sentence that matters most to anyone deciding what to do about it — repairs quickly exceed what the truck saves you. This is a body-on-frame truck, so the rust question splits in two and the two halves are not equally serious. Corroded arches and sills are metal and money. Corroded body mounts and a corroded frame are structure: they are what holds the cab to the chassis and the suspension to the truck, and there is no cosmetic version of that. That split is why this entry carries the safety framing even though its severity is written as damaging — the fault destroys the truck slowly, but it destroys a part of the truck whose failure is not slow. The other reason to look properly is that corrosion is the one fault that gets deliberately hidden. Fresh underseal on a thirty-year-old truck is a question, not an answer, and the honest test is still a light tap: sound metal rings, tired metal thuds.",
+      "slug": "structural-corrosion",
+      "symptoms": {
+        "bubbling-paint-along-the-rear-arches": "Paint bubbling or lifting along the rear wheel arches",
+        "flaking-scale-on-the-sills": "Flaking scale along the sills below the doors",
+        "rust-blooming-around-a-body-mount": "Rust blooming around a body mount where the cab meets the frame",
+        "dull-thud-instead-of-a-ring-when-tapped": "A dull thud instead of a ring when the panel is tapped",
+        "fresh-underseal-hiding-the-underside": "Fresh, thick underseal covering an otherwise unrestored underside"
+      },
+      "causes": {
+        "corroded-rear-arches-and-sills": "Corroded rear arches and sills",
+        "corroded-body-mounts": "Corroded body mounts",
+        "corroded-frame-rails-and-rear-crossmember": "Corroded frame rails or rear crossmember",
+        "trapped-water-from-blocked-drains": "Water trapped in a cavity by blocked drains"
+      },
+      "diagnosticSteps": {
+        "tap-along-the-sills-and-arches": "Tap along the sills and the arch lips with the handle of a screwdriver and listen for the change from a ring to a thud",
+        "inspect-every-body-mount-from-below": "With the truck safely raised and supported, inspect every body mount in turn, looking at the mount, its bolt and the metal it passes through",
+        "work-along-the-frame-rails-to-the-rear-crossmember": "Work along both frame rails from front to back and pay particular attention to the rear crossmember and to anywhere mud is packed against the metal",
+        "clear-and-test-every-drain": "Find the drain holes in the sills, the doors and the tailgate, clear them, and pour a little water through to prove they run"
+      },
+      "fixPaths": {
+        "cut-out-and-replace-the-affected-metal": {
+          "title": "Cut out the rotten metal and let in new",
+          "detail": "The only real repair. Structural metal is cut back to sound material and replaced with the right thickness, properly welded and then sealed inside and out. Filler over rust is not a repair and it hides the next round. Frame and body-mount work is structural welding on a safety-critical part of the truck, and it is a job for someone who does it properly."
+        },
+        "clear-the-drains-and-treat-early-corrosion": {
+          "title": "Clear the drains and treat corrosion while it is still surface",
+          "detail": "Cheap, and the only stage where prevention is worth anything. Clear every drain, get the packed mud out of the frame and the arch liners, and treat the surface rust before it becomes a hole. A truck that stays dry inside its cavities rusts far more slowly than one that does not."
+        },
+        "decide-whether-this-truck-is-worth-saving": {
+          "title": "Decide honestly whether the truck is worth the repair",
+          "detail": "The cited guide's own conclusion is that these repairs quickly cost more than the truck saves. That is a genuine fix path on a thirty-year-old vehicle: get the underside assessed by someone with no interest in the outcome, price the structural work, and compare it with a better shell before spending. It is not defeat — it is the difference between one repair and an endless series of them."
+        }
+      }
+    },
+    "es": {
+      "title": "Corrosión estructural en guardabarros, estribos, soportes de carrocería y chasis",
+      "summary": "Una guía de compra escrita para esta generación nombra la corrosión como una de las dos cosas que deciden si un carro vale la pena comprarlo, y lista exactamente dónde ver: guardabarros traseros, estribos, soportes de carrocería y el chasis mismo, señalando los largueros, el travesaño trasero y los pisos como puntos de revisión. Agrega además la frase que más le importa a quien está decidiendo qué hacer: las reparaciones rápidamente cuestan más de lo que el carro le ahorra. Este es un carro de carrocería sobre chasis, así que la pregunta del óxido se parte en dos y las dos mitades no son igual de graves. Guardabarros y estribos corroídos son lámina y plata. Soportes de carrocería corroídos y un chasis corroído son estructura: son lo que amarra la cabina al chasis y la suspensión al carro, y de eso no existe una versión cosmética. Esa división es la razón por la que esta entrada lleva el marco de seguridad aunque su severidad esté escrita como dañina: la falla destruye el carro despacio, pero destruye una parte del carro cuya falla no es despacio. La otra razón para revisar bien es que la corrosión es la única falla que se esconde a propósito. Antióxido fresco en un carro de treinta años es una pregunta, no una respuesta, y la prueba honesta sigue siendo un golpecito: la lámina sana suena, la lámina cansada hace un ruido sordo.",
+      "slug": "corrosion-estructural",
+      "symptoms": {
+        "bubbling-paint-along-the-rear-arches": "Pintura burbujeada o levantada a lo largo de los guardabarros traseros",
+        "flaking-scale-on-the-sills": "Costra escamada a lo largo de los estribos, debajo de las puertas",
+        "rust-blooming-around-a-body-mount": "Óxido brotando alrededor de un soporte de carrocería, donde la cabina se une al chasis",
+        "dull-thud-instead-of-a-ring-when-tapped": "Un ruido sordo en vez de un repique cuando se golpea suave la lámina",
+        "fresh-underseal-hiding-the-underside": "Antióxido fresco y grueso cubriendo unos bajos que por lo demás no están restaurados"
+      },
+      "causes": {
+        "corroded-rear-arches-and-sills": "Guardabarros traseros y estribos corroídos",
+        "corroded-body-mounts": "Soportes de carrocería corroídos",
+        "corroded-frame-rails-and-rear-crossmember": "Largueros del chasis o travesaño trasero corroídos",
+        "trapped-water-from-blocked-drains": "Agua atrapada en una cavidad por drenajes tapados"
+      },
+      "diagnosticSteps": {
+        "tap-along-the-sills-and-arches": "Golpee suave a lo largo de los estribos y del labio de los guardabarros con el mango de un destornillador y escuche el cambio de repique a ruido sordo",
+        "inspect-every-body-mount-from-below": "Con el carro levantado y apoyado sobre soportes de seguridad, revise uno por uno todos los soportes de carrocería, viendo el soporte, su tornillo y la lámina que atraviesa",
+        "work-along-the-frame-rails-to-the-rear-crossmember": "Recorra los dos largueros del chasis de adelante hacia atrás y ponga atención especial al travesaño trasero y a cualquier punto donde haya barro compactado contra el metal",
+        "clear-and-test-every-drain": "Ubique los huecos de drenaje de los estribos, las puertas y la puerta trasera, destápelos, y eche un poco de agua para comprobar que corren"
+      },
+      "fixPaths": {
+        "cut-out-and-replace-the-affected-metal": {
+          "title": "Cortar la lámina podrida y meter lámina nueva",
+          "detail": "Es la única reparación de verdad. La lámina estructural se corta hasta material sano y se reemplaza con el espesor correcto, bien soldada y después sellada por dentro y por fuera. Masilla sobre óxido no es una reparación y esconde la siguiente vuelta. El trabajo en chasis y en soportes de carrocería es soldadura estructural en una parte de seguridad crítica del carro, y es trabajo para quien lo haga bien."
+        },
+        "clear-the-drains-and-treat-early-corrosion": {
+          "title": "Destapar los drenajes y tratar la corrosión mientras sea superficial",
+          "detail": "Es barato, y es la única etapa en la que la prevención sirve de algo. Destape todos los drenajes, saque el barro compactado del chasis y de los forros de guardabarros, y trate el óxido superficial antes de que sea un hueco. Un carro que se mantiene seco por dentro de sus cavidades se oxida mucho más despacio que uno que no."
+        },
+        "decide-whether-this-truck-is-worth-saving": {
+          "title": "Decidir con honestidad si el carro aguanta la reparación",
+          "detail": "La conclusión de la propia guía citada es que estas reparaciones rápidamente cuestan más de lo que el carro ahorra. Esa es una salida legítima en un vehículo de treinta años: mande a evaluar los bajos con alguien que no tenga interés en el resultado, cotice el trabajo estructural, y compárelo contra una carrocería mejor antes de gastar. No es rendirse: es la diferencia entre una reparación y una serie interminable de ellas."
+        }
+      }
+    }
+  }
+}

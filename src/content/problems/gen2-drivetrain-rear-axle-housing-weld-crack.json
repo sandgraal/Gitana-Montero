@@ -1,0 +1,177 @@
+{
+  "id": "gen2-drivetrain-rear-axle-housing-weld-crack",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "markets": ["us"],
+    "years": {
+      "from": 1992,
+      "to": 1999
+    }
+  },
+  "system": "drivetrain",
+  "safetyCritical": true,
+  "severity": "safety-critical",
+  "drivability": "tow-only",
+  "symptoms": [
+    "gear-oil-weeping-along-a-seam-on-the-axle",
+    "one-rear-wheel-leaning-out-of-true",
+    "clunk-and-a-change-in-tracking-under-power",
+    "visible-crack-along-a-weld-on-the-housing",
+    "rear-tyre-wearing-on-one-edge-suddenly"
+  ],
+  "causes": [
+    { "id": "cracked-weld-on-the-axle-housing" },
+    { "id": "bent-axle-housing-from-an-impact" },
+    { "id": "failed-wheel-bearing-or-axle-shaft" },
+    { "id": "leaking-differential-cover-or-seal" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "clean-the-axle-and-inspect-every-weld",
+      "rulesIn": ["cracked-weld-on-the-axle-housing"],
+      "rulesOut": ["leaking-differential-cover-or-seal"]
+    },
+    {
+      "id": "sight-down-the-rear-wheels-from-behind",
+      "rulesIn": [
+        "bent-axle-housing-from-an-impact",
+        "cracked-weld-on-the-axle-housing"
+      ],
+      "rulesOut": ["leaking-differential-cover-or-seal"]
+    },
+    {
+      "id": "rock-each-rear-wheel-and-listen",
+      "rulesIn": ["failed-wheel-bearing-or-axle-shaft"],
+      "rulesOut": ["bent-axle-housing-from-an-impact"]
+    },
+    {
+      "id": "trace-the-oil-to-its-highest-point",
+      "rulesIn": ["leaking-differential-cover-or-seal"],
+      "rulesOut": ["cracked-weld-on-the-axle-housing"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-axle-housing",
+      "difficulty": 5,
+      "cost": { "from": "significant", "to": "major" },
+      "addresses": [
+        "cracked-weld-on-the-axle-housing",
+        "bent-axle-housing-from-an-impact"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-bearing-and-shaft",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["failed-wheel-bearing-or-axle-shaft"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "reseal-the-differential",
+      "difficulty": 3,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["leaking-differential-cover-or-seal"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA owner complaint database — 1995 Mitsubishi Montero (a group of reports describing rear axle housing welds cracking and separating, with differential oil leaks and wheel misalignment)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1995",
+      "archiveUrl": "http://web.archive.org/web/20260902175019/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1995",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1999 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "archiveUrl": "https://web.archive.org/web/20260902175310/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Cracked weld on the rear axle housing",
+      "summary": "A small group of owner reports filed with the United States road safety agency describes something that does not appear on most fault lists for this truck: welds on the rear axle housing cracking and separating, with gear oil escaping along the seam, the wheel on that side no longer standing square, and owners describing the wheel as heading for separation. There is no recall behind this and no factory bulletin cited here — it is a pattern in owner reports, several of them, describing the same failure in the same place. That is exactly why it is written down at community-consensus rather than presented with the authority of a bulletin, and why the triage below is set where it is. The reason this entry says tow rather than drive carefully is that the failure has no useful middle. An axle housing is what holds the wheel at the right angle to the road and keeps the differential's gears in mesh; when it is cracked, load is being carried by less metal every kilometre, and the failure that ends it is a wheel going somewhere the truck is not. If you find a wet seam along a weld on the axle, or a rear wheel that has started leaning, the sensible next move is a flatbed and a qualified mechanic looking at it on a hoist, not a careful drive to the workshop.",
+      "slug": "cracked-rear-axle-housing-weld",
+      "symptoms": {
+        "gear-oil-weeping-along-a-seam-on-the-axle": "Gear oil weeping along a seam or a weld on the rear axle housing",
+        "one-rear-wheel-leaning-out-of-true": "One rear wheel visibly leaning where the other stands square",
+        "clunk-and-a-change-in-tracking-under-power": "A clunk and a change in how the truck tracks when power comes on",
+        "visible-crack-along-a-weld-on-the-housing": "A visible crack, or a bright line of clean metal, along a weld on the housing",
+        "rear-tyre-wearing-on-one-edge-suddenly": "A rear tyre that has suddenly started wearing on one edge only"
+      },
+      "causes": {
+        "cracked-weld-on-the-axle-housing": "Cracked weld on the rear axle housing",
+        "bent-axle-housing-from-an-impact": "Axle housing bent by an impact or overload",
+        "failed-wheel-bearing-or-axle-shaft": "Failed rear wheel bearing or axle shaft",
+        "leaking-differential-cover-or-seal": "Leaking differential cover gasket or an axle seal"
+      },
+      "diagnosticSteps": {
+        "clean-the-axle-and-inspect-every-weld": "Degrease the whole axle housing, then inspect every weld and seam along it in good light, looking for a fine dark line or a bright edge where the surface has moved",
+        "sight-down-the-rear-wheels-from-behind": "Stand behind the truck on level ground and sight along both rear wheels, comparing how each one stands against vertical",
+        "rock-each-rear-wheel-and-listen": "With the wheel raised and supported, rock it top and bottom and side to side and listen for a knock, then turn it and listen for roughness",
+        "trace-the-oil-to-its-highest-point": "Follow the oil film upward to the highest wet point and decide whether it starts at a cover, a seal or a seam in the housing itself"
+      },
+      "fixPaths": {
+        "replace-the-axle-housing": {
+          "title": "Replace the axle housing",
+          "detail": "A cracked housing is replaced, and welding it back up is not a repair anyone should accept on the road: the crack started at a weld, the metal around it has been fatigued, and a bead laid over that leaves a stiff spot beside a tired one. This is a whole-axle job with the differential set up again afterwards, and it belongs with a qualified mechanic."
+        },
+        "renew-the-bearing-and-shaft": {
+          "title": "Renew the rear wheel bearing and inspect the shaft",
+          "detail": "Where the housing is sound and the noise and play come from the bearing. The shaft is inspected while it is out, because a bearing that has run rough leaves marks on the surface it ran on and a shaft with those marks will destroy the new bearing."
+        },
+        "reseal-the-differential": {
+          "title": "Reseal the differential",
+          "detail": "The good outcome: the oil is coming from a cover gasket or an axle seal and the housing itself is intact. Clean, reseal, refill with the correct gear oil, and then look again in a week to confirm the leak really has stopped."
+        }
+      }
+    },
+    "es": {
+      "title": "Soldadura rajada en la carcasa del eje trasero",
+      "summary": "Un grupo pequeño de reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos describe algo que no sale en la mayoría de las listas de fallas de este carro: soldaduras de la carcasa del eje trasero que se rajan y se separan, con aceite de engranajes escapándose por la costura, la rueda de ese lado ya sin quedar a escuadra, y dueños describiendo que la rueda iba camino a soltarse. Detrás de esto no hay llamado a revisión y aquí no se cita ningún boletín de fábrica: es un patrón en reportes de dueños, varios de ellos, describiendo la misma falla en el mismo lugar. Justamente por eso queda anotado como consenso de la comunidad y no se presenta con la autoridad de un boletín, y por eso el triaje de abajo está donde está. La razón por la que esta entrada dice grúa y no manejar con cuidado es que esta falla no tiene un punto medio útil. La carcasa del eje es lo que sostiene la rueda en el ángulo correcto contra el camino y lo que mantiene engranados los piñones del diferencial; cuando está rajada, cada kilómetro la carga la lleva menos metal, y la falla que la termina es una rueda yéndose para donde el carro no va. Si usted encuentra una costura húmeda a lo largo de una soldadura del eje, o una rueda trasera que empezó a inclinarse, lo sensato es una plataforma y un mecánico calificado viéndolo en un elevador, no un viaje cuidadoso hasta el taller.",
+      "slug": "soldadura-rajada-en-el-eje-trasero",
+      "symptoms": {
+        "gear-oil-weeping-along-a-seam-on-the-axle": "Aceite de engranajes sudando por una costura o una soldadura de la carcasa del eje trasero",
+        "one-rear-wheel-leaning-out-of-true": "Una rueda trasera visiblemente inclinada mientras la otra queda a escuadra",
+        "clunk-and-a-change-in-tracking-under-power": "Un golpe seco y un cambio en cómo agarra el carro cuando entra la fuerza",
+        "visible-crack-along-a-weld-on-the-housing": "Una rajadura visible, o una línea brillante de metal limpio, a lo largo de una soldadura de la carcasa",
+        "rear-tyre-wearing-on-one-edge-suddenly": "Una llanta trasera que de pronto empezó a gastarse solo de un borde"
+      },
+      "causes": {
+        "cracked-weld-on-the-axle-housing": "Soldadura rajada en la carcasa del eje trasero",
+        "bent-axle-housing-from-an-impact": "Carcasa del eje doblada por un golpe o una sobrecarga",
+        "failed-wheel-bearing-or-axle-shaft": "Rodamiento de rueda trasera o palier dañado",
+        "leaking-differential-cover-or-seal": "Empaque de la tapa del diferencial o un retenedor de palier con fuga"
+      },
+      "diagnosticSteps": {
+        "clean-the-axle-and-inspect-every-weld": "Desengrase toda la carcasa del eje y después revise cada soldadura y cada costura con buena luz, buscando una línea oscura fina o un borde brillante donde la superficie se haya movido",
+        "sight-down-the-rear-wheels-from-behind": "Párese detrás del carro en piso nivelado y mire a lo largo de las dos ruedas traseras, comparando cómo queda cada una contra la vertical",
+        "rock-each-rear-wheel-and-listen": "Con la rueda levantada y apoyada, muévala de arriba abajo y de lado a lado escuchando si suena un golpe, y luego gírela escuchando si hay aspereza",
+        "trace-the-oil-to-its-highest-point": "Siga la película de aceite hacia arriba hasta el punto húmedo más alto y decida si empieza en una tapa, en un retenedor o en una costura de la carcasa misma"
+      },
+      "fixPaths": {
+        "replace-the-axle-housing": {
+          "title": "Cambiar la carcasa del eje",
+          "detail": "Una carcasa rajada se cambia, y volverla a soldar no es una reparación que nadie deba aceptar para la calle: la rajadura empezó en una soldadura, el metal alrededor quedó fatigado, y un cordón encima de eso deja un punto duro al lado de uno cansado. Este es un trabajo de eje completo con el diferencial vuelto a calibrar después, y le corresponde a un mecánico calificado."
+        },
+        "renew-the-bearing-and-shaft": {
+          "title": "Renovar el rodamiento de rueda trasera y revisar el palier",
+          "detail": "Cuando la carcasa está sana y el ruido y el juego vienen del rodamiento. El palier se revisa mientras está afuera, porque un rodamiento que corrió áspero deja marcas en la superficie sobre la que corrió, y un palier con esas marcas destruye el rodamiento nuevo."
+        },
+        "reseal-the-differential": {
+          "title": "Volver a sellar el diferencial",
+          "detail": "El desenlace bueno: el aceite viene de un empaque de tapa o de un retenedor de palier y la carcasa está entera. Limpie, selle de nuevo, rellene con el aceite de engranajes correcto, y revise otra vez a la semana para confirmar que la fuga de verdad paró."
+        }
+      }
+    }
+  }
+}

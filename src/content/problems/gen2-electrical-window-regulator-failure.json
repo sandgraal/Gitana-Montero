@@ -1,0 +1,195 @@
+{
+  "id": "gen2-electrical-window-regulator-failure",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "electrical",
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "window-crawls-then-stops",
+    "motor-runs-but-the-glass-does-not-move",
+    "glass-tilts-in-the-frame",
+    "grinding-or-clicking-inside-the-door",
+    "window-works-only-from-the-drivers-switch"
+  ],
+  "causes": [
+    { "id": "worn-regulator-mechanism" },
+    { "id": "dry-or-perished-window-run-channels" },
+    { "id": "failed-window-switch-or-contacts" },
+    { "id": "broken-wiring-in-the-door-hinge-loom" },
+    { "id": "failed-window-motor" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "listen-at-the-door-while-someone-operates-it",
+      "rulesIn": ["worn-regulator-mechanism", "failed-window-motor"],
+      "rulesOut": ["failed-window-switch-or-contacts"]
+    },
+    {
+      "id": "try-the-same-window-from-both-switches",
+      "rulesIn": ["failed-window-switch-or-contacts"],
+      "rulesOut": ["failed-window-motor"]
+    },
+    {
+      "id": "flex-the-loom-in-the-door-hinge",
+      "rulesIn": ["broken-wiring-in-the-door-hinge-loom"],
+      "rulesOut": ["worn-regulator-mechanism"]
+    },
+    {
+      "id": "help-the-glass-by-hand-while-it-runs",
+      "rulesIn": ["dry-or-perished-window-run-channels"],
+      "rulesOut": ["broken-wiring-in-the-door-hinge-loom"]
+    },
+    {
+      "id": "take-the-door-card-off-and-watch-the-mechanism",
+      "rulesIn": ["worn-regulator-mechanism"],
+      "rulesOut": ["dry-or-perished-window-run-channels"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-regulator",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": ["worn-regulator-mechanism", "failed-window-motor"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "clean-and-lubricate-the-runs",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["dry-or-perished-window-run-channels"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "clean-or-replace-the-switch",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["failed-window-switch-or-contacts"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "repair-the-door-loom",
+      "difficulty": 3,
+      "cost": { "from": "minimal" },
+      "addresses": ["broken-wiring-in-the-door-hinge-loom"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: window regulators, climate controls and interior plastics can be brittle on older generations",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "CarsGuide — 1995 Mitsubishi Pajero problems (owner questions answered on this generation)",
+      "url": "https://www.carsguide.com.au/mitsubishi/pajero/problems/1995",
+      "archiveUrl": "http://web.archive.org/web/20220809180432/https://www.carsguide.com.au/mitsubishi/pajero/problems/1995",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Electric windows crawl, stall or stop working",
+      "summary": "A buyer's guide for this generation lists window regulators alongside climate controls and interior plastics as the things that have gone brittle with age on these trucks. It is the least serious fault in this set and it is here for two reasons. The first is that it is common enough that most owners meet it, and the second is that the obvious conclusion is usually wrong. A window that has slowed to a crawl is far more often being held back than under-powered: the rubber channels the glass runs in have hardened and gripped, and the motor is doing the same work it always did against far more friction. That is worth knowing before anyone buys a regulator, because cleaning and lubricating the runs is an afternoon and costs almost nothing, and a motor that has been fighting a dry run will fight the new one too. The mechanism does genuinely wear out as well, and the tell for that is different: a motor you can hear running while the glass stays put, or glass that tilts in the frame instead of rising level. Nothing here affects how the truck drives — but a window stuck down is a truck that cannot be left anywhere, and one stuck up in a hot climate is its own kind of punishment.",
+      "slug": "electric-windows-stop-working",
+      "symptoms": {
+        "window-crawls-then-stops": "The window crawls upward and then stops part way",
+        "motor-runs-but-the-glass-does-not-move": "You can hear the motor running but the glass does not move",
+        "glass-tilts-in-the-frame": "The glass tilts in the frame instead of rising level",
+        "grinding-or-clicking-inside-the-door": "A grinding or clicking from inside the door as it operates",
+        "window-works-only-from-the-drivers-switch": "The window works from the driver's master switch but not from its own"
+      },
+      "causes": {
+        "worn-regulator-mechanism": "Worn regulator mechanism",
+        "dry-or-perished-window-run-channels": "Dry or hardened window run channels gripping the glass",
+        "failed-window-switch-or-contacts": "Failed switch or dirty switch contacts",
+        "broken-wiring-in-the-door-hinge-loom": "Broken wire in the loom that crosses the door hinge",
+        "failed-window-motor": "Failed window motor"
+      },
+      "diagnosticSteps": {
+        "listen-at-the-door-while-someone-operates-it": "Put your ear to the door while someone works the switch and note whether the motor runs, strains, clicks, or is silent",
+        "try-the-same-window-from-both-switches": "Operate the same window from its own switch and from the driver's master switch and compare the two",
+        "flex-the-loom-in-the-door-hinge": "Open the door, find the rubber boot between the body and the door, and flex the loom inside it while the switch is held",
+        "help-the-glass-by-hand-while-it-runs": "Hold the switch and lift gently on the glass by hand: if it then moves freely, the mechanism is being held back rather than failing",
+        "take-the-door-card-off-and-watch-the-mechanism": "Take the door card and its plastic sheet off and watch the regulator work, looking for a cable coming off its drum or an arm binding at a pivot"
+      },
+      "fixPaths": {
+        "replace-the-regulator": {
+          "title": "Replace the regulator, motor and all",
+          "detail": "Where the mechanism itself is worn or a cable has come off its drum. Regulators are usually sold with the motor attached, which is the sensible way to buy one on a truck this age. Clean and lubricate the runs while the door is open anyway — fitting a new regulator behind a dry channel is how the new one wears out early."
+        },
+        "clean-and-lubricate-the-runs": {
+          "title": "Clean and lubricate the window runs",
+          "detail": "The first thing to try and by far the cheapest. Clean the channels out, treat the rubber, and lubricate the sliding parts of the mechanism with grease rather than a penetrating spray, which washes out and takes the dust with it next time."
+        },
+        "clean-or-replace-the-switch": {
+          "title": "Clean or replace the switch",
+          "detail": "Switches that carry motor current burn their own contacts over decades. If the window works from one switch and not the other, you have already found which one, and there is no need to open the door at all."
+        },
+        "repair-the-door-loom": {
+          "title": "Repair the wiring where it crosses the hinge",
+          "detail": "Every wire to the door bends thousands of times in that boot, and they break inside their insulation where nothing shows. Solder and heatshrink the broken conductor, do not just twist it, and leave enough slack for the door to swing."
+        }
+      }
+    },
+    "es": {
+      "title": "Los vidrios eléctricos suben despacio, se trancan o dejan de servir",
+      "summary": "Una guía de compra de esta generación lista los elevavidrios junto con los controles de clima y los plásticos interiores como lo que se ha vuelto quebradizo con los años en estos carros. Es la falla menos grave de este conjunto y está aquí por dos razones. La primera es que es tan común que casi todo dueño se la encuentra, y la segunda es que la conclusión obvia normalmente está equivocada. Un vidrio que se puso lento casi siempre está siendo frenado y no le falta fuerza: los canales de hule por donde corre el vidrio se endurecieron y lo agarran, y el motor está haciendo el mismo trabajo de siempre contra mucha más fricción. Eso conviene saberlo antes de que alguien compre un elevavidrios, porque limpiar y lubricar los canales es una tarde y no cuesta casi nada, y un motor que venía peleando contra un canal seco va a pelear igual contra el nuevo. El mecanismo también se acaba de verdad, y la pista para eso es distinta: un motor que usted oye correr mientras el vidrio se queda quieto, o un vidrio que se inclina en su marco en lugar de subir parejo. Nada de esto afecta cómo anda el carro, pero un vidrio trancado abajo es un carro que no se puede dejar en ningún lado, y uno trancado arriba en clima caliente es su propio castigo.",
+      "slug": "vidrios-electricos-no-sirven",
+      "symptoms": {
+        "window-crawls-then-stops": "El vidrio sube despacito y se detiene a medio camino",
+        "motor-runs-but-the-glass-does-not-move": "Se oye el motor trabajando pero el vidrio no se mueve",
+        "glass-tilts-in-the-frame": "El vidrio se inclina en su marco en vez de subir parejo",
+        "grinding-or-clicking-inside-the-door": "Un rechinido o un chasquido dentro de la puerta cuando se acciona",
+        "window-works-only-from-the-drivers-switch": "El vidrio funciona desde el interruptor del conductor pero no desde el suyo"
+      },
+      "causes": {
+        "worn-regulator-mechanism": "Mecanismo del elevavidrios gastado",
+        "dry-or-perished-window-run-channels": "Canales de guía del vidrio secos o endurecidos que agarran el vidrio",
+        "failed-window-switch-or-contacts": "Interruptor dañado o con los contactos sucios",
+        "broken-wiring-in-the-door-hinge-loom": "Cable roto en el ramal que cruza la bisagra de la puerta",
+        "failed-window-motor": "Motor del elevavidrios dañado"
+      },
+      "diagnosticSteps": {
+        "listen-at-the-door-while-someone-operates-it": "Pegue el oído a la puerta mientras alguien acciona el interruptor y note si el motor corre, si se esfuerza, si hace clic, o si queda mudo",
+        "try-the-same-window-from-both-switches": "Accione el mismo vidrio desde su propio interruptor y desde el interruptor maestro del conductor y compare los dos",
+        "flex-the-loom-in-the-door-hinge": "Abra la puerta, ubique el fuelle de hule entre la carrocería y la puerta, y mueva el ramal que va por dentro mientras se mantiene el interruptor accionado",
+        "help-the-glass-by-hand-while-it-runs": "Mantenga el interruptor y levante suave el vidrio con la mano: si ahí sí se mueve libre, el mecanismo está siendo frenado y no fallando",
+        "take-the-door-card-off-and-watch-the-mechanism": "Quite el panel de la puerta y su plástico y observe el mecanismo trabajando, buscando un cable salido de su carrete o un brazo trabado en un pivote"
+      },
+      "fixPaths": {
+        "replace-the-regulator": {
+          "title": "Cambiar el elevavidrios completo, con motor",
+          "detail": "Para cuando el mecanismo está gastado o se salió un cable de su carrete. Los elevavidrios normalmente se venden con el motor puesto, que es la forma sensata de comprarlo en un carro de esta edad. Aproveche la puerta abierta para limpiar y lubricar los canales: montar un elevavidrios nuevo detrás de un canal seco es como el nuevo se acaba antes de tiempo."
+        },
+        "clean-and-lubricate-the-runs": {
+          "title": "Limpiar y lubricar los canales del vidrio",
+          "detail": "Es lo primero que hay que probar y de lejos lo más barato. Limpie los canales, trate el hule, y lubrique las partes deslizantes del mecanismo con grasa y no con un penetrante en aerosol, que se lava y la próxima vez se lleva el polvo pegado."
+        },
+        "clean-or-replace-the-switch": {
+          "title": "Limpiar o cambiar el interruptor",
+          "detail": "Los interruptores que llevan la corriente del motor se queman sus propios contactos con las décadas. Si el vidrio funciona desde un interruptor y no desde el otro, usted ya encontró cuál es, y no hace falta abrir la puerta."
+        },
+        "repair-the-door-loom": {
+          "title": "Reparar el cableado donde cruza la bisagra",
+          "detail": "Cada cable que va a la puerta se dobla miles de veces dentro de ese fuelle, y se rompen por dentro del aislante donde no se ve nada. Suelde y ponga termoencogible en el conductor roto, no lo deje solo torcido, y deje suficiente holgura para que la puerta abra."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "id": "gen2-interior-nadi-airbag-inflator",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "markets": ["us"],
+    "years": {
+      "from": 1998,
+      "to": 2000
+    }
+  },
+  "system": "interior",
+  "safetyCritical": true,
+  "severity": "safety-critical",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "no-recall-record-for-the-inflator",
+    "srs-lamp-behaviour-changed",
+    "airbag-cover-swollen-or-distorted",
+    "horn-pad-works-intermittently"
+  ],
+  "causes": [
+    { "id": "unremedied-nadi-inflator" },
+    { "id": "srs-fault-unrelated-to-the-campaign" },
+    { "id": "previously-replaced-inflator" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "run-the-vin-through-the-recall-lookup",
+      "rulesIn": ["unremedied-nadi-inflator"],
+      "rulesOut": ["previously-replaced-inflator"]
+    },
+    {
+      "id": "ask-the-dealer-for-the-campaign-history",
+      "rulesIn": ["previously-replaced-inflator"],
+      "rulesOut": ["unremedied-nadi-inflator"]
+    },
+    {
+      "id": "watch-the-srs-lamp-through-a-start-cycle",
+      "rulesIn": ["srs-fault-unrelated-to-the-campaign"],
+      "rulesOut": ["previously-replaced-inflator"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "have-the-inflator-replaced-under-the-campaign",
+      "difficulty": 5,
+      "cost": { "from": "minimal" },
+      "addresses": ["unremedied-nadi-inflator"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "have-the-srs-diagnosed-properly",
+      "difficulty": 5,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["srs-fault-unrelated-to-the-campaign"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "tsb",
+  "sources": [
+    {
+      "title": "NHTSA safety recall 20V035000 (Mitsubishi Motors North America) — non-azide driver airbag inflators may absorb moisture and rupture or underinflate",
+      "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=20V035000",
+      "archiveUrl": "https://web.archive.org/web/20260902174830/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=20V035000",
+      "accessed": "2026-09-02",
+      "kind": "tsb"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1998 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1998",
+      "archiveUrl": "https://web.archive.org/web/20260902205258/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1998",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Driver airbag inflator recall on late trucks",
+      "summary": "Mitsubishi Motors North America recalled the driver airbag inflators fitted to the last United States trucks of this generation. The campaign says the inflators can absorb moisture over time and then either rupture when the airbag fires, sending metal fragments at whoever is behind the wheel, or underinflate so that the airbag does not do its job at all. Both outcomes only appear in a crash, which is what makes this different from every other fault on this site: nothing about how you drive changes the risk on any single trip, and there is no test you can run in the driveway. What does change is exposure — the defect is a moisture problem that accumulates, and every additional month of humidity and heat is on the wrong side of it. That is the honest reason the triage here is not simply 'drive normally': keep using the truck if you must, but get the remedy booked rather than filed away. The remedy is a free inflator replacement at a dealer, and this generation is old enough that a truck may have changed hands several times without the notice ever reaching the current owner. Never open, probe or attempt to replace an airbag module yourself. The campaign is a United States one; a truck sold or imported elsewhere was not part of it, and what any other market required is not stated here.",
+      "slug": "driver-airbag-inflator-recall",
+      "symptoms": {
+        "no-recall-record-for-the-inflator": "Nothing in the truck's history shows the inflator campaign was ever carried out",
+        "srs-lamp-behaviour-changed": "The airbag warning lamp no longer behaves the way it used to at start-up",
+        "airbag-cover-swollen-or-distorted": "The centre pad of the steering wheel looks swollen, lifted or distorted",
+        "horn-pad-works-intermittently": "The horn in the steering wheel pad works only sometimes"
+      },
+      "causes": {
+        "unremedied-nadi-inflator": "The recalled inflator is still fitted",
+        "srs-fault-unrelated-to-the-campaign": "A separate airbag system fault, unrelated to the campaign",
+        "previously-replaced-inflator": "The inflator was already replaced under the campaign"
+      },
+      "diagnosticSteps": {
+        "run-the-vin-through-the-recall-lookup": "Enter the truck's identification number into the road safety agency's recall lookup and read which campaigns are still listed as open",
+        "ask-the-dealer-for-the-campaign-history": "Ask a franchised dealer to pull the campaign history against the identification number, which shows work done under a previous owner",
+        "watch-the-srs-lamp-through-a-start-cycle": "Turn the key and watch the airbag warning lamp through the whole start cycle: it should light, then go out, and neither stay on nor fail to light at all"
+      },
+      "fixPaths": {
+        "have-the-inflator-replaced-under-the-campaign": {
+          "title": "Have the inflator replaced under the campaign",
+          "detail": "This is dealer work and it is free under the campaign. The difficulty rating here is not a suggestion that anyone attempt it: an airbag module holds a live pyrotechnic charge, and it is not a home repair at any skill level."
+        },
+        "have-the-srs-diagnosed-properly": {
+          "title": "Have the airbag system diagnosed by a qualified mechanic",
+          "detail": "A warning lamp that stays on, or one that never lights, means the system has recorded a fault and may not deploy when it is needed. This needs a scan tool that talks to the airbag system and someone who knows the disarming procedure — it is not guesswork with a fuse."
+        }
+      }
+    },
+    "es": {
+      "title": "Llamado a revisión del inflador de la bolsa de aire del conductor",
+      "summary": "Mitsubishi Motors North America llamó a revisión los infladores de la bolsa de aire del conductor montados en los últimos carros estadounidenses de esta generación. La campaña dice que esos infladores pueden absorber humedad con el tiempo y después, o bien reventarse cuando la bolsa de aire se dispara y lanzar fragmentos de metal hacia quien va al volante, o bien inflarse de menos y no cumplir su función. Los dos desenlaces solo aparecen en un choque, y eso hace que este caso sea distinto de todos los demás de este sitio: nada de cómo maneje usted cambia el riesgo en un viaje concreto, y no hay prueba que usted pueda hacer en su casa. Lo que sí cambia es la exposición: el defecto es un problema de humedad que se acumula, y cada mes más de calor y humedad juega en contra. Esa es la razón honesta por la que aquí no dice simplemente 'maneje normal': siga usando el carro si lo necesita, pero deje la cita hecha en vez de archivar el aviso. El remedio es un cambio de inflador gratis en un concesionario, y esta generación ya tiene edad suficiente para que un carro haya cambiado de dueño varias veces sin que el aviso llegara nunca al dueño de hoy. Nunca abra, hurgue ni intente cambiar usted mismo un módulo de bolsa de aire. La campaña es estadounidense; un carro vendido o importado a otro mercado no estuvo dentro de ella, y aquí no se afirma qué exigió otro país.",
+      "slug": "llamado-a-revision-del-inflador-de-bolsa-de-aire",
+      "symptoms": {
+        "no-recall-record-for-the-inflator": "En el historial del carro no aparece que la campaña del inflador se haya hecho alguna vez",
+        "srs-lamp-behaviour-changed": "La luz de advertencia de la bolsa de aire ya no se comporta como antes al encender el carro",
+        "airbag-cover-swollen-or-distorted": "La tapa central del volante se ve hinchada, levantada o deformada",
+        "horn-pad-works-intermittently": "El pito del volante funciona solo a veces"
+      },
+      "causes": {
+        "unremedied-nadi-inflator": "El inflador llamado a revisión sigue montado",
+        "srs-fault-unrelated-to-the-campaign": "Otra falla del sistema de bolsas de aire, sin relación con la campaña",
+        "previously-replaced-inflator": "El inflador ya se cambió bajo la campaña"
+      },
+      "diagnosticSteps": {
+        "run-the-vin-through-the-recall-lookup": "Meta el número de identificación del carro en el buscador de llamados a revisión de la agencia de seguridad vial y lea cuáles campañas siguen apareciendo abiertas",
+        "ask-the-dealer-for-the-campaign-history": "Pida a un concesionario autorizado que saque el historial de campañas contra el número de identificación, que muestra el trabajo hecho con un dueño anterior",
+        "watch-the-srs-lamp-through-a-start-cycle": "Dé la llave y observe la luz de advertencia de la bolsa de aire durante todo el ciclo de encendido: debe encenderse y luego apagarse, ni quedarse encendida ni dejar de encender"
+      },
+      "fixPaths": {
+        "have-the-inflator-replaced-under-the-campaign": {
+          "title": "Hacer cambiar el inflador bajo la campaña",
+          "detail": "Este es trabajo de concesionario y es gratis bajo la campaña. La dificultad que aparece aquí no es una invitación a que alguien lo intente: un módulo de bolsa de aire lleva una carga pirotécnica viva y no es una reparación casera a ningún nivel de destreza."
+        },
+        "have-the-srs-diagnosed-properly": {
+          "title": "Hacer diagnosticar el sistema de bolsas de aire con un mecánico calificado",
+          "detail": "Una luz de advertencia que se queda encendida, o una que nunca enciende, significa que el sistema registró una falla y puede no desplegarse cuando haga falta. Esto necesita un escáner que hable con el sistema de bolsas de aire y alguien que conozca el procedimiento de desarmado: no se adivina cambiando un fusible."
+        }
+      }
+    }
+  }
+}

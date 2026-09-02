@@ -1,0 +1,173 @@
+{
+  "id": "gen2-transmission-atf-coolant-crossleak",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "transmissions": ["automatic-4-speed"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "transmission",
+  "severity": "damaging",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "pink-froth-in-the-coolant",
+    "milky-fluid-on-the-transmission-dipstick",
+    "coolant-level-rises-and-smells-of-oil",
+    "shifts-turn-soft-and-slurred",
+    "transmission-fluid-level-climbs"
+  ],
+  "causes": [
+    { "id": "split-cooler-inside-the-radiator" },
+    { "id": "head-gasket-letting-coolant-into-the-oil" },
+    { "id": "external-cooler-line-leak" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "look-in-the-radiator-cold",
+      "rulesIn": ["split-cooler-inside-the-radiator"],
+      "rulesOut": ["external-cooler-line-leak"]
+    },
+    {
+      "id": "pull-the-transmission-dipstick",
+      "rulesIn": ["split-cooler-inside-the-radiator"],
+      "rulesOut": ["head-gasket-letting-coolant-into-the-oil"]
+    },
+    {
+      "id": "check-the-engine-oil-as-well",
+      "rulesIn": ["head-gasket-letting-coolant-into-the-oil"],
+      "rulesOut": ["split-cooler-inside-the-radiator"]
+    },
+    {
+      "id": "isolate-and-pressure-test-the-cooler",
+      "rulesIn": [
+        "split-cooler-inside-the-radiator",
+        "external-cooler-line-leak"
+      ],
+      "rulesOut": ["head-gasket-letting-coolant-into-the-oil"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-radiator-and-flush-both-systems",
+      "difficulty": 4,
+      "cost": { "from": "significant" },
+      "addresses": ["split-cooler-inside-the-radiator"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "fit-an-external-cooler-instead",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": [
+        "split-cooler-inside-the-radiator",
+        "external-cooler-line-leak"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "have-the-transmission-assessed",
+      "difficulty": 5,
+      "cost": { "from": "significant", "to": "major" },
+      "addresses": ["split-cooler-inside-the-radiator"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "CarsGuide — 1995 Mitsubishi Pajero problems: the automatic transmission cooler inside the radiator could split and let coolant and transmission fluid mix, often ruining the transmission",
+      "url": "https://www.carsguide.com.au/mitsubishi/pajero/problems/1995",
+      "archiveUrl": "http://web.archive.org/web/20220809180432/https://www.carsguide.com.au/mitsubishi/pajero/problems/1995",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: automatic transmission wear from heat, old fluid and a clogged cooler",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Coolant and transmission fluid mixing",
+      "summary": "The automatic's fluid is cooled by a heat exchanger that lives inside the radiator, with engine coolant on one side of a thin wall and transmission fluid on the other. A motoring publication answering owner questions about this generation names the failure directly: that cooler can split, the two fluids mix, and the transmission is often ruined as a result. Manual trucks have no such cooler and cannot have this fault at all. It is worth being blunt about which direction hurts. Transmission fluid in the coolant makes an ugly pink froth and a mess to clean up. Coolant in the transmission is what destroys it — the clutch material inside an automatic is not designed to be soaked in coolant, and the damage is not undone by draining it afterwards. Both fluids are pumped every time the engine turns, so the mixing continues for as long as the engine runs, and a truck driven home 'just this once' is a truck whose gearbox spent that trip being ruined. This is the reason for the triage: the truck may well drive normally on the day you find it, and driving it is what turns a radiator bill into a transmission bill.",
+      "slug": "coolant-and-transmission-fluid-mixing",
+      "symptoms": {
+        "pink-froth-in-the-coolant": "Pink or brown froth floating in the radiator or in the overflow bottle",
+        "milky-fluid-on-the-transmission-dipstick": "Milky, pale, strawberry-coloured fluid on the transmission dipstick",
+        "coolant-level-rises-and-smells-of-oil": "The coolant level rises on its own and smells oily rather than sweet",
+        "shifts-turn-soft-and-slurred": "Shifts go soft, slurred or late where they used to be crisp",
+        "transmission-fluid-level-climbs": "The transmission fluid level reads higher than it did"
+      },
+      "causes": {
+        "split-cooler-inside-the-radiator": "The transmission fluid cooler inside the radiator has split",
+        "head-gasket-letting-coolant-into-the-oil": "Head gasket letting coolant into the engine oil, a different fault with a similar look",
+        "external-cooler-line-leak": "A leaking external cooler line or fitting"
+      },
+      "diagnosticSteps": {
+        "look-in-the-radiator-cold": "With the engine cold, take the cap off and look at the surface of the coolant and at the inside of the filler neck for a coloured froth or an oily film",
+        "pull-the-transmission-dipstick": "Pull the transmission dipstick and wipe it on white paper: healthy fluid is translucent red, contaminated fluid is opaque and pale",
+        "check-the-engine-oil-as-well": "Check the engine oil on its own dipstick and under the filler cap for the same milky look, which points at the head gasket rather than the cooler",
+        "isolate-and-pressure-test-the-cooler": "Have the cooler isolated at its lines and pressure-tested on its own, which is the test that separates the internal cooler from everything else"
+      },
+      "fixPaths": {
+        "replace-the-radiator-and-flush-both-systems": {
+          "title": "Replace the radiator and flush both systems thoroughly",
+          "detail": "The radiator is replaced, not repaired, and both circuits are flushed until they run clean, including the cooler lines, which hold contaminated fluid that will go straight back into a new transmission. A torque converter holds fluid that a drain does not remove, so ask what is being done about it."
+        },
+        "fit-an-external-cooler-instead": {
+          "title": "Run the transmission through an external cooler",
+          "detail": "Bypassing the radiator with an air-to-oil cooler removes the shared wall that caused the fault. Note the trade-off honestly: the in-radiator cooler also warms the fluid to working temperature, which matters more in a cold climate than in a warm one, and it is a change to how the truck was designed rather than a repair to it."
+        },
+        "have-the-transmission-assessed": {
+          "title": "Have the transmission assessed before deciding anything",
+          "detail": "The publication cited says the transmission is often ruined by this. Whether yours is depends on how long it ran contaminated, and that judgement is worth paying for before a new radiator goes in front of a transmission that is already finished."
+        }
+      }
+    },
+    "es": {
+      "title": "Se mezclan el refrigerante y el aceite de transmisión automática",
+      "summary": "El aceite de la transmisión automática se enfría en un intercambiador que vive dentro del radiador, con refrigerante del motor de un lado de una pared delgada y aceite de transmisión del otro. Una publicación de motores que responde preguntas de dueños sobre esta generación nombra la falla directamente: ese enfriador se puede partir, los dos líquidos se mezclan, y como resultado la transmisión muchas veces queda arruinada. Los carros de caja de cambios manual no llevan ese enfriador y no pueden tener esta falla. Vale la pena ser franco sobre cuál dirección duele. Aceite de transmisión en el refrigerante hace una espuma rosada fea y un desorden que hay que limpiar. Refrigerante dentro de la transmisión es lo que la destruye: el material de fricción de una transmisión automática no está hecho para empaparse de refrigerante, y ese daño no se deshace vaciándola después. Los dos líquidos se bombean cada vez que el motor gira, así que la mezcla sigue mientras el motor esté encendido, y un carro que uno maneja a la casa 'solo esta vez' es un carro cuya caja pasó ese viaje arruinándose. Esa es la razón del triaje: el carro puede andar perfectamente normal el día en que usted lo descubre, y manejarlo es lo que convierte una cuenta de radiador en una cuenta de transmisión.",
+      "slug": "refrigerante-mezclado-con-aceite-de-transmision",
+      "symptoms": {
+        "pink-froth-in-the-coolant": "Espuma rosada o café flotando en el radiador o en el depósito de recuperación",
+        "milky-fluid-on-the-transmission-dipstick": "Aceite lechoso, pálido, color fresa en la varilla de la transmisión",
+        "coolant-level-rises-and-smells-of-oil": "El nivel de refrigerante sube solo y huele a aceite en vez de dulce",
+        "shifts-turn-soft-and-slurred": "Los cambios se vuelven blandos, arrastrados o tardíos donde antes entraban limpios",
+        "transmission-fluid-level-climbs": "El nivel de aceite de transmisión automática marca más alto que antes"
+      },
+      "causes": {
+        "split-cooler-inside-the-radiator": "El enfriador de aceite de transmisión que va dentro del radiador se partió",
+        "head-gasket-letting-coolant-into-the-oil": "Empaque de cabezote que deja pasar refrigerante al aceite de motor, otra falla con apariencia parecida",
+        "external-cooler-line-leak": "Una cañería o una conexión del enfriador externo con fuga"
+      },
+      "diagnosticSteps": {
+        "look-in-the-radiator-cold": "Con el motor frío, quite la tapa y observe la superficie del refrigerante y el interior del cuello de llenado buscando espuma de color o película aceitosa",
+        "pull-the-transmission-dipstick": "Saque la varilla de la transmisión y límpiela sobre papel blanco: el aceite sano es rojo translúcido, el contaminado es opaco y pálido",
+        "check-the-engine-oil-as-well": "Revise el aceite de motor en su propia varilla y debajo de la tapa de llenado buscando el mismo aspecto lechoso, que apunta al empaque de cabezote y no al enfriador",
+        "isolate-and-pressure-test-the-cooler": "Mande a aislar el enfriador en sus cañerías y a probarlo con presión por separado, que es la prueba que distingue el enfriador interno de todo lo demás"
+      },
+      "fixPaths": {
+        "replace-the-radiator-and-flush-both-systems": {
+          "title": "Cambiar el radiador y lavar bien los dos sistemas",
+          "detail": "El radiador se cambia, no se repara, y los dos circuitos se lavan hasta que salgan limpios, incluidas las cañerías del enfriador, que guardan aceite contaminado que se va a devolver derechito a una transmisión nueva. El convertidor de par guarda aceite que un simple vaciado no saca, así que pregunte qué se va a hacer con él."
+        },
+        "fit-an-external-cooler-instead": {
+          "title": "Pasar la transmisión por un enfriador externo",
+          "detail": "Puentear el radiador con un enfriador de aire elimina la pared compartida que causó la falla. Diga el intercambio con honestidad: el enfriador dentro del radiador también calienta el aceite hasta temperatura de trabajo, lo que pesa más en clima frío que en clima caliente, y esto es un cambio al diseño del carro y no una reparación de él."
+        },
+        "have-the-transmission-assessed": {
+          "title": "Hacer evaluar la transmisión antes de decidir nada",
+          "detail": "La publicación citada dice que la transmisión muchas veces queda arruinada por esto. Si la suya lo está depende de cuánto tiempo anduvo contaminada, y ese juicio vale la pena pagarlo antes de poner un radiador nuevo delante de una transmisión que ya está acabada."
+        }
+      }
+    }
+  }
+}

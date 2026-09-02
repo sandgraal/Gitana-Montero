@@ -1,0 +1,165 @@
+{
+  "id": "gen2-engine-4d56-balance-shaft-belt",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "engines": ["4d56"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "engine",
+  "severity": "damaging",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "no-record-of-the-inner-belt-being-changed",
+    "rattle-or-whine-from-behind-the-timing-cover",
+    "new-vibration-that-was-not-there-before",
+    "oil-soaked-belts-behind-the-cover",
+    "engine-stopped-and-will-not-restart"
+  ],
+  "causes": [
+    { "id": "worn-or-shredded-balance-shaft-belt" },
+    { "id": "leaking-front-oil-seal-soaking-the-belts" },
+    { "id": "worn-tensioner-or-idler" },
+    { "id": "timing-belt-already-past-its-life" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "find-out-when-the-belts-were-last-done",
+      "rulesIn": [
+        "timing-belt-already-past-its-life",
+        "worn-or-shredded-balance-shaft-belt"
+      ],
+      "rulesOut": ["leaking-front-oil-seal-soaking-the-belts"]
+    },
+    {
+      "id": "take-the-timing-cover-off-and-look",
+      "rulesIn": [
+        "worn-or-shredded-balance-shaft-belt",
+        "leaking-front-oil-seal-soaking-the-belts"
+      ],
+      "rulesOut": ["timing-belt-already-past-its-life"]
+    },
+    {
+      "id": "inspect-the-inner-belt-teeth-section-by-section",
+      "rulesIn": ["worn-or-shredded-balance-shaft-belt"],
+      "rulesOut": ["worn-tensioner-or-idler"]
+    },
+    {
+      "id": "spin-the-tensioner-and-idlers",
+      "rulesIn": ["worn-tensioner-or-idler"],
+      "rulesOut": ["worn-or-shredded-balance-shaft-belt"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-both-belts-and-the-seals-together",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": [
+        "worn-or-shredded-balance-shaft-belt",
+        "leaking-front-oil-seal-soaking-the-belts",
+        "worn-tensioner-or-idler",
+        "timing-belt-already-past-its-life"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "remove-the-balance-shaft-belt-entirely",
+      "difficulty": 4,
+      "cost": { "from": "moderate" },
+      "addresses": ["worn-or-shredded-balance-shaft-belt"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero Owners Club — thread: 4d56 balance belt (members report a snapped balance belt taking the cam belt with it, and describe worn belt teeth where the shafts have slipped)",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=161205",
+      "archiveUrl": "https://web.archive.org/web/20260902180020/https://www.pocuk.com/forums/viewtopic.php?t=161205",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: a failed balancer belt can take the timing belt with it on an interference-design diesel",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Balance shaft belt takes the timing belt with it",
+      "summary": "The 4D56 diesel runs two belts behind the same cover: the timing belt, and a smaller balance shaft belt sitting behind it. The inner belt drives nothing the engine needs to run, which is exactly why it gets forgotten — a truck can have had its timing belt changed on schedule for thirty years while nobody touched the belt underneath it. A buyer's guide written for this generation and an owners' club thread agree on what happens next, from different directions. The club's members describe a snapped balance belt taking the cam belt with it and describe the worn, chewed sections of tooth that mark where the shafts stopped turning. The guide states the outcome for a belt-driven diesel of this design in one sentence: a thrown timing belt usually means a replacement engine. There is no warning light for this and nothing to feel from the seat. What you have instead is paperwork: if nobody can tell you when the inner belt was last changed, treat it as never. The same thread records that the club's own experienced members often remove the balance belt rather than replace it, and reports the engine running smoothly without it — that is a real and widely used answer, and it is also a change to how the engine was built, so it is set out below as its own choice rather than buried in the recommendation.",
+      "slug": "balance-shaft-belt-takes-the-timing-belt",
+      "symptoms": {
+        "no-record-of-the-inner-belt-being-changed": "No service record shows the inner belt was ever changed with the timing belt",
+        "rattle-or-whine-from-behind-the-timing-cover": "A rattle or whine from behind the timing cover that changes with engine speed",
+        "new-vibration-that-was-not-there-before": "A new vibration through the engine that was not there before",
+        "oil-soaked-belts-behind-the-cover": "Oil pooled inside the timing cover and soaked into the belts",
+        "engine-stopped-and-will-not-restart": "The engine stopped without warning and will not turn over properly or restart"
+      },
+      "causes": {
+        "worn-or-shredded-balance-shaft-belt": "Balance shaft belt worn, shredded or already broken",
+        "leaking-front-oil-seal-soaking-the-belts": "Leaking front oil seal soaking both belts",
+        "worn-tensioner-or-idler": "Worn tensioner or idler pulley",
+        "timing-belt-already-past-its-life": "Timing belt already past its service life"
+      },
+      "diagnosticSteps": {
+        "find-out-when-the-belts-were-last-done": "Ask for the service records and find out whether the inner belt was changed with the outer one, and treat 'the timing belt was done' as not answering the question",
+        "take-the-timing-cover-off-and-look": "Take the timing cover off and look at both belts, at the pulleys and at the inside of the cover for standing oil",
+        "inspect-the-inner-belt-teeth-section-by-section": "Turn the engine over by hand and inspect the inner belt right around its length, looking for sections where the teeth are worn away rather than a single damaged spot",
+        "spin-the-tensioner-and-idlers": "With the belts off, spin the tensioner and every idler by hand and feel for roughness, and check each for side play"
+      },
+      "fixPaths": {
+        "replace-both-belts-and-the-seals-together": {
+          "title": "Replace both belts, the tensioner and the seals as one job",
+          "detail": "Both belts, the tensioner, the idlers and the front seals come out together, because the labour to reach the inner belt is nearly all the labour of the job and doing half of it now means doing all of it again later. If a seal was leaking, the new belts will be ruined by the same oil unless the seal is fixed with them."
+        },
+        "remove-the-balance-shaft-belt-entirely": {
+          "title": "Remove the balance shaft belt rather than replace it",
+          "detail": "What the club's experienced members describe doing, with one member reporting the engine noticeably smoother without it. Stated honestly: this removes the risk of the inner belt destroying the outer one, it costs nothing in parts, and it is a deliberate departure from how the engine was built — the balance shafts exist to cancel a vibration, and opinions on what the engine feels like afterwards differ. It is a choice to make with your eyes open, not a repair."
+        }
+      }
+    },
+    "es": {
+      "title": "La faja del eje balanceador se lleva la faja de distribución",
+      "summary": "El diésel 4D56 lleva dos fajas detrás de la misma tapa: la faja de distribución, y una faja más pequeña del eje balanceador que va por detrás de ella. La faja interna no mueve nada que el motor necesite para funcionar, y justamente por eso se olvida: un carro puede haber tenido su faja de distribución cambiada al día durante treinta años sin que nadie tocara la faja que va debajo. Una guía de compra escrita para esta generación y un hilo de un club de dueños coinciden en lo que pasa después, cada uno desde su lado. Los miembros del club describen una faja balanceadora reventada que se llevó la faja de distribución, y describen los tramos de dientes comidos que marcan dónde los ejes dejaron de girar. La guía dice el desenlace para un diésel de este diseño en una sola frase: una faja de distribución botada normalmente significa cambiar el motor. Para esto no hay luz de advertencia ni nada que se sienta desde el asiento. Lo que uno tiene en su lugar es papelería: si nadie le puede decir cuándo se cambió la faja interna por última vez, trátelo como que nunca. Ese mismo hilo registra que los miembros con más experiencia del club muchas veces quitan la faja balanceadora en lugar de cambiarla, y reportan que el motor corre suave sin ella; esa es una salida real y muy usada, y también es un cambio a cómo se construyó el motor, así que aparece abajo como una opción propia y no escondida dentro de la recomendación.",
+      "slug": "faja-del-eje-balanceador-4d56",
+      "symptoms": {
+        "no-record-of-the-inner-belt-being-changed": "Ningún registro de servicio muestra que la faja interna se haya cambiado junto con la faja de distribución",
+        "rattle-or-whine-from-behind-the-timing-cover": "Un cascabeleo o un chillido detrás de la tapa de distribución que cambia con las revoluciones",
+        "new-vibration-that-was-not-there-before": "Una vibración nueva en el motor que antes no estaba",
+        "oil-soaked-belts-behind-the-cover": "Aceite acumulado dentro de la tapa de distribución y empapando las fajas",
+        "engine-stopped-and-will-not-restart": "El motor se detuvo sin aviso y no gira bien ni vuelve a arrancar"
+      },
+      "causes": {
+        "worn-or-shredded-balance-shaft-belt": "Faja del eje balanceador gastada, deshilachada o ya reventada",
+        "leaking-front-oil-seal-soaking-the-belts": "Retenedor delantero con fuga que empapa las dos fajas",
+        "worn-tensioner-or-idler": "Tensor o polea loca gastados",
+        "timing-belt-already-past-its-life": "Faja de distribución ya vencida de vida útil"
+      },
+      "diagnosticSteps": {
+        "find-out-when-the-belts-were-last-done": "Pida los registros de servicio y averigüe si la faja interna se cambió junto con la externa, y tome un 'se le hizo la faja de distribución' como una respuesta que no responde la pregunta",
+        "take-the-timing-cover-off-and-look": "Quite la tapa de distribución y revise las dos fajas, las poleas y el interior de la tapa buscando aceite acumulado",
+        "inspect-the-inner-belt-teeth-section-by-section": "Gire el motor a mano y revise la faja interna en toda su vuelta, buscando tramos donde los dientes estén comidos y no un solo punto dañado",
+        "spin-the-tensioner-and-idlers": "Con las fajas afuera, gire a mano el tensor y cada polea loca sintiendo si hay aspereza, y revise si tienen juego lateral"
+      },
+      "fixPaths": {
+        "replace-both-belts-and-the-seals-together": {
+          "title": "Cambiar las dos fajas, el tensor y los retenedores en un solo trabajo",
+          "detail": "Las dos fajas, el tensor, las poleas locas y los retenedores delanteros salen juntos, porque la mano de obra para llegar a la faja interna es casi toda la mano de obra del trabajo y hacer la mitad hoy significa volver a hacerlo todo después. Si había un retenedor con fuga, ese mismo aceite arruina las fajas nuevas si no se arregla junto con ellas."
+        },
+        "remove-the-balance-shaft-belt-entirely": {
+          "title": "Quitar la faja del eje balanceador en vez de cambiarla",
+          "detail": "Es lo que describen haciendo los miembros con experiencia del club, y uno de ellos reporta el motor notablemente más suave sin ella. Dicho con honestidad: esto elimina el riesgo de que la faja interna destruya la externa, no cuesta nada en repuestos, y es una desviación deliberada de cómo se construyó el motor, porque los ejes balanceadores existen para cancelar una vibración y las opiniones sobre cómo queda el motor difieren. Es una decisión que se toma con los ojos abiertos, no una reparación."
+        }
+      }
+    }
+  }
+}
