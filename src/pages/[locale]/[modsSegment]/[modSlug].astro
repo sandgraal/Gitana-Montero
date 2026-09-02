@@ -52,7 +52,9 @@
  * `modSafety` (`src/lib/mods/safety.ts`), not `isSafetyCritical` alone: a
  * dual-battery install is filed under `electrical`, and if it `breaks` the ABS
  * module this is a brakes page whatever its own facet says. The widening only
- * ever promotes.
+ * ever promotes — and the page renders **one notice per system that made it
+ * fire**, naming the actual hazard rather than the entry's filing (T601
+ * review, F1).
  *
  * refs specs/001-foundation (MOD-01, MOD-02, I18N-01, I18N-04, I18N-05, I18N-08)
  */
@@ -198,6 +200,28 @@ const affects = data.affects.map((row) => ({
 }));
 
 const safety = modSafety(data);
+
+/**
+ * Which systems the standing bilingual safety notice is rendered **for** —
+ * one notice each.
+ *
+ * `safety.systems` is the *reason* the notice fires, and the first version of
+ * this page threw it away and named `data.system` instead. On the case this
+ * collection exists to model — a `body`-filed roof rack that `breaks` the
+ * brakes — that produced a heading reading "Safety notice — Body", as the
+ * region's `aria-labelledby` label too, while the actual hazard appeared only
+ * in a table row further down. That is not vague, it is wrong, and T602's own
+ * wave-1 list (dual battery → electrical/ABS; armour and roof storage →
+ * body/suspension) is made of exactly that shape (T601 review, F1).
+ *
+ * The fallback to `data.system` covers the one case with no system behind it:
+ * `safetyCritical: true` on an entry neither the system list nor the subject
+ * detector catches (SRS, load ratings). That is what `parts` and `reference`
+ * do for the same case, so this page is not inventing a fourth behaviour.
+ */
+const safetySystems =
+  safety.systems.length > 0 ? safety.systems : [data.system];
+
 const showCaveat = needsConfidenceCaveat(data.confidence);
 const indexHref = localeHref(locale, collectionRoutePath("mods", locale));
 const numbers = new Intl.NumberFormat(LOCALE_BCP47[locale]);
@@ -266,17 +290,18 @@ function formatAccessed(iso: string): string {
        * bilingual safety notice" are two warnings that can drift in wording,
        * in colour and in reading order.
        *
-       * The heading names `data.system` — the mod's own — even when the reason
-       * the notice renders is an affected system. That is deliberate: the
-       * notice's job is to say "this page is about work on a system where a
-       * mistake hurts someone", and the affected systems are named, one row
-       * each with their own sentence, in the table below. Naming several
-       * systems in one heading would produce a sentence no glossary label
-       * fits.
+       * **One notice per system that made the page safety-critical** — see
+       * `safetySystems` above. `SafetyNotice` was built for this: it derives
+       * `headingId` from `system` precisely so a page can carry several bands
+       * without two elements sharing one id and `aria-labelledby` resolving to
+       * the wrong one. Several notices, each naming one system, is the honest
+       * rendering; one combined heading is the thing no glossary label fits,
+       * and naming only the entry's own facet is simply false.
        */
-      safety.safetyCritical && (
-        <SafetyNotice locale={locale} system={data.system} />
-      )
+      safety.safetyCritical &&
+        safetySystems.map((system) => (
+          <SafetyNotice locale={locale} system={system} />
+        ))
     }
 
     {showCaveat && <ConfidenceCaveat locale={locale} tier={data.confidence} />}

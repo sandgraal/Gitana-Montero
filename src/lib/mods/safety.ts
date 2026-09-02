@@ -19,23 +19,45 @@
  * refs specs/001-foundation (MOD-01; AGENTS.md "Safety and legal")
  */
 import { isSafetyCritical, systemIsSafetyCritical } from "../safety";
+import type { GlossarySystem } from "../../schemas/glossary";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (typeof value !== "object" || value === null) return null;
   return value as Record<string, unknown>;
 }
 
+/**
+ * {@link systemIsSafetyCritical} as a type guard.
+ *
+ * Sound by construction rather than by assertion: that function returns `true`
+ * only for members of `SAFETY_CRITICAL_SYSTEMS`, which is declared
+ * `readonly GlossarySystem[]`, so anything it accepts *is* a `GlossarySystem`.
+ *
+ * The narrowing exists because {@link ModSafety.systems} is rendered — a page
+ * feeds each entry straight to `SafetyNotice`, whose `system` prop is a
+ * `GlossarySystem` because it looks the label up by that key. Returning bare
+ * `string[]` pushed a cast onto every call site, and a cast at the call site is
+ * where "the notice names a system with no label" gets in.
+ */
+function isSafetyCriticalSystem(value: unknown): value is GlossarySystem {
+  return systemIsSafetyCritical(value);
+}
+
 /** Why a mod page renders the standing bilingual safety notice, if it does. */
 export interface ModSafety {
   readonly safetyCritical: boolean;
   /**
-   * The systems that made it so, in declaration order: the entry's own
-   * `system` first when it qualifies, then every affected system that does.
-   * Empty when the verdict came from the `safetyCritical` flag alone —
-   * which is the flag's whole purpose (AGENTS.md categories with no
-   * `GLOSSARY_SYSTEMS` id).
+   * The systems that made it so — **the page renders one notice per entry**,
+   * in this order: the entry's own `system` first when it qualifies, then
+   * every affected system that does.
+   *
+   * Empty when the verdict came from the `safetyCritical` flag alone — which
+   * is the flag's whole purpose (AGENTS.md categories with no
+   * `GLOSSARY_SYSTEMS` id). A page with an empty list and
+   * `safetyCritical: true` falls back to naming the entry's own `system`,
+   * which is what `parts` and `reference` have always done for that case.
    */
-  readonly systems: readonly string[];
+  readonly systems: readonly GlossarySystem[];
 }
 
 /**
@@ -67,11 +89,9 @@ export function modSafety(entry: unknown): ModSafety {
   const record = asRecord(entry);
   if (record === null) return { safetyCritical: false, systems: [] };
 
-  const systems: string[] = [];
+  const systems: GlossarySystem[] = [];
   const own = record["system"];
-  if (systemIsSafetyCritical(own) && typeof own === "string") {
-    systems.push(own);
-  }
+  if (isSafetyCriticalSystem(own)) systems.push(own);
 
   const affects = record["affects"];
   if (Array.isArray(affects)) {
@@ -79,8 +99,7 @@ export function modSafety(entry: unknown): ModSafety {
       const row = asRecord(value);
       if (row === null) continue;
       const system = row["system"];
-      if (typeof system !== "string") continue;
-      if (!systemIsSafetyCritical(system)) continue;
+      if (!isSafetyCriticalSystem(system)) continue;
       if (systems.includes(system)) continue;
       systems.push(system);
     }

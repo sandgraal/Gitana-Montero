@@ -17,16 +17,29 @@
  *    the row would render a *shorter* requirements list than the entry
  *    declares, which is a confident answer derived from having failed to look
  *    (AGENTS.md, "a failure is not a zero").
- *  · **the safety notice, including the mods widening.** A mod filed under a
- *    system nobody would flag, which breaks one that everybody would, has to
- *    carry the standing bilingual band.
+ *  · **the safety notice, including the mods widening — and *which system it
+ *    names*.** A mod filed under a system nobody would flag, which breaks one
+ *    that everybody would, has to carry the standing bilingual band **naming
+ *    the hazard**. The first version of this file asserted the opposite: it
+ *    pinned `id="safety-notice-electrical"` on the electrical-filed,
+ *    brakes-breaking fixture, so it graded the defect as correct and would
+ *    have gone red on the fix (T601 review, F1/F2). That is the failure mode a
+ *    self-authored grader has and an independent one does not, and it is
+ *    recorded here rather than quietly corrected.
  *
  * Fixture conventions follow `tests/pages/part-page.sections.render.test.ts`.
  *
  * refs specs/001-foundation (MOD-01, MOD-02, I18N-01, I18N-05)
  */
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { t } from "../../src/i18n/ui.ts";
+import {
+  confidenceCaveat,
+  generationLabel,
+  glossarySystemLabel,
+  sourceKindLabel,
+  t,
+} from "../../src/i18n/ui.ts";
+import type { GlossarySystem } from "../../src/schemas/glossary.ts";
 
 type Locale = "en" | "es";
 
@@ -52,11 +65,29 @@ const PART_ID = "test-mod-part";
 const OTHER_MOD_ID = "test-mod-prereq";
 
 /**
- * The page's subject: `electrical` by facet, `breaks` the brakes — so its
- * safety notice comes only from the widening — with one resolvable `parts`
- * requirement, one resolvable `mods` requirement, and one that names nothing.
+ * The page's subject: `electrical` by facet, affecting **two** safety-critical
+ * systems (`brakes` and `suspension`) — so its safety notices come entirely
+ * from the widening — with one resolvable `parts` requirement, one resolvable
+ * `mods` requirement, and one that names nothing.
  */
 const SUBJECT_ID = "test-mod-subject";
+
+/**
+ * `electrical` by facet, breaking exactly **one** safety-critical system.
+ *
+ * The single-hazard case, kept separate from the subject so "names the
+ * affected system" and "names *every* affected system" are two independent
+ * assertions rather than one that could pass by accident.
+ */
+const ONE_HAZARD_ID = "test-mod-one-hazard";
+
+/**
+ * Safety-critical by the upward-only flag alone: `interior` is on no list, and
+ * it affects nothing critical. `modSafety` therefore returns an **empty**
+ * `systems` array, and the page has to fall back to naming the entry's own
+ * system — the behaviour `parts` and `reference` already have for this case.
+ */
+const FLAG_ONLY_ID = "test-mod-flag-only";
 
 function modEntry(id: string, extra: Record<string, unknown> = {}) {
   return {
@@ -135,13 +166,54 @@ const SUBJECT = modEntry(SUBJECT_ID, {
   },
 });
 
+const ONE_HAZARD = modEntry(ONE_HAZARD_ID, {
+  affects: [{ id: "abs", system: "brakes", impact: "breaks" }],
+  prose: {
+    en: {
+      title: `TEST ${ONE_HAZARD_ID}`,
+      summary: "Synthetic T601 fixture.",
+      tradeoffs: "TEST tradeoffs sentence in English.",
+      affectsNotes: { abs: "TEST English note about the ABS module." },
+    },
+    es: {
+      title: `PRUEBA ${ONE_HAZARD_ID}`,
+      summary: "Entrada sintética de T601.",
+      tradeoffs: "Frase TEST de contras en español.",
+      affectsNotes: { abs: "Nota TEST en español sobre el módulo del ABS." },
+    },
+  },
+});
+
+const FLAG_ONLY = modEntry(FLAG_ONLY_ID, {
+  system: "interior",
+  safetyCritical: true,
+});
+
+/** At the caveat boundary: `tsb` itself renders none. */
+const TSB_ID = "test-mod-tsb";
+
+/**
+ * Cites nothing, at a tier that permits it. The sources section must be
+ * absent, not an empty list under a heading — "we looked and found nothing" is
+ * a different claim from "nothing is cited".
+ */
+const UNCITED_ID = "test-mod-uncited";
+
 /** A mod with no requirements and no consequences — both empty states. */
 const BARE_ID = "test-mod-bare";
 
 vi.mock("astro:content", () => ({
   getCollection: async (name: string) => {
     if (name === "mods") {
-      return [SUBJECT, modEntry(OTHER_MOD_ID), modEntry(BARE_ID)];
+      return [
+        SUBJECT,
+        ONE_HAZARD,
+        FLAG_ONLY,
+        modEntry(TSB_ID, { confidence: "tsb" }),
+        modEntry(UNCITED_ID, { confidence: "anecdotal", sources: [] }),
+        modEntry(OTHER_MOD_ID),
+        modEntry(BARE_ID),
+      ];
     }
     if (name === "parts") {
       return [{ id: PART_ID, data: { id: PART_ID } }];
@@ -152,6 +224,10 @@ vi.mock("astro:content", () => ({
 
 const MOD_SLUGS: Record<string, Record<Locale, string>> = {
   [SUBJECT_ID]: { en: "subject", es: "es-subject" },
+  [ONE_HAZARD_ID]: { en: "one-hazard", es: "es-one-hazard" },
+  [FLAG_ONLY_ID]: { en: "flag-only", es: "es-flag-only" },
+  [TSB_ID]: { en: "tsb", es: "es-tsb" },
+  [UNCITED_ID]: { en: "uncited", es: "es-uncited" },
   [OTHER_MOD_ID]: { en: "prereq", es: "es-prereq" },
   [BARE_ID]: { en: "bare", es: "es-bare" },
 };
@@ -391,25 +467,86 @@ describe("the consequences table (MOD-01)", () => {
  * Safety and figures
  * ---------------------------------------------------------------------- */
 
+/** The heading text `SafetyNotice` renders for `system`, in `locale`. */
+function safetyHeading(locale: Locale, system: GlossarySystem): string {
+  const strings = t(locale);
+  return strings.safetyNoticeLabelTemplate.replace(
+    "{system}",
+    glossarySystemLabel(strings, system)
+  );
+}
+
 describe("the safety notice", () => {
   it("RENDERS on a mod whose own system is not critical but whose affected one is", async () => {
     // The widening, on the page: `electrical` + `breaks brakes`.
     for (const locale of LOCALES) {
-      const html = await render(locale);
-      expect(html).toContain('id="safety-notice-electrical"');
+      const html = await render(locale, ONE_HAZARD_ID);
+      expect(html).toContain('id="safety-notice-brakes"');
       expect(text(html)).toContain(t(locale).safetyCriticalChipLabel);
     }
   });
 
-  it("carries BOTH languages in one band, as AGENTS.md requires", async () => {
+  it("NAMES THE HAZARD, not the entry's own filing (T601 review, F1)", async () => {
+    /*
+     * The finding this test exists for. `test-mod-one-hazard` is filed
+     * `electrical` and breaks the `brakes`; the first version of this page
+     * rendered `system={data.system}`, so the heading — and the region's
+     * `aria-labelledby` label — read "Safety notice — Electrical system"
+     * while the actual hazard appeared only in a table row below. Both
+     * assertions matter: naming brakes, and *not* naming electrical.
+     */
+    for (const locale of LOCALES) {
+      const body = text(await render(locale, ONE_HAZARD_ID));
+      expect(body).toContain(safetyHeading(locale, "brakes"));
+      expect(body).not.toContain(safetyHeading(locale, "electrical"));
+    }
+  });
+
+  it("renders ONE NOTICE PER affected safety-critical system", async () => {
+    // The subject affects `brakes` and `suspension`; both are on the list, so
+    // both get a band with its own id — which is what `SafetyNotice` derives
+    // `headingId` from `system` for.
+    for (const locale of LOCALES) {
+      const html = await render(locale);
+      expect(html).toContain('id="safety-notice-brakes"');
+      expect(html).toContain('id="safety-notice-suspension"');
+      expect(html).not.toContain('id="safety-notice-electrical"');
+
+      const body = text(html);
+      expect(body).toContain(safetyHeading(locale, "brakes"));
+      expect(body).toContain(safetyHeading(locale, "suspension"));
+    }
+  });
+
+  it("gives each notice a distinct id, so aria-labelledby cannot cross-resolve", async () => {
     const html = await render("en");
+    const ids = [...html.matchAll(/id="(safety-notice-[a-z-]+)"/g)].map(
+      (match) => match[1]
+    );
+    expect(ids).toHaveLength(2);
+    expect(new Set(ids).size).toBe(2);
+  });
+
+  it("falls back to the entry's own system when the FLAG alone fired it", async () => {
+    // `interior` is on no list and nothing critical is affected, so
+    // `modSafety().systems` is empty — the one case where naming `data.system`
+    // is the correct answer, and the behaviour `parts`/`reference` already have.
+    for (const locale of LOCALES) {
+      const html = await render(locale, FLAG_ONLY_ID);
+      expect(html).toContain('id="safety-notice-interior"');
+      expect(text(html)).toContain(safetyHeading(locale, "interior"));
+    }
+  });
+
+  it("carries BOTH languages in one band, as AGENTS.md requires", async () => {
+    const html = await render("en", ONE_HAZARD_ID);
     expect(text(html)).toContain(t("en").safetyNoticeBody);
     expect(text(html)).toContain(t("es").safetyNoticeBody);
   });
 
   it("does NOT render on a mod that touches nothing critical", async () => {
     const html = await render("en", BARE_ID);
-    expect(html).not.toContain('id="safety-notice-electrical"');
+    expect(html).not.toMatch(/id="safety-notice-/);
     expect(text(html)).not.toContain(t("en").safetyCriticalChipLabel);
   });
 });
@@ -434,5 +571,64 @@ describe("figures", () => {
     expect(html).toContain(
       'aria-label="A normal parts-and-an-afternoon job – A major component or a shop bill"'
     );
+  });
+
+  it("renders the fitment chips (a mod with no fitment shown is unfiltered)", async () => {
+    for (const locale of LOCALES) {
+      const strings = t(locale);
+      const body = text(await render(locale));
+      expect(body).toContain(strings.modsFitsLabel);
+      expect(body).toContain(generationLabel(strings, "gen3"));
+    }
+  });
+});
+
+/* -------------------------------------------------------------------------
+ * The bands and the citations (T601 review, F3)
+ *
+ * The reviewer deleted the sources list, the confidence caveat and the fitment
+ * chips from this template by mutation and no grader went red — three whole
+ * sections of a page with no coverage at all. Closed here.
+ * ---------------------------------------------------------------------- */
+
+describe("evidence", () => {
+  it("renders the confidence caveat below `tsb`, in both locales' text", async () => {
+    // The caveat is one band carrying both languages, like the safety notice.
+    const body = text(await render("en"));
+    expect(body).toContain(confidenceCaveat(t("en"), "community-consensus"));
+    expect(body).toContain(confidenceCaveat(t("es"), "community-consensus"));
+  });
+
+  it("does NOT render the caveat at `tsb` — the boundary is inclusive", async () => {
+    const body = text(await render("en", TSB_ID));
+    expect(body).not.toContain(confidenceCaveat(t("en"), "tsb"));
+  });
+
+  it("renders the numbered sources list with title, kind, date and archive", async () => {
+    for (const locale of LOCALES) {
+      const strings = t(locale);
+      const html = await render(locale);
+      const body = text(html);
+
+      expect(body).toContain(strings.sourcesHeading);
+      expect(body).toContain("TEST fixture source — not a real document");
+      // The provenance label — what *kind* of document backs the claim.
+      expect(body).toContain(sourceKindLabel(strings, "forum"));
+      expect(body).toContain(strings.sourceArchiveLabel);
+      expect(html).toContain('href="https://example.invalid/t601/source"');
+      expect(html).toContain(
+        'href="https://web.archive.org/web/20260101000000/' +
+          'https://example.invalid/t601/source"'
+      );
+      // The accessed date, formatted by `Intl` in this locale — never typed in.
+      expect(html).toContain('datetime="2026-09-02"');
+    }
+  });
+
+  it("omits the sources section entirely when an entry cites nothing", async () => {
+    // Legal below `tsb`; an empty `<ol>` under a heading would read as
+    // "we looked and found nothing" rather than "nothing is cited".
+    const html = await render("en", UNCITED_ID);
+    expect(text(html)).not.toContain(t("en").sourcesHeading);
   });
 });
