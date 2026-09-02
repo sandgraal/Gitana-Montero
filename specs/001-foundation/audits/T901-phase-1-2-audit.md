@@ -437,13 +437,14 @@ gated on `GARAGE_LIVE`:
 ↓ tests/garage/rls-deny-by-default.test.ts … [skipped: GARAGE_LIVE is unset — Tier B needs a local Supabase stack]
 ```
 
-`grep -rn "GARAGE_LIVE\|test:garage" .github/` returns **nothing** — the live
-RLS tier runs on no CI path. AGENTS.md *Boundaries*: "every user table ships
-with row-level security proven by graders before content flows." The graders
-exist and are good; they are simply not executed by the merge gate, so the
-proof is a manual step someone has to remember. This is 002 scope, outside this
-audit's mandate, and is recorded here only because the sweep surfaced it and
-T902 should not have to rediscover it.
+As originally written (before the 2026-09-01 correction above), this audit
+found: `grep -rn "GARAGE_LIVE\|test:garage" .github/` returned **nothing** —
+the live RLS tier ran on no CI path. AGENTS.md *Boundaries*: "every user
+table ships with row-level security proven by graders before content flows."
+The graders existed and were good; they were simply not executed by the
+merge gate, so the proof was a manual step someone had to remember. This was
+002 scope, outside this audit's mandate, and was recorded here only because
+the sweep surfaced it and T902 should not have had to rediscover it.
 
 ---
 

@@ -70,7 +70,9 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   every other provider off. *Tier B (behavioural)* proves the same guarantees
   against a real Postgres through the real PostgREST / GoTrue / Storage
   surfaces as three actors (anon, owner A, owner B), and needs
-  `supabase start` — i.e. Docker, which CI does not have.
+  `supabase start` — i.e. Docker, which this task originally assumed CI did
+  not have (see the correction directly below: that assumption was untested
+  and wrong).
   <br>**Correction, 2026-09-01:** "Docker, which CI does not have" was never
   tested and is false. GitHub's stock `ubuntu-latest` ships Docker Engine and
   Compose, `supabase start` takes ~70 s there, and all 66 Tier-B graders run
