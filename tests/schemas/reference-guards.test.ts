@@ -181,39 +181,31 @@ describe("F1 — a dimension's sign rule follows its unit family", () => {
     );
   });
 
-  it.fails(
-    "REJECTS a negative length — the audit's repro, a -2725 mm wheelbase",
-    () => {
-      const outcome = schema.safeParse(
-        dimensionEntry({ value: -2725, unit: "mm" })
-      );
-      expect(outcome.success).toBe(false);
-      // Exactly one field is wrong, and it is the one the author must change:
-      // the twin below proves the rest of the entry is well-formed, so this
-      // cannot be red for an unrelated reason.
-      //
-      // What this does NOT do (review F-C): it does not constrain the fix to
-      // any particular schema shape. An earlier note claimed the exact path
-      // ruled out a `z.union` over unit families; it does not, because Zod
-      // reports a failed union through its best-matching branch and the path
-      // survives. The assertion is about SCF-04 — the error names the field —
-      // and the implementer is free to choose the shape.
-      expect(pathsOf(outcome)).toEqual(["dimension.value"]);
-    }
-  );
+  it("REJECTS a negative length — the audit's repro, a -2725 mm wheelbase", () => {
+    const outcome = schema.safeParse(
+      dimensionEntry({ value: -2725, unit: "mm" })
+    );
+    expect(outcome.success).toBe(false);
+    // Exactly one field is wrong, and it is the one the author must change:
+    // the twin below proves the rest of the entry is well-formed, so this
+    // cannot be red for an unrelated reason.
+    //
+    // What this does NOT do (review F-C): it does not constrain the fix to
+    // any particular schema shape. An earlier note claimed the exact path
+    // ruled out a `z.union` over unit families; it does not, because Zod
+    // reports a failed union through its best-matching branch and the path
+    // survives. The assertion is about SCF-04 — the error names the field —
+    // and the implementer is free to choose the shape.
+    expect(pathsOf(outcome)).toEqual(["dimension.value"]);
+  });
 
-  it.fails(
-    "REJECTS a zero mass — the audit's repro, a 0 kg kerb weight",
-    () => {
-      const outcome = schema.safeParse(
-        dimensionEntry({ value: 0, unit: "kg" })
-      );
-      expect(outcome.success).toBe(false);
-      expect(pathsOf(outcome)).toEqual(["dimension.value"]);
-    }
-  );
+  it("REJECTS a zero mass — the audit's repro, a 0 kg kerb weight", () => {
+    const outcome = schema.safeParse(dimensionEntry({ value: 0, unit: "kg" }));
+    expect(outcome.success).toBe(false);
+    expect(pathsOf(outcome)).toEqual(["dimension.value"]);
+  });
 
-  it.fails.each([...MAGNITUDE_DIMENSION_UNITS])(
+  it.each([...MAGNITUDE_DIMENSION_UNITS])(
     "REJECTS a negative dimension in %s",
     (unit) => {
       const outcome = schema.safeParse(dimensionEntry({ value: -12, unit }));
@@ -222,7 +214,7 @@ describe("F1 — a dimension's sign rule follows its unit family", () => {
     }
   );
 
-  it.fails.each([...MAGNITUDE_DIMENSION_UNITS])(
+  it.each([...MAGNITUDE_DIMENSION_UNITS])(
     "REJECTS a zero dimension in %s",
     (unit) => {
       const outcome = schema.safeParse(dimensionEntry({ value: 0, unit }));
@@ -231,7 +223,7 @@ describe("F1 — a dimension's sign rule follows its unit family", () => {
     }
   );
 
-  it.fails("REJECTS a negative band bound, not only a negative nominal", () => {
+  it("REJECTS a negative band bound, not only a negative nominal", () => {
     // The rule belongs to the number factory inside `quantitySchema`, which
     // builds `value`, `min` and `max` from one call: a fix applied to
     // `value` alone would leave "-10 to 5 mm" spellable.
@@ -385,7 +377,7 @@ function fsmSectionEntry(
 }
 
 describe("F2 — cite the FSM, never reproduce it, in the title as well", () => {
-  it.fails.each(["en", "es"])(
+  it.each(["en", "es"])(
     "REJECTS an fsm-section entry whose %s title is a whole procedure",
     (locale) => {
       const outcome = schema.safeParse(
@@ -406,23 +398,20 @@ describe("F2 — cite the FSM, never reproduce it, in the title as well", () => 
     }
   );
 
-  it.fails(
-    "REJECTS a procedure pasted into BOTH locale titles, naming both",
-    () => {
-      const long = "a".repeat(PROCEDURE_LENGTH);
-      const outcome = schema.safeParse(
-        fsmSectionEntry({
-          prose: {
-            en: { title: long, summary: "Synthetic audit fixture." },
-            es: { title: long, summary: "Ficha sintética de prueba." },
-          },
-        })
-      );
-      expect(outcome.success).toBe(false);
-      expect(pathsOf(outcome)).toContain("prose.en.title");
-      expect(pathsOf(outcome)).toContain("prose.es.title");
-    }
-  );
+  it("REJECTS a procedure pasted into BOTH locale titles, naming both", () => {
+    const long = "a".repeat(PROCEDURE_LENGTH);
+    const outcome = schema.safeParse(
+      fsmSectionEntry({
+        prose: {
+          en: { title: long, summary: "Synthetic audit fixture." },
+          es: { title: long, summary: "Ficha sintética de prueba." },
+        },
+      })
+    );
+    expect(outcome.success).toBe(false);
+    expect(pathsOf(outcome)).toContain("prose.en.title");
+    expect(pathsOf(outcome)).toContain("prose.es.title");
+  });
 
   /* --- positive controls: green today, and green after the fix ---------- */
 
@@ -945,7 +934,7 @@ describe("F3 — the safety-critical ratchet over shipped reference content", ()
     });
   }
 
-  it.fails("REJECTS a towing row that never says safetyCritical: true", () => {
+  it("REJECTS a towing row that never says safetyCritical: true", () => {
     // AGENTS.md, "Safety and legal": towing "gets […] a standing bilingual
     // safety notice on the page […] regardless of how small the diff is."
     // With no system id to derive it from, the flag is the only thing that
@@ -956,7 +945,7 @@ describe("F3 — the safety-critical ratchet over shipped reference content", ()
     expect(pathsOf(outcome)).toContain("safetyCritical");
   });
 
-  it.fails("REJECTS an unflagged jacking-points row the same way", () => {
+  it("REJECTS an unflagged jacking-points row the same way", () => {
     const outcome = schema.safeParse(
       testEnvelope({
         id: "TEST-fsm-gen9-00-lifting-jacking",

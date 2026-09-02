@@ -100,8 +100,11 @@
  * AGENTS.md is unconditional: "Section references only. It is copyrighted."
  * Two structural expressions of that rule live on the `fsm-section` kind —
  * it must cite an `fsm` source (an index of a manual nobody read is not an
- * index), and its per-locale summary is length-capped, because a field that
- * cannot hold a procedure cannot be used to paste one. Neither replaces
+ * index), and its per-locale `title` and `summary` are both length-capped,
+ * because a field that cannot hold a procedure cannot be used to paste one.
+ * `title` was found carrying a whole procedure with nothing objecting (T207
+ * audit, F2) — the cap always applied to `summary`, and now applies equally
+ * to `title`, the other half of the same object. Neither cap replaces
  * review; both make the easy mistake impossible rather than merely forbidden.
  *
  * ## Safety
@@ -119,7 +122,10 @@ import { z } from "astro/zod";
 import { defineEntrySchema, nonBlankString } from "./entry";
 import { glossarySystemSchema } from "./glossary";
 import { assertNoFieldCollisions } from "./reference-kind-collisions";
-import { systemIsSafetyCritical } from "../lib/safety";
+import {
+  requiresSafetyFlagFromSubject,
+  systemIsSafetyCritical,
+} from "../lib/safety";
 import {
   DRIVE_TYPES,
   GENERATION_IDS,
@@ -217,35 +223,38 @@ export type DimensionUnit = (typeof DIMENSION_UNITS)[number];
  */
 export interface QuantityOptions {
   /**
-   * Whether a figure may be zero or negative. Off by default: a zero torque
-   * or a negative capacity is always an error. Alignment figures (camber,
-   * caster, toe) are legitimately signed, so `dimension` turns it on.
+   * Which of `units` may be stated as zero or negative. Empty by default: a
+   * zero torque or a negative capacity is always an error, whatever unit it
+   * is in.
+   *
+   * **The sign rule follows the unit family, not the `kind` the quantity
+   * belongs to** (T207 audit, finding F1). Alignment figures (camber, caster,
+   * toe — {@link ANGLE_UNITS}) are legitimately signed; a length or a mass is
+   * a magnitude and never is. A `dimension` entry carries both families in
+   * one field ({@link DIMENSION_UNITS}), so the licence to be non-positive is
+   * named per unit here rather than turned on for the whole family — turning
+   * it on for all of `DIMENSION_UNITS` is exactly the bug the audit found: a
+   * wheelbase of `-2725 mm` and a kerb mass of `0 kg` both parsed.
    */
-  readonly allowNonPositive?: boolean;
+  readonly signedUnits?: readonly string[];
 }
 
 export function quantitySchema<Units extends readonly [string, ...string[]]>(
   units: Units,
   options: QuantityOptions = {}
 ) {
-  const { allowNonPositive = false } = options;
-  // `z.number()` already rejects NaN and ±Infinity in this Zod line, so the
-  // only sign rule left to state is the one that varies by unit family.
-  const number = () =>
-    allowNonPositive
-      ? z.number()
-      : z.number().positive({ message: "must be greater than zero" });
+  const signedUnits = new Set<string>(options.signedUnits ?? []);
 
   return z
     .object({
-      value: number().optional(),
-      min: number().optional(),
-      max: number().optional(),
+      value: z.number().optional(),
+      min: z.number().optional(),
+      max: z.number().optional(),
       unit: z.enum(units),
     })
     .strict()
     .superRefine((quantity, ctx) => {
-      const { value, min, max } = quantity;
+      const { value, min, max, unit } = quantity;
       const hasBand = min !== undefined && max !== undefined;
 
       if (value === undefined && !hasBand) {
@@ -286,6 +295,24 @@ export function quantitySchema<Units extends readonly [string, ...string[]]>(
           message: `\`max\` (${max}) must not be below \`min\` (${min})`,
         });
         return;
+      }
+
+      // The sign rule, applied per present field rather than at the type
+      // level, because which unit family a figure belongs to is only known
+      // once `unit` itself has parsed (T207 audit, F1).
+      if (!signedUnits.has(unit)) {
+        for (const [field, figure] of [
+          ["value", value],
+          ["min", min],
+          ["max", max],
+        ] as const) {
+          if (figure === undefined || figure > 0) continue;
+          ctx.addIssue({
+            code: "custom",
+            path: [field],
+            message: "must be greater than zero",
+          });
+        }
       }
 
       if (value === undefined || !hasBand) return;
@@ -844,8 +871,13 @@ export const REFERENCE_KIND_SHAPES = {
     capacity: capacityQuantity,
   },
   dimension: {
-    /** Signed on purpose — camber, caster and toe are legitimately negative. */
-    dimension: quantitySchema(DIMENSION_UNITS, { allowNonPositive: true }),
+    /**
+     * Length and mass are magnitudes and stay positive-only; angle
+     * ({@link ANGLE_UNITS} — camber, caster, toe) is legitimately signed. See
+     * {@link QuantityOptions.signedUnits} for why this is named per unit
+     * rather than turned on for the whole `dimension` kind (T207 audit, F1).
+     */
+    dimension: quantitySchema(DIMENSION_UNITS, { signedUnits: ANGLE_UNITS }),
   },
   "vin-position": {
     positions: vinPositionsSchema,
@@ -1047,11 +1079,24 @@ function checkFsmSectionCitesManual(
 }
 
 /**
+ * The `prose.<locale>` fields the anti-reproduction cap applies to.
+ *
+ * **Both `title` and `summary`, not summary alone** (T207 audit, finding F2):
+ * `title` sits on the same object, is written by the same author, and held a
+ * whole 9,720-character procedure with nothing objecting — the identical
+ * copyright-reproduction defect T207's own review already fixed once in a
+ * different field (a 9,626-char verbatim body that reached the site through
+ * an unvalidated Markdown field).
+ */
+const FSM_CAPPED_PROSE_FIELDS = ["title", "summary"] as const;
+
+/**
  * The anti-reproduction cap (AGENTS.md: "Cite the Factory Service Manual,
  * never reproduce it. Section references only. It is copyrighted."), applied
- * per locale so a long ES summary is caught as readily as a long EN one.
+ * to both `title` and `summary`, per locale, so a long ES field is caught as
+ * readily as a long EN one.
  */
-function checkFsmSectionSummaryLength(
+function checkFsmSectionProseLength(
   entry: ReferenceEntryShape,
   ctx: ReferenceRefineContext
 ): void {
@@ -1060,21 +1105,24 @@ function checkFsmSectionSummaryLength(
 
   for (const [locale, value] of Object.entries(prose)) {
     if (typeof value !== "object" || value === null) continue;
-    const summary = (value as { summary?: unknown }).summary;
-    if (typeof summary !== "string") continue;
-    if (summary.length <= FSM_SUMMARY_MAX_LENGTH) continue;
 
-    ctx.addIssue({
-      code: "custom",
-      path: ["prose", locale, "summary"],
-      message:
-        `${summary.length} characters, and an \`fsm-section\` summary may be ` +
-        `at most ${FSM_SUMMARY_MAX_LENGTH}: this entry says *where* the ` +
-        `manual covers something, it never reproduces what the manual says ` +
-        `— the FSM is copyrighted and section references are the only thing ` +
-        `this site publishes (AGENTS.md "Safety and legal"). ` +
-        `refs specs/001-foundation (REF-01)`,
-    });
+    for (const field of FSM_CAPPED_PROSE_FIELDS) {
+      const text = (value as Record<string, unknown>)[field];
+      if (typeof text !== "string") continue;
+      if (text.length <= FSM_SUMMARY_MAX_LENGTH) continue;
+
+      ctx.addIssue({
+        code: "custom",
+        path: ["prose", locale, field],
+        message:
+          `${text.length} characters, and an \`fsm-section\` ${field} may be ` +
+          `at most ${FSM_SUMMARY_MAX_LENGTH}: this entry says *where* the ` +
+          `manual covers something, it never reproduces what the manual says ` +
+          `— the FSM is copyrighted and section references are the only thing ` +
+          `this site publishes (AGENTS.md "Safety and legal"). ` +
+          `refs specs/001-foundation (REF-01)`,
+      });
+    }
   }
 }
 
@@ -1364,6 +1412,40 @@ function checkSafetyFlag(
 }
 
 /**
+ * Promotes an entry whose *subject* names towing, or jacking/lifting points —
+ * two of AGENTS.md's safety-critical categories with no `GLOSSARY_SYSTEMS` id
+ * of their own, so `checkSafetyFlag`'s `system`-based promotion cannot reach
+ * them. Before this rule, nothing but an author's memory enforced the flag on
+ * such a row (T207 audit, finding F3) — a real gap: five of the corpus's six
+ * hand-flagged safety-critical entries are exactly this category.
+ *
+ * The detector itself — {@link requiresSafetyFlagFromSubject} — lives in
+ * `src/lib/safety.ts` beside `isSafetyCritical`, not here, for the same
+ * reason `systemIsSafetyCritical` does: the rule that decides whether the
+ * standing bilingual safety notice renders is one rule, read from one place,
+ * whether a page template or this schema is asking.
+ */
+function checkSafetySubject(
+  entry: ReferenceEntryShape,
+  ctx: ReferenceRefineContext
+): void {
+  if (entry.safetyCritical === true) return;
+  if (systemIsSafetyCritical(entry.system)) return;
+  if (!requiresSafetyFlagFromSubject(entry)) return;
+
+  ctx.addIssue({
+    code: "custom",
+    path: ["safetyCritical"],
+    message:
+      `this entry's subject names towing, or jacking/lifting points — ` +
+      `AGENTS.md safety-critical categories with no \`system\` id of their ` +
+      `own — so it must set \`safetyCritical: true\` to render the standing ` +
+      `bilingual safety notice (AGENTS.md "Safety and legal"). ` +
+      `refs specs/001-foundation (REF-01)`,
+  });
+}
+
+/**
  * Every reference rule, applied to an entry that already satisfies the base
  * entry shape. Exported so the rules can be unit-tested — and read — without
  * reconstructing the whole collection schema.
@@ -1376,6 +1458,7 @@ export function checkReferenceEntry(
   const candidate = entry as ReferenceEntryShape;
 
   checkSafetyFlag(candidate, ctx);
+  checkSafetySubject(candidate, ctx);
 
   const { kind } = candidate;
   if (!(REFERENCE_KINDS as readonly unknown[]).includes(kind)) return;
@@ -1385,7 +1468,7 @@ export function checkReferenceEntry(
 
   if (referenceKind === "fsm-section") {
     checkFsmSectionCitesManual(candidate, ctx);
-    checkFsmSectionSummaryLength(candidate, ctx);
+    checkFsmSectionProseLength(candidate, ctx);
   }
 
   if (referenceKind === "vin-position") {
