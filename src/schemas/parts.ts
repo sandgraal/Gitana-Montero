@@ -102,6 +102,16 @@
  * is not a weak claim about a truck — it is an unsourced claim about a named
  * business, which is a different kind of problem.
  *
+ * ## The other three verdicts' note is optional, but symmetric
+ *
+ * `oem-supplier`, `equivalent` and `lower-grade` carry no such requirement —
+ * PRT-01 asks for evidence only on the bad-brand case. But a note is still
+ * prose, and AGENTS.md draws no exception for "only part of the page": *no
+ * page ships in one language, both or neither*. A note written in `en` and
+ * left out of `es` (or the reverse) is that rule violated one table cell at a
+ * time rather than one whole page — a T501 audit finding (F1), fixed by
+ * {@link checkOptionalNotesAreSymmetric}.
+ *
  * refs specs/001-foundation (PRT-01, PRT-02, PRT-03)
  */
 import { z } from "astro/zod";
@@ -711,6 +721,65 @@ function checkAvoidRowsCarryEvidence(
   }
 }
 
+/**
+ * A quality note is optional for `oem-supplier`, `equivalent` and
+ * `lower-grade` rows — but once one locale carries a non-blank note for a
+ * given cross-reference, every locale the entry declares must (T501 audit,
+ * F1). AGENTS.md draws no exception for "only part of the page": *no page
+ * ships in one language, both or neither* — a note that exists in `en` and
+ * not `es` is exactly that, just scoped to one cell of the cross-reference
+ * table instead of the whole entry.
+ *
+ * `avoid` rows are excluded here on purpose: their note is *required*
+ * outright, and {@link checkAvoidRowsCarryEvidence} already reports that —
+ * this rule reporting the same missing sentence a second time would violate
+ * this module's own "one mistake, one error" invariant.
+ */
+function checkOptionalNotesAreSymmetric(
+  entry: PartsEntryShape,
+  ctx: PartsRefineContext
+): void {
+  const locales = readNotes(entry);
+  if (locales.length < 2) return;
+
+  const optional = readCrossReferences(entry).filter(
+    ({ quality }) =>
+      quality !== undefined && quality !== CROSS_REFERENCE_QUALITY_AVOID
+  );
+
+  for (const { ref, quality, index } of optional) {
+    if (ref === undefined) continue;
+
+    const hasNote = (notes: Record<string, unknown>): boolean => {
+      const note = notes[ref];
+      return typeof note === "string" && note.trim().length > 0;
+    };
+
+    const present = locales.filter(({ notes }) => hasNote(notes));
+    if (present.length === 0 || present.length === locales.length) continue;
+
+    const presentLocales = present.map(({ locale }) => locale).sort();
+
+    for (const { locale } of locales) {
+      if (presentLocales.includes(locale)) continue;
+
+      ctx.addIssue({
+        code: "custom",
+        path: ["prose", locale, "crossReferenceNotes", ref],
+        message:
+          `the \`${quality}\` cross-reference at index ${index} has a note ` +
+          `in ${presentLocales.map((l) => `\`${l}\``).join(", ")} but none ` +
+          `in \`${locale}\` — a note here is optional, but once one locale ` +
+          `carries one, every locale this entry declares must (AGENTS.md, ` +
+          `"no page ships in one language, both or neither"). Write the ` +
+          `\`${locale}\` note, or remove it from ` +
+          `${presentLocales.map((l) => `\`${l}\``).join(", ")} so the row ` +
+          `carries no commentary at all. refs specs/001-foundation (PRT-01, I18N-06)`,
+      });
+    }
+  }
+}
+
 /** No entry may list the same vendor twice. */
 function checkVendorsAreUnique(
   entry: PartsEntryShape,
@@ -753,6 +822,7 @@ export function checkPartsEntry(entry: unknown, ctx: PartsRefineContext): void {
   checkCrossReferencePairsAreUnique(candidate, ctx);
   checkNotesNameDeclaredRefs(candidate, ctx);
   checkAvoidRowsCarryEvidence(candidate, ctx);
+  checkOptionalNotesAreSymmetric(candidate, ctx);
   checkVendorsAreUnique(candidate, ctx);
 }
 
