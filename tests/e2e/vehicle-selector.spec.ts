@@ -218,6 +218,16 @@ for (const listing of [
     card: ".entry",
   },
   { name: "glossary", en: "/en/glossary/", es: "/es/glosario/", card: ".term" },
+  // Added with T403's first wave of `problems` content. The row could not
+  // exist while the collection was empty — `injectFitment` needs a card with
+  // a `data-fitment` index to repoint, and an empty listing renders none
+  // (recorded as a follow-up on tasks.md's T401 line).
+  {
+    name: "problems",
+    en: "/en/problems/",
+    es: "/es/problemas/",
+    card: ".problem-card",
+  },
 ] as const) {
   for (const locale of ["en", "es"] as const) {
     test(`marks a provisional match on the ${listing.name} listing (${locale})`, async ({

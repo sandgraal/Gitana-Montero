@@ -1,0 +1,146 @@
+{
+  "id": "gen3-front-camshaft-seal-leak",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "engine",
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "oil-weeping-from-the-timing-cover-area",
+    "oil-level-falling-with-no-puddle-under-the-truck",
+    "burnt-oil-smell-after-a-run",
+    "black-rubber-dust-around-the-front-cover"
+  ],
+  "causes": [
+    { "id": "front-camshaft-seal-hardened" },
+    { "id": "front-crankshaft-seal-hardened" },
+    { "id": "valve-cover-gasket-leaking-onto-the-cover" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "clean-the-front-of-the-engine-and-drive-it-a-week",
+      "rulesIn": [
+        "front-camshaft-seal-hardened",
+        "front-crankshaft-seal-hardened",
+        "valve-cover-gasket-leaking-onto-the-cover"
+      ]
+    },
+    {
+      "id": "work-out-whether-the-oil-starts-above-or-below-the-cover",
+      "rulesIn": ["valve-cover-gasket-leaking-onto-the-cover"],
+      "rulesOut": ["front-crankshaft-seal-hardened"]
+    },
+    {
+      "id": "look-for-rubber-dust-behind-the-front-cover",
+      "rulesIn": [
+        "front-camshaft-seal-hardened",
+        "front-crankshaft-seal-hardened"
+      ]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-seals-during-the-timing-belt-service",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "front-camshaft-seal-hardened",
+        "front-crankshaft-seal-hardened"
+      ],
+      "parts": ["gen3-front-camshaft-seal", "gen3-front-crankshaft-seal"],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-valve-cover-gaskets",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["valve-cover-gasket-leaking-onto-the-cover"],
+      "parts": ["gen3-valve-cover-gasket"],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 OEM Timing Belt Kit: «Front Camshaft Seal - A common oil leak point», with the recommended replacement cadence and the quantity per vehicle",
+      "url": "https://lusooverland.com/VP-LO-K-TB005",
+      "archiveUrl": "https://web.archive.org/web/20260902205852id_/https://lusooverland.com/VP-LO-K-TB005",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Oil leak at the front camshaft seals",
+      "summary": "The kit supplier for this engine names the front camshaft seals as a common oil leak point and recommends replacing them on a fixed cadence rather than waiting for them to weep — and the reason is not the oil you lose. These seals sit behind the timing covers, which means the oil they leak lands on the timing belt, and a belt that has been soaked in oil is a belt on borrowed time regardless of how new it is. The economics follow from the geometry: the labour to reach the seals is the labour of a timing belt service, so a seal replaced during that job is nearly free and a seal replaced on its own is not. If the front of your engine is wet and the belt history is unknown, read this entry and the timing belt one together — they are the same afternoon of work.",
+      "slug": "oil-leak-front-camshaft-seals",
+      "symptoms": {
+        "oil-weeping-from-the-timing-cover-area": "Oil weeping from the area of the timing covers",
+        "oil-level-falling-with-no-puddle-under-the-truck": "The oil level falls but nothing pools on the ground",
+        "burnt-oil-smell-after-a-run": "A burnt oil smell after a run, strongest with the hood up",
+        "black-rubber-dust-around-the-front-cover": "Black rubber dust in and around the front cover"
+      },
+      "causes": {
+        "front-camshaft-seal-hardened": "A front camshaft seal has hardened and is passing oil",
+        "front-crankshaft-seal-hardened": "The front crankshaft seal has hardened and is passing oil",
+        "valve-cover-gasket-leaking-onto-the-cover": "A valve cover gasket is leaking and the oil is running down the front"
+      },
+      "diagnosticSteps": {
+        "clean-the-front-of-the-engine-and-drive-it-a-week": "Degrease the front of the engine, drive it for a week and look again at where the oil starts",
+        "work-out-whether-the-oil-starts-above-or-below-the-cover": "Work out whether the wet trail begins above the valve covers or behind the timing cover",
+        "look-for-rubber-dust-behind-the-front-cover": "With the front cover off, look for black rubber dust and oil on the belt and pulleys"
+      },
+      "fixPaths": {
+        "replace-the-seals-during-the-timing-belt-service": {
+          "title": "Replace the seals during the timing belt service",
+          "detail": "Almost all of this cost is access you are already paying for. Doing the seals separately means paying that access twice for a pair of inexpensive parts."
+        },
+        "replace-the-valve-cover-gaskets": {
+          "title": "Replace the valve cover gaskets",
+          "detail": "The cheaper answer when the oil starts above the covers rather than behind them. Confirm the source before ordering, because the two look identical once the oil has run down."
+        }
+      }
+    },
+    "es": {
+      "title": "Fuga de aceite en los retenedores delanteros del árbol de levas",
+      "summary": "El proveedor del juego para este motor señala los retenedores delanteros del árbol de levas como un punto de fuga común y recomienda cambiarlos con una periodicidad fija en vez de esperar a que rezumen, y la razón no es el aceite que se pierde. Estos retenedores van detrás de las tapas de distribución, lo que significa que el aceite que dejan pasar cae sobre la faja de distribución, y una faja empapada en aceite es una faja con los días contados por nueva que esté. La economía se deduce de la geometría: la mano de obra para llegar a los retenedores es la misma del servicio de faja de distribución, así que un retenedor cambiado durante ese trabajo sale casi gratis y uno cambiado aparte no. Si el frente de su motor está húmedo y no se sabe el historial de la faja, lea esta entrada junto con la de la faja de distribución: son la misma tarde de trabajo.",
+      "slug": "fuga-de-aceite-retenedores-del-arbol-de-levas",
+      "symptoms": {
+        "oil-weeping-from-the-timing-cover-area": "Aceite rezumando por la zona de las tapas de distribución",
+        "oil-level-falling-with-no-puddle-under-the-truck": "El nivel de aceite baja pero no se junta nada en el piso",
+        "burnt-oil-smell-after-a-run": "Olor a aceite quemado después de andar, más fuerte con el capó abierto",
+        "black-rubber-dust-around-the-front-cover": "Polvillo negro de hule dentro y alrededor de la tapa delantera"
+      },
+      "causes": {
+        "front-camshaft-seal-hardened": "Un retenedor delantero del árbol de levas se endureció y deja pasar aceite",
+        "front-crankshaft-seal-hardened": "El retenedor delantero del cigüeñal se endureció y deja pasar aceite",
+        "valve-cover-gasket-leaking-onto-the-cover": "Un empaque de tapa de válvulas tiene fuga y el aceite corre hacia el frente"
+      },
+      "diagnosticSteps": {
+        "clean-the-front-of-the-engine-and-drive-it-a-week": "Desengrase el frente del motor, ande una semana y vuelva a ver dónde nace el aceite",
+        "work-out-whether-the-oil-starts-above-or-below-the-cover": "Determine si el rastro húmedo empieza por encima de las tapas de válvulas o por detrás de la tapa de distribución",
+        "look-for-rubber-dust-behind-the-front-cover": "Con la tapa delantera afuera, busque polvillo negro de hule y aceite sobre la faja y las poleas"
+      },
+      "fixPaths": {
+        "replace-the-seals-during-the-timing-belt-service": {
+          "title": "Cambiar los retenedores durante el servicio de faja de distribución",
+          "detail": "Casi todo este costo es acceso que usted ya está pagando. Hacer los retenedores por aparte es pagar ese acceso dos veces por un par de piezas baratas."
+        },
+        "replace-the-valve-cover-gaskets": {
+          "title": "Cambiar los empaques de las tapas de válvulas",
+          "detail": "Es la respuesta más barata cuando el aceite nace por encima de las tapas y no por detrás. Confirme el origen antes de pedir repuestos, porque las dos fugas se ven idénticas una vez que el aceite corrió."
+        }
+      }
+    }
+  }
+}

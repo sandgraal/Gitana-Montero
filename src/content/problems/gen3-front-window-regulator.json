@@ -1,0 +1,149 @@
+{
+  "id": "gen3-front-window-regulator",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2004,
+      "to": 2006
+    }
+  },
+  "system": "body",
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "window-drops-into-the-door-and-will-not-come-back",
+    "grinding-or-clicking-inside-the-door-when-the-switch-is-pressed",
+    "glass-comes-up-crooked-or-stops-part-way",
+    "motor-runs-but-the-glass-does-not-move"
+  ],
+  "causes": [
+    { "id": "regulator-cable-or-guide-failed" },
+    { "id": "window-motor-failed" },
+    { "id": "switch-or-wiring-in-the-door-jamb-faulty" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "listen-at-the-door-while-somebody-presses-the-switch",
+      "rulesIn": ["regulator-cable-or-guide-failed", "window-motor-failed"]
+    },
+    {
+      "id": "try-the-same-window-from-the-driver-master-switch",
+      "rulesIn": ["switch-or-wiring-in-the-door-jamb-faulty"],
+      "rulesOut": ["window-motor-failed"]
+    },
+    {
+      "id": "flex-the-loom-in-the-door-jamb-while-operating-the-window",
+      "rulesIn": ["switch-or-wiring-in-the-door-jamb-faulty"]
+    },
+    {
+      "id": "remove-the-door-card-and-look-at-the-regulator",
+      "rulesIn": ["regulator-cable-or-guide-failed"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-regulator-and-motor-assembly",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["regulator-cable-or-guide-failed", "window-motor-failed"],
+      "parts": ["gen3-front-window-regulator-and-motor"],
+      "procedures": []
+    },
+    {
+      "id": "repair-the-switch-or-the-door-jamb-loom",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["switch-or-wiring-in-the-door-jamb-faulty"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 2004-2006 Window Regulator & Motor Assembly, FRONT (fits 2004-2006 only)",
+      "url": "https://lusooverland.com/VP-LO-MN16727X",
+      "archiveUrl": "https://web.archive.org/web/20260902210113id_/https://lusooverland.com/VP-LO-MN16727X",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Luso Overland — MITSUBISHI / MONTERO Gen 3 (2001-2006) / Parts catalogue listing",
+      "url": "https://lusooverland.com/mitsubishi/montero-g3/parts/",
+      "archiveUrl": "https://web.archive.org/web/20260902210157id_/https://lusooverland.com/mitsubishi/montero-g3/parts/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front window drops into the door",
+      "summary": "A comfort failure rather than a mechanical one, but it is the fault most likely to leave a Montero unlockable in the rain, so it earns a place in the first wave. The regulator and motor are supplied as one assembly for the later trucks, and the fitment note on that part is worth reading before ordering: the assembly the specialist stocks is listed for the last three model years of the generation only, so a truck from earlier in the run needs a different part even though the door looks the same. Before buying anything, separate a dead motor from a broken regulator and both of those from a switch or a loom fault in the door jamb, where the wires flex every time the door opens. The order of those three tests costs nothing and decides whether this is a part or a splice.",
+      "slug": "front-window-drops-into-the-door",
+      "symptoms": {
+        "window-drops-into-the-door-and-will-not-come-back": "The glass drops into the door and will not come back up",
+        "grinding-or-clicking-inside-the-door-when-the-switch-is-pressed": "Grinding or clicking inside the door when the switch is pressed",
+        "glass-comes-up-crooked-or-stops-part-way": "The glass comes up crooked, binds, or stops part of the way",
+        "motor-runs-but-the-glass-does-not-move": "You can hear the motor run but nothing moves"
+      },
+      "causes": {
+        "regulator-cable-or-guide-failed": "The regulator cable or its guide has failed inside the door",
+        "window-motor-failed": "The window motor has failed",
+        "switch-or-wiring-in-the-door-jamb-faulty": "The switch, or the wiring where the loom crosses the door jamb, is faulty"
+      },
+      "diagnosticSteps": {
+        "listen-at-the-door-while-somebody-presses-the-switch": "Put a hand on the door and listen while somebody holds the switch in each direction",
+        "try-the-same-window-from-the-driver-master-switch": "Try the same window from the driver's master switch as well as from its own",
+        "flex-the-loom-in-the-door-jamb-while-operating-the-window": "Flex the rubber boot and loom in the door jamb while the switch is held",
+        "remove-the-door-card-and-look-at-the-regulator": "Take the door card off and look directly at the regulator, its cable and its guide"
+      },
+      "fixPaths": {
+        "replace-the-regulator-and-motor-assembly": {
+          "title": "Replace the regulator and motor as one assembly",
+          "detail": "Check the model years on the listing against your own truck before ordering — the later assembly does not cover the whole generation. Tape the glass up before undoing anything."
+        },
+        "repair-the-switch-or-the-door-jamb-loom": {
+          "title": "Repair the switch or the door jamb wiring",
+          "detail": "Far cheaper, and the answer more often than people expect on a vehicle of this age. Broken strands inside an intact-looking rubber boot are the classic find."
+        }
+      }
+    },
+    "es": {
+      "title": "El vidrio delantero se cae dentro de la puerta",
+      "summary": "Es una falla de confort y no de mecánica, pero es la que con más probabilidad deja una Montero sin poder cerrarse bajo la lluvia, así que se gana un lugar en la primera tanda. En los vehículos más nuevos el mecanismo elevador y el motor se venden como un solo conjunto, y vale leer la nota de compatibilidad de ese repuesto antes de pedirlo: el conjunto que tiene la casa especializada aparece listado solo para los últimos tres años modelo de la generación, así que un vehículo de años anteriores necesita otra pieza aunque la puerta se vea igual. Antes de comprar nada, separe un motor muerto de un mecanismo quebrado, y ambos de una falla del suiche o del cableado en el marco de la puerta, donde los cables se doblan cada vez que la puerta se abre. El orden de esas tres pruebas no cuesta nada y decide si esto es un repuesto o un empalme.",
+      "slug": "vidrio-delantero-se-cae-dentro-de-la-puerta",
+      "symptoms": {
+        "window-drops-into-the-door-and-will-not-come-back": "El vidrio se cae dentro de la puerta y ya no sube",
+        "grinding-or-clicking-inside-the-door-when-the-switch-is-pressed": "Ruido de molienda o chasquidos dentro de la puerta al presionar el suiche",
+        "glass-comes-up-crooked-or-stops-part-way": "El vidrio sube torcido, se traba, o se queda a medio camino",
+        "motor-runs-but-the-glass-does-not-move": "Se oye correr el motor pero nada se mueve"
+      },
+      "causes": {
+        "regulator-cable-or-guide-failed": "El cable del mecanismo elevador o su guía falló dentro de la puerta",
+        "window-motor-failed": "El motor del vidrio se dañó",
+        "switch-or-wiring-in-the-door-jamb-faulty": "El suiche, o el cableado donde el ramal cruza el marco de la puerta, está fallando"
+      },
+      "diagnosticSteps": {
+        "listen-at-the-door-while-somebody-presses-the-switch": "Ponga la mano en la puerta y escuche mientras alguien sostiene el suiche en cada sentido",
+        "try-the-same-window-from-the-driver-master-switch": "Pruebe el mismo vidrio desde el suiche maestro del chofer además del suyo propio",
+        "flex-the-loom-in-the-door-jamb-while-operating-the-window": "Doble el fuelle de hule y el ramal en el marco de la puerta mientras el suiche está presionado",
+        "remove-the-door-card-and-look-at-the-regulator": "Quite el tapiz de la puerta y revise directamente el mecanismo elevador, su cable y su guía"
+      },
+      "fixPaths": {
+        "replace-the-regulator-and-motor-assembly": {
+          "title": "Cambiar mecanismo elevador y motor como un solo conjunto",
+          "detail": "Compare los años modelo del listado contra su propio vehículo antes de pedir: el conjunto nuevo no cubre toda la generación. Sostenga el vidrio con cinta antes de aflojar nada."
+        },
+        "repair-the-switch-or-the-door-jamb-loom": {
+          "title": "Reparar el suiche o el cableado del marco de la puerta",
+          "detail": "Sale mucho más barato, y en un vehículo de esta edad es la respuesta más seguido de lo que la gente espera. Los hilos quebrados dentro de un fuelle de hule que se ve entero son el hallazgo clásico."
+        }
+      }
+    }
+  }
+}

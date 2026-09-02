@@ -1,0 +1,195 @@
+{
+  "id": "gen3-freewheel-clutch-solenoid",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "transfer-case",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "green-front-wheel-symbols-blinking",
+    "four-wheel-drive-will-not-engage",
+    "it-will-not-go-back-to-two-wheel-drive",
+    "steering-binds-on-dry-pavement"
+  ],
+  "causes": [
+    { "id": "vacuum-solenoid-stuck" },
+    { "id": "cracked-or-disconnected-vacuum-hose" },
+    { "id": "freewheel-clutch-actuator-diaphragm-torn" },
+    { "id": "freewheel-clutch-stuck-from-disuse" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "cycle-the-selector-forwards-and-in-reverse",
+      "rulesIn": ["freewheel-clutch-stuck-from-disuse"]
+    },
+    {
+      "id": "trace-the-vacuum-hoses-at-the-right-inner-fender",
+      "rulesIn": ["cracked-or-disconnected-vacuum-hose"]
+    },
+    {
+      "id": "apply-vacuum-directly-at-the-actuator",
+      "rulesIn": [
+        "vacuum-solenoid-stuck",
+        "cracked-or-disconnected-vacuum-hose"
+      ],
+      "rulesOut": ["freewheel-clutch-actuator-diaphragm-torn"]
+    },
+    {
+      "id": "fit-a-known-good-solenoid-and-try-again",
+      "rulesIn": ["vacuum-solenoid-stuck"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "use-the-four-wheel-drive-regularly",
+      "difficulty": 1,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["freewheel-clutch-stuck-from-disuse"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-freewheel-clutch-control-solenoid",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "time": {
+        "value": 5,
+        "unit": "min"
+      },
+      "addresses": ["vacuum-solenoid-stuck"],
+      "parts": ["gen3-freewheel-clutch-control-solenoid"],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-vacuum-hoses",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["cracked-or-disconnected-vacuum-hose"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-front-clutch-actuator",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant"
+      },
+      "addresses": ["freewheel-clutch-actuator-diaphragm-torn"],
+      "parts": ["gen3-front-freewheel-clutch-actuator"],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen 2, 2.5, 3 Freewheel Clutch Control Solenoid (MR430381)",
+      "url": "https://lusooverland.com/VP-LO-MR430381",
+      "archiveUrl": "https://web.archive.org/web/20260902205247id_/https://lusooverland.com/VP-LO-MR430381",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Opinautos — «Diferencial: fallas y soluciones», Mitsubishi Montero (hilo «Prende luz de transfer o diferencial cada 30 km aprox», Montero 2006 3.8 GLS)",
+      "url": "https://www.opinautos.com/us/mitsubishi/montero/defectos/diferencial",
+      "archiveUrl": "https://web.archive.org/web/20260902205307id_/https://www.opinautos.com/us/mitsubishi/montero/defectos/diferencial",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Green front-wheel symbols blinking, front axle will not engage",
+      "summary": "This is the other blinking-light fault, and it is not the same one as the transfer case switches. When the green front-wheel symbols blink rather than the amber centre-diff symbol, the front axle is having trouble engaging or disengaging, and the part the specialist supplier names as the usual culprit is the freewheel clutch control solenoid — a vacuum valve that is easy to reach and quick to change, and one they recommend carrying spare. Around it are the vacuum hoses on the right inner fender and the clutch actuator diaphragm on the front differential itself, and Spanish-language owner threads describe both: a solenoid valve that fixed it outright, and a differential clutch actuator diaphragm replaced alongside it. Owners also report the clutch sticking on trucks whose four-wheel drive is never used, which is an argument for exercising it rather than a fault to buy parts for.",
+      "slug": "front-wheel-symbols-blinking-4wd-not-engaging",
+      "symptoms": {
+        "green-front-wheel-symbols-blinking": "The green front-wheel symbols on the dash blink instead of holding steady",
+        "four-wheel-drive-will-not-engage": "Selecting four-wheel drive does nothing at the front axle",
+        "it-will-not-go-back-to-two-wheel-drive": "The front drive will not release once it has engaged",
+        "steering-binds-on-dry-pavement": "The steering binds and the tires scrub in tight turns on dry pavement"
+      },
+      "causes": {
+        "vacuum-solenoid-stuck": "The freewheel clutch control solenoid is stuck and not passing vacuum",
+        "cracked-or-disconnected-vacuum-hose": "A vacuum hose to the front axle is cracked, split or off its spigot",
+        "freewheel-clutch-actuator-diaphragm-torn": "The clutch actuator diaphragm at the front differential is torn",
+        "freewheel-clutch-stuck-from-disuse": "The freewheel clutch itself is stuck because the four-wheel drive is never used"
+      },
+      "diagnosticSteps": {
+        "cycle-the-selector-forwards-and-in-reverse": "Select four-wheel drive, roll forward a few metres, deselect, then roll back a few metres and listen for the release",
+        "trace-the-vacuum-hoses-at-the-right-inner-fender": "Follow the vacuum hoses at the right inner fender, squeezing each one for splits and checking every spigot",
+        "apply-vacuum-directly-at-the-actuator": "Apply vacuum straight to the actuator at the front differential and watch whether the axle engages",
+        "fit-a-known-good-solenoid-and-try-again": "Fit a known-good solenoid, matching the hose routing to the old one, and try the selector again"
+      },
+      "fixPaths": {
+        "use-the-four-wheel-drive-regularly": {
+          "title": "Exercise the system before buying anything",
+          "detail": "Free, and the answer surprisingly often on a truck that has lived its whole life on pavement. Do it somewhere the front and rear can turn at slightly different speeds without loading the drivetrain."
+        },
+        "replace-the-freewheel-clutch-control-solenoid": {
+          "title": "Replace the control solenoid",
+          "detail": "Easy to reach and quick, and the supplier who sells it recommends keeping one in the truck for exactly this. Note how the hoses run on the old one before you unplug it."
+        },
+        "renew-the-vacuum-hoses": {
+          "title": "Renew the vacuum hoses",
+          "detail": "Cheap, and a split hose gives the same blinking symbols as a dead solenoid. Worth doing at the same time as the solenoid rather than twice."
+        },
+        "replace-the-front-clutch-actuator": {
+          "title": "Replace the clutch actuator at the front differential",
+          "detail": "The answer when vacuum reaches the actuator and nothing happens. This one is a workshop job and the parts cost accordingly."
+        }
+      }
+    },
+    "es": {
+      "title": "Luces verdes de las ruedas delanteras parpadeando y el eje delantero no acopla",
+      "summary": "Esta es la otra falla de luz parpadeando, y no es la misma de los interruptores de la caja de transferencia. Cuando lo que parpadea son los símbolos verdes de las ruedas delanteras, y no el ámbar del diferencial central, lo que está costando es acoplar o desacoplar el eje delantero, y el repuesto que la casa especializada señala como culpable habitual es la válvula solenoide de control del embrague de rueda libre: una válvula de vacío fácil de alcanzar, rápida de cambiar, y que ellos recomiendan cargar de repuesto en el vehículo. Alrededor de ella están las mangueras de vacío del guardabarros interno derecho y el diafragma del actuador del embrague en el mismo diferencial delantero, y los hilos de dueños en español describen los dos: una válvula solenoide que resolvió la falla de una vez, y un diafragma del actuador del diferencial delantero cambiado junto con ella. También reportan el embrague pegado en vehículos a los que nunca se les usa la doble tracción, que es un argumento para ejercitarla y no para comprar repuestos.",
+      "slug": "luces-verdes-parpadeando-doble-traccion-no-acopla",
+      "symptoms": {
+        "green-front-wheel-symbols-blinking": "Los símbolos verdes de las ruedas delanteras parpadean en vez de quedarse fijos",
+        "four-wheel-drive-will-not-engage": "Al seleccionar doble tracción no pasa nada en el eje delantero",
+        "it-will-not-go-back-to-two-wheel-drive": "La tracción delantera no se suelta una vez que acopló",
+        "steering-binds-on-dry-pavement": "La dirección se traba y las llantas patinan en curvas cerradas sobre asfalto seco"
+      },
+      "causes": {
+        "vacuum-solenoid-stuck": "La válvula solenoide de control del embrague de rueda libre está pegada y no deja pasar el vacío",
+        "cracked-or-disconnected-vacuum-hose": "Una manguera de vacío hacia el eje delantero está rajada, partida o salida de su espiga",
+        "freewheel-clutch-actuator-diaphragm-torn": "El diafragma del actuador del embrague, en el diferencial delantero, está roto",
+        "freewheel-clutch-stuck-from-disuse": "El embrague de rueda libre está pegado porque nunca se usa la doble tracción"
+      },
+      "diagnosticSteps": {
+        "cycle-the-selector-forwards-and-in-reverse": "Meta doble tracción, avance unos metros, quítela, retroceda unos metros y escuche el desacople",
+        "trace-the-vacuum-hoses-at-the-right-inner-fender": "Siga las mangueras de vacío del guardabarros interno derecho, apretando cada una para hallar rajaduras y revisando cada espiga",
+        "apply-vacuum-directly-at-the-actuator": "Aplique vacío directo al actuador del diferencial delantero y observe si el eje acopla",
+        "fit-a-known-good-solenoid-and-try-again": "Monte una válvula solenoide sana, copiando el ruteo de mangueras de la vieja, y pruebe otra vez la palanca"
+      },
+      "fixPaths": {
+        "use-the-four-wheel-drive-regularly": {
+          "title": "Ejercitar el sistema antes de comprar nada",
+          "detail": "Es gratis, y sorprendentemente seguido es la respuesta en un vehículo que pasó toda su vida en asfalto. Hágalo donde adelante y atrás puedan girar a velocidades algo distintas sin forzar el tren motriz."
+        },
+        "replace-the-freewheel-clutch-control-solenoid": {
+          "title": "Cambiar la válvula solenoide de control",
+          "detail": "Está a la mano y es rápida; la casa que la vende recomienda llevar una en el vehículo precisamente para esto. Fíjese en cómo van las mangueras en la vieja antes de desconectarla."
+        },
+        "renew-the-vacuum-hoses": {
+          "title": "Renovar las mangueras de vacío",
+          "detail": "Sale barato, y una manguera partida da los mismos símbolos parpadeando que una válvula dañada. Conviene hacerlo junto con la válvula y no dos veces."
+        },
+        "replace-the-front-clutch-actuator": {
+          "title": "Cambiar el actuador del embrague en el diferencial delantero",
+          "detail": "Es la respuesta cuando el vacío llega al actuador y no pasa nada. Este sí es trabajo de taller y el repuesto cuesta acorde."
+        }
+      }
+    }
+  }
+}

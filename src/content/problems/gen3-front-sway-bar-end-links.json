@@ -1,0 +1,163 @@
+{
+  "id": "gen3-front-sway-bar-end-links",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "suspension",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "knock-from-the-front-over-small-bumps",
+    "noise-worse-on-uneven-ground-than-on-smooth",
+    "more-body-roll-than-it-used-to-have",
+    "play-you-can-feel-by-hand-at-the-link"
+  ],
+  "causes": [
+    { "id": "end-link-ball-joint-worn-out" },
+    { "id": "end-link-broken-or-pulled-apart" },
+    { "id": "sway-bar-bushings-perished" },
+    { "id": "aftermarket-links-not-up-to-the-load" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "grab-each-link-and-try-to-move-it",
+      "rulesIn": [
+        "end-link-ball-joint-worn-out",
+        "end-link-broken-or-pulled-apart"
+      ]
+    },
+    {
+      "id": "pry-between-the-link-and-the-bar",
+      "rulesIn": ["end-link-ball-joint-worn-out"],
+      "rulesOut": ["sway-bar-bushings-perished"]
+    },
+    {
+      "id": "look-at-the-rubber-mounts-that-clamp-the-bar",
+      "rulesIn": ["sway-bar-bushings-perished"]
+    },
+    {
+      "id": "check-what-brand-of-link-is-fitted-and-what-tires-it-carries",
+      "rulesIn": ["aftermarket-links-not-up-to-the-load"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-both-front-links",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": [
+        "end-link-ball-joint-worn-out",
+        "end-link-broken-or-pulled-apart",
+        "aftermarket-links-not-up-to-the-load"
+      ],
+      "parts": ["gen3-front-sway-bar-end-link"],
+      "procedures": []
+    },
+    {
+      "id": "replace-links-and-bar-bushings-together",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "end-link-ball-joint-worn-out",
+        "end-link-broken-or-pulled-apart",
+        "sway-bar-bushings-perished"
+      ],
+      "parts": ["gen3-front-sway-bar-end-link", "gen3-front-sway-bar-bushing"],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 Front Sway Bar End Link (left 4056A106 / right 4056A105)",
+      "url": "https://lusooverland.com/VP-MMC-4056A10X",
+      "archiveUrl": "https://web.archive.org/web/20260902205328id_/https://lusooverland.com/VP-MMC-4056A10X",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Grupo Navcar (Costa Rica) — Tornillo Barra Estabilizadora, Chevrolet Trooper / Mitsubishi Montero (OEM MB-527385)",
+      "url": "https://www.gruponavcar.com/tornillo-barra-estabilizadora-chevrolet-trooper-mitsubishi-montero-mb527385/p",
+      "archiveUrl": "https://web.archive.org/web/20260902210517id_/https://www.gruponavcar.com/tornillo-barra-estabilizadora-chevrolet-trooper-mitsubishi-montero-mb527385/p",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Knock from the front end over small bumps",
+      "summary": "The links that tie the front sway bar to the suspension are short, they carry every roll input the bar generates, and they are among the first things on this truck to start knocking. The knock is loudest over small, sharp bumps and quietest on smooth road, which is what separates it from a worn bushing further inboard. The left and right links are different parts, so replacing one means ordering the correct side, and the supplier who stocks the genuine ones warns specifically that on trucks running larger tires the aftermarket links do not hold up to the extra load — worth knowing before you buy the cheap pair twice. This entry is scoped to a link that is worn and knocking. A link that has actually come apart changes how the truck behaves in an avoidance manoeuvre, and that is not a drive-gently situation.",
+      "slug": "front-end-knock-over-bumps-sway-bar-links",
+      "symptoms": {
+        "knock-from-the-front-over-small-bumps": "A knock or clunk from the front end over small bumps",
+        "noise-worse-on-uneven-ground-than-on-smooth": "The noise is loud on broken surfaces and disappears on smooth road",
+        "more-body-roll-than-it-used-to-have": "The truck leans more in corners than it used to",
+        "play-you-can-feel-by-hand-at-the-link": "You can move the link by hand and feel the play in it"
+      },
+      "causes": {
+        "end-link-ball-joint-worn-out": "The ball joint in the sway bar link is worn and rattling",
+        "end-link-broken-or-pulled-apart": "The link is broken or has pulled apart from the bar",
+        "sway-bar-bushings-perished": "The rubber mounts that clamp the bar to the body have perished",
+        "aftermarket-links-not-up-to-the-load": "Aftermarket links have failed early under larger tires or off-road use"
+      },
+      "diagnosticSteps": {
+        "grab-each-link-and-try-to-move-it": "With the truck on the ground, take hold of each link and try to rock it by hand",
+        "pry-between-the-link-and-the-bar": "Pry gently between the link and the bar and watch the joint rather than the bar",
+        "look-at-the-rubber-mounts-that-clamp-the-bar": "Look at the rubber mounts clamping the bar to the body for splits, squash or displacement",
+        "check-what-brand-of-link-is-fitted-and-what-tires-it-carries": "Note whether the fitted links are genuine or aftermarket, and what tire size the truck is running"
+      },
+      "fixPaths": {
+        "replace-both-front-links": {
+          "title": "Replace both front links",
+          "detail": "Always in pairs, and always with the correct side ordered — the left and right parts are not the same. Tighten with the suspension carrying the truck's weight, not hanging."
+        },
+        "replace-links-and-bar-bushings-together": {
+          "title": "Replace the links and the bar bushings together",
+          "detail": "The bushings are cheap and they are already exposed once the bar is loose. Doing them separately means paying for the same access twice."
+        }
+      }
+    },
+    "es": {
+      "title": "Golpeteo del tren delantero al pasar huecos pequeños",
+      "summary": "Los tensores que amarran la barra estabilizadora delantera a la suspensión son cortos, aguantan toda la carga de balanceo que genera la barra, y son de lo primero que empieza a sonar en este vehículo. El golpe se oye más fuerte en huecos pequeños y secos y casi no se oye en carretera lisa, que es lo que lo distingue de un buje gastado más adentro. El tensor izquierdo y el derecho son repuestos distintos, así que cambiar uno obliga a pedir el lado correcto, y la casa que vende los originales advierte que en vehículos con llantas más grandes los tensores no originales no aguantan la carga extra: conviene saberlo antes de comprar el par barato dos veces. Esta entrada está acotada a un tensor gastado que suena. Un tensor que de plano se soltó cambia cómo se comporta el vehículo en una maniobra de esquive, y eso ya no es cosa de manejar suave.",
+      "slug": "golpeteo-del-tren-delantero-tensores-estabilizadora",
+      "symptoms": {
+        "knock-from-the-front-over-small-bumps": "Golpe o toqueteo del tren delantero al pasar huecos pequeños",
+        "noise-worse-on-uneven-ground-than-on-smooth": "El ruido se oye fuerte en superficie irregular y desaparece en carretera lisa",
+        "more-body-roll-than-it-used-to-have": "El vehículo se recuesta más en las curvas que antes",
+        "play-you-can-feel-by-hand-at-the-link": "Usted puede mover el tensor con la mano y sentirle el juego"
+      },
+      "causes": {
+        "end-link-ball-joint-worn-out": "La rótula del tensor de la barra estabilizadora está gastada y suena",
+        "end-link-broken-or-pulled-apart": "El tensor está quebrado o se soltó de la barra",
+        "sway-bar-bushings-perished": "Los hules que sujetan la barra a la carrocería están resecos",
+        "aftermarket-links-not-up-to-the-load": "Unos tensores no originales fallaron temprano por llantas grandes o uso fuera de carretera"
+      },
+      "diagnosticSteps": {
+        "grab-each-link-and-try-to-move-it": "Con el vehículo en el suelo, agarre cada tensor y trate de moverlo con la mano",
+        "pry-between-the-link-and-the-bar": "Haga palanca suave entre el tensor y la barra y observe la rótula, no la barra",
+        "look-at-the-rubber-mounts-that-clamp-the-bar": "Revise los hules que sujetan la barra a la carrocería buscando rajaduras, aplastamiento o corrimiento",
+        "check-what-brand-of-link-is-fitted-and-what-tires-it-carries": "Fíjese si los tensores montados son originales o no, y qué medida de llanta trae el vehículo"
+      },
+      "fixPaths": {
+        "replace-both-front-links": {
+          "title": "Cambiar los dos tensores delanteros",
+          "detail": "Siempre en pares y siempre pidiendo el lado correcto: la pieza izquierda y la derecha no son la misma. Apriete con la suspensión cargando el peso del vehículo, no colgando."
+        },
+        "replace-links-and-bar-bushings-together": {
+          "title": "Cambiar los tensores y los hules de la barra de una vez",
+          "detail": "Los hules salen baratos y ya quedan a la vista cuando la barra está suelta. Hacerlo por aparte es pagar dos veces el mismo acceso."
+        }
+      }
+    }
+  }
+}

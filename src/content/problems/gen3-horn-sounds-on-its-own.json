@@ -1,0 +1,170 @@
+{
+  "id": "gen3-horn-sounds-on-its-own",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "interior",
+  "safetyCritical": true,
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "horn-sounds-by-itself-with-the-vehicle-parked",
+    "horn-sounds-when-the-steering-wheel-is-turned-or-over-bumps",
+    "it-happens-most-on-the-coldest-mornings",
+    "the-only-way-to-stop-it-is-pulling-the-fuse"
+  ],
+  "causes": [
+    { "id": "horn-contacts-on-the-airbag-module-shorting" },
+    { "id": "steering-wheel-trim-shrinking-onto-the-contacts" },
+    { "id": "clock-spring-or-column-wiring-chafed" },
+    { "id": "horn-relay-sticking" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "note-the-temperature-and-the-time-of-day-it-happens",
+      "rulesIn": ["steering-wheel-trim-shrinking-onto-the-contacts"]
+    },
+    {
+      "id": "check-whether-turning-the-wheel-triggers-it",
+      "rulesIn": ["clock-spring-or-column-wiring-chafed"],
+      "rulesOut": ["horn-relay-sticking"]
+    },
+    {
+      "id": "press-gently-around-the-wheel-pad-and-listen",
+      "rulesIn": [
+        "horn-contacts-on-the-airbag-module-shorting",
+        "steering-wheel-trim-shrinking-onto-the-contacts"
+      ]
+    },
+    {
+      "id": "swap-the-horn-relay-for-an-identical-one",
+      "rulesIn": ["horn-relay-sticking"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "swap-the-horn-relay",
+      "difficulty": 1,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["horn-relay-sticking"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "have-a-shop-service-the-wheel-pad-contacts",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "horn-contacts-on-the-airbag-module-shorting",
+        "steering-wheel-trim-shrinking-onto-the-contacts"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "have-the-clock-spring-and-column-wiring-checked",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": ["clock-spring-or-column-wiring-chafed"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year (ODI 11583242, 10653550, 10556927, 10785008: horn sounding by itself, cold-weather pattern, contacts under the steering wheel pad)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "The horn sounds on its own",
+      "summary": "A recurring complaint on this generation, and one whose repair sits somewhere most owners should not go. The horn contacts live under the pad in the middle of the steering wheel — directly on top of the driver's airbag module — and complaints describe the horn going off when the wheel is turned, when the truck hits a bump, and most often on cold mornings with the vehicle parked and switched off. One owner's account explains the mechanism: the covering over the module contracts in the cold and squeezes the horn contacts underneath it. Owners report living with it by pulling the horn fuse, which trades one problem for another. Whether a vehicle without a working horn passes inspection depends on where you are — Costa Rica's RTV, a British MOT and a US state inspection each set their own rules — so check locally rather than assuming. What does not vary is that the pad in the middle of that wheel is a live restraint device: this repair belongs to a qualified mechanic.",
+      "slug": "the-horn-sounds-on-its-own",
+      "symptoms": {
+        "horn-sounds-by-itself-with-the-vehicle-parked": "The horn sounds by itself with the vehicle parked and switched off",
+        "horn-sounds-when-the-steering-wheel-is-turned-or-over-bumps": "The horn sounds when the wheel is turned to a certain angle, or over bumps",
+        "it-happens-most-on-the-coldest-mornings": "It happens most on the coldest mornings and settles as the day warms",
+        "the-only-way-to-stop-it-is-pulling-the-fuse": "The only thing that stops it is pulling the horn fuse or disconnecting the battery"
+      },
+      "causes": {
+        "horn-contacts-on-the-airbag-module-shorting": "The horn contacts sitting on top of the airbag module are shorting",
+        "steering-wheel-trim-shrinking-onto-the-contacts": "The trim covering the module contracts in the cold and presses the contacts together",
+        "clock-spring-or-column-wiring-chafed": "The clock spring or the wiring in the column has chafed",
+        "horn-relay-sticking": "The horn relay is sticking closed"
+      },
+      "diagnosticSteps": {
+        "note-the-temperature-and-the-time-of-day-it-happens": "Write down the temperature and time of day each time it happens, for a week",
+        "check-whether-turning-the-wheel-triggers-it": "Note whether turning the wheel to a particular angle sets it off",
+        "press-gently-around-the-wheel-pad-and-listen": "Press gently around the edge of the wheel pad and listen for the horn to trigger",
+        "swap-the-horn-relay-for-an-identical-one": "Swap the horn relay with an identical one from another circuit and see whether the fault moves"
+      },
+      "fixPaths": {
+        "swap-the-horn-relay": {
+          "title": "Swap the horn relay first",
+          "detail": "The one thing on this list you can do yourself with no risk. It costs nothing to try, and it eliminates the only cause that is not inside the steering wheel."
+        },
+        "have-a-shop-service-the-wheel-pad-contacts": {
+          "title": "Have the wheel pad contacts serviced by a shop",
+          "detail": "This means disturbing the driver's airbag module. Do not attempt it on the strength of a video: an airbag deploying in a workshop injures people, and see a qualified mechanic is the honest answer here."
+        },
+        "have-the-clock-spring-and-column-wiring-checked": {
+          "title": "Have the clock spring and column wiring checked",
+          "detail": "The path to look at when the fault follows steering angle. Same warning: the clock spring is part of the restraint circuit and is not a place to improvise."
+        }
+      }
+    },
+    "es": {
+      "title": "La bocina suena sola",
+      "summary": "Es una queja recurrente en esta generación, y su reparación queda en un lugar al que la mayoría de dueños no debería meterse. Los contactos de la bocina viven bajo la tapa central del volante, justo encima de la bolsa de aire del conductor, y las quejas describen la bocina sonando al girar el volante, al pasar un hueco, y sobre todo en las mañanas frías con el vehículo parqueado y apagado. El relato de un dueño explica el mecanismo: el forro que cubre el módulo se contrae con el frío y aprieta los contactos de la bocina que van debajo. Los dueños reportan que conviven con la falla sacando el fusible de la bocina, que es cambiar un problema por otro. Si un vehículo sin bocina pasa o no la inspección depende de dónde esté usted —la RTV de Costa Rica, el MOT británico y las inspecciones estatales de Estados Unidos ponen cada una sus reglas—, así que confirme localmente en vez de suponer. Lo que no cambia es que esa tapa en el centro del volante es un dispositivo de retención activo: esta reparación es de un mecánico calificado.",
+      "slug": "la-bocina-suena-sola",
+      "symptoms": {
+        "horn-sounds-by-itself-with-the-vehicle-parked": "La bocina suena sola con el vehículo parqueado y apagado",
+        "horn-sounds-when-the-steering-wheel-is-turned-or-over-bumps": "La bocina suena al girar el volante hasta cierto ángulo, o al pasar huecos",
+        "it-happens-most-on-the-coldest-mornings": "Pasa sobre todo en las mañanas más frías y se calma cuando entra el calor",
+        "the-only-way-to-stop-it-is-pulling-the-fuse": "Lo único que la detiene es sacar el fusible de la bocina o desconectar la batería"
+      },
+      "causes": {
+        "horn-contacts-on-the-airbag-module-shorting": "Los contactos de la bocina que van sobre el módulo de la bolsa de aire están haciendo corto",
+        "steering-wheel-trim-shrinking-onto-the-contacts": "El forro que cubre el módulo se contrae con el frío y junta los contactos",
+        "clock-spring-or-column-wiring-chafed": "El resorte de reloj o el cableado de la columna está pelado",
+        "horn-relay-sticking": "El relé de la bocina se queda pegado"
+      },
+      "diagnosticSteps": {
+        "note-the-temperature-and-the-time-of-day-it-happens": "Anote la temperatura y la hora cada vez que ocurra, durante una semana",
+        "check-whether-turning-the-wheel-triggers-it": "Fíjese si girar el volante hasta cierto ángulo la dispara",
+        "press-gently-around-the-wheel-pad-and-listen": "Presione suave alrededor del borde de la tapa central del volante y escuche si la bocina se dispara",
+        "swap-the-horn-relay-for-an-identical-one": "Intercambie el relé de la bocina con uno idéntico de otro circuito y vea si la falla se mueve"
+      },
+      "fixPaths": {
+        "swap-the-horn-relay": {
+          "title": "Cambiar primero el relé de la bocina",
+          "detail": "Es lo único de esta lista que usted puede hacer sin riesgo. Probarlo no cuesta nada y elimina la única causa que no está dentro del volante."
+        },
+        "have-a-shop-service-the-wheel-pad-contacts": {
+          "title": "Que un taller atienda los contactos de la tapa del volante",
+          "detail": "Esto implica mover el módulo de la bolsa de aire del conductor. No lo intente por haber visto un video: una bolsa de aire que se dispara en un taller lastima gente, y aquí la respuesta honesta es acudir a un mecánico calificado."
+        },
+        "have-the-clock-spring-and-column-wiring-checked": {
+          "title": "Que revisen el resorte de reloj y el cableado de la columna",
+          "detail": "Es el camino a revisar cuando la falla sigue al ángulo del volante. Misma advertencia: el resorte de reloj es parte del circuito de retención y no es lugar para improvisar."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "id": "gen3-transfer-case-position-switch",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "transfer-case",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "amber-centre-diff-light-blinking",
+    "selector-will-not-change-mode",
+    "light-comes-back-after-a-while-of-driving",
+    "clunk-as-the-drive-tries-to-engage"
+  ],
+  "causes": [
+    { "id": "a-position-switch-has-failed" },
+    { "id": "detent-ball-gummed-up-under-the-switch" },
+    { "id": "connector-pins-or-harness-damaged" },
+    { "id": "transfer-case-oil-low-or-old" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "read-the-transfer-case-trouble-code",
+      "rulesIn": [
+        "a-position-switch-has-failed",
+        "connector-pins-or-harness-damaged"
+      ]
+    },
+    {
+      "id": "check-the-transfer-case-oil-level",
+      "rulesIn": ["transfer-case-oil-low-or-old"]
+    },
+    {
+      "id": "measure-each-switch-with-a-multimeter",
+      "rulesIn": ["a-position-switch-has-failed"],
+      "rulesOut": ["connector-pins-or-harness-damaged"]
+    },
+    {
+      "id": "inspect-the-connector-pins-and-the-loom",
+      "rulesIn": ["connector-pins-or-harness-damaged"]
+    },
+    {
+      "id": "remove-the-switch-and-look-at-the-detent-ball",
+      "rulesIn": ["detent-ball-gummed-up-under-the-switch"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "top-up-or-change-the-transfer-case-oil",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["transfer-case-oil-low-or-old"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "clean-the-connector-and-repair-the-pins",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["connector-pins-or-harness-damaged"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-failed-switch-and-clean-the-detent",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "a-position-switch-has-failed",
+        "detent-ball-gummed-up-under-the-switch"
+      ],
+      "parts": [
+        "gen3-transfer-case-position-switch",
+        "gen3-transfer-case-switch-crush-washer"
+      ],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 Transfer Case Position Switch",
+      "url": "https://lusooverland.com/VP-MMC-MR58015X",
+      "archiveUrl": "https://web.archive.org/web/20260902175141id_/https://lusooverland.com/VP-MMC-MR58015X",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Opinautos — «Luz de transfer parpadea», Mitsubishi Montero 2003 Limited 3.8",
+      "url": "https://www.opinautos.com/mitsubishi/montero/defectos/83083/luz-de-transfer-parpadea",
+      "archiveUrl": "https://web.archive.org/web/20260902175206id_/https://www.opinautos.com/mitsubishi/montero/defectos/83083/luz-de-transfer-parpadea",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year (ODI 10939248, 11103604, 10127610)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Amber centre-diff light blinking, transfer case will not change mode",
+      "summary": "Five switches sit on top of the transfer case and tell the truck which mode the selector is actually in. When one stops answering, the amber centre-diff-lock symbol on the dash blinks, and depending on which switch it is the selector will refuse to leave the mode it is in. The pattern owners report most often is a light that starts blinking after a set distance of highway driving, goes out when the engine is restarted, and comes back after the same distance again. The specialist supplier's advice is to pull the transfer-case-specific trouble code first and confirm with a resistance measurement on each switch rather than replacing all five, and to clean the detent ball and its cavity and fit a new crush washer whenever a switch comes out. Owners across Latin America report the same fault being cured by three different things — a low oil level, a broken connector pin, and a genuine dead switch — which is exactly why the code comes first.",
+      "slug": "centre-diff-light-blinking-transfer-case",
+      "symptoms": {
+        "amber-centre-diff-light-blinking": "The amber centre-diff-lock symbol on the dash blinks on its own",
+        "selector-will-not-change-mode": "The selector refuses to move out of the mode it is in",
+        "light-comes-back-after-a-while-of-driving": "Restarting the engine clears it, and the same distance of driving brings it back",
+        "clunk-as-the-drive-tries-to-engage": "A clunk from underneath as the drive tries to engage and lets go again"
+      },
+      "causes": {
+        "a-position-switch-has-failed": "One of the position switches on top of the transfer case has failed",
+        "detent-ball-gummed-up-under-the-switch": "The detent ball under a switch is gummed up and no longer moves cleanly",
+        "connector-pins-or-harness-damaged": "A connector pin or a length of harness at the switches is broken or corroded",
+        "transfer-case-oil-low-or-old": "The transfer case oil is low or long past its change"
+      },
+      "diagnosticSteps": {
+        "read-the-transfer-case-trouble-code": "Have the transfer-case-specific trouble code read before touching anything",
+        "check-the-transfer-case-oil-level": "Check the transfer case oil at the filler plug and look at its condition",
+        "measure-each-switch-with-a-multimeter": "Measure the resistance of each switch in turn and compare them",
+        "inspect-the-connector-pins-and-the-loom": "Unplug the connectors, look for bent, green or broken pins, and flex the loom while watching the reading",
+        "remove-the-switch-and-look-at-the-detent-ball": "With a switch out, take the detent ball out with it and look at the ball and its cavity"
+      },
+      "fixPaths": {
+        "top-up-or-change-the-transfer-case-oil": {
+          "title": "Correct the transfer case oil first",
+          "detail": "The cheapest thing on the list and the one owners most often report as the whole answer. Clean oil also keeps the detent balls from gumming up again."
+        },
+        "clean-the-connector-and-repair-the-pins": {
+          "title": "Repair the connector",
+          "detail": "A broken pin gives exactly the same blinking light as a dead switch and costs nothing to rule in or out."
+        },
+        "replace-the-failed-switch-and-clean-the-detent": {
+          "title": "Replace only the switch the code names",
+          "detail": "Genuine switches are worth the difference here — a switch that does not work out of the box means doing the job twice. Clean the detent ball and its cavity and fit a new crush washer while you are in there."
+        }
+      }
+    },
+    "es": {
+      "title": "Luz ámbar del diferencial central parpadeando y la caja de transferencia no cambia",
+      "summary": "Sobre la caja de transferencia van cinco interruptores que le dicen al vehículo en cuál modo está realmente la palanca. Cuando uno deja de responder, el símbolo ámbar del bloqueo del diferencial central parpadea en el tablero y, según cuál sea, la palanca se niega a salir del modo en que está. El patrón que más reportan los dueños es una luz que empieza a parpadear después de cierta distancia en carretera, se apaga al volver a arrancar el motor y regresa a la misma distancia. La casa especializada recomienda leer primero el código propio de la caja de transferencia y confirmarlo midiendo la resistencia de cada interruptor, en vez de cambiar los cinco, y limpiar la bolita del detenedor y su alojamiento y poner arandela nueva cada vez que se saca un interruptor. En toda Latinoamérica los dueños reportan la misma falla resuelta por tres cosas distintas —nivel de aceite bajo, un pin de conector quebrado y un interruptor de verdad dañado—, que es justamente por lo que el código va de primero.",
+      "slug": "luz-del-diferencial-central-parpadeando",
+      "symptoms": {
+        "amber-centre-diff-light-blinking": "El símbolo ámbar del bloqueo del diferencial central parpadea solo en el tablero",
+        "selector-will-not-change-mode": "La palanca no quiere salir del modo en que está",
+        "light-comes-back-after-a-while-of-driving": "Al volver a arrancar el motor se apaga, y con la misma distancia de manejo vuelve a aparecer",
+        "clunk-as-the-drive-tries-to-engage": "Un golpe abajo, como si la tracción tratara de acoplarse y se soltara"
+      },
+      "causes": {
+        "a-position-switch-has-failed": "Uno de los interruptores de posición sobre la caja de transferencia falló",
+        "detent-ball-gummed-up-under-the-switch": "La bolita del detenedor debajo de un interruptor está engomada y ya no se mueve libre",
+        "connector-pins-or-harness-damaged": "Hay un pin del conector o un tramo de cableado dañado o sulfatado en los interruptores",
+        "transfer-case-oil-low-or-old": "El aceite de la caja de transferencia está bajo o muy pasado de cambio"
+      },
+      "diagnosticSteps": {
+        "read-the-transfer-case-trouble-code": "Haga leer el código propio de la caja de transferencia antes de tocar nada",
+        "check-the-transfer-case-oil-level": "Revise el aceite de la caja de transferencia en el tapón de llenado y vea en qué estado está",
+        "measure-each-switch-with-a-multimeter": "Mida la resistencia de cada interruptor por turno y compárelas",
+        "inspect-the-connector-pins-and-the-loom": "Desconecte los conectores, busque pines doblados, verdosos o quebrados, y mueva el cableado mientras observa la lectura",
+        "remove-the-switch-and-look-at-the-detent-ball": "Con el interruptor afuera, saque también la bolita del detenedor y revise la bolita y su alojamiento"
+      },
+      "fixPaths": {
+        "top-up-or-change-the-transfer-case-oil": {
+          "title": "Primero corregir el aceite de la caja de transferencia",
+          "detail": "Es lo más barato de la lista y lo que más dueños reportan como la solución completa. Además, el aceite limpio evita que las bolitas del detenedor se vuelvan a engomar."
+        },
+        "clean-the-connector-and-repair-the-pins": {
+          "title": "Reparar el conector",
+          "detail": "Un pin quebrado da exactamente la misma luz parpadeando que un interruptor dañado, y descartarlo no cuesta nada."
+        },
+        "replace-the-failed-switch-and-clean-the-detent": {
+          "title": "Cambiar solo el interruptor que señala el código",
+          "detail": "Aquí sí vale la diferencia del repuesto original: un interruptor que no sirve recién sacado de la caja significa hacer el trabajo dos veces. Aproveche para limpiar la bolita del detenedor y su alojamiento y poner arandela nueva."
+        }
+      }
+    }
+  }
+}

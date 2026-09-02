@@ -1,0 +1,90 @@
+{
+  "id": "all-suspension-tensor-de-barra-estabilizadora",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "suspension",
+  "aliases": [
+    {
+      "term": "sway bar links",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "end link",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "end links",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "drop link",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "drop links",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "stabilizer link",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "bieleta",
+      "locale": "es",
+      "countries": ["ES", "AR"]
+    },
+    {
+      "term": "bieletas",
+      "locale": "es",
+      "countries": ["ES", "AR"]
+    },
+    {
+      "term": "terminal de barra estabilizadora",
+      "locale": "es",
+      "countries": ["SV", "HN"]
+    },
+    {
+      "term": "terminales de barra estabilizadora",
+      "locale": "es",
+      "countries": ["SV", "HN"]
+    }
+  ],
+  "relatedTerms": [
+    "all-suspension-barra-estabilizadora",
+    "all-suspension-rotula"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Grupo Navcar (Costa Rica) — Tornillo Barra Estabilizadora, Chevrolet Trooper / Mitsubishi Montero (OEM MB-527385)",
+      "url": "https://www.gruponavcar.com/tornillo-barra-estabilizadora-chevrolet-trooper-mitsubishi-montero-mb527385/p",
+      "archiveUrl": "https://web.archive.org/web/20260902210517id_/https://www.gruponavcar.com/tornillo-barra-estabilizadora-chevrolet-trooper-mitsubishi-montero-mb527385/p",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 Front Sway Bar End Link (left 4056A106 / right 4056A105)",
+      "url": "https://lusooverland.com/VP-MMC-4056A10X",
+      "archiveUrl": "https://web.archive.org/web/20260902205328id_/https://lusooverland.com/VP-MMC-4056A10X",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "sway bar link",
+      "summary": "The short link, with a ball joint at each end, that connects the sway bar to the suspension at one corner. Left and right are usually different parts. A worn one knocks over small bumps and is one of the first noises a heavy truck develops."
+    },
+    "es": {
+      "title": "tensor de barra estabilizadora",
+      "summary": "El tensor corto, con una rótula en cada punta, que une la barra estabilizadora con la suspensión en una esquina del vehículo. El izquierdo y el derecho suelen ser piezas distintas. Cuando se gasta suena al pasar huecos pequeños, y es de los primeros ruidos que agarra un vehículo pesado. En las listas de repuestos ticas también aparece por el tornillo que lo sujeta, como tornillo de barra estabilizadora."
+    }
+  }
+}

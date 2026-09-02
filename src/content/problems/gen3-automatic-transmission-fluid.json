@@ -1,0 +1,178 @@
+{
+  "id": "gen3-automatic-transmission-fluid",
+  "fitment": {
+    "gens": ["gen3"],
+    "transmissions": ["automatic-4-speed", "automatic-5-speed"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "transmission",
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "shifts-that-thump-or-hesitate",
+    "shudder-under-load-or-on-a-climb",
+    "burnt-smelling-or-dark-fluid",
+    "no-record-of-a-transmission-service"
+  ],
+  "causes": [
+    { "id": "wrong-fluid-specification-used" },
+    { "id": "fluid-and-filter-long-overdue" },
+    { "id": "crossmember-bushings-collapsed" },
+    { "id": "internal-wear-already-done" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "ask-the-last-shop-which-fluid-they-put-in",
+      "rulesIn": ["wrong-fluid-specification-used"]
+    },
+    {
+      "id": "look-at-the-fluid-on-a-white-rag-and-smell-it",
+      "rulesIn": ["fluid-and-filter-long-overdue", "internal-wear-already-done"]
+    },
+    {
+      "id": "check-whether-the-thump-is-the-mounts-rather-than-the-shift",
+      "rulesIn": ["crossmember-bushings-collapsed"],
+      "rulesOut": ["fluid-and-filter-long-overdue"]
+    },
+    {
+      "id": "inspect-the-pan-and-the-filter-when-the-fluid-is-dropped",
+      "rulesIn": ["internal-wear-already-done"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "service-the-fluid-and-filter-to-specification",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "wrong-fluid-specification-used",
+        "fluid-and-filter-long-overdue"
+      ],
+      "parts": [
+        "gen3-automatic-transmission-fluid-spiii",
+        "gen3-transmission-pan-filter",
+        "gen3-transmission-pan-drain-crush-washer"
+      ],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-crossmember-bushings-at-the-same-time",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["crossmember-bushings-collapsed"],
+      "parts": ["gen3-transmission-crossmember-bushing"],
+      "procedures": []
+    },
+    {
+      "id": "have-the-transmission-assessed-by-a-specialist",
+      "difficulty": 5,
+      "cost": {
+        "from": "major"
+      },
+      "addresses": ["internal-wear-already-done"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 Automatic Transmission Service Kit (service interval, the SP-III fluid requirement, and kit contents)",
+      "url": "https://lusooverland.com/VP-LO-K-AT003",
+      "archiveUrl": "https://web.archive.org/web/20260902205404id_/https://lusooverland.com/VP-LO-K-AT003",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year (ODI 10268701, 10089597, 10026156)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Harsh or hesitant shifts, and the fluid nobody can name",
+      "summary": "The most avoidable transmission failure on this truck is a fluid decision. The specialist supplier who assembles the service kit says it in one sentence: they have seen several of these transmissions ruined by shops using the wrong fluid, which is why their kit ships with the manufacturer's own SP-III and a printed copy of the factory procedure. Owner complaints filed against this generation include grinding and shuddering on well-maintained trucks with quotes in the thousands, so the downside is real. Two things make this entry worth reading before you book anything: the first question is which fluid went in last, not what the symptom is; and a thump you feel through the floor may be collapsed crossmember bushings rather than the gearbox at all, which is a far cheaper answer and is checked from underneath in minutes.",
+      "slug": "harsh-shifts-and-transmission-fluid",
+      "symptoms": {
+        "shifts-that-thump-or-hesitate": "Shifts that thump, flare or hesitate where they used to be smooth",
+        "shudder-under-load-or-on-a-climb": "A shudder under load or on a long climb",
+        "burnt-smelling-or-dark-fluid": "Fluid that is dark on a rag or smells burnt",
+        "no-record-of-a-transmission-service": "No record of the transmission ever having been serviced"
+      },
+      "causes": {
+        "wrong-fluid-specification-used": "A fluid other than the specified one was put in at the last service",
+        "fluid-and-filter-long-overdue": "The fluid and filter are long past the service interval",
+        "crossmember-bushings-collapsed": "The transmission crossmember bushings have collapsed and you are feeling the mounts",
+        "internal-wear-already-done": "Internal wear has already happened and no service will reverse it"
+      },
+      "diagnosticSteps": {
+        "ask-the-last-shop-which-fluid-they-put-in": "Ask whoever serviced it last exactly which fluid they used, by name",
+        "look-at-the-fluid-on-a-white-rag-and-smell-it": "Put some fluid on a white rag, look at the colour and smell it",
+        "check-whether-the-thump-is-the-mounts-rather-than-the-shift": "From underneath, check the crossmember bushings for collapse before blaming the gearbox",
+        "inspect-the-pan-and-the-filter-when-the-fluid-is-dropped": "When the pan comes down, look at what is in it and at the state of the filter"
+      },
+      "fixPaths": {
+        "service-the-fluid-and-filter-to-specification": {
+          "title": "Service it with the specified fluid",
+          "detail": "Fluid, pan filter and gasket, and the drain bolt crush washer. Insist on the specification by name, and keep the receipt that says which fluid went in — the next owner will want it, and so will you."
+        },
+        "replace-the-crossmember-bushings-at-the-same-time": {
+          "title": "Replace the crossmember bushings while it is on the ramp",
+          "detail": "Cheap, they are in the kit for a reason, and they can be the entire complaint on a truck whose gearbox is fine."
+        },
+        "have-the-transmission-assessed-by-a-specialist": {
+          "title": "Have it assessed before you spend anything else",
+          "detail": "If the pan holds debris, a service is not a repair. A specialist's opinion on whether this gearbox is worth rebuilding is money better spent than another fluid change."
+        }
+      }
+    },
+    "es": {
+      "title": "Cambios bruscos o perezosos, y el aceite que nadie sabe nombrar",
+      "summary": "La falla de transmisión más evitable de este vehículo es una decisión de aceite. La casa especializada que arma el juego de servicio lo dice en una frase: han visto varias de estas transmisiones arruinadas por talleres que usaron el aceite equivocado, y por eso su juego incluye el SP-III del propio fabricante y una copia impresa del procedimiento de fábrica. Entre las quejas de dueños presentadas contra esta generación hay ruidos de molienda y vibraciones en vehículos bien mantenidos, con cotizaciones de miles, así que el riesgo es real. Dos cosas hacen que valga leer esta entrada antes de agendar nada: la primera pregunta es cuál aceite entró la última vez, no cuál es el síntoma; y un golpe que usted siente por el piso puede ser los bujes del travesaño vencidos y no la caja, que es una respuesta mucho más barata y se revisa desde abajo en minutos.",
+      "slug": "cambios-bruscos-y-aceite-de-transmision",
+      "symptoms": {
+        "shifts-that-thump-or-hesitate": "Cambios que golpean, se van de vueltas o titubean donde antes entraban suaves",
+        "shudder-under-load-or-on-a-climb": "Vibración con carga o en una subida larga",
+        "burnt-smelling-or-dark-fluid": "Aceite oscuro sobre un trapo o con olor a quemado",
+        "no-record-of-a-transmission-service": "Ningún registro de que a la transmisión le hayan hecho servicio alguna vez"
+      },
+      "causes": {
+        "wrong-fluid-specification-used": "En el último servicio le pusieron un aceite distinto al especificado",
+        "fluid-and-filter-long-overdue": "El aceite y el filtro están muy pasados del intervalo de servicio",
+        "crossmember-bushings-collapsed": "Los bujes del travesaño de la transmisión están vencidos y lo que usted siente son los soportes",
+        "internal-wear-already-done": "El desgaste interno ya ocurrió y ningún servicio lo devuelve"
+      },
+      "diagnosticSteps": {
+        "ask-the-last-shop-which-fluid-they-put-in": "Pregúntele a quien le hizo el último servicio exactamente cuál aceite usó, por nombre",
+        "look-at-the-fluid-on-a-white-rag-and-smell-it": "Ponga un poco de aceite en un trapo blanco, vea el color y huélalo",
+        "check-whether-the-thump-is-the-mounts-rather-than-the-shift": "Desde abajo, revise si los bujes del travesaño están vencidos antes de culpar a la caja",
+        "inspect-the-pan-and-the-filter-when-the-fluid-is-dropped": "Cuando baje el cárter de la transmisión, vea qué trae adentro y en qué estado está el filtro"
+      },
+      "fixPaths": {
+        "service-the-fluid-and-filter-to-specification": {
+          "title": "Hacer el servicio con el aceite especificado",
+          "detail": "Aceite, filtro y empaque del cárter, y la arandela del tapón de drenaje. Exija la especificación por nombre y guarde la factura que diga cuál aceite entró: la va a querer el próximo dueño, y usted también."
+        },
+        "replace-the-crossmember-bushings-at-the-same-time": {
+          "title": "Cambiar los bujes del travesaño mientras está en la rampa",
+          "detail": "Salen baratos, vienen en el juego por algo, y pueden ser toda la queja en un vehículo cuya caja está sana."
+        },
+        "have-the-transmission-assessed-by-a-specialist": {
+          "title": "Que la valore un especialista antes de gastar más",
+          "detail": "Si el cárter trae limalla, un servicio no es una reparación. La opinión de un especialista sobre si vale reconstruir esta caja es mejor plata que otro cambio de aceite."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "id": "gen3-rear-sags-under-load",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "suspension",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "the-rear-sits-visibly-low-when-loaded",
+    "it-bottoms-out-over-bumps-with-people-or-gear-aboard",
+    "headlights-point-at-the-trees-when-towing",
+    "the-back-wallows-on-a-rough-road"
+  ],
+  "causes": [
+    { "id": "rear-springs-tired-and-sagging" },
+    { "id": "springs-rated-below-what-the-truck-now-carries" },
+    { "id": "rear-shock-absorbers-worn-out" },
+    { "id": "spring-pads-crushed-or-missing" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "measure-the-ride-height-at-each-rear-arch-empty-and-loaded",
+      "rulesIn": [
+        "rear-springs-tired-and-sagging",
+        "springs-rated-below-what-the-truck-now-carries"
+      ]
+    },
+    {
+      "id": "add-up-the-permanent-weight-that-has-been-added-to-the-truck",
+      "rulesIn": ["springs-rated-below-what-the-truck-now-carries"],
+      "rulesOut": ["rear-springs-tired-and-sagging"]
+    },
+    {
+      "id": "bounce-each-rear-corner-and-count-how-it-settles",
+      "rulesIn": ["rear-shock-absorbers-worn-out"]
+    },
+    {
+      "id": "look-at-the-rubber-pads-at-each-end-of-the-rear-springs",
+      "rulesIn": ["spring-pads-crushed-or-missing"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "renew-the-spring-pads",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["spring-pads-crushed-or-missing"],
+      "parts": ["gen3-rear-coil-spring-pad"],
+      "procedures": []
+    },
+    {
+      "id": "fit-springs-rated-for-what-the-truck-actually-carries",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant"
+      },
+      "addresses": [
+        "rear-springs-tired-and-sagging",
+        "springs-rated-below-what-the-truck-now-carries"
+      ],
+      "parts": ["gen3-rear-coil-spring"],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-rear-shock-absorbers",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["rear-shock-absorbers-worn-out"],
+      "parts": ["gen3-rear-shock-absorber"],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 Lovells Coil Springs: height and load-carrying classifications, the trim-weight caveat, and the pairing recommendation with the listed dampers",
+      "url": "https://lusooverland.com/2001-2006-mitsubishi-montero-gen3-coil-springs",
+      "archiveUrl": "https://web.archive.org/web/20260902205728id_/https://lusooverland.com/2001-2006-mitsubishi-montero-gen3-coil-springs",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Luso Overland — MITSUBISHI / MONTERO Gen 3 (2001-2006) / Parts catalogue listing (rear coil spring pads, rear dampers)",
+      "url": "https://lusooverland.com/mitsubishi/montero-g3/parts/",
+      "archiveUrl": "https://web.archive.org/web/20260902210157id_/https://lusooverland.com/mitsubishi/montero-g3/parts/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "The rear sits low and bottoms out under load",
+      "summary": "A Montero that squats when it is loaded is usually not broken — it is carrying more than the springs in it were chosen for. The spring supplier for this generation classifies its rear springs by load-carrying capacity as well as by height, and warns that even a difference in factory trim changes which spring suits a given truck, which tells you how sensitive the rear end is to what you have added. Every permanent accessory counts: a steel bumper, a winch, skid plates, a second battery, a drawer system, a full water tank. This matters beyond comfort. A rear that has run out of travel changes how the truck steers and brakes, aims the headlights at the trees, and gives a trailer somewhere to push the back end around — which is why suspension, load rating and towing all sit on the same safety list. Buy the rate for the truck you actually have, not the one you bought.",
+      "slug": "rear-sits-low-and-bottoms-out",
+      "symptoms": {
+        "the-rear-sits-visibly-low-when-loaded": "The rear sits visibly lower than the front once the truck is loaded",
+        "it-bottoms-out-over-bumps-with-people-or-gear-aboard": "It bottoms out over bumps with people or gear aboard",
+        "headlights-point-at-the-trees-when-towing": "The headlights point high, and oncoming drivers flash you, when there is weight or a trailer behind",
+        "the-back-wallows-on-a-rough-road": "The back wallows and keeps moving after a bump on a rough road"
+      },
+      "causes": {
+        "rear-springs-tired-and-sagging": "The rear springs are tired and have lost their free height",
+        "springs-rated-below-what-the-truck-now-carries": "The springs are rated below what the truck now permanently carries",
+        "rear-shock-absorbers-worn-out": "The rear dampers are worn out and no longer control the spring",
+        "spring-pads-crushed-or-missing": "The rubber pads at the ends of the rear springs are crushed or missing"
+      },
+      "diagnosticSteps": {
+        "measure-the-ride-height-at-each-rear-arch-empty-and-loaded": "Measure from the ground to each rear arch, empty, then again loaded as you normally drive it",
+        "add-up-the-permanent-weight-that-has-been-added-to-the-truck": "List and add up every permanent accessory the truck now carries",
+        "bounce-each-rear-corner-and-count-how-it-settles": "Bounce each rear corner hard and watch whether it settles in one movement",
+        "look-at-the-rubber-pads-at-each-end-of-the-rear-springs": "Look at the rubber pads at the ends of both rear springs for crushing, splitting or absence"
+      },
+      "fixPaths": {
+        "renew-the-spring-pads": {
+          "title": "Renew the spring pads",
+          "detail": "The cheapest thing on the list, and the only one that is worth doing on its own before you decide anything else. Crushed pads make a good spring look tired."
+        },
+        "fit-springs-rated-for-what-the-truck-actually-carries": {
+          "title": "Fit springs rated for the truck as it is now",
+          "detail": "The supplier publishes both a height and a load classification, so tell them what the truck carries rather than which model it is. A spring chosen for a bare truck will sag again under a loaded one."
+        },
+        "replace-the-rear-shock-absorbers": {
+          "title": "Replace the rear dampers",
+          "detail": "A wallowing back end can be dampers with perfectly good springs. If you are changing spring rate anyway, choose dampers to match rather than reusing what is there."
+        }
+      }
+    },
+    "es": {
+      "title": "La parte trasera se sienta y toca fondo con carga",
+      "summary": "Una Montero que se sienta atrás cuando va cargada normalmente no está dañada: está cargando más de lo que los resortes que trae fueron elegidos para llevar. El proveedor de resortes para esta generación clasifica los traseros tanto por altura como por capacidad de carga, y advierte que hasta una diferencia de acabado de fábrica cambia cuál resorte le sirve a un vehículo determinado, lo que dice mucho de lo sensible que es la parte trasera a lo que usted le agregó. Todo accesorio permanente cuenta: bumper de acero, winch, protector de cárter, segunda batería, sistema de gavetas, un tanque de agua lleno. Esto importa más allá de la comodidad. Una parte trasera que se quedó sin recorrido cambia cómo dirige y cómo frena el vehículo, apunta los faroles a los árboles, y le da a un remolque dónde empujar la cola, que es por lo que suspensión, capacidad de carga y remolque están en la misma lista de seguridad. Compre la capacidad para el vehículo que tiene hoy, no para el que compró.",
+      "slug": "la-parte-trasera-se-sienta-con-carga",
+      "symptoms": {
+        "the-rear-sits-visibly-low-when-loaded": "La parte trasera queda visiblemente más baja que la delantera al cargar el vehículo",
+        "it-bottoms-out-over-bumps-with-people-or-gear-aboard": "Toca fondo en los huecos cuando lleva gente o equipo",
+        "headlights-point-at-the-trees-when-towing": "Los faroles apuntan alto y los que vienen de frente le hacen luces cuando lleva peso o remolque",
+        "the-back-wallows-on-a-rough-road": "La cola se mece y sigue moviéndose después de un hueco en camino irregular"
+      },
+      "causes": {
+        "rear-springs-tired-and-sagging": "Los resortes traseros están cansados y perdieron altura libre",
+        "springs-rated-below-what-the-truck-now-carries": "Los resortes tienen menos capacidad de la que el vehículo carga hoy de forma permanente",
+        "rear-shock-absorbers-worn-out": "Los amortiguadores traseros están acabados y ya no controlan el resorte",
+        "spring-pads-crushed-or-missing": "Los hules de asiento en los extremos de los resortes traseros están aplastados o faltan"
+      },
+      "diagnosticSteps": {
+        "measure-the-ride-height-at-each-rear-arch-empty-and-loaded": "Mida del suelo a cada guardabarros trasero, vacío, y otra vez cargado como usted normalmente anda",
+        "add-up-the-permanent-weight-that-has-been-added-to-the-truck": "Haga la lista y sume todo accesorio permanente que el vehículo carga hoy",
+        "bounce-each-rear-corner-and-count-how-it-settles": "Hunda con fuerza cada esquina trasera y observe si se acomoda en un solo movimiento",
+        "look-at-the-rubber-pads-at-each-end-of-the-rear-springs": "Revise los hules de asiento en los extremos de ambos resortes traseros por aplastamiento, roturas o ausencia"
+      },
+      "fixPaths": {
+        "renew-the-spring-pads": {
+          "title": "Renovar los hules de asiento",
+          "detail": "Es lo más barato de la lista y lo único que vale hacer por aparte antes de decidir otra cosa. Un hule aplastado hace ver cansado a un resorte sano."
+        },
+        "fit-springs-rated-for-what-the-truck-actually-carries": {
+          "title": "Montar resortes con la capacidad que el vehículo tiene hoy",
+          "detail": "El proveedor publica clasificación de altura y de carga, así que dígale qué carga el vehículo y no cuál modelo es. Un resorte escogido para un vehículo pelado se vuelve a sentar bajo uno cargado."
+        },
+        "replace-the-rear-shock-absorbers": {
+          "title": "Cambiar los amortiguadores traseros",
+          "detail": "Una cola que se mece pueden ser los amortiguadores con resortes perfectamente sanos. Si de todos modos va a cambiar la capacidad del resorte, escoja amortiguadores acordes en vez de reutilizar los que están."
+        }
+      }
+    }
+  }
+}

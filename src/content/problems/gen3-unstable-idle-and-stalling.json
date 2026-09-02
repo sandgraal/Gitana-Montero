@@ -1,0 +1,197 @@
+{
+  "id": "gen3-unstable-idle-and-stalling",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "engine",
+  "severity": "stranding",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "engine-shakes-at-idle-and-nearly-stalls",
+    "the-needle-drops-towards-zero-and-recovers",
+    "it-stalls-at-a-stop-and-restarts-fine",
+    "check-engine-light-with-a-misfire-code"
+  ],
+  "causes": [
+    { "id": "idle-air-control-dirty-or-failing" },
+    { "id": "vacuum-leak-at-the-intake" },
+    { "id": "worn-plugs-coils-or-leads" },
+    { "id": "fuel-delivery-restricted" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "read-the-stored-codes-before-changing-parts",
+      "rulesIn": ["worn-plugs-coils-or-leads", "fuel-delivery-restricted"]
+    },
+    {
+      "id": "note-whether-it-only-misbehaves-at-idle",
+      "rulesIn": [
+        "idle-air-control-dirty-or-failing",
+        "vacuum-leak-at-the-intake"
+      ],
+      "rulesOut": ["fuel-delivery-restricted"]
+    },
+    {
+      "id": "smoke-test-or-listen-for-a-vacuum-leak",
+      "rulesIn": ["vacuum-leak-at-the-intake"]
+    },
+    {
+      "id": "clean-the-idle-air-passage-and-throttle-body",
+      "rulesIn": ["idle-air-control-dirty-or-failing"]
+    },
+    {
+      "id": "check-the-age-of-the-plugs-coils-and-leads",
+      "rulesIn": ["worn-plugs-coils-or-leads"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "clean-the-throttle-body-and-idle-air-passage",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["idle-air-control-dirty-or-failing"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-ignition-service-items",
+      "difficulty": 2,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["worn-plugs-coils-or-leads"],
+      "parts": ["gen3-spark-plug"],
+      "procedures": []
+    },
+    {
+      "id": "find-and-close-the-vacuum-leak",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["vacuum-leak-at-the-intake"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "service-the-fuel-filter-and-check-delivery",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["fuel-delivery-restricted"],
+      "parts": ["gen3-fuel-filter"],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year (ODI 10041117, 10010812, 10003369, 10046283, 8008732: idle vibration, stalling, idle speed control replacement)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "Luso Overland — MITSUBISHI / MONTERO Gen 3 (2001-2006) / Parts catalogue listing",
+      "url": "https://lusooverland.com/mitsubishi/montero-g3/parts/",
+      "archiveUrl": "https://web.archive.org/web/20260902210157id_/https://lusooverland.com/mitsubishi/montero-g3/parts/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Shakes at idle and stalls at a stop",
+      "summary": "A recognisable cluster in the owner-complaint record for this generation: the engine vibrates at a standstill, the tachometer needle sinks towards zero as though the engine is about to die, and it either catches itself or stalls and restarts without drama. Several owners describe dealers replacing plugs and leads, then an idle speed control, before the fault settled. That history is the useful part — it says the symptom has more than one cause and that parts-swapping in the dark is expensive. The triage is drive-gently-repair-soon rather than drive-normally for one reason: an engine that stalls unpredictably will eventually do it pulling into traffic, and a stall takes the power steering assist and the brake booster pump with it. Get the codes read before anybody sells you an ignition service.",
+      "slug": "shakes-at-idle-and-stalls",
+      "symptoms": {
+        "engine-shakes-at-idle-and-nearly-stalls": "The engine shakes at idle and feels as if it is about to die",
+        "the-needle-drops-towards-zero-and-recovers": "The tachometer needle sinks towards zero and then recovers",
+        "it-stalls-at-a-stop-and-restarts-fine": "It stalls at a stop and then restarts normally",
+        "check-engine-light-with-a-misfire-code": "The check engine light comes on, often with a misfire code stored"
+      },
+      "causes": {
+        "idle-air-control-dirty-or-failing": "The idle air control passage is dirty or the control itself is failing",
+        "vacuum-leak-at-the-intake": "There is a vacuum leak at the intake or one of its hoses",
+        "worn-plugs-coils-or-leads": "Plugs, coils or leads are worn out",
+        "fuel-delivery-restricted": "Fuel delivery is restricted at the filter, the pump or the injectors"
+      },
+      "diagnosticSteps": {
+        "read-the-stored-codes-before-changing-parts": "Read the stored codes and write them down before anything is replaced",
+        "note-whether-it-only-misbehaves-at-idle": "Note whether it only misbehaves at idle or also under load at road speed",
+        "smoke-test-or-listen-for-a-vacuum-leak": "Smoke test the intake, or listen around it with the engine idling",
+        "clean-the-idle-air-passage-and-throttle-body": "Clean the throttle body and the idle air passage and see whether the idle settles",
+        "check-the-age-of-the-plugs-coils-and-leads": "Establish how old the plugs, coils and leads are, by receipt rather than by looking"
+      },
+      "fixPaths": {
+        "clean-the-throttle-body-and-idle-air-passage": {
+          "title": "Clean before you replace",
+          "detail": "The cheapest test that is also a repair. If the idle settles and stays settled for a week, you have your answer without buying a control unit."
+        },
+        "renew-the-ignition-service-items": {
+          "title": "Renew the ignition service items",
+          "detail": "Worth doing on age alone if nobody can produce a receipt, but do it because the codes point there, not as a first guess."
+        },
+        "find-and-close-the-vacuum-leak": {
+          "title": "Find and close the vacuum leak",
+          "detail": "On the larger V6 this can lead back to the variable intake assembly, which has its own entry. Follow the leak rather than assuming."
+        },
+        "service-the-fuel-filter-and-check-delivery": {
+          "title": "Service the fuel side and measure delivery",
+          "detail": "Last on the list because it is the most invasive, but a starved engine and a mis-fuelled one feel similar from the driver's seat."
+        }
+      }
+    },
+    "es": {
+      "title": "Tiembla en marcha mínima y se apaga en los altos",
+      "summary": "Es un grupo reconocible dentro del registro de quejas de dueños de esta generación: el motor vibra con el vehículo detenido, la aguja del tacómetro se cae hacia cero como si se fuera a apagar, y o se recupera sola o se apaga y vuelve a arrancar sin drama. Varios dueños describen concesionarios que cambiaron bujías y cables, luego un control de marcha mínima, y hasta entonces se calmó la falla. Esa historia es la parte útil: dice que el síntoma tiene más de una causa y que cambiar repuestos a ciegas sale caro. La clasificación es manejar suave y reparar pronto, y no manejar normal, por una razón: un motor que se apaga sin avisar tarde o temprano lo va a hacer al incorporarse al tráfico, y al apagarse se lleva consigo la asistencia de la dirección hidráulica y la bomba del booster de freno. Haga leer los códigos antes de que alguien le venda un servicio de encendido.",
+      "slug": "tiembla-en-marcha-minima-y-se-apaga",
+      "symptoms": {
+        "engine-shakes-at-idle-and-nearly-stalls": "El motor tiembla en marcha mínima y se siente como si se fuera a apagar",
+        "the-needle-drops-towards-zero-and-recovers": "La aguja del tacómetro se cae hacia cero y luego se recupera",
+        "it-stalls-at-a-stop-and-restarts-fine": "Se apaga en un alto y después arranca normal",
+        "check-engine-light-with-a-misfire-code": "Se enciende la luz de check y muchas veces queda guardado un código de falla de encendido"
+      },
+      "causes": {
+        "idle-air-control-dirty-or-failing": "El conducto de aire de marcha mínima está sucio o el control mismo está fallando",
+        "vacuum-leak-at-the-intake": "Hay una entrada de aire falsa en la admisión o en una de sus mangueras",
+        "worn-plugs-coils-or-leads": "Las bujías, las bobinas o los cables están gastados",
+        "fuel-delivery-restricted": "La entrega de combustible está restringida en el filtro, la bomba o los inyectores"
+      },
+      "diagnosticSteps": {
+        "read-the-stored-codes-before-changing-parts": "Haga leer los códigos guardados y anótelos antes de cambiar cualquier cosa",
+        "note-whether-it-only-misbehaves-at-idle": "Fíjese si solo se porta mal en marcha mínima o también con carga a velocidad de carretera",
+        "smoke-test-or-listen-for-a-vacuum-leak": "Haga prueba de humo a la admisión, o escuche alrededor con el motor en marcha mínima",
+        "clean-the-idle-air-passage-and-throttle-body": "Limpie el cuerpo de aceleración y el conducto de aire de marcha mínima y vea si la marcha se estabiliza",
+        "check-the-age-of-the-plugs-coils-and-leads": "Averigüe qué edad tienen las bujías, las bobinas y los cables, por factura y no a ojo"
+      },
+      "fixPaths": {
+        "clean-the-throttle-body-and-idle-air-passage": {
+          "title": "Limpiar antes de cambiar",
+          "detail": "Es la prueba más barata que además es reparación. Si la marcha mínima se estabiliza y aguanta una semana así, ya tiene la respuesta sin comprar una unidad de control."
+        },
+        "renew-the-ignition-service-items": {
+          "title": "Renovar los consumibles del encendido",
+          "detail": "Vale hacerlo solo por edad si nadie puede mostrar una factura, pero hágalo porque los códigos apuntan ahí y no como primera adivinanza."
+        },
+        "find-and-close-the-vacuum-leak": {
+          "title": "Encontrar y cerrar la entrada de aire falsa",
+          "detail": "En el V6 más grande esto puede llevar de vuelta al conjunto de admisión variable, que tiene su propia entrada. Siga la fuga en vez de suponerla."
+        },
+        "service-the-fuel-filter-and-check-delivery": {
+          "title": "Atender el lado de combustible y medir la entrega",
+          "detail": "Va de último porque es lo más invasivo, pero un motor con hambre de combustible y uno mal encendido se sienten parecido desde el asiento del chofer."
+        }
+      }
+    }
+  }
+}

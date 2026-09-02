@@ -1,0 +1,187 @@
+{
+  "id": "gen3-brake-booster-accumulator",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "brakes",
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "honk-or-chirp-when-braking",
+    "brake-and-abs-lights-with-buzzer",
+    "pedal-goes-long-or-to-the-floor",
+    "weak-first-stop-after-parking"
+  ],
+  "causes": [
+    { "id": "accumulator-lost-its-charge" },
+    { "id": "hydraulic-unit-internal-leak" },
+    { "id": "pump-motor-worn-out" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "listen-for-the-pump-with-ignition-on",
+      "rulesIn": ["accumulator-lost-its-charge"],
+      "rulesOut": ["pump-motor-worn-out"]
+    },
+    {
+      "id": "listen-at-the-left-of-the-dash-while-braking",
+      "rulesIn": ["accumulator-lost-its-charge"]
+    },
+    {
+      "id": "check-fluid-level-and-look-for-wet-fittings",
+      "rulesIn": ["hydraulic-unit-internal-leak"]
+    },
+    {
+      "id": "read-the-abs-codes-with-a-scan-tool",
+      "rulesIn": ["hydraulic-unit-internal-leak", "pump-motor-worn-out"],
+      "rulesOut": ["accumulator-lost-its-charge"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "check-the-vin-against-the-recall",
+      "difficulty": 1,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["accumulator-lost-its-charge"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-accumulator",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": ["accumulator-lost-its-charge"],
+      "parts": ["gen3-brake-booster-accumulator"],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-hydraulic-booster-unit",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
+      "addresses": [
+        "accumulator-lost-its-charge",
+        "hydraulic-unit-internal-leak",
+        "pump-motor-worn-out"
+      ],
+      "parts": ["gen3-hydraulic-brake-booster"],
+      "procedures": []
+    }
+  ],
+  "confidence": "tsb",
+  "sources": [
+    {
+      "title": "NHTSA recalls database — Mitsubishi Montero, 2002 model year: campaign 01V254001, hydraulic brake booster accumulator (Mitsubishi safety recall SR-01-008)",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902173755id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "tsb"
+    },
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year (ODI 10981628, 10918621, 10908227, 10855279, 11022029, 10968765)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 NP Brake Booster Accumulator (4630A012)",
+      "url": "https://lusooverland.com/VP-MMC-4630A012",
+      "archiveUrl": "https://web.archive.org/web/20260902205047id_/https://lusooverland.com/VP-MMC-4630A012",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Opinautos — «Ruido como un pato en la bomba del sistema de frenos», Mitsubishi Montero 2005 Limited",
+      "url": "https://www.opinautos.com/mitsubishi/montero/defectos/274707/ruido-como-un-pato-en-la-bomba-del-sistema-de-frenos",
+      "archiveUrl": "https://web.archive.org/web/20260902205221id_/https://www.opinautos.com/mitsubishi/montero/defectos/274707/ruido-como-un-pato-en-la-bomba-del-sistema-de-frenos",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Brake accumulator has lost its charge",
+      "summary": "The third generation does not use a vacuum servo. It uses a hydraulic booster fed by an electric pump and a gas-charged accumulator, and that accumulator is the single most reported fault on this truck. Mitsubishi recalled it: the factory campaign says the accumulator may have been improperly manufactured, that it can leak its pressurised nitrogen over time, and that the result is an abnormal noise from the left of the dash panel plus a delayed first application of boost after the truck has been parked. Owners describe the noise the same way in every language — a chirp, a turkey gobble, the honk of a goose — and the specialist supplier who sells the replacement part names the same sound as the telltale. The recall covered specific vehicles in the United States market, and many owners whose trucks match the symptom exactly find their VIN is not on the list; the fault is not confined to the campaign. Treat a stored charge you can no longer count on as a brake you can no longer count on.",
+      "slug": "brake-accumulator-lost-its-charge",
+      "symptoms": {
+        "honk-or-chirp-when-braking": "A chirp, honk or gobbling noise from the left of the dash each time you use the brake",
+        "brake-and-abs-lights-with-buzzer": "Brake and ABS warning lights together, often with a buzzer",
+        "pedal-goes-long-or-to-the-floor": "The pedal travels much further than it used to, sometimes to the floor",
+        "weak-first-stop-after-parking": "The first stop after the truck has sat is unassisted, then normal assistance returns"
+      },
+      "causes": {
+        "accumulator-lost-its-charge": "The accumulator has leaked its nitrogen charge and no longer stores pressure",
+        "hydraulic-unit-internal-leak": "The hydraulic booster unit is leaking internally and cannot hold pressure",
+        "pump-motor-worn-out": "The electric pump motor is worn and no longer refills the accumulator"
+      },
+      "diagnosticSteps": {
+        "listen-for-the-pump-with-ignition-on": "Turn the ignition on without starting, and listen for the pump motor running under the hood",
+        "listen-at-the-left-of-the-dash-while-braking": "With the engine running, press and release the pedal several times and listen at the left of the dash panel",
+        "check-fluid-level-and-look-for-wet-fittings": "Check the brake fluid level, then inspect the booster unit and its fittings for damp spots",
+        "read-the-abs-codes-with-a-scan-tool": "Have the braking system read with a scan tool and note which codes are stored"
+      },
+      "fixPaths": {
+        "check-the-vin-against-the-recall": {
+          "title": "Check the VIN against the factory campaign first",
+          "detail": "If the truck is inside the recall population the remedy is the manufacturer's to pay for. It costs nothing to ask, and the answer decides which of the paths below you are on."
+        },
+        "replace-the-accumulator": {
+          "title": "Replace the accumulator alone",
+          "detail": "The accumulator is sold separately from the booster it bolts to, and the trucks fitted with traction control use a different one from those without. The system has to be bled afterwards."
+        },
+        "replace-the-hydraulic-booster-unit": {
+          "title": "Replace the hydraulic booster unit",
+          "detail": "The honest answer when the pump motor or the unit itself is at fault rather than the accumulator, and the expensive one. Have a shop confirm which before you buy anything."
+        }
+      }
+    },
+    "es": {
+      "title": "Esfera de presión del booster de freno descargada",
+      "summary": "La tercera generación no lleva servo de vacío. Lleva un booster de freno hidráulico alimentado por una bomba eléctrica y una esfera cargada con gas que almacena la presión, y esa esfera es la falla más reportada de este vehículo. Mitsubishi lo llamó a revisión: la campaña de fábrica dice que la pieza pudo haberse fabricado mal, que con el tiempo puede fugar el nitrógeno a presión que lleva adentro, y que el resultado es un ruido anormal del lado izquierdo del tablero más un retardo en la primera asistencia de frenado después de que el carro estuvo parqueado. Los dueños describen el ruido igual en todos los idiomas —un chillido, un graznido de ganso, un pato— y la casa especializada que vende el repuesto señala ese mismo sonido como la seña. La campaña cubrió vehículos determinados del mercado estadounidense, y a muchos dueños con el síntoma exacto les dicen que su número de chasis no está en la lista; la falla no se limita a la campaña. Una presión almacenada con la que ya no puede contar es un freno con el que ya no puede contar.",
+      "slug": "esfera-de-presion-del-booster-descargada",
+      "symptoms": {
+        "honk-or-chirp-when-braking": "Un chillido, graznido o ruido de pato al lado izquierdo del tablero cada vez que usted frena",
+        "brake-and-abs-lights-with-buzzer": "Se encienden juntas la luz de freno y la del ABS, muchas veces con una alarma sonora",
+        "pedal-goes-long-or-to-the-floor": "El pedal recorre mucho más que antes, a veces hasta el fondo",
+        "weak-first-stop-after-parking": "El primer frenazo después de que el carro estuvo parqueado sale sin asistencia y luego vuelve a la normalidad"
+      },
+      "causes": {
+        "accumulator-lost-its-charge": "La esfera de presión fugó su carga de nitrógeno y ya no almacena presión",
+        "hydraulic-unit-internal-leak": "El conjunto del booster de freno hidráulico tiene fuga interna y no sostiene la presión",
+        "pump-motor-worn-out": "El motor de la bomba eléctrica está gastado y ya no recarga la esfera de presión"
+      },
+      "diagnosticSteps": {
+        "listen-for-the-pump-with-ignition-on": "Ponga el suiche en contacto sin arrancar y escuche si la bomba eléctrica corre debajo del capó",
+        "listen-at-the-left-of-the-dash-while-braking": "Con el motor encendido, pise y suelte el pedal varias veces y escuche al lado izquierdo del tablero",
+        "check-fluid-level-and-look-for-wet-fittings": "Revise el nivel del líquido de frenos y busque humedad en el conjunto del booster y en sus conexiones",
+        "read-the-abs-codes-with-a-scan-tool": "Haga leer el sistema de frenos con un escáner y anote cuáles códigos quedaron guardados"
+      },
+      "fixPaths": {
+        "check-the-vin-against-the-recall": {
+          "title": "Primero consulte el número de chasis contra la campaña de fábrica",
+          "detail": "Si el vehículo entra en la campaña, la reparación le corresponde al fabricante. Preguntar no cuesta nada, y la respuesta decide en cuál de los caminos de abajo está usted."
+        },
+        "replace-the-accumulator": {
+          "title": "Cambiar solo la esfera de presión",
+          "detail": "La esfera se vende aparte del booster de freno al que va atornillada, y los vehículos con control de tracción llevan una distinta a la de los que no lo traen. Después hay que purgar el sistema."
+        },
+        "replace-the-hydraulic-booster-unit": {
+          "title": "Cambiar el conjunto del booster de freno hidráulico",
+          "detail": "Es la respuesta honesta cuando lo dañado es el motor de la bomba o el conjunto mismo, y no la esfera; también es la cara. Confirme en un taller cuál de las dos es antes de comprar nada."
+        }
+      }
+    }
+  }
+}
