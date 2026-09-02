@@ -1,0 +1,184 @@
+{
+  "id": "g4-fuel-injector-and-pump-wear",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["cr", "uk", "au", "jdm", "eu", "me", "global"],
+    "engines": ["4m41"],
+    "years": {
+      "from": 2006,
+      "to": 2021
+    }
+  },
+  "system": "fuel",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "harder-to-start-when-cold",
+    "misfire-or-shake-at-idle",
+    "fuel-consumption-creeping-up",
+    "smoke-under-load"
+  ],
+  "causes": [
+    { "id": "worn-injectors" },
+    { "id": "worn-high-pressure-pump" },
+    { "id": "contaminated-fuel-or-a-tired-filter" },
+    { "id": "glow-plug-or-preheat-fault" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "note-whether-it-is-only-hard-cold",
+      "rulesIn": ["glow-plug-or-preheat-fault"],
+      "rulesOut": []
+    },
+    {
+      "id": "change-the-fuel-filter-and-drain-the-water-trap",
+      "rulesIn": ["contaminated-fuel-or-a-tired-filter"],
+      "rulesOut": []
+    },
+    {
+      "id": "run-an-injector-leak-off-test",
+      "rulesIn": ["worn-injectors"],
+      "rulesOut": ["glow-plug-or-preheat-fault"]
+    },
+    {
+      "id": "have-rail-pressure-logged-while-driving",
+      "rulesIn": ["worn-high-pressure-pump"],
+      "rulesOut": ["contaminated-fuel-or-a-tired-filter"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "fuel-filter-and-clean-fuel",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["contaminated-fuel-or-a-tired-filter"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-glow-plugs",
+      "difficulty": 3,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["glow-plug-or-preheat-fault"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "rebuild-or-replace-the-injectors",
+      "difficulty": 4,
+      "cost": { "from": "significant" },
+      "addresses": ["worn-injectors"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "overhaul-the-high-pressure-pump",
+      "difficulty": 5,
+      "cost": { "from": "significant", "to": "major" },
+      "addresses": ["worn-high-pressure-pump"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero 4x4 Life — \"Pajero 3.2 DI-D common problems\": lists injector and high-pressure pump wear as affecting both the third and fourth generations, with symptoms at high mileage of \"harder cold starting, slight misfires at idle, increased fuel consumption, and in later stages, smoke under load\", attributed to normal wear on precision components, and notes that injector rebuilding is a known diesel-specialist service",
+      "url": "https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "archiveUrl": "https://web.archive.org/web/20260902175907id_/https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"Mk 4\" thread: members confirm that the fourth generation uses a fundamentally different fuel system from the earlier trucks, \"mk4 is high pressure pump with fuel rail and electronic injectors\"",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=171496",
+      "archiveUrl": "https://web.archive.org/web/20260902175526id_/https://www.pocuk.com/forums/viewtopic.php?t=171496",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Injector and high-pressure pump wear at high mileage",
+      "slug": "injector-and-pump-wear",
+      "summary": "The fourth-generation diesel uses a high-pressure pump feeding a common rail and electronic injectors, which is a different system from the earlier trucks and wears differently. The cited source describes what high-mileage wear looks like: harder cold starting, a slight misfire at idle, fuel consumption creeping up, and eventually smoke under load. It calls this normal wear on precision components rather than a defect, and this entry follows it at the site's weakest confidence tier because it is a single source. The practical point is the order of elimination. Injectors and pumps are the expensive answer and the fashionable diagnosis, and three cheaper things produce the same symptoms — a tired fuel filter, water or dirt in the fuel, and failing glow plugs. Work through those first. Fuel systems are safety-critical: high-pressure diesel injection is not a system to open casually, so have the testing and any repair done by a qualified diesel specialist.",
+      "symptoms": {
+        "harder-to-start-when-cold": "The engine takes noticeably longer to start when cold",
+        "misfire-or-shake-at-idle": "A slight misfire or shake at idle that was not there before",
+        "fuel-consumption-creeping-up": "Fuel consumption creeping up over months with no change in how the truck is used",
+        "smoke-under-load": "Smoke from the exhaust under load"
+      },
+      "causes": {
+        "worn-injectors": "One or more injectors are worn and no longer metering or spraying accurately",
+        "worn-high-pressure-pump": "The high-pressure pump is worn and cannot hold rail pressure under demand",
+        "contaminated-fuel-or-a-tired-filter": "Water or dirt in the fuel, or a filter long past its interval",
+        "glow-plug-or-preheat-fault": "A glow plug or the preheat circuit has failed, which shows up as cold starting alone"
+      },
+      "diagnosticSteps": {
+        "note-whether-it-is-only-hard-cold": "Note carefully whether the truck is only hard to start cold, or also misfires and smokes once warm",
+        "change-the-fuel-filter-and-drain-the-water-trap": "Change the fuel filter, drain the water trap, and look at what comes out before assuming anything expensive",
+        "run-an-injector-leak-off-test": "Have an injector leak-off test done and compare the return from each injector against the others",
+        "have-rail-pressure-logged-while-driving": "Have rail pressure logged with diagnostic equipment while driving under load, to see whether the pump holds the pressure the engine is asking for"
+      },
+      "fixPaths": {
+        "fuel-filter-and-clean-fuel": {
+          "title": "Fuel filter, water drain and clean fuel",
+          "detail": "The cheapest and most often skipped step. Do it first every time, and keep the old filter to look at."
+        },
+        "replace-the-glow-plugs": {
+          "title": "Replace the glow plugs",
+          "detail": "If the fault is cold starting alone, this is usually where it lives. Removing seized glow plugs from a high-mileage diesel head is its own job — do not rush it."
+        },
+        "rebuild-or-replace-the-injectors": {
+          "title": "Rebuild or replace the injectors",
+          "detail": "Injector rebuilding is a routine service at diesel specialists, and usually cheaper than new. Whichever you choose, the injectors must be coded to the engine afterwards."
+        },
+        "overhaul-the-high-pressure-pump": {
+          "title": "Overhaul or replace the high-pressure pump",
+          "detail": "The biggest bill on the page, and the last thing to conclude. If a pump has failed by shedding metal, the rail, lines and injectors need attention too or the new pump follows the old one."
+        }
+      }
+    },
+    "es": {
+      "title": "Desgaste de inyectores y de la bomba de alta presión con mucho kilometraje",
+      "slug": "desgaste-de-inyectores-y-bomba",
+      "summary": "El diésel de cuarta generación usa una bomba de alta presión que alimenta un riel común e inyectores electrónicos, un sistema distinto del de los carros anteriores y que se desgasta distinto. La fuente citada describe cómo se ve ese desgaste con mucho kilometraje: cuesta más arrancar en frío, aparece una falla leve en marcha mínima, el consumo de combustible sube poco a poco y al final aparece humo bajo carga. Lo llama desgaste normal de piezas de precisión y no un defecto, y esta entrada lo sigue con el nivel de confianza más bajo del sitio porque es una sola fuente. Lo práctico es el orden de descarte. Los inyectores y la bomba son la respuesta cara y el diagnóstico de moda, y hay tres cosas más baratas que dan los mismos síntomas: un filtro de combustible cansado, agua o suciedad en el combustible, y bujías de precalentamiento fallando. Empiece por ahí. Los sistemas de combustible son críticos para la seguridad: la inyección diésel de alta presión no es un sistema para abrir a la ligera, así que deje las pruebas y cualquier reparación en manos de un especialista en diésel calificado.",
+      "symptoms": {
+        "harder-to-start-when-cold": "Al motor le cuesta notoriamente más arrancar en frío",
+        "misfire-or-shake-at-idle": "Una falla o un temblor leve en marcha mínima que antes no estaba",
+        "fuel-consumption-creeping-up": "El consumo de combustible sube mes a mes sin que haya cambiado el uso del carro",
+        "smoke-under-load": "Humo por el escape cuando el motor va cargado"
+      },
+      "causes": {
+        "worn-injectors": "Uno o varios inyectores están desgastados y ya no dosifican ni pulverizan bien",
+        "worn-high-pressure-pump": "La bomba de alta presión está desgastada y no logra sostener la presión del riel cuando se le pide",
+        "contaminated-fuel-or-a-tired-filter": "Agua o suciedad en el combustible, o un filtro de combustible vencido hace rato",
+        "glow-plug-or-preheat-fault": "Falló una bujía de precalentamiento o el circuito de precalentamiento, lo cual aparece solo como arranque en frío difícil"
+      },
+      "diagnosticSteps": {
+        "note-whether-it-is-only-hard-cold": "Fíjese bien si al carro solo le cuesta arrancar en frío, o si además falla y humea ya caliente",
+        "change-the-fuel-filter-and-drain-the-water-trap": "Cambie el filtro de combustible, drene la trampa de agua y observe qué sale antes de dar por hecho algo caro",
+        "run-an-injector-leak-off-test": "Mande a hacer una prueba de retorno de inyectores y compare el retorno de cada uno contra los demás",
+        "have-rail-pressure-logged-while-driving": "Haga registrar la presión del riel con equipo de diagnóstico manejando bajo carga, para ver si la bomba sostiene la presión que el motor le pide"
+      },
+      "fixPaths": {
+        "fuel-filter-and-clean-fuel": {
+          "title": "Filtro de combustible, drenaje de agua y combustible limpio",
+          "detail": "El paso más barato y el que más se salta la gente. Hágalo siempre de primero, y guarde el filtro viejo para verlo."
+        },
+        "replace-the-glow-plugs": {
+          "title": "Cambiar las bujías de precalentamiento",
+          "detail": "Si la falla es solo el arranque en frío, por lo general ahí vive. Sacar bujías de precalentamiento agarrotadas de un cabezote diésel con muchos kilómetros es un trabajo aparte: no lo apure."
+        },
+        "rebuild-or-replace-the-injectors": {
+          "title": "Reparar o cambiar los inyectores",
+          "detail": "La reparación de inyectores es un servicio de rutina en los especialistas en diésel y por lo general sale más barata que los nuevos. Elija lo que elija, después hay que codificar los inyectores al motor."
+        },
+        "overhaul-the-high-pressure-pump": {
+          "title": "Reparar o cambiar la bomba de alta presión",
+          "detail": "La cuenta más grande de la página, y lo último que se debe concluir. Si una bomba falló soltando limaduras, el riel, las líneas y los inyectores también necesitan atención, o la bomba nueva se va detrás de la vieja."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "id": "g1-fuel-runs-lean-fails-emissions",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us"],
+    "years": {
+      "from": 1983,
+      "to": 1991
+    }
+  },
+  "system": "fuel",
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "fails-an-emissions-test",
+    "hesitates-or-stumbles-off-idle",
+    "idle-hunts-or-is-too-high",
+    "pinging-under-load"
+  ],
+  "causes": [
+    { "id": "vacuum-leak" },
+    { "id": "clogged-exhaust-gas-recirculation" },
+    { "id": "perished-rubber-and-hoses-everywhere" },
+    { "id": "worn-fuel-metering" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "read-the-emissions-print-out",
+      "rulesIn": ["vacuum-leak", "clogged-exhaust-gas-recirculation"],
+      "rulesOut": []
+    },
+    {
+      "id": "hunt-for-vacuum-leaks-at-idle",
+      "rulesIn": ["vacuum-leak", "perished-rubber-and-hoses-everywhere"],
+      "rulesOut": []
+    },
+    {
+      "id": "remove-and-inspect-the-recirculation-valve",
+      "rulesIn": ["clogged-exhaust-gas-recirculation"],
+      "rulesOut": []
+    },
+    {
+      "id": "check-fuelling-after-the-leaks-are-fixed",
+      "rulesIn": ["worn-fuel-metering"],
+      "rulesOut": ["vacuum-leak"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "renew-every-vacuum-hose",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["vacuum-leak", "perished-rubber-and-hoses-everywhere"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "clean-or-replace-the-recirculation-valve",
+      "difficulty": 3,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["clogged-exhaust-gas-recirculation"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "overhaul-the-fuel-metering",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["worn-fuel-metering"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Expedition Portal forum — \"First Gen Montero Advice\" thread: the truck under discussion ran lean and failed an emissions test on high NOx and HC, with members pointing at exhaust gas recirculation clogging and vacuum leaks as contributors",
+      "url": "https://forum.expeditionportal.com/threads/first-gen-montero-advice.152161/",
+      "archiveUrl": "https://web.archive.org/web/20260902175302id_/https://forum.expeditionportal.com/threads/first-gen-montero-advice.152161/",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Runs lean and fails an emissions test",
+      "slug": "runs-lean-and-fails-emissions",
+      "summary": "One truck in the cited thread ran lean and failed its emissions test on both oxides of nitrogen and unburnt hydrocarbons, and members pointed at a clogged exhaust gas recirculation path and at vacuum leaks. This is a single thread and it is tiered accordingly, but the shape of the advice is worth having because it says something specific about where to start: on a forty-year-old truck the rubber is the suspect before the metering is. Emissions rules are not universal — what a truck must pass, and whether it must be tested at all, depends entirely on the jurisdiction, and a US state test, a Costa Rican inspection and a British test measure different things to different limits. Treat the numbers on your own test slip as the evidence and this page as a method. Nothing here changes how the truck should be driven; it changes what it costs you to run and whether it passes wherever you live.",
+      "symptoms": {
+        "fails-an-emissions-test": "The truck fails its emissions test, typically on unburnt hydrocarbons or oxides of nitrogen",
+        "hesitates-or-stumbles-off-idle": "It hesitates, stumbles or flat-spots as you pull away",
+        "idle-hunts-or-is-too-high": "The idle wanders up and down, or sits higher than it should",
+        "pinging-under-load": "A light metallic pinging under load on a hill"
+      },
+      "causes": {
+        "vacuum-leak": "A vacuum leak is letting unmetered air into the engine",
+        "clogged-exhaust-gas-recirculation": "The exhaust gas recirculation path is clogged with carbon and no longer doing its job",
+        "perished-rubber-and-hoses-everywhere": "Decades-old rubber hoses have gone hard and are leaking at several points at once",
+        "worn-fuel-metering": "The fuel metering itself is worn or out of adjustment"
+      },
+      "diagnosticSteps": {
+        "read-the-emissions-print-out": "Read the actual numbers on the test slip and note which pollutants failed and by how much, rather than working from the pass or fail alone",
+        "hunt-for-vacuum-leaks-at-idle": "With the engine idling, work systematically along every vacuum hose and joint listening and watching for a change in idle speed",
+        "remove-and-inspect-the-recirculation-valve": "Take the EGR valve off and look at the valve and its passage for carbon packed hard enough to block it",
+        "check-fuelling-after-the-leaks-are-fixed": "Only after every leak is cured, check the fuelling and adjustment — a leak makes every fuelling measurement lie"
+      },
+      "fixPaths": {
+        "renew-every-vacuum-hose": {
+          "title": "Renew all the vacuum hoses as a set",
+          "detail": "On a truck this age, chasing one leak at a time is slower and dearer than replacing the lot. Hose is cheap; the diagnosis time is not."
+        },
+        "clean-or-replace-the-recirculation-valve": {
+          "title": "Clean or replace the EGR valve and its passage",
+          "detail": "Clean the valve and the passage behind it. A blocked passage with a perfectly good valve bolted to it is a common and frustrating way to spend money on the wrong part."
+        },
+        "overhaul-the-fuel-metering": {
+          "title": "Overhaul or re-adjust the fuel metering",
+          "detail": "Last, not first. Every measurement you take before the leaks are fixed will send you here for the wrong reason."
+        }
+      }
+    },
+    "es": {
+      "title": "Trabaja pobre y no pasa la prueba de emisiones",
+      "slug": "trabaja-pobre-y-no-pasa-emisiones",
+      "summary": "Un carro del hilo que se cita trabajaba pobre y no pasó su prueba de emisiones ni en óxidos de nitrógeno ni en hidrocarburos sin quemar, y los miembros apuntaron a la recirculación de gases de escape tapada y a fugas de vacío. Es un solo hilo y el nivel de confianza va acorde, pero vale la pena tener la forma del consejo porque dice algo concreto sobre por dónde empezar: en un carro de cuarenta años el sospechoso es el hule, no la dosificación de combustible. Las reglas de emisiones no son universales: qué tiene que pasar un carro, y si siquiera tiene que medirse, depende por completo de la jurisdicción, y una prueba estatal de Estados Unidos, una revisión técnica vehicular costarricense y una prueba británica miden cosas distintas contra límites distintos. Tome los números de su propio comprobante como la evidencia y esta página como el método. Nada de esto cambia cómo hay que manejar el carro; cambia lo que le cuesta mantenerlo y si pasa donde usted vive.",
+      "symptoms": {
+        "fails-an-emissions-test": "El carro no pasa la prueba de emisiones, por lo general en hidrocarburos sin quemar o en óxidos de nitrógeno",
+        "hesitates-or-stumbles-off-idle": "Titubea, tropieza o se queda sin fuerza al arrancar",
+        "idle-hunts-or-is-too-high": "La marcha mínima sube y baja sola, o se queda más alta de lo que debería",
+        "pinging-under-load": "Un cascabeleo metálico suave bajo carga en las cuestas"
+      },
+      "causes": {
+        "vacuum-leak": "Una fuga de vacío está dejando entrar aire sin medir al motor",
+        "clogged-exhaust-gas-recirculation": "El paso de recirculación de gases de escape está tapado de carbón y ya no hace su trabajo",
+        "perished-rubber-and-hoses-everywhere": "Las mangueras de hule, de décadas de edad, se endurecieron y están fugando en varios puntos a la vez",
+        "worn-fuel-metering": "La dosificación de combustible en sí está desgastada o fuera de ajuste"
+      },
+      "diagnosticSteps": {
+        "read-the-emissions-print-out": "Lea los números reales del comprobante y anote en qué contaminantes reprobó y por cuánto, en vez de guiarse solo por el aprobado o reprobado",
+        "hunt-for-vacuum-leaks-at-idle": "Con el motor en marcha mínima, recorra de forma ordenada cada manguera y cada unión de vacío oyendo y viendo si cambia la velocidad de marcha mínima",
+        "remove-and-inspect-the-recirculation-valve": "Desmonte la válvula EGR y revise la válvula y su conducto buscando carbón compactado hasta taparlo",
+        "check-fuelling-after-the-leaks-are-fixed": "Solo después de curar todas las fugas, revise la dosificación y el ajuste: con una fuga presente, toda medición de mezcla miente"
+      },
+      "fixPaths": {
+        "renew-every-vacuum-hose": {
+          "title": "Cambiar todas las mangueras de vacío de una vez",
+          "detail": "En un carro de esta edad, perseguir una fuga a la vez sale más lento y más caro que cambiarlas todas. La manguera es barata; el tiempo de diagnóstico no."
+        },
+        "clean-or-replace-the-recirculation-valve": {
+          "title": "Limpiar o cambiar la válvula EGR y su conducto",
+          "detail": "Limpie la válvula y también el conducto detrás de ella. Un conducto tapado con una válvula perfectamente buena atornillada encima es una forma común y frustrante de gastar en la pieza equivocada."
+        },
+        "overhaul-the-fuel-metering": {
+          "title": "Reparar o reajustar la dosificación de combustible",
+          "detail": "De último, no de primero. Cualquier medición que usted tome antes de arreglar las fugas lo va a mandar aquí por la razón equivocada."
+        }
+      }
+    }
+  }
+}

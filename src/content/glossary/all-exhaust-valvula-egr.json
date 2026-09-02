@@ -1,0 +1,50 @@
+{
+  "id": "all-exhaust-valvula-egr",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "exhaust",
+  "aliases": [
+    {
+      "term": "EGR valves",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "exhaust gas recirculation valve",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    }
+  ],
+  "relatedTerms": [
+    "all-exhaust-catalizador",
+    "all-fuel-sistema-de-combustible"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Repuestos USA Motors, Tres Ríos, Cartago, Costa Rica — parts listing naming \"VALVULA EGR\" among the valves the shop stocks",
+      "url": "https://repuestosusamotorscr.com/producto/valvulas-variedad/",
+      "archiveUrl": "https://web.archive.org/web/20260902180204id_/https://repuestosusamotorscr.com/producto/valvulas-variedad/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero 4x4 Life — \"Pajero 3.2 DI-D common problems\": describes the exhaust gas recirculation valve recirculating exhaust into the inlet manifold and carbonising there under short-trip urban use",
+      "url": "https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "archiveUrl": "https://web.archive.org/web/20260902175907id_/https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "EGR valve",
+      "summary": "The valve that lets a measured amount of exhaust gas back into the inlet, lowering peak combustion temperature and with it the oxides of nitrogen the engine makes. Costa Rican counters sell it under the English initials. Because what it admits is sooty and what it meets in the inlet is oily, it is also the part that carbons up: a valve held off its seat by deposits feeds exhaust in continuously, and the truck runs rough and flat."
+    },
+    "es": {
+      "title": "válvula EGR",
+      "summary": "La válvula que deja pasar una cantidad medida de gases de escape de vuelta a la admisión, bajando la temperatura pico de combustión y con ella los óxidos de nitrógeno que produce el motor. En las repuesteras ticas se pide por sus siglas en inglés. Como lo que deja entrar viene con hollín y lo que encuentra en la admisión viene con aceite, también es la pieza que se carboniza: una válvula que los depósitos dejan sin asentar mete escape todo el tiempo, y el carro trabaja disparejo y sin fuerza."
+    }
+  }
+}

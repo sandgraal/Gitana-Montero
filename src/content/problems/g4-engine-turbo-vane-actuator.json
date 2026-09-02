@@ -1,0 +1,177 @@
+{
+  "id": "g4-engine-turbo-vane-actuator",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["cr", "uk", "au", "jdm", "eu", "me", "global"],
+    "engines": ["4m41"],
+    "years": {
+      "from": 2006,
+      "to": 2021
+    }
+  },
+  "system": "engine",
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "black-smoke-under-load",
+    "blue-or-white-smoke-at-idle",
+    "whine-or-rattle-from-the-turbocharger",
+    "boost-comes-and-goes"
+  ],
+  "causes": [
+    { "id": "variable-vane-mechanism-stuck-with-soot" },
+    { "id": "turbocharger-bearing-failure" },
+    { "id": "oil-servicing-neglect" },
+    { "id": "boost-leak-in-the-pipework" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "ask-for-the-oil-service-history",
+      "rulesIn": ["oil-servicing-neglect"],
+      "rulesOut": []
+    },
+    {
+      "id": "check-the-intercooler-pipework-and-clamps",
+      "rulesIn": ["boost-leak-in-the-pipework"],
+      "rulesOut": []
+    },
+    {
+      "id": "check-the-shaft-for-play-through-the-inlet",
+      "rulesIn": ["turbocharger-bearing-failure"],
+      "rulesOut": ["variable-vane-mechanism-stuck-with-soot"]
+    },
+    {
+      "id": "watch-the-vane-actuator-move",
+      "rulesIn": ["variable-vane-mechanism-stuck-with-soot"],
+      "rulesOut": []
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "clean-and-free-the-vane-actuator",
+      "difficulty": 4,
+      "cost": { "from": "moderate" },
+      "addresses": ["variable-vane-mechanism-stuck-with-soot"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-turbocharger",
+      "difficulty": 5,
+      "cost": { "from": "significant", "to": "major" },
+      "addresses": ["turbocharger-bearing-failure"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "restore-correct-oil-servicing",
+      "difficulty": 2,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["oil-servicing-neglect"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "seal-the-boost-pipework",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["boost-leak-in-the-pipework"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero 4x4 Life — \"Pajero 3.2 DI-D common problems\": lists turbocharger failure on the third and fourth generations, notes the fourth generation uses a variable vane turbocharger, gives symptoms of excessive black smoke under load, blue or white smoke at idle and a whining or rattling noise, attributes the cause to \"extended oil change intervals, incorrect oil specification, or insufficient warm-up and cool-down periods\", and offers variable vane actuator cleaning as the fix if caught early",
+      "url": "https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "archiveUrl": "https://web.archive.org/web/20260902175907id_/https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Turbocharger vanes stick, or the turbo fails",
+      "slug": "turbocharger-vanes-stick",
+      "summary": "The fourth-generation diesel uses a variable-vane turbocharger, and the vanes that make it flexible are also what soot sticks to. The cited source names the causes as oil-related — long oil change intervals, the wrong oil specification, and not letting the engine warm up or cool down — and separates two outcomes: a vane mechanism that has gummed up, which can sometimes be cleaned if it is caught early, and a turbocharger whose bearings have failed, which cannot. This is a single source, so the tier is the site's weakest, but the ordering it implies is sound and cheap to follow. Before either of those, eliminate a boost leak: a split intercooler hose or a loose clamp gives the same flat, smoky, comes-and-goes performance for the price of a clamp. If the turbo is passing oil, it is feeding the intake, and continuing to drive it hard risks the engine running on its own oil — which is why this is not filed as drive-normally.",
+      "symptoms": {
+        "black-smoke-under-load": "Heavy black smoke under load",
+        "blue-or-white-smoke-at-idle": "Blue or white smoke at idle or on start-up",
+        "whine-or-rattle-from-the-turbocharger": "A whine, siren or rattle from the turbocharger that rises with engine speed",
+        "boost-comes-and-goes": "The truck pulls strongly sometimes and flat at others, with no pattern you can pin down"
+      },
+      "causes": {
+        "variable-vane-mechanism-stuck-with-soot": "The variable vane mechanism is gummed up with soot and no longer moves freely",
+        "turbocharger-bearing-failure": "The turbocharger bearings have failed and the shaft has play",
+        "oil-servicing-neglect": "Long oil intervals, the wrong oil specification, or no warm-up and cool-down time",
+        "boost-leak-in-the-pipework": "A split hose or loose clamp in the intercooler pipework is losing boost"
+      },
+      "diagnosticSteps": {
+        "ask-for-the-oil-service-history": "Ask for the oil service history and check both the interval and the oil specification used, because that is the cause the source names first",
+        "check-the-intercooler-pipework-and-clamps": "Go over every intercooler hose, joint and clamp looking for splits, oil and slack before touching the turbocharger",
+        "check-the-shaft-for-play-through-the-inlet": "With the inlet pipe off and the engine stopped, check the compressor wheel for side play and for contact marks on the housing",
+        "watch-the-vane-actuator-move": "Have the vane actuator watched or commanded through its travel with diagnostic equipment to see whether it moves smoothly and fully"
+      },
+      "fixPaths": {
+        "clean-and-free-the-vane-actuator": {
+          "title": "Clean and free the variable vane mechanism",
+          "detail": "Worth trying if the shaft is tight and the problem was caught early. It is not a fix for a turbocharger that is already passing oil or has bearing play."
+        },
+        "replace-the-turbocharger": {
+          "title": "Replace the turbocharger",
+          "detail": "Once the bearings have gone, replacement is the answer. Clean the intercooler and pipework of oil at the same time, or the debris left in there goes straight through the new unit."
+        },
+        "restore-correct-oil-servicing": {
+          "title": "Return to correct oil servicing",
+          "detail": "The right oil specification, the right interval, and the discipline of letting the engine idle a moment before shutdown after a hard run. This is what stops the replacement turbocharger going the same way."
+        },
+        "seal-the-boost-pipework": {
+          "title": "Find and seal the boost leak",
+          "detail": "The cheapest thing on this page and the first to eliminate. A leak makes a perfectly healthy turbocharger feel dead."
+        }
+      }
+    },
+    "es": {
+      "title": "Se pegan los álabes del turbo, o el turbo falla",
+      "slug": "se-pegan-los-alabes-del-turbo",
+      "summary": "El diésel de cuarta generación usa un turbo de álabes variables, y esos mismos álabes que lo hacen flexible son a lo que se le pega el hollín. La fuente citada nombra causas ligadas al aceite —intervalos de cambio muy largos, especificación de aceite equivocada y no dejar que el motor caliente ni enfríe— y separa dos desenlaces: un mecanismo de álabes engomado, que a veces se puede limpiar si se agarra temprano, y un turbo con los rodamientos ya dañados, que no. Es una sola fuente, así que el nivel de confianza es el más bajo del sitio, pero el orden que propone es sensato y barato de seguir. Antes de cualquiera de las dos cosas, descarte una fuga de presión: una manguera del enfriador de aire rajada o una abrazadera floja da exactamente esa sensación de carro plano, humeante e irregular, por el precio de una abrazadera. Si el turbo está pasando aceite, se lo está metiendo a la admisión, y seguir exigiéndolo arriesga que el motor termine andando con su propio aceite; por eso esto no se clasifica como manejar normal.",
+      "symptoms": {
+        "black-smoke-under-load": "Humo negro abundante bajo carga",
+        "blue-or-white-smoke-at-idle": "Humo azul o blanco en marcha mínima o al arrancar",
+        "whine-or-rattle-from-the-turbocharger": "Un silbido, una sirena o un traqueteo del turbo que sube con las revoluciones",
+        "boost-comes-and-goes": "El carro a veces jala fuerte y a veces plano, sin un patrón que usted logre identificar"
+      },
+      "causes": {
+        "variable-vane-mechanism-stuck-with-soot": "El mecanismo de álabes variables está engomado de hollín y ya no se mueve libre",
+        "turbocharger-bearing-failure": "Los rodamientos del turbo fallaron y el eje tiene juego",
+        "oil-servicing-neglect": "Intervalos de aceite largos, especificación de aceite equivocada, o cero tiempo de calentamiento y enfriamiento",
+        "boost-leak-in-the-pipework": "Una manguera rajada o una abrazadera floja en la tubería del enfriador de aire está perdiendo presión"
+      },
+      "diagnosticSteps": {
+        "ask-for-the-oil-service-history": "Pida el historial de cambios de aceite y revise tanto el intervalo como la especificación del aceite usado, porque esa es la causa que la fuente nombra de primero",
+        "check-the-intercooler-pipework-and-clamps": "Recorra todas las mangueras, uniones y abrazaderas del enfriador de aire buscando rajaduras, aceite y flojedad antes de tocar el turbo",
+        "check-the-shaft-for-play-through-the-inlet": "Con la tubería de admisión quitada y el motor apagado, revise si la turbina del compresor tiene juego lateral y si hay marcas de roce en la carcasa",
+        "watch-the-vane-actuator-move": "Haga observar o comandar el actuador de álabes en todo su recorrido con equipo de diagnóstico, para ver si se mueve parejo y completo"
+      },
+      "fixPaths": {
+        "clean-and-free-the-vane-actuator": {
+          "title": "Limpiar y liberar el mecanismo de álabes variables",
+          "detail": "Vale la pena intentarlo si el eje está sano y el problema se agarró temprano. No es solución para un turbo que ya está pasando aceite o que tiene juego en los rodamientos."
+        },
+        "replace-the-turbocharger": {
+          "title": "Cambiar el turbo",
+          "detail": "Una vez que los rodamientos se fueron, la respuesta es el cambio. Limpie de aceite el enfriador de aire y la tubería en el mismo trabajo, o los residuos que quedan ahí se van derechito por la unidad nueva."
+        },
+        "restore-correct-oil-servicing": {
+          "title": "Volver al mantenimiento de aceite correcto",
+          "detail": "La especificación de aceite correcta, el intervalo correcto y la disciplina de dejar el motor en marcha mínima un momento antes de apagarlo después de exigirlo. Eso es lo que evita que el turbo de reemplazo se vaya por el mismo camino."
+        },
+        "seal-the-boost-pipework": {
+          "title": "Encontrar y sellar la fuga de presión",
+          "detail": "Lo más barato de esta página y lo primero que hay que descartar. Una fuga hace sentir muerto a un turbo perfectamente sano."
+        }
+      }
+    }
+  }
+}

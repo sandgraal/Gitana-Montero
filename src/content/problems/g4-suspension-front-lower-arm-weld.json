@@ -1,0 +1,140 @@
+{
+  "id": "g4-suspension-front-lower-arm-weld",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["au", "eu", "global"],
+    "years": {
+      "from": 2016,
+      "to": 2019
+    }
+  },
+  "system": "suspension",
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "vehicle-identification-number-appears-on-a-recall-list",
+    "clunk-from-the-right-front-over-bumps",
+    "steering-wanders-or-feels-vague",
+    "visible-crack-at-a-lower-arm-weld"
+  ],
+  "causes": [
+    { "id": "improper-weld-on-the-right-front-lower-arm" },
+    { "id": "recall-remedy-never-carried-out" },
+    { "id": "ordinary-worn-bushings-or-ball-joint" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "check-the-vehicle-identification-number-with-the-maker",
+      "rulesIn": [
+        "improper-weld-on-the-right-front-lower-arm",
+        "recall-remedy-never-carried-out"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "inspect-the-right-front-lower-arm-welds",
+      "rulesIn": ["improper-weld-on-the-right-front-lower-arm"],
+      "rulesOut": []
+    },
+    {
+      "id": "lever-the-lower-arm-and-watch-the-joints",
+      "rulesIn": ["ordinary-worn-bushings-or-ball-joint"],
+      "rulesOut": ["improper-weld-on-the-right-front-lower-arm"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "have-the-arm-replaced-under-recall",
+      "difficulty": 4,
+      "cost": { "from": "minimal" },
+      "addresses": [
+        "improper-weld-on-the-right-front-lower-arm",
+        "recall-remedy-never-carried-out"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-worn-bushings-or-ball-joint",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["ordinary-worn-bushings-or-ball-joint"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "car-recalls.eu — EU Safety Gate alert A12/01591/20, reference ENL-20-018-SR, Mitsubishi Pajero model years 2017 to 2018: \"the right-hand side front lower arm might break during vehicle usage due to an improper welding process\", risk classified Serious, published 27 November 2020 by the Polish authority",
+      "url": "https://car-recalls.eu/recall/mitsubishi-pajero-front-lower-arm/",
+      "archiveUrl": "https://web.archive.org/web/20211022220303id_/https://car-recalls.eu/recall/mitsubishi-pajero-front-lower-arm/",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front lower control arm weld may break",
+      "slug": "front-lower-control-arm-weld-may-break",
+      "summary": "Mitsubishi recalled late fourth-generation trucks because the right-hand front lower control arm could break at a weld joint made by a faulty welding process. The European alert cited below classes the risk as serious and states the failure mode plainly: the arm might break in normal use. A lower control arm is what holds the bottom of the front wheel in place, so losing one is losing control of that corner — this is not a noise you drive to the shop with. The complication is that a worn bush or ball joint in the same arm makes almost exactly the same clunk, and the two demand very different urgency, so the first step here is the vehicle identification number and not the stethoscope. If the truck is in the affected build range and the recall has not been done, it should be recovered rather than driven. Suspension is safety-critical: have this inspected and repaired by a qualified mechanic.",
+      "symptoms": {
+        "vehicle-identification-number-appears-on-a-recall-list": "The vehicle identification number comes back as affected on the manufacturer's recall look-up",
+        "clunk-from-the-right-front-over-bumps": "A clunk or knock from the right front over bumps and on turn-in",
+        "steering-wanders-or-feels-vague": "The steering wanders or feels vague and loose at speed",
+        "visible-crack-at-a-lower-arm-weld": "A visible crack, or a rust line, at one of the welds on the lower arm"
+      },
+      "causes": {
+        "improper-weld-on-the-right-front-lower-arm": "A weld joint on the right-hand front lower arm was made improperly and is failing",
+        "recall-remedy-never-carried-out": "The recall was issued but the remedy was never carried out on this truck",
+        "ordinary-worn-bushings-or-ball-joint": "The bushings or ball joint in the arm are simply worn, which sounds much the same"
+      },
+      "diagnosticSteps": {
+        "check-the-vehicle-identification-number-with-the-maker": "Run the vehicle identification number through the manufacturer's recall look-up before doing anything else",
+        "inspect-the-right-front-lower-arm-welds": "Clean and inspect every weld on the right-hand front lower arm in good light, looking for cracks and lifted weld edges",
+        "lever-the-lower-arm-and-watch-the-joints": "With the wheel safely off the ground, lever the lower arm while somebody watches the bushings and the ball joint for movement"
+      },
+      "fixPaths": {
+        "have-the-arm-replaced-under-recall": {
+          "title": "Have the arm replaced under the recall",
+          "detail": "The manufacturer's remedy is free in the markets that issued the recall. Get the completion record in writing, and have the wheel alignment reset afterwards."
+        },
+        "replace-worn-bushings-or-ball-joint": {
+          "title": "Replace the worn bushings or ball joint",
+          "detail": "If the welds are sound and the truck is outside the affected range, this is ordinary suspension wear. It still needs doing, and it still needs an alignment afterwards."
+        }
+      }
+    },
+    "es": {
+      "title": "La soldadura de la tijereta inferior delantera se puede quebrar",
+      "slug": "soldadura-de-la-tijereta-inferior-se-puede-quebrar",
+      "summary": "Mitsubishi llamó a revisión los carros de cuarta generación de los últimos años porque la tijereta inferior delantera del lado derecho se podía quebrar en una unión soldada hecha con un proceso defectuoso. La alerta europea que se cita abajo clasifica el riesgo como grave y describe el modo de falla sin rodeos: la tijereta se puede quebrar en uso normal. Una tijereta inferior es lo que sostiene la parte de abajo de la rueda delantera en su lugar, así que perder una es perder el control de esa esquina; esto no es un ruido con el que uno se va manejando hasta el taller. Lo complicado es que un buje o una rótula gastada en esa misma tijereta suena casi igual, y las dos cosas piden urgencias muy distintas, así que aquí el primer paso es el número de chasis y no el estetoscopio. Si el carro cae en el rango afectado y no le han aplicado la campaña, hay que llevarlo en plataforma, no manejándolo. La suspensión es crítica para la seguridad: deje la revisión y la reparación en manos de un mecánico calificado.",
+      "symptoms": {
+        "vehicle-identification-number-appears-on-a-recall-list": "El número de chasis aparece como afectado en la consulta de campañas del fabricante",
+        "clunk-from-the-right-front-over-bumps": "Un golpe seco al frente derecho en los huecos y al entrar en curva",
+        "steering-wanders-or-feels-vague": "La dirección se va sola o se siente vaga y suelta a velocidad",
+        "visible-crack-at-a-lower-arm-weld": "Una rajadura visible, o una línea de herrumbre, en alguna de las soldaduras de la tijereta inferior"
+      },
+      "causes": {
+        "improper-weld-on-the-right-front-lower-arm": "Una unión soldada de la tijereta inferior delantera derecha quedó mal hecha y está fallando",
+        "recall-remedy-never-carried-out": "La campaña se emitió pero a este carro nunca le aplicaron la solución",
+        "ordinary-worn-bushings-or-ball-joint": "Los bujes o la rótula de la tijereta simplemente están gastados, y suenan muy parecido"
+      },
+      "diagnosticSteps": {
+        "check-the-vehicle-identification-number-with-the-maker": "Consulte el número de chasis en la herramienta de campañas del fabricante antes de hacer cualquier otra cosa",
+        "inspect-the-right-front-lower-arm-welds": "Limpie y revise con buena luz todas las soldaduras de la tijereta inferior delantera derecha, buscando rajaduras y bordes de soldadura levantados",
+        "lever-the-lower-arm-and-watch-the-joints": "Con la rueda bien levantada del suelo, haga palanca en la tijereta inferior mientras alguien observa si se mueven los bujes y la rótula"
+      },
+      "fixPaths": {
+        "have-the-arm-replaced-under-recall": {
+          "title": "Que cambien la tijereta bajo la campaña",
+          "detail": "La solución del fabricante es gratuita en los mercados que emitieron la campaña. Pida el comprobante por escrito y haga reajustar el alineamiento después."
+        },
+        "replace-worn-bushings-or-ball-joint": {
+          "title": "Cambiar los bujes o la rótula gastados",
+          "detail": "Si las soldaduras están sanas y el carro queda fuera del rango afectado, esto es desgaste normal de suspensión. Igual hay que hacerlo, e igual hay que alinear después."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "id": "g1-steering-shaft-corrosion",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us"],
+    "years": {
+      "from": 1983,
+      "to": 1991
+    }
+  },
+  "system": "steering",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "steering-does-not-return-to-centre",
+    "steering-heavy-in-one-direction",
+    "power-steering-fluid-weeping-at-the-input-shaft",
+    "gritty-feel-through-the-steering-wheel"
+  ],
+  "causes": [
+    { "id": "pitted-steering-box-input-shaft" },
+    { "id": "torn-input-shaft-seal" },
+    { "id": "low-or-old-power-steering-fluid" },
+    { "id": "seized-steering-shaft-joint" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "check-the-fluid-level-and-colour",
+      "rulesIn": ["low-or-old-power-steering-fluid"],
+      "rulesOut": []
+    },
+    {
+      "id": "look-at-the-input-shaft-where-it-enters-the-box",
+      "rulesIn": ["pitted-steering-box-input-shaft", "torn-input-shaft-seal"],
+      "rulesOut": []
+    },
+    {
+      "id": "turn-the-wheel-lock-to-lock-on-a-jack",
+      "rulesIn": ["seized-steering-shaft-joint"],
+      "rulesOut": ["low-or-old-power-steering-fluid"]
+    },
+    {
+      "id": "disconnect-the-shaft-and-turn-each-half",
+      "rulesIn": ["seized-steering-shaft-joint"],
+      "rulesOut": ["pitted-steering-box-input-shaft"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "flush-and-refill-the-system",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["low-or-old-power-steering-fluid"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "rebuild-or-replace-the-steering-box",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["pitted-steering-box-input-shaft", "torn-input-shaft-seal"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-intermediate-shaft",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": ["seized-steering-shaft-joint"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (a steering complaint reporting that the shaft entering the steering gear becomes pitted and eroded by road grime and salt, tearing the seal, after which the vehicle is hard to steer and does not return to straight without manual assistance)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
+      "archiveUrl": "https://web.archive.org/web/20260902180641id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1991 Mitsubishi Montero (four steering complaints, including a sudden loss of power steering while driving and a steering column failure)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "archiveUrl": "https://web.archive.org/web/20260902175215id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Steering goes heavy and will not self-centre",
+      "slug": "steering-goes-heavy",
+      "summary": "One owner described the mechanism to the federal regulator clearly enough to be worth recording: road grime and salt pit the shaft where it enters the steering gear, the rough shaft tears the seal, the lubrication leaves, and the truck becomes hard to steer and will not return to straight on its own without being helped round. That is a single report, which is why this entry carries the weakest confidence tier on the site — read it as one plausible explanation among several, not as an established pattern. The reason it earns a page anyway is that the symptom is common on trucks of this age and the four causes below are cheap to tell apart in the order given, starting with the fluid. Steering is safety-critical. Heavy steering is not the same as no steering, so the truck is drivable, but a wheel that does not come back to centre is a wheel you are fighting: get it looked at by a qualified mechanic rather than living with it.",
+      "symptoms": {
+        "steering-does-not-return-to-centre": "The wheel stays where you left it after a corner instead of unwinding by itself",
+        "steering-heavy-in-one-direction": "The steering is noticeably heavier turning one way than the other",
+        "power-steering-fluid-weeping-at-the-input-shaft": "A wet film or drips at the point where the shaft enters the steering box",
+        "gritty-feel-through-the-steering-wheel": "A dry, gritty or notchy feel through the rim as you turn"
+      },
+      "causes": {
+        "pitted-steering-box-input-shaft": "The steering box input shaft is pitted by grime and salt, so it saws through its own seal",
+        "torn-input-shaft-seal": "The input shaft seal is torn and the box is losing pressure and lubrication",
+        "low-or-old-power-steering-fluid": "The power steering fluid is low, aerated or long past its life",
+        "seized-steering-shaft-joint": "A joint in the intermediate steering shaft has seized and is fighting the return"
+      },
+      "diagnosticSteps": {
+        "check-the-fluid-level-and-colour": "Check the power steering fluid level and look at its colour and smell — dark, foamy or burnt tells you something",
+        "look-at-the-input-shaft-where-it-enters-the-box": "Clean and inspect the shaft where it enters the steering box for pitting, rust scale and a wet seal",
+        "turn-the-wheel-lock-to-lock-on-a-jack": "With the front wheels off the ground on a jack and axle stands, turn lock to lock by hand and feel where the effort changes",
+        "disconnect-the-shaft-and-turn-each-half": "Disconnect the intermediate shaft and turn the column and the box separately, so you can tell which side of the joint is stiff"
+      },
+      "fixPaths": {
+        "flush-and-refill-the-system": {
+          "title": "Flush and refill the power steering system",
+          "detail": "The cheapest thing to eliminate, and worth doing first even if it turns out not to be the answer. Old, aerated fluid makes every other symptom on this page worse."
+        },
+        "rebuild-or-replace-the-steering-box": {
+          "title": "Rebuild or replace the steering box",
+          "detail": "A pitted input shaft will destroy a new seal, so a seal on its own is not a repair. This is the job where a rebuilt unit usually beats a kit."
+        },
+        "replace-the-intermediate-shaft": {
+          "title": "Replace the intermediate steering shaft",
+          "detail": "A seized joint in the shaft between the column and the box gives exactly the no-self-centring symptom with a perfectly healthy steering box. Prove which one it is before spending money on the box."
+        }
+      }
+    },
+    "es": {
+      "title": "La dirección se pone dura y no se centra sola",
+      "slug": "la-direccion-se-pone-dura",
+      "summary": "Un dueño le describió el mecanismo al regulador federal con suficiente claridad como para dejarlo anotado: la suciedad y la sal de la calle pican el eje donde entra a la caja de dirección, ese eje áspero rompe el retenedor, se pierde la lubricación y el carro se vuelve duro de manejar y ya no regresa solo a recto, hay que devolverlo a mano. Es un solo reporte, y por eso esta entrada lleva el nivel de confianza más bajo del sitio: léala como una explicación posible entre varias, no como un patrón demostrado. Si aun así se le dedica una página es porque el síntoma es común en carros de esta edad y las cuatro causas de abajo se descartan barato en el orden en que están, empezando por el líquido. La dirección es crítica para la seguridad. Dirección dura no es lo mismo que quedarse sin dirección, así que el carro se puede manejar, pero un volante que no vuelve al centro es un volante contra el que usted va peleando: llévelo donde un mecánico calificado en vez de acostumbrarse.",
+      "symptoms": {
+        "steering-does-not-return-to-centre": "El volante se queda donde usted lo dejó al salir de la curva en vez de devolverse solo",
+        "steering-heavy-in-one-direction": "La dirección pesa notoriamente más para un lado que para el otro",
+        "power-steering-fluid-weeping-at-the-input-shaft": "Una película húmeda o goteo justo donde el eje entra a la caja de dirección",
+        "gritty-feel-through-the-steering-wheel": "Un tacto seco, áspero o con topes en el aro del volante al girar"
+      },
+      "causes": {
+        "pitted-steering-box-input-shaft": "El eje de entrada de la caja de dirección está picado por la suciedad y la sal, y va serruchando su propio retenedor",
+        "torn-input-shaft-seal": "El retenedor del eje de entrada está roto y la caja está perdiendo presión y lubricación",
+        "low-or-old-power-steering-fluid": "El líquido de dirección hidráulica está bajo, aireado o vencido hace rato",
+        "seized-steering-shaft-joint": "Una junta del eje intermedio de la dirección se agarrotó y pelea contra el retorno"
+      },
+      "diagnosticSteps": {
+        "check-the-fluid-level-and-colour": "Revise el nivel del líquido de dirección hidráulica y fíjese en su color y su olor: oscuro, espumoso o quemado ya le está diciendo algo",
+        "look-at-the-input-shaft-where-it-enters-the-box": "Limpie y revise el eje donde entra a la caja de dirección buscando picaduras, costra de herrumbre y el retenedor mojado",
+        "turn-the-wheel-lock-to-lock-on-a-jack": "Con las ruedas delanteras en el aire sobre la gata y los soportes de seguridad, gire de tope a tope con la mano y sienta dónde cambia el esfuerzo",
+        "disconnect-the-shaft-and-turn-each-half": "Desconecte el eje intermedio y gire la columna y la caja por separado, para saber de qué lado de la junta está la dureza"
+      },
+      "fixPaths": {
+        "flush-and-refill-the-system": {
+          "title": "Lavar y rellenar el sistema de dirección hidráulica",
+          "detail": "Es lo más barato de descartar y vale la pena hacerlo de primero aunque después resulte que no era eso. El líquido viejo y aireado empeora todos los demás síntomas de esta página."
+        },
+        "rebuild-or-replace-the-steering-box": {
+          "title": "Reparar o cambiar la caja de dirección",
+          "detail": "Un eje de entrada picado se come un retenedor nuevo, así que poner solo el retenedor no es una reparación. En este trabajo una caja reconstruida casi siempre le sale mejor que un kit de empaques."
+        },
+        "replace-the-intermediate-shaft": {
+          "title": "Cambiar el eje intermedio de la dirección",
+          "detail": "Una junta agarrotada en el eje entre la columna y la caja da exactamente el síntoma de no centrarse sola, con la caja de dirección en perfecto estado. Demuestre cuál de las dos es antes de gastar en la caja."
+        }
+      }
+    }
+  }
+}

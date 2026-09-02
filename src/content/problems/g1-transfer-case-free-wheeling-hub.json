@@ -1,0 +1,170 @@
+{
+  "id": "g1-transfer-case-free-wheeling-hub",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us", "cr", "uk", "au", "jdm", "eu", "global"],
+    "transferCases": ["easy-select"],
+    "years": {
+      "from": 1983,
+      "to": 1991
+    }
+  },
+  "system": "transfer-case",
+  "severity": "stranding",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "ratcheting-noise-from-one-front-wheel",
+    "no-drive-to-the-front-in-four-wheel-drive",
+    "one-front-wheel-drives-and-the-other-does-not",
+    "hub-will-not-turn-to-lock"
+  ],
+  "causes": [
+    { "id": "broken-driving-dog-in-an-automatic-hub" },
+    { "id": "hub-internals-full-of-water-and-rust" },
+    { "id": "transfer-case-not-actually-engaged" },
+    { "id": "broken-front-axle-shaft-or-joint" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "lock-both-hubs-and-listen",
+      "rulesIn": ["broken-driving-dog-in-an-automatic-hub"],
+      "rulesOut": []
+    },
+    {
+      "id": "jack-one-front-wheel-and-turn-it",
+      "rulesIn": [
+        "broken-driving-dog-in-an-automatic-hub",
+        "broken-front-axle-shaft-or-joint"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "check-the-transfer-lever-actually-engaged",
+      "rulesIn": ["transfer-case-not-actually-engaged"],
+      "rulesOut": ["broken-driving-dog-in-an-automatic-hub"]
+    },
+    {
+      "id": "open-the-hub-and-look-inside",
+      "rulesIn": [
+        "broken-driving-dog-in-an-automatic-hub",
+        "hub-internals-full-of-water-and-rust"
+      ],
+      "rulesOut": ["transfer-case-not-actually-engaged"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "service-and-repack-the-hubs",
+      "difficulty": 3,
+      "cost": { "from": "minimal" },
+      "addresses": ["hub-internals-full-of-water-and-rust"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "fit-manual-free-wheeling-hubs",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": [
+        "broken-driving-dog-in-an-automatic-hub",
+        "hub-internals-full-of-water-and-rust"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-axle-shaft-or-joint",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["broken-front-axle-shaft-or-joint"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"Free Wheeling Hubs\" thread: members report that automatic hubs break the small driving dog that mates with the rear hub, typically under shock loading when rocking a stuck vehicle forward and back, that a ratcheting sound from the hub is the early warning, and that the factory manual hubs are stronger than the automatics and bolt straight on",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=17315",
+      "archiveUrl": "https://web.archive.org/web/20260902174908id_/https://www.pocuk.com/forums/viewtopic.php?t=17315",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Free-wheeling hub will not drive the front wheel",
+      "slug": "free-wheeling-hub-will-not-drive",
+      "summary": "You select four-wheel drive, the transfer case goes in, and one front wheel still does nothing. On the automatic hubs, the usual answer in the cited club thread is a small driving dog inside the hub that has snapped off — and the loading that snaps it is exactly the loading you apply when you are already stuck and rocking the truck forward and back. Members describe a ratcheting sound from the hub as the warning that comes first, which makes it worth acting on rather than driving through. The same thread is unanimous that the factory manual hubs are the stronger part and bolt straight up in place of the automatics, which is why that is listed here as a fix and not as a modification. The truck drives perfectly well in two-wheel drive with a dead hub, so this is not an emergency on tarmac — it is an emergency the first time you need the front axle and do not have it.",
+      "symptoms": {
+        "ratcheting-noise-from-one-front-wheel": "A ratcheting or clicking noise from one front wheel, often only when turning",
+        "no-drive-to-the-front-in-four-wheel-drive": "Four-wheel drive is selected and engaged but the front wheels are not pulling",
+        "one-front-wheel-drives-and-the-other-does-not": "One front wheel clearly drives and the other one spins free",
+        "hub-will-not-turn-to-lock": "The dial on a manual hub will not turn to the locked position"
+      },
+      "causes": {
+        "broken-driving-dog-in-an-automatic-hub": "The small driving dog inside an automatic hub has broken off, usually under shock load",
+        "hub-internals-full-of-water-and-rust": "Water has got into the hub and the internals are rusted or packed with mud",
+        "transfer-case-not-actually-engaged": "The transfer case is not actually in four-wheel drive, whatever the lever or the lamp says",
+        "broken-front-axle-shaft-or-joint": "A front axle shaft or its joint has failed further inboard, so the hub never sees drive"
+      },
+      "diagnosticSteps": {
+        "lock-both-hubs-and-listen": "Lock or engage both hubs, drive slowly in a tight circle on loose ground and listen for a ratcheting from one side",
+        "jack-one-front-wheel-and-turn-it": "With the truck safely on a jack and axle stands and the hub locked, turn that front wheel by hand and feel whether the axle shaft turns with it",
+        "check-the-transfer-lever-actually-engaged": "Confirm the transfer case is genuinely engaged by checking that the front driveshaft turns with the wheels, not by trusting the lever position",
+        "open-the-hub-and-look-inside": "Take the hub cover off and look inside for a snapped driving dog, water, rust or packed mud"
+      },
+      "fixPaths": {
+        "service-and-repack-the-hubs": {
+          "title": "Strip, clean and repack the hubs",
+          "detail": "Often the whole repair, and always worth doing on a truck of unknown history. Renew the seals while it is apart; water getting in is what caused the rust in the first place."
+        },
+        "fit-manual-free-wheeling-hubs": {
+          "title": "Convert to manual free-wheeling hubs",
+          "detail": "Members of the cited club thread agree the factory manual hubs are the stronger part and bolt straight on. Keep the shims from the automatic hub and the circlip that retains it. The trade is convenience: you get out and turn each hub by hand."
+        },
+        "replace-the-axle-shaft-or-joint": {
+          "title": "Replace the front axle shaft or joint",
+          "detail": "If the shaft does not turn with the locked hub, the hub is innocent and the failure is further in. That is a bigger job and a bigger bill, so prove it before you buy hubs."
+        }
+      }
+    },
+    "es": {
+      "title": "El cubo de rueda libre no le da tracción a la rueda delantera",
+      "slug": "el-cubo-de-rueda-libre-no-da-traccion",
+      "summary": "Usted mete doble tracción, la caja de transferencia entra, y una rueda delantera sigue sin hacer nada. En los cubos automáticos, la respuesta más común en el hilo del club que se cita es un dientecillo de arrastre adentro del cubo que se quebró, y la carga que lo quiebra es justamente la que usted aplica cuando ya está atascado y mece el carro hacia adelante y hacia atrás. Los miembros describen un chasquido repetitivo en el cubo como el aviso que aparece primero, y por eso vale la pena atenderlo en vez de seguir manejando encima. Ese mismo hilo es unánime en que los cubos manuales de fábrica son la pieza más fuerte y se empernan directo en lugar de los automáticos, y por eso aquí aparecen como reparación y no como modificación. El carro anda perfectamente en tracción sencilla con un cubo muerto, así que en asfalto esto no es una emergencia: la emergencia llega la primera vez que usted necesite el eje delantero y no lo tenga.",
+      "symptoms": {
+        "ratcheting-noise-from-one-front-wheel": "Un chasquido repetitivo o traqueteo en una rueda delantera, muchas veces solo al girar",
+        "no-drive-to-the-front-in-four-wheel-drive": "La doble tracción está puesta y engranada pero las ruedas delanteras no jalan",
+        "one-front-wheel-drives-and-the-other-does-not": "Una rueda delantera claramente jala y la otra gira libre",
+        "hub-will-not-turn-to-lock": "La perilla de un cubo manual no gira hasta la posición de trabado"
+      },
+      "causes": {
+        "broken-driving-dog-in-an-automatic-hub": "El dientecillo de arrastre dentro de un cubo automático se quebró, casi siempre por carga de golpe",
+        "hub-internals-full-of-water-and-rust": "Le entró agua al cubo y las piezas de adentro están herrumbradas o llenas de lodo",
+        "transfer-case-not-actually-engaged": "La caja de transferencia no está realmente en doble tracción, diga lo que diga la palanca o la luz de advertencia",
+        "broken-front-axle-shaft-or-joint": "Falló un palier delantero o su junta más hacia adentro, así que al cubo nunca le llega tracción"
+      },
+      "diagnosticSteps": {
+        "lock-both-hubs-and-listen": "Trabe o engrane ambos cubos, ande despacio en un círculo cerrado sobre superficie suelta y oiga si hay chasquidos de un lado",
+        "jack-one-front-wheel-and-turn-it": "Con el carro bien montado sobre la gata y los soportes de seguridad y el cubo trabado, gire esa rueda delantera con la mano y sienta si el palier gira con ella",
+        "check-the-transfer-lever-actually-engaged": "Confirme que la caja de transferencia sí está engranada viendo que el cardán delantero gire junto con las ruedas, en vez de fiarse de la posición de la palanca",
+        "open-the-hub-and-look-inside": "Quite la tapa del cubo y revise por dentro si hay un dientecillo de arrastre quebrado, agua, herrumbre o lodo compactado"
+      },
+      "fixPaths": {
+        "service-and-repack-the-hubs": {
+          "title": "Desarmar, limpiar y reengrasar los cubos",
+          "detail": "Muchas veces esa es toda la reparación, y en un carro de historia desconocida siempre vale la pena. Cambie los retenedores mientras está abierto: el agua que entra fue lo que causó la herrumbre desde el principio."
+        },
+        "fit-manual-free-wheeling-hubs": {
+          "title": "Convertir a cubos de rueda libre manuales",
+          "detail": "Los miembros del hilo citado coinciden en que los cubos manuales de fábrica son la pieza más fuerte y se empernan directo. Guarde los suplementos del cubo automático y el anillo de retención. Lo que se pierde es comodidad: hay que bajarse a girar cada cubo con la mano."
+        },
+        "replace-the-axle-shaft-or-joint": {
+          "title": "Cambiar el palier delantero o su junta",
+          "detail": "Si el palier no gira con el cubo trabado, el cubo está sano y la falla está más adentro. Ese es un trabajo más grande y una cuenta más grande, así que demuéstrelo antes de comprar cubos."
+        }
+      }
+    }
+  }
+}

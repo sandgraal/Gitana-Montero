@@ -1,0 +1,62 @@
+{
+  "id": "all-engine-polea-del-ciguenal",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "polea principal del motor",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "harmonic balancer",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "crank pulley",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "vibration damper",
+      "locale": "en",
+      "countries": ["US", "GB"]
+    },
+    {
+      "term": "torsional vibration damper",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": ["all-engine-ciguenal", "all-engine-faja"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Repuestos USA Motors, Tres Ríos, Cartago, Costa Rica — parts listing naming the part \"polea principal del motor o damper\" alongside the camshaft and water pump pulleys",
+      "url": "https://repuestosusamotorscr.com/producto/poleas-variedad/",
+      "archiveUrl": "https://web.archive.org/web/20260902180046id_/https://repuestosusamotorscr.com/producto/poleas-variedad/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Opinautos — Mitsubishi Montero, fallas reportadas de la polea del cigüeñal: owner reports across several model years using \"polea del cigüeñal\" and \"damper\" for the same part",
+      "url": "https://www.opinautos.com/mx/mitsubishi/montero/defectos/polea-del-ciguenal",
+      "archiveUrl": "https://web.archive.org/web/20260902175954id_/https://www.opinautos.com/mx/mitsubishi/montero/defectos/polea-del-ciguenal",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "crankshaft pulley",
+      "summary": "The pulley bolted to the nose of the crankshaft that drives the accessory belts. On most of these engines it is not a plain pulley but a damper: two metal rings bonded through a rubber layer that soaks up the crankshaft's torsional vibration. Costa Rican counters list it as the polea principal del motor and will also answer to damper. Two things go wrong with it, and this site documents both — the rubber perishes and lets the outer ring walk, or the single bolt through its centre works loose."
+    },
+    "es": {
+      "title": "polea del cigüeñal",
+      "summary": "La polea empernada a la punta del cigüeñal que mueve las fajas de accesorios. En casi todos estos motores no es una polea simple sino un amortiguador de vibración: dos anillos metálicos unidos por una capa de hule que absorbe la vibración torsional del cigüeñal. En las repuesteras ticas se pide como polea principal del motor, y en el mostrador también la reconocen por su nombre en inglés. Le pasan dos cosas, y este sitio documenta las dos: el hule se cristaliza y deja que el anillo exterior camine, o el único tornillo que lleva en el centro se afloja."
+    }
+  }
+}
