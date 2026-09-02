@@ -98,7 +98,16 @@ Routing by tag:
   the conductor makes), update persistent memory (entry `gitana-progress`:
   which task merged, what's next), remove the worktree
   (`git worktree remove <path>`), and dispatch the next eligible task **in
-  the same turn** as the bookkeeping.
+  the same turn** as the bookkeeping. **Do the worktree removal every time,
+  in this exact turn — not "later."** A single skipped cleanup compounds
+  silently and does not self-correct: on 2026-09-01 the backlog reached
+  ~130 stale worktrees and branches, going back to the project's first
+  task, because "dispatch the next eligible task" visibly kept winning
+  against "close the books on the last one" under sustained parallel load.
+  If a worktree is dirty and `git worktree remove` refuses, that is itself
+  worth a second's thought (real uncommitted work, or filesystem drift on
+  this volume — CLAUDE.md's "silently dropped writes" note) before
+  `--force`, not a reason to defer the whole step.
 
 While waiting: do not poll agents; the harness notifies you. Use
 `ScheduleWakeup`/`Monitor` only for external state (CI) if you are otherwise

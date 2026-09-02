@@ -101,6 +101,11 @@ conducts.
   grader defect, spec ambiguity, an AGENTS.md boundary, infra failure after one
   rerun. Keep other tasks moving while asking.
 - Blockers are surfaced in chat **and** as a `⛔ Blocked:` PR comment.
+- **One conductor session at a time (owner ruling, 2026-09-01).** A second
+  session's concurrent edits to `.claude/`, `specs/*/tasks.md`, or routing
+  config are a process failure to report to the owner, not a pattern the
+  harness is designed to coordinate around — this happened once and should
+  not happen again.
 
 ## Harness
 
