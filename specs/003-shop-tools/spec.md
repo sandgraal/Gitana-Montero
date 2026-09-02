@@ -1,7 +1,11 @@
 # Spec 003 — Shop tools: the mechanic's side of the garage
 
-**Status:** DRAFT — awaiting owner approval (this PR). Nothing in it is
-buildable until the owner merges it and the constitution amendments in §7 land.
+**Status:** APPROVED — the spec merged (PR #56) and its §7 constitution
+amendments landed the same day (PR #59), both 2026-08-31. The remaining
+gate is not governance: it's code. `specs/002-montero-garage` Phase P3
+(T2-401, then T2-402 and T2-404, which this spec's roster and proposal
+surfaces build directly on) must merge first — see that spec's `tasks.md`
+for current status.
 **Written:** 2026-08-31 · **Depends on:** `specs/002-montero-garage` SHR-05..09
 (typed share grants), which this spec assumes exist.
 **Owner rulings already made (2026-08-31, recorded in 002 §10):**
