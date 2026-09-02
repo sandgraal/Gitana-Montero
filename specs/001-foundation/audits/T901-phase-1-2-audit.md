@@ -409,6 +409,25 @@ explicit `[TEST]` back-fill task before T501 rather than after.
 
 ### 5.5 New standing risk — 66 security graders are skipped by default and are not run in CI
 
+> **CLOSED 2026-09-01** (branch `fix/001-ci-tier-b-promote`). The premise below
+> — "CI has no Docker" — was never tested and turned out to be false. GitHub's
+> stock `ubuntu-latest` image ships Docker Engine 28.0.4 and Compose v2.38.2;
+> `supabase start` completes in 66–73 s and all 66 graders run green, four for
+> four (`audits/T901-tier-b-ci-investigation.md`). `ci.yml` now carries a
+> fourth job, "Tier-B RLS graders (live stack)", on the same
+> `pull_request` + `push: main` triggers as the rest of the workflow, so the
+> live tier reports on every PR. `grep -rn "GARAGE_LIVE\|test:garage" .github/`
+> no longer returns nothing.
+>
+> One thing is **not** yet true and the risk is downgraded rather than gone:
+> the job is deliberately **advisory**, not in `main`'s required contexts, so
+> AGENTS.md's "proven by graders" is now *observed on every PR* but still not
+> *enforced at merge*. Promotion to required is Stage 2 — a repo-settings
+> change, the owner's, after a soak long enough to measure how often the
+> `public.ecr.aws` anonymous-pull throttle reddens the job. See the
+> investigation write-up for the staging argument and the soak-telemetry step
+> that makes the count cheap.
+
 `npm test` reports `1893 passed | 66 skipped`. Every skip is the 002 live tier,
 gated on `GARAGE_LIVE`:
 

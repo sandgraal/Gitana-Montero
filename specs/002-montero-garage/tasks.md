@@ -70,7 +70,17 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   every other provider off. *Tier B (behavioural)* proves the same guarantees
   against a real Postgres through the real PostgREST / GoTrue / Storage
   surfaces as three actors (anon, owner A, owner B), and needs
-  `supabase start` — i.e. Docker, which CI does not have. Tier B suites
+  `supabase start` — i.e. Docker, which CI does not have.
+  <br>**Correction, 2026-09-01:** "Docker, which CI does not have" was never
+  tested and is false. GitHub's stock `ubuntu-latest` ships Docker Engine and
+  Compose, `supabase start` takes ~70 s there, and all 66 Tier-B graders run
+  green — four for four
+  (`specs/001-foundation/audits/T901-tier-b-ci-investigation.md`). The
+  environment-variable prediction below held exactly: `ci.yml`'s `tier-b` job
+  runs `npm run test:garage` and not one test file changed. The word to amend
+  is *merge-blocking* — that job is deliberately advisory for now, pending the
+  owner adding it to `main`'s required contexts (Stage 2).
+  <br>Tier B suites
   `describe.skipIf` with the reason printed in the report, and
   `GARAGE_LIVE_REQUIRED=1` turns a missing stack into a hard failure, so the
   day CI grows a Postgres service one environment variable makes every

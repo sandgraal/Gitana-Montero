@@ -33,7 +33,9 @@
  * │ stack signs with its own well-known development secret.                 │
  * │ Proves: the deny-by-default matrix, the private-object matrix, the      │
  * │ ACC-03 cascade reaching storage, the SHR-01 default round-tripping.     │
- * │ Requires: Docker + the Supabase CLI. **CI has neither today.**          │
+ * │ Requires: Docker + the Supabase CLI. CI has both — the `tier-b` job in  │
+ * │ `.github/workflows/ci.yml` installs the pinned CLI and runs             │
+ * │ `supabase start`. Advisory, not merge-blocking, for now.                │
  * └────────────────────────────────────────────────────────────────────────┘
  *
  * ## Why Tier B is opt-in, and why that is not a loophole
@@ -44,8 +46,16 @@
  *
  * 1. **Fail-closed under a flag.** Set `GARAGE_LIVE_REQUIRED=1` and a missing
  *    stack becomes a hard failure (`harness-contract.test.ts` grades this).
- *    The day CI grows a Postgres service, one environment variable turns
- *    every Tier B proof into a merge gate — no test file changes.
+ *    This file used to predict that "the day CI grows a Postgres service, one
+ *    environment variable turns every Tier B proof into a CI signal — no test
+ *    file changes." That day was 2026-09-01, and the prediction held exactly:
+ *    `ci.yml`'s `tier-b` job runs `npm run test:garage`, which already carries
+ *    `GARAGE_LIVE=1 GARAGE_LIVE_REQUIRED=1` (package.json), and not one test
+ *    file was edited to make it happen. On that runner the report reads
+ *    `555 passed | 9 expected fail` with a skip count of **zero**. What is
+ *    still outstanding is only branch protection: the job is advisory until
+ *    the owner adds it to `main`'s required contexts
+ *    (`specs/001-foundation/audits/T901-tier-b-ci-investigation.md`, Stage 2).
  * 2. **Tier A never skips.** The declaration half is on the merge path from
  *    the moment T2-202 lands.
  *
