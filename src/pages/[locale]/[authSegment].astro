@@ -268,6 +268,25 @@ const configured = SUPABASE_BROWSER_CONFIG !== null;
     max-width: 34rem;
   }
 
+  /*
+   * F10 (T2-303 review sweep of the same trap across the site): an
+   * author-origin `display: flex` beats the user-agent `[hidden] { display:
+   * none }` rule. `.signin__status` (below) hit it for real — the "You're
+   * signed in as ___" line rendered, empty and inert, for a signed-out
+   * visitor, because it ships `hidden` in the server markup but its own
+   * `display: flex` outranked the user-agent rule. Rather than patch that one
+   * selector, this closes the whole class the same way `[garageSegment].astro`
+   * does: no descendant of `.signin` — present or future — can ever compute a
+   * display other than `none` while it carries `hidden`. `!important` is
+   * deliberate, for the same reason as the garage page's identical rule:
+   * matching selector specificity against an unknown, growing set of
+   * `display: flex`/`grid` declarations is the trap, not a defense against
+   * it. Graded by `tests/e2e/hidden-guard.spec.ts`.
+   */
+  .signin [hidden] {
+    display: none !important;
+  }
+
   .signin__intro {
     display: flex;
     flex-direction: column;

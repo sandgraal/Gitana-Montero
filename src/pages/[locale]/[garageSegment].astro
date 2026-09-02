@@ -3476,6 +3476,43 @@ const hasReferences = Object.values(referenceCatalogue).some(
     max-width: 52rem;
   }
 
+  /*
+   * F10 (T2-303 review sweep): closing the whole class of bug, not the next
+   * instance of it.
+   *
+   * An author-origin `display: flex`/`grid` on a descendant beats the
+   * user-agent `[hidden] { display: none }` rule, so any element under
+   * `.garage` that carries `hidden` — from its initial server-rendered
+   * markup, or set by the script at runtime — can still render laid out.
+   * That has now shipped four separate times as one-off per-selector
+   * patches on this one page (`.garage__gate`, the T2-303 derived-sheet
+   * trio, the chip/link rows, the receipt form — see the removed comments
+   * this rule supersedes below), and a fifth review pass found *five more*
+   * elements nobody had patched yet: `[data-garage-app]` itself — so a
+   * signed-out visitor was served the entire garage application, gate and
+   * all, laid out beneath the sign-in prompt — plus `[data-garage-empty]`,
+   * `[data-garage-detail-view]`, `[data-garage-form]` and
+   * `[data-garage-record-form]`. Chasing each new leak with its own
+   * `.foo[hidden] { display: none }` is exactly the pattern that keeps
+   * producing the next one, because it depends on every future
+   * `display: flex`/`grid` declaration under `.garage` remembering to pair
+   * itself with a same-specificity guard — an invariant nothing enforces.
+   *
+   * This rule enforces the invariant once, for the whole subtree, so no
+   * descendant of `.garage` — present or future — can ever compute a
+   * display other than `none` while it carries `hidden`, regardless of
+   * what layout rule targets it. `!important` is deliberate and is the one
+   * `!important` on this page: relying on selector specificity to always
+   * outrank an unknown, growing set of `display: flex`/`grid` declarations
+   * is the trap itself, not a defense against it. `tests/e2e/hidden-guard.spec.ts`
+   * (the automated version of the T2-303 reviewer's manual sweep) is the
+   * grader that keeps this true; its mutation check requires this exact
+   * rule to exist.
+   */
+  .garage [hidden] {
+    display: none !important;
+  }
+
   .garage__intro {
     display: flex;
     flex-direction: column;
@@ -3524,14 +3561,12 @@ const hasReferences = Object.values(referenceCatalogue).some(
   }
 
   /*
-   * An author `display: flex` silently overrides the user-agent `[hidden]`
-   * rule; without this the prompt would still be on screen behind a signed-in
-   * garage. Same bug the glossary and community toolbars shipped once.
+   * This element used to carry its own `.garage__gate[hidden] { display:
+   * none }` guard (the same bug the glossary and community toolbars shipped
+   * once each). Superseded by the page-wide `.garage [hidden]` rule near the
+   * top of this block (F10) — kept here only as the historical note in case
+   * a future reader remembers this guard and goes looking for it.
    */
-  .garage__gate[hidden] {
-    display: none;
-  }
-
   .garage__gate {
     display: flex;
     flex-direction: column;
@@ -3747,32 +3782,19 @@ const hasReferences = Object.values(referenceCatalogue).some(
    * ------------------------------------------------------------------ */
 
   /*
-   * The `[hidden]` guard, and why these three need it (T2-303 review, F9).
+   * Why these three needed their own `[hidden]` guard (T2-303 review, F9),
+   * now superseded by the page-wide `.garage [hidden]` rule (F10) — the
+   * finding is worth keeping even though the fix moved.
    *
-   * An author-origin `display: flex` outranks the user-agent
-   * `[hidden] { display: none }` rule, so every one of these elements carried
-   * `hidden` from the script and rendered anyway. `.garage__gate` below
-   * documents the same trap and the glossary and community toolbars shipped
-   * it once each; these three missed the guard.
-   *
-   * It is not cosmetic here. `.garage__sheet` is what `paintCurrentState`
-   * hides while the records are in flight, so without this, opening vehicle B
-   * while its request was still running showed B's loading notice with
-   * **vehicle A's** odometer still asserted underneath it as computed fact —
-   * and it persisted into the failure state, which is the whole class of wrong
-   * answer this task exists to prevent. `.garage__sheet-block` is the group
-   * wrapper, so an empty "Past their date" heading rendered over nothing.
-   *
-   * `.garage__sheet-list` is included because it is the same trap waiting: no
-   * caller hides one today, and the first one that does would find out the
-   * same way.
+   * `.garage__sheet` is what `paintCurrentState` hides while the records are
+   * in flight, so without a guard, opening vehicle B while its request was
+   * still running showed B's loading notice with **vehicle A's** odometer
+   * still asserted underneath it as computed fact — and it persisted into
+   * the failure state, which is the whole class of wrong answer this task
+   * exists to prevent. `.garage__sheet-block` is the group wrapper, so an
+   * empty "Past their date" heading rendered over nothing. `.garage__sheet-list`
+   * was included pre-emptively because it was the same trap waiting.
    */
-  .garage__sheet[hidden],
-  .garage__sheet-block[hidden],
-  .garage__sheet-list[hidden] {
-    display: none;
-  }
-
   .garage__sheet {
     display: flex;
     flex-direction: column;
@@ -3990,10 +4012,10 @@ const hasReferences = Object.values(referenceCatalogue).some(
     list-style: none;
   }
 
-  .garage__chips[hidden],
-  .garage__links[hidden] {
-    display: none;
-  }
+  /*
+   * These two used to carry their own `[hidden]` guard, superseded by the
+   * page-wide `.garage [hidden]` rule (F10).
+   */
 
   .garage__chip {
     font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
@@ -4080,9 +4102,10 @@ const hasReferences = Object.values(referenceCatalogue).some(
     gap: 0.75rem;
   }
 
-  .garage__receipt-form[hidden] {
-    display: none;
-  }
+  /*
+   * `.garage__receipt-form` used to carry its own `[hidden]` guard,
+   * superseded by the page-wide `.garage [hidden]` rule (F10).
+   */
 
   .garage__receipt-list {
     display: flex;
