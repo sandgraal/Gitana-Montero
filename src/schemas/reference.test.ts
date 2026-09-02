@@ -18,7 +18,7 @@
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { z } from "astro/zod";
-import { issuePaths } from "../../tests/helpers/schema-outcome.ts";
+import { issueCodes, issuePaths } from "../../tests/helpers/schema-outcome.ts";
 import {
   COLLECTION_ENTRY_PATTERNS,
   DATA_ENTRY_PATTERN,
@@ -1309,5 +1309,250 @@ describe("the safety hook", () => {
       schema.safeParse(torqueEntry({ system: "body", safetyCritical: false }))
         .success
     ).toBe(true);
+  });
+});
+
+/* -------------------------------------------------------------------------
+ * T208 audit follow-up — the independent `[TEST]` back-fill (T901 ledger)
+ *
+ * Everything above this line was written by the agent that wrote
+ * `src/schemas/reference.ts`. Everything below it was written by a separate
+ * `test-writer` pass that read only `specs/001-foundation/spec.md`, the T207
+ * and T208 tasks.md lines, and the schema module's own stated rules — the
+ * AGENTS.md separation the T901 audit found unmet for this surface.
+ *
+ * Three findings, in the order the audit numbered them. Two of the three are
+ * *coverage* gaps: the behaviour is correct today and the existing graders
+ * cannot tell. They are green here and their value is the mutation battery
+ * recorded on the branch, not a red run. The third (F3) is a live defect, so
+ * its graders carry `it.fails` — one marker line per test, deleted by the
+ * implementer as each is fixed.
+ *
+ * refs specs/001-foundation (REF-01, REF-02)
+ * ---------------------------------------------------------------------- */
+
+describe("F1 — the excluded-letter list is pinned, not derived from itself", () => {
+  /*
+   * The grader above (`it.each([...VIN_EXCLUDED_LETTERS])`) reads its own
+   * table out of the constant it exists to grade. Drop `"O"` from
+   * `VIN_EXCLUDED_LETTERS` and that suite does not go red — it goes *shorter*,
+   * silently, from three cases to two, and a green run reports the same word
+   * either way. The literal below is the whole point: ISO 3779's excluded set
+   * is a fact about the standard, not about this repo's source file, so it is
+   * written out by hand and only changes when someone decides to change it.
+   */
+  it.each(["I", "O", "Q"])(
+    "REJECTS the literal letter %s in a VIN code (hard-coded, not spread)",
+    (letter) => {
+      const outcome = schema.safeParse(vinCodeEntry({ code: letter }));
+      expect(issuePaths(outcome)).toContain("code");
+      expect(JSON.stringify(outcome)).toMatch(/ISO 3779/);
+    }
+  );
+
+  it("pins VIN_EXCLUDED_LETTERS itself — the constant, not its consequences", () => {
+    expect([...VIN_EXCLUDED_LETTERS]).toEqual(["I", "O", "Q"]);
+  });
+
+  /*
+   * Positive control for the rule as a whole: the check rejects three letters,
+   * not "letters". `0` and `1` are here on purpose — they are the two
+   * characters ISO 3779 excludes `O` and `I` *for*, and a rule that confused
+   * the pair with the pair it protects would fail here rather than in content.
+   */
+  it.each(["N", "S", "Z", "0", "1"])(
+    "still accepts %s, which a VIN does contain",
+    (code) => {
+      expect(schema.safeParse(vinCodeEntry({ code })).success, code).toBe(true);
+    }
+  );
+});
+
+describe("F2 — the 17-position ceiling, with no section bound masking it", () => {
+  /*
+   * `vinPositionsSchema.max(VIN_LENGTH)` is the only defence in exactly two
+   * places, and the existing graders exercise neither:
+   *
+   * - **`vin-code`** has no `checkVinPositionSection` at all (it carries no
+   *   `encodes`), by design — a code row is scoped by its own `positions`.
+   * - **`vin-position` with `encodes: "check-digit"`** is bounded by no
+   *   section on purpose (`VIN_FIELD_SECTIONS["check-digit"] === null`, so
+   *   markets that place it differently are writable).
+   *
+   * "REJECTS a position outside the 17-character VIN" above uses the default
+   * `serial` fixture, whose section (12–17) rejects `18` and `1–71` on its
+   * own. Loosen `.max(VIN_LENGTH)` to `.max(99)` and that test stays green.
+   * These do not: every fixture below is one the section rule cannot see.
+   */
+  it("REJECTS a vin-code read from position 18 — nothing else bounds it", () => {
+    const outcome = schema.safeParse(vinCodeEntry({ positions: { from: 18 } }));
+    expect(issuePaths(outcome)).toContain("positions.from");
+    expect(issueCodes(outcome)).toContain("too_big");
+  });
+
+  it("REJECTS a vin-code range wholly past the end of the VIN (20–25)", () => {
+    // The code is six characters so the position-fill rule is satisfied: if
+    // the ceiling goes, nothing at all is left to reject this row.
+    const outcome = schema.safeParse(
+      vinCodeEntry({ positions: { from: 20, to: 25 }, code: "ZZZZZZ" })
+    );
+    expect(issuePaths(outcome)).toContain("positions.from");
+    expect(issuePaths(outcome)).toContain("positions.to");
+    expect(issueCodes(outcome)).toContain("too_big");
+  });
+
+  it("REJECTS a check-digit row at position 18 — the section bound is null", () => {
+    const outcome = schema.safeParse(
+      vinPositionEntry({ encodes: "check-digit", positions: { from: 18 } })
+    );
+    expect(issuePaths(outcome)).toContain("positions.from");
+    expect(issueCodes(outcome)).toContain("too_big");
+    // For the right reason: `check-digit` is deliberately unplaced, so this
+    // must NOT be the ISO-3779 section message wearing a different hat.
+    expect(JSON.stringify(outcome)).not.toMatch(/is encoded in positions/);
+  });
+
+  it("accepts the same three rows at the last position that exists", () => {
+    expect(
+      schema.safeParse(vinCodeEntry({ positions: { from: 17 } })).success,
+      "vin-code at 17"
+    ).toBe(true);
+    expect(
+      schema.safeParse(
+        vinCodeEntry({ positions: { from: 12, to: 17 }, code: "ZZZZZZ" })
+      ).success,
+      "vin-code 12–17"
+    ).toBe(true);
+    expect(
+      schema.safeParse(
+        vinPositionEntry({ encodes: "check-digit", positions: { from: 17 } })
+      ).success,
+      "check-digit at 17"
+    ).toBe(true);
+  });
+});
+
+describe("F3 — a decoded model year needs a window that DISAMBIGUATES it", () => {
+  /*
+   * The rule's own error message states the requirement: "the VIN's year
+   * cipher repeats every thirty years — `2002` is also 1972 and 2032 — so a
+   * row that decodes a year states the window it decodes it in". A window
+   * satisfies that sentence only when it can contain exactly one of a
+   * thirty-apart pair. Two things follow, and `checkDecodedMeaning` enforces
+   * neither:
+   *
+   * 1. **Both bounds are required.** `fitment.years` has `from` and `to`
+   *    independently optional (`src/schemas/entry.ts`), so `{ to: 2021 }` and
+   *    `{ from: 1982 }` are both writable — and both are accepted today for
+   *    `1982` *and* for `2012`, which is the exact ambiguity the rule exists
+   *    to refuse. `reference.ts:1298` is the branch that does it.
+   * 2. **The window must be narrower than the cipher.** A closed window still
+   *    fails to disambiguate once `to - from >= 30`; and
+   *    `PRODUCTION_YEAR_RANGE` is 1982–2021, thirty-nine years, so "the whole
+   *    production run" is a window a content author can plausibly write and
+   *    that decodes nothing.
+   *
+   * Correct rule, derived from the message above and REF-02's intent: when
+   * `decodesTo.modelYear` is stated, `fitment.years` states BOTH `from` and
+   * `to`, and `to - from < 30`.
+   *
+   * **RATIFIED (conductor ruling, 2026-09-01) — this rule ships as written.**
+   * The graders below were authored before it was ruled on, so the ruling is
+   * recorded here, in the artifact, rather than only in a dispatch report.
+   * Three parts:
+   *
+   * - `to - from < 30` is the correct predicate, not a guess: a closed window
+   *   disambiguates the thirty-year cipher **iff** it contains no pair thirty
+   *   years apart, which for integer bounds is exactly this inequality.
+   * - It needs **no content migration**. All seven real entries carrying
+   *   `decodesTo.modelYear` (`vin-code-gen3-us-year-2001`…`-2006` and
+   *   `vin-code-gen3-export-year-1`) already state single-year closed windows.
+   * - It is deliberately scoped to rows that state `decodesTo.modelYear`, and
+   *   must **not** be generalized to `fitment.years` at large: seven real
+   *   entries elsewhere use half-open windows legitimately and a global rule
+   *   would break them.
+   *
+   * **Recorded follow-up, NOT required for correctness:** whether the window
+   * should further be generation-scoped (tighter than the full cipher period)
+   * is open and is a nice-to-have. Cipher-safety is sufficient; do not treat
+   * that question as blocking this fix.
+   *
+   * The `it.fails` lines below are the current defect, pinned. The three
+   * unmarked tests are the positive controls and pass today and after.
+   */
+  const yearRow = (
+    modelYear: number,
+    years?: Record<string, number>
+  ): Record<string, unknown> =>
+    vinCodeEntry({
+      positions: { from: 10 },
+      code: "2",
+      system: "general",
+      fitment: years ? { gens: ["gen3"], years } : { gens: ["gen3"] },
+      decodesTo: { modelYear },
+    });
+
+  const rejects = (entry: Record<string, unknown>): void => {
+    const outcome = schema.safeParse(entry);
+    expect(issuePaths(outcome)).toContain("decodesTo.modelYear");
+    expect(JSON.stringify(outcome)).toMatch(/thirty years/);
+  };
+
+  it.fails("REJECTS a half-open `{ to: 2021 }` window decoding 1982", () => {
+    rejects(yearRow(1982, { to: 2021 }));
+  });
+
+  it.fails("REJECTS the same `{ to: 2021 }` window decoding 2012", () => {
+    // Paired with the case above on purpose: one window, two readings thirty
+    // years apart, both accepted — the window disambiguates nothing.
+    rejects(yearRow(2012, { to: 2021 }));
+  });
+
+  it.fails(
+    "REJECTS an open-ended `{ from: 1982 }` window decoding 1982",
+    () => {
+      rejects(yearRow(1982, { from: 1982 }));
+    }
+  );
+
+  it.fails("REJECTS the same `{ from: 1982 }` window decoding 2012", () => {
+    rejects(yearRow(2012, { from: 1982 }));
+  });
+
+  it.fails("REJECTS the whole production run as a window (1982–2021)", () => {
+    // Thirty-nine years. Closed, in range, and still holds 1982 and 2012.
+    rejects(yearRow(2002, { from: 1982, to: 2021 }));
+  });
+
+  it.fails("REJECTS a window exactly as wide as the cipher (1990–2020)", () => {
+    // The boundary: `to - from === 30` holds both 1990 and 2020.
+    rejects(yearRow(1990, { from: 1990, to: 2020 }));
+  });
+
+  it("accepts the widest window that still disambiguates (1990–2019)", () => {
+    // `to - from === 29`, which is **30 model years** inclusive — the largest
+    // window holding no two years thirty apart, so it is exactly on the right
+    // side of the line the test above is on the wrong side of.
+    //
+    // Note that `to - from < 30` and `to - from <= 29` are the same predicate
+    // over integers; either spelling is correct. The drift this positive
+    // control exists to catch is a rule tightened one step further — to
+    // `to - from < 29` — which would start rejecting correct thirty-model-year
+    // windows that disambiguate perfectly well.
+    expect(
+      schema.safeParse(yearRow(2002, { from: 1990, to: 2019 })).success
+    ).toBe(true);
+  });
+
+  it("accepts a normal, real-shaped closed window (2001–2006)", () => {
+    expect(
+      schema.safeParse(yearRow(2002, { from: 2001, to: 2006 })).success
+    ).toBe(true);
+  });
+
+  it("keeps rejecting a year a well-formed window does not contain", () => {
+    // Positive control in the other direction: the containment half of the
+    // rule must survive whatever fixes the width and both-bounds halves.
+    rejects(yearRow(2012, { from: 2001, to: 2006 }));
   });
 });
