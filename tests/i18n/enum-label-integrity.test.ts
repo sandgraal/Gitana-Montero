@@ -29,12 +29,27 @@
  *    table cannot grade itself. Anchors are deliberately *keyword* checks with
  *    generous alternations, not exact-string pins: they must survive a
  *    legitimate copy edit ("Do not drive" → "Do not drive it") and still fail
- *    a swap. They cover `drivability.*` and `severity.*` only — the two
- *    families where being told the wrong thing has a physical consequence.
- *    `costBand.*` and `confidenceTier.*` get coverage and distinctness, no
- *    anchors: their EN labels legitimately share vocabulary ("A **major**
- *    component…" is the `significant` band), so a keyword anchor there would
- *    be a false-positive generator rather than a guard.
+ *    a swap. `ANCHORED_MEMBERS` below is the authoritative list of what is
+ *    anchored and the sweep holds the two in sync, so an anchor cannot be
+ *    quietly dropped and one cannot be added without saying so.
+ *
+ *    `drivability.*`, `severity.*` and `confidenceTier.*` are anchored in
+ *    full. The first two because being told the wrong thing has a physical
+ *    consequence; the third because `confidenceCaveatTemplate` fills `{tier}`
+ *    from this exact table, so a swapped tier label presents an anecdotal
+ *    entry with the authority of an FSM spec — the thing AGENTS.md prohibits
+ *    by name. (This file's first revision left `confidenceTier.*` unanchored
+ *    on a shared-vocabulary argument that is simply false for it: "Confirmed
+ *    in the Factory Service Manual (FSM)" and "Anecdotal" share nothing. A
+ *    reviewer swapped the pair and watched the full merge gate exit 0.)
+ *
+ *    `costBand.*` is anchored at `minimal` only, and that restriction is the
+ *    real vocabulary argument: the EN label for `significant` is "A **major**
+ *    component or a shop bill", so a keyword anchor on `major` would match
+ *    two bands and grade nothing. The cheap end has no such collision
+ *    (`cheap` / `barat`), and confusing "cheapest" with "a big share of what
+ *    the truck is worth" is the costly direction. Ordering the four bands
+ *    properly needs index anchoring against `COST_BANDS`, not more keywords.
  *
  * Rules 1 and 2 are stated as pure functions over an arbitrary label table and
  * exercised against synthetic corpora — a clean one that must report nothing
@@ -118,6 +133,24 @@ function duplicateLabelGroups(table: LabelTable): readonly string[] {
 
 /* -------------------------------------------------------------------------
  * The real families, derived from their enum constants.
+ *
+ * **Follow-up, deliberately not taken here.** `FAMILIES` is one line per
+ * family and `src/i18n/ui.ts` has several more keyed closed enums with the
+ * identical swap exposure. Two are worth a ticket of their own rather than a
+ * silent omission:
+ *
+ * - `crossReferenceQuality.*` — the verdict column of a parts page's
+ *   cross-reference table. `avoid` swapped with `oem-supplier` tells a reader
+ *   to buy the part the site means to warn them off; it is a
+ *   purchase-decision label, so getting it wrong costs a reader real money.
+ * - `glossarySystem.*` — fills `{system}` in `safetyNoticeLabelTemplate`, so
+ *   these labels name which system the standing safety notice is warning
+ *   about. A swap misdirects the warning itself.
+ *
+ * Also unguarded, lower stakes: `sourceKind.*`, `generation.*`, `drive.*`,
+ * `fitmentFacet.*`, `communityActivity.*`. Adding any of them is a `FAMILIES`
+ * entry (coverage + distinctness come free) plus, where the vocabulary
+ * allows, an `ANCHORED_MEMBERS` entry and its anchors.
  * ---------------------------------------------------------------------- */
 
 interface Family {
@@ -373,6 +406,118 @@ const ANCHOR_SPECS: readonly Anchor[] = [
     mustNot: /(segurid|peligr|riesg)/i,
     because: "same, in Spanish",
   },
+
+  /* --- confidenceTier: whose word this is ---------------------------------
+   *
+   * `confidenceCaveatTemplate` fills `{tier}` straight out of this family, so
+   * these labels are the sentence that tells a reader how much to trust the
+   * page. AGENTS.md: "an anecdotal entry must never be presented with the
+   * authority of an FSM spec" — a swapped label does exactly that, silently,
+   * and a reviewer confirmed the swap clears the whole merge gate.
+   *
+   * Each tier's `must` is a keyword only that tier's label can contain, so a
+   * swap between *any* two of the five fails on the receiving end, not only
+   * the two ends of the ladder. The extra `mustNot` on the top and bottom is
+   * belt-and-braces on the pair AGENTS.md names.
+   * -------------------------------------------------------------------- */
+  {
+    family: "confidenceTier",
+    member: "fsm-confirmed",
+    locale: "en",
+    must: /(fsm|factory\s*service|factory)/i,
+    mustNot: /anecdot/i,
+    because:
+      "the strongest tier names the factory manual; if it says `Anecdotal` " +
+      "the page grants FSM authority to hearsay",
+  },
+  {
+    family: "confidenceTier",
+    member: "fsm-confirmed",
+    locale: "es",
+    must: /(fsm|f[áa]brica|manual\s+de\s+servicio)/i,
+    mustNot: /anecd[oó]t/i,
+    because: "same, in Spanish",
+  },
+  {
+    family: "confidenceTier",
+    member: "anecdotal",
+    locale: "en",
+    must: /anecdot/i,
+    mustNot: /(fsm|factory|bulletin|tsb)/i,
+    because:
+      "the weakest tier must read as weak; a manual or bulletin word here " +
+      "means it has been swapped with an authoritative tier",
+  },
+  {
+    family: "confidenceTier",
+    member: "anecdotal",
+    locale: "es",
+    must: /anecd[oó]t/i,
+    mustNot: /(fsm|f[áa]brica|bolet[ií]n|tsb)/i,
+    because: "same, in Spanish",
+  },
+  {
+    family: "confidenceTier",
+    member: "tsb",
+    locale: "en",
+    must: /(tsb|bulletin)/i,
+    because: "a service bulletin is a named class of document, not a feeling",
+  },
+  {
+    family: "confidenceTier",
+    member: "tsb",
+    locale: "es",
+    must: /(tsb|bolet[ií]n)/i,
+    because: "same, in Spanish",
+  },
+  {
+    family: "confidenceTier",
+    member: "community-consensus",
+    locale: "en",
+    must: /(communit|consensus)/i,
+    because: "this tier is other owners agreeing, and has to say so",
+  },
+  {
+    family: "confidenceTier",
+    member: "community-consensus",
+    locale: "es",
+    must: /(comunidad|consenso)/i,
+    because: "same, in Spanish",
+  },
+  {
+    family: "confidenceTier",
+    member: "first-hand",
+    locale: "en",
+    must: /(first[\s-]*hand|own\s+experience)/i,
+    because: "one person's own experience — distinct from a whole community's",
+  },
+  {
+    family: "confidenceTier",
+    member: "first-hand",
+    locale: "es",
+    must: /(primera\s+mano|propia\s+experiencia)/i,
+    because: "same, in Spanish",
+  },
+
+  /* --- costBand: the cheap end only; see the header for why --- */
+  {
+    family: "costBand",
+    member: "minimal",
+    locale: "en",
+    must: /(cheap|least|minimal|small)/i,
+    mustNot: /(major|shop\s+bill|worth)/i,
+    because:
+      "the cheapest band must not read as the dearest; `cheap` collides with " +
+      "no other band's label, unlike `major`",
+  },
+  {
+    family: "costBand",
+    member: "minimal",
+    locale: "es",
+    must: /(barat|econ[oó]mic|m[ií]nim)/i,
+    mustNot: /(mayor|factura|vale\s+el)/i,
+    because: "same, in Spanish",
+  },
 ];
 
 /**
@@ -386,23 +531,43 @@ const ANCHORS = ANCHOR_SPECS.map((anchor) => ({
   key: `${anchor.family}.${anchor.member}`,
 }));
 
+/**
+ * Which members carry a semantic anchor — the authoritative statement, from
+ * which the sweep below is computed in both directions.
+ *
+ * Three families in full, derived from their constants so a fifth drivability
+ * state or a sixth confidence tier arrives unanchored *and red*, rather than
+ * unanchored and silent. `costBand` names one member by hand: see the header
+ * for why the other three are keyword-anchorable only by an ordering
+ * technique this file does not implement.
+ */
+const ANCHORED_MEMBERS: Readonly<Record<string, readonly string[]>> = {
+  drivability: DRIVABILITY_STATES,
+  severity: PROBLEM_SEVERITIES,
+  confidenceTier: CONFIDENCE_TIERS,
+  costBand: ["minimal"],
+};
+
 describe("safety-bearing labels still say what their enum id means", () => {
-  it("anchors every drivability state and every severity, in both locales", () => {
-    // A sweep, so an anchor cannot be quietly dropped: the anchor set must
-    // cover the full cross-product of the two families and the two locales.
+  it("anchors exactly what `ANCHORED_MEMBERS` declares, in both locales", () => {
+    // Both directions on purpose. Missing-side: an anchor cannot be quietly
+    // dropped. Extra-side: an anchor cannot be added without declaring it,
+    // which is what keeps the header's account of what is and is not anchored
+    // honest — the previous revision's account of `confidenceTier.*` was not.
     const expected = new Set<string>();
-    for (const member of DRIVABILITY_STATES) {
-      for (const locale of LOCALES)
-        expected.add(`drivability.${member}.${locale}`);
-    }
-    for (const member of PROBLEM_SEVERITIES) {
-      for (const locale of LOCALES)
-        expected.add(`severity.${member}.${locale}`);
+    for (const [family, members] of Object.entries(ANCHORED_MEMBERS)) {
+      for (const member of members) {
+        for (const locale of LOCALES) {
+          expected.add(`${family}.${member}.${locale}`);
+        }
+      }
     }
     const covered = new Set(
       ANCHORS.map((anchor) => `${anchor.key}.${anchor.locale}`)
     );
+
     expect([...expected].filter((key) => !covered.has(key))).toEqual([]);
+    expect([...covered].filter((key) => !expected.has(key))).toEqual([]);
   });
 
   it.each(ANCHORS)(
