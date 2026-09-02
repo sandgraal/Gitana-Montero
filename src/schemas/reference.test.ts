@@ -1324,9 +1324,10 @@ describe("the safety hook", () => {
  * Three findings, in the order the audit numbered them. Two of the three are
  * *coverage* gaps: the behaviour is correct today and the existing graders
  * cannot tell. They are green here and their value is the mutation battery
- * recorded on the branch, not a red run. The third (F3) is a live defect, so
- * its graders carry `it.fails` — one marker line per test, deleted by the
- * implementer as each is fixed.
+ * recorded on the branch, not a red run. The third (F3) was a live defect;
+ * its six rejection graders carried `it.fails` markers until an implementer
+ * applied the ratified rule on `fix/001-t208-model-year-cipher` and deleted
+ * them. All three suites now grade shipped behaviour.
  *
  * refs specs/001-foundation (REF-01, REF-02)
  * ---------------------------------------------------------------------- */
@@ -1434,51 +1435,50 @@ describe("F2 — the 17-position ceiling, with no section bound masking it", () 
 
 describe("F3 — a decoded model year needs a window that DISAMBIGUATES it", () => {
   /*
-   * The rule's own error message states the requirement: "the VIN's year
-   * cipher repeats every thirty years — `2002` is also 1972 and 2032 — so a
-   * row that decodes a year states the window it decodes it in". A window
-   * satisfies that sentence only when it can contain exactly one of a
-   * thirty-apart pair. Two things follow, and `checkDecodedMeaning` enforces
-   * neither:
+   * **The invariant these tests hold:** when a row states
+   * `decodesTo.modelYear`, its `fitment.years` states BOTH `from` and `to`,
+   * and `to - from < 30`.
+   *
+   * It follows from the rule's own error message — "the VIN's year cipher
+   * repeats every thirty years — `2002` is also 1972 and 2032 — so a row that
+   * decodes a year states the window it decodes it in". A window satisfies
+   * that sentence only when it can contain exactly one of a thirty-apart
+   * pair, and two requirements fall out of that:
    *
    * 1. **Both bounds are required.** `fitment.years` has `from` and `to`
    *    independently optional (`src/schemas/entry.ts`), so `{ to: 2021 }` and
-   *    `{ from: 1982 }` are both writable — and both are accepted today for
-   *    `1982` *and* for `2012`, which is the exact ambiguity the rule exists
-   *    to refuse. `reference.ts:1298` is the branch that does it.
+   *    `{ from: 1982 }` are both writable — and either one reads `1982` and
+   *    `2012` alike, which is the exact ambiguity the rule exists to refuse.
    * 2. **The window must be narrower than the cipher.** A closed window still
    *    fails to disambiguate once `to - from >= 30`; and
    *    `PRODUCTION_YEAR_RANGE` is 1982–2021, thirty-nine years, so "the whole
    *    production run" is a window a content author can plausibly write and
    *    that decodes nothing.
    *
-   * Correct rule, derived from the message above and REF-02's intent: when
-   * `decodesTo.modelYear` is stated, `fitment.years` states BOTH `from` and
-   * `to`, and `to - from < 30`.
+   * `to - from < 30` is the correct predicate, not a guess: a closed window
+   * disambiguates the thirty-year cipher **iff** it contains no pair thirty
+   * years apart, which for integer bounds is exactly this inequality.
    *
-   * **RATIFIED (conductor ruling, 2026-09-01) — this rule ships as written.**
-   * The graders below were authored before it was ruled on, so the ruling is
-   * recorded here, in the artifact, rather than only in a dispatch report.
-   * Three parts:
-   *
-   * - `to - from < 30` is the correct predicate, not a guess: a closed window
-   *   disambiguates the thirty-year cipher **iff** it contains no pair thirty
-   *   years apart, which for integer bounds is exactly this inequality.
-   * - It needs **no content migration**. All seven real entries carrying
-   *   `decodesTo.modelYear` (`vin-code-gen3-us-year-2001`…`-2006` and
-   *   `vin-code-gen3-export-year-1`) already state single-year closed windows.
-   * - It is deliberately scoped to rows that state `decodesTo.modelYear`, and
-   *   must **not** be generalized to `fitment.years` at large: seven real
-   *   entries elsewhere use half-open windows legitimately and a global rule
-   *   would break them.
+   * **Provenance.** This suite was written by the independent `[TEST]`
+   * back-fill (T901 ledger) against a `checkDecodedMeaning` that enforced
+   * neither requirement — it accepted both half-open windows and any closed
+   * window thirty years or wider. The six rejection cases below carried
+   * `it.fails` markers pinning that defect. The conductor ratified the rule
+   * as written (2026-09-01) on three grounds: the predicate above is
+   * mathematically exact; it needed **no content migration** (all seven real
+   * entries carrying `decodesTo.modelYear` —
+   * `vin-code-gen3-us-year-2001`…`-2006` and `vin-code-gen3-export-year-1` —
+   * already state single-year closed windows); and it is deliberately scoped
+   * to rows that state `decodesTo.modelYear` and must **not** be generalized
+   * to `fitment.years` at large, where seven real entries use half-open
+   * windows legitimately. An implementer applied it on
+   * `fix/001-t208-model-year-cipher` and deleted the markers; every test here
+   * is now a live grader of shipped behaviour, and reverting that one guard
+   * in `reference.ts` turns exactly these six red.
    *
    * **Recorded follow-up, NOT required for correctness:** whether the window
    * should further be generation-scoped (tighter than the full cipher period)
-   * is open and is a nice-to-have. Cipher-safety is sufficient; do not treat
-   * that question as blocking this fix.
-   *
-   * The `it.fails` lines below are the current defect, pinned. The three
-   * unmarked tests are the positive controls and pass today and after.
+   * is open and is a nice-to-have. Cipher-safety is sufficient.
    */
   const yearRow = (
     modelYear: number,
@@ -1504,7 +1504,8 @@ describe("F3 — a decoded model year needs a window that DISAMBIGUATES it", () 
 
   it("REJECTS the same `{ to: 2021 }` window decoding 2012", () => {
     // Paired with the case above on purpose: one window, two readings thirty
-    // years apart, both accepted — the window disambiguates nothing.
+    // years apart, so the window disambiguates nothing and neither reading of
+    // it may parse.
     rejects(yearRow(2012, { to: 2021 }));
   });
 
@@ -1549,7 +1550,7 @@ describe("F3 — a decoded model year needs a window that DISAMBIGUATES it", () 
 
   it("keeps rejecting a year a well-formed window does not contain", () => {
     // Positive control in the other direction: the containment half of the
-    // rule must survive whatever fixes the width and both-bounds halves.
+    // rule still holds alongside the width and both-bounds halves.
     rejects(yearRow(2012, { from: 2001, to: 2006 }));
   });
 });

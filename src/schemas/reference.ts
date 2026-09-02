@@ -387,10 +387,10 @@ export const VIN_LENGTH = 17;
 export const VIN_EXCLUDED_LETTERS = ["I", "O", "Q"] as const;
 
 /**
- * The VIN model-year cipher's period: the ten digits and the letters ISO 3779
- * leaves usable cycle every thirty model years (49 CFR 565.25 Table XIII), so
- * `2` stands for 1982, 2012 **and** 2042 with nothing in the character itself
- * to tell them apart.
+ * The VIN model-year cipher's period. The year character runs through a fixed
+ * sequence of letters and digits and then starts the sequence over, thirty
+ * model years later (49 CFR 565.25 Table XIII) — so `2` stands for 1982, 2012
+ * **and** 2042, with nothing in the character itself to tell them apart.
  *
  * A `fitment.years` window resolves that ambiguity **iff** it cannot hold two
  * years thirty apart — for integer bounds, exactly `to - from < 30` with both
