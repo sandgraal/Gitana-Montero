@@ -538,8 +538,57 @@ const SAFETY_SUBJECT_TERMS: readonly { label: string; pattern: RegExp }[] = [
   { label: "bolsa de aire (es)", pattern: /\bbolsas? de aire\b/ },
   { label: "levantar (es)", pattern: /\blevant\w*\b/ },
   { label: "peso bruto (es)", pattern: /\bpesos? brutos?\b/ },
-  { label: "carga util (es)", pattern: /\bcargas? utiles?\b/ },
+  { label: "carga util (es)", pattern: /\bcargas? util(es)?\b/ },
   { label: "capacidad de carga (es)", pattern: /\bcapacidad de carga\b/ },
+];
+
+/** Titles free of every term above, so a fixture only says one thing. */
+const NEUTRAL_EN_TITLE = "TEST fixture row";
+const NEUTRAL_ES_TITLE = "Ficha de prueba";
+
+/**
+ * One `[label, EN title, ES title]` fixture per row of
+ * {@link SAFETY_SUBJECT_TERMS}, each chosen so that **exactly** its own row
+ * matches — `null` means "use the neutral title for that locale".
+ *
+ * The equality this feeds (rather than "matched at least one row") is the whole
+ * point. GRADER-PRINCIPLES says to "mutation-test each clause of the rule
+ * separately, not just the rule as a whole", and a per-row deletion sweep of
+ * the first two rounds of this table found **11 of 18 rows silently deletable**
+ * with the entire suite green — including two rows added in round 2 whose own
+ * comment claimed they were individually pinned. They were not: their fixtures
+ * were covered by a *sibling* row (`gross … mass` carried the GVWR case,
+ * `capacidad de carga` carried the payload case), and `axle rating (en)` never
+ * fired on any fixture in the file at all (review F-E).
+ *
+ * A row with no isolating fixture is a row a later simplification deletes
+ * without consequence, which is how a whole safety category goes quiet. Every
+ * row added above owes a case here, and a completeness grader below enforces
+ * that rather than trusting this sentence.
+ */
+const ROW_ISOLATION_FIXTURES: readonly [
+  label: string,
+  titleEn: string | null,
+  titleEs: string | null,
+][] = [
+  ["towing (en)", "TEST towbar mounting point", null],
+  ["jacking (en)", "TEST jack point", null],
+  ["lifting (en)", "TEST lifting eye", null],
+  ["srs (en)", "TEST SRS module", null],
+  ["airbag (en)", "TEST airbag connector", null],
+  ["gross weight rating (en)", "TEST gross combination mass", null],
+  ["gvw/gcm abbreviations (en)", "TEST GVWR plate figure", null],
+  ["payload (en)", "TEST payload figure", null],
+  ["axle rating (en)", "TEST rear axle rating", null],
+  ["remolque (es)", null, "Remolque de prueba"],
+  ["gata (es)", null, "Gata hidráulica de prueba"],
+  ["elevador (es)", null, "Elevador de dos columnas"],
+  ["puntos de apoyo (es)", null, "Puntos de apoyo del bastidor"],
+  ["bolsa de aire (es)", null, "Bolsa de aire del conductor"],
+  ["levantar (es)", null, "Cómo levantar el carro"],
+  ["peso bruto (es)", null, "Peso bruto máximo"],
+  ["carga util (es)", null, "Carga útil máxima"],
+  ["capacidad de carga (es)", null, "Capacidad de carga del eje"],
 ];
 
 /**
@@ -784,27 +833,35 @@ describe("F3 — the safety-critical ratchet over shipped reference content", ()
     expect(violations[0]).toMatch(/peso bruto \(es\)/);
   });
 
-  it.each([
-    ["gvwr (en)", "TEST GVWR — gross combination mass", "TEST"],
-    ["payload (en)", "TEST payload rating", "TEST"],
-    ["carga util (es)", "TEST", "Capacidad de carga útil de prueba"],
-  ])("matches the load-rating spelling %s", (_label, titleEn, titleEs) => {
-    // One row per spelling, each asserted: "enumerate the category, not one
-    // spelling of it" (GRADER-PRINCIPLES). A table with a row that never fires
-    // is a category with a bypass built in.
-    const entry: CorpusEntry = {
-      id: "TEST-dimension-gen9-load-rating",
-      file: "TEST-dimension-gen9-load-rating.json",
-      data: {
-        kind: "dimension",
-        system: "general",
-        prose: {
-          en: { title: titleEn, summary: "TEST." },
-          es: { title: titleEs, summary: "TEST." },
+  // Per-row coverage: see `ROW_ISOLATION_FIXTURES` for why each case asserts
+  // an exact single-label match rather than "matched something" (review F-E).
+  it.each(ROW_ISOLATION_FIXTURES)(
+    "row %s fires, and fires alone",
+    (label, titleEn, titleEs) => {
+      const entry: CorpusEntry = {
+        id: "TEST-dimension-gen9-isolation-row",
+        file: "TEST-dimension-gen9-isolation-row.json",
+        data: {
+          kind: "dimension",
+          system: "general",
+          prose: {
+            en: { title: titleEn ?? NEUTRAL_EN_TITLE, summary: "TEST." },
+            es: { title: titleEs ?? NEUTRAL_ES_TITLE, summary: "TEST." },
+          },
         },
-      },
-    };
-    expect(safetySubjectMatches(entry).length).toBeGreaterThan(0);
+      };
+      expect(safetySubjectMatches(entry)).toEqual([label]);
+    }
+  );
+
+  it("has an isolating fixture for every row in the table", () => {
+    // The fixture table is itself a list, and "a sweep is only as complete as
+    // its list" (GRADER-PRINCIPLES). Derived from `SAFETY_SUBJECT_TERMS`, in
+    // order, so a row added without a fixture is a red test rather than
+    // another silently-deletable clause.
+    expect(ROW_ISOLATION_FIXTURES.map(([label]) => label)).toEqual(
+      SAFETY_SUBJECT_TERMS.map((term) => term.label)
+    );
   });
 
   it.each([
