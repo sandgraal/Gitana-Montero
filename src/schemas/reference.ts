@@ -221,7 +221,7 @@ export type DimensionUnit = (typeof DIMENSION_UNITS)[number];
  * nominal invented as the midpoint of a band is a number no source states,
  * which is the same failure as an invented part number in a smaller costume.
  */
-export interface QuantityOptions {
+export interface QuantityOptions<Units extends readonly [string, ...string[]]> {
   /**
    * Which of `units` may be stated as zero or negative. Empty by default: a
    * zero torque or a negative capacity is always an error, whatever unit it
@@ -235,13 +235,18 @@ export interface QuantityOptions {
    * named per unit here rather than turned on for the whole family — turning
    * it on for all of `DIMENSION_UNITS` is exactly the bug the audit found: a
    * wheelbase of `-2725 mm` and a kerb mass of `0 kg` both parsed.
+   *
+   * Typed against `Units` (T207 review, Copilot) so a `signedUnits` entry
+   * that is not actually one of the `units` passed to {@link quantitySchema}
+   * is a compile error, not a silent no-op — `signedUnits.has(unit)` below
+   * would otherwise accept a typo forever, because it would just never match.
    */
-  readonly signedUnits?: readonly string[];
+  readonly signedUnits?: readonly Units[number][];
 }
 
 export function quantitySchema<Units extends readonly [string, ...string[]]>(
   units: Units,
-  options: QuantityOptions = {}
+  options: QuantityOptions<Units> = {}
 ) {
   const signedUnits = new Set<string>(options.signedUnits ?? []);
 
@@ -377,6 +382,15 @@ export const serviceIntervalSchema = z
  * Generous on purpose — this is a guard against wholesale reproduction, not a
  * style rule, and a cap that legitimate summaries trip would just teach
  * authors to work around it.
+ *
+ * **Applied to both `title` and `summary`, not summary alone** (T207 audit,
+ * finding F2; see {@link checkFsmSectionProseLength}) — the name predates
+ * that fix and still says only "summary", but the cap itself, per locale,
+ * catches a long `title` exactly as it catches a long `summary`. Left
+ * unrenamed on purpose: this constant is imported by name from a `[TEST]`-owned
+ * grader (`tests/schemas/reference-guards.test.ts`), which implementers may
+ * not edit outside deleting `it.fails` markers, so a rename here would break
+ * that import with no safe fix available on this branch.
  */
 export const FSM_SUMMARY_MAX_LENGTH = 500;
 
