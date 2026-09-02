@@ -31,15 +31,30 @@ name: CI
 # That is why the Lighthouse budgets live in "Links + a11y" rather than in a
 # job of their own: they are merge-blocking today, with no settings change.
 #
-# ## The fourth job is deliberately NOT in that list
+# ## The fourth job is a narrow, time-boxed exception — not a precedent
 #
-# "Tier-B RLS graders (live stack)" is **advisory on purpose**, and is the one
-# case where the paragraph above does not apply. It reports on every PR and on
-# every push to `main`, it goes red when the live row-level-security proofs
-# break, and it blocks nothing. That is Stage 1 of the staged promotion in
-# `specs/001-foundation/audits/T901-tier-b-ci-investigation.md`; Stage 2 — the
-# owner adding it to `main`'s required contexts in repo settings after a soak
-# period — is a settings change nobody should make from this file. Nothing in
+# "Tier-B RLS graders (live stack)" is advisory on purpose. **This is not a
+# general licence to add advisory jobs**, and the rule above still governs
+# every other gate: if you are adding a check that should block merges, it goes
+# inside one of the three jobs named above. The exception is granted here only
+# because all four of these are true at once, and it expires when they stop
+# being true:
+#
+#   1. The check is *already written and passing* — it is 66 existing graders
+#      that ran nowhere in CI, not new coverage being introduced advisory-first.
+#   2. It depends on an unauthenticated third-party container registry
+#      (`public.ecr.aws`) whose flake rate under GitHub's shared runner IPs has
+#      been observed but not yet measured over time.
+#   3. There is a written, dated plan to make it required — Stage 2 in
+#      `specs/001-foundation/audits/T901-tier-b-ci-investigation.md` — with a
+#      stated trigger (~15–20 PRs) and a stated metric, not a vague intention.
+#   4. Advisory is strictly better than the status quo it replaces, which was
+#      the check running on no CI path at all.
+#
+# Anything that cannot claim all four belongs in a required job from day one.
+#
+# Stage 2 — the owner adding this to `main`'s required contexts in repo
+# settings — is a settings change nobody should make from this file. Nothing in
 # this file marks any job required; required-status configuration lives only in
 # repo settings, and the three names above are documentation of that setting,
 # not a declaration of it.
@@ -389,6 +404,23 @@ jobs:
     # ever wedges, this fails in 20 minutes instead of holding a runner for the
     # 6-hour default.
     timeout-minutes: 20
+    # ── Load-bearing. Do not delete this block. ──────────────────────────
+    # GitHub's default shell for a `run:` step is `bash -e {0}` — **without**
+    # `pipefail`. Naming `bash` explicitly gets
+    # `bash --noprofile --norc -eo pipefail {0}` instead. Two steps below pipe
+    # into `tee` to keep a log, and under the default shell the pipeline's exit
+    # status is `tee`'s (always 0), so `supabase start` could fail and the step
+    # would still go green — which would silently destroy this job's whole
+    # point *and* the failure-attribution rule stated above.
+    #
+    # This is not hypothetical: the investigation workflow this job was ported
+    # from handled it with `set +e` + `${PIPESTATUS[0]}` + a verdict step, and
+    # that control flow was lost in the port. Setting the default at the *job*
+    # level rather than per-step means a future step added here cannot
+    # reintroduce the same hole by forgetting a `shell:` key.
+    defaults:
+      run:
+        shell: bash
     env:
       # Pinned deliberately — bump this and the checksum step re-verifies the
       # new release automatically. Investigation-proven version.
@@ -434,12 +466,29 @@ jobs:
       - name: supabase start (images + boot + migrations)
         run: supabase start 2>&1 | tee supabase-start.log
 
-      # Re-applies the migrations against the already-warm stack. This is not
-      # redundant with the line above: `supabase start` folds the first
-      # migration run into a command that also pulls images, so a migration
-      # that only fails on a *second* application — a non-idempotent DDL edit,
-      # the classic one — would be invisible without this. ~24 s.
-      - name: supabase db reset (migrations, re-applied)
+      # `db reset` **drops and recreates the database**, then replays every
+      # migration from zero against the already-warm containers.
+      #
+      # Read that sentence before editing this step. An earlier version of this
+      # comment claimed the step catches "a migration that only fails on a
+      # second application" — a non-idempotent DDL edit. That is wrong and the
+      # step structurally cannot do it: because reset starts from an empty
+      # database, this is a second *fresh* application, not a second
+      # application onto the migrated schema. The migrations here contain 28
+      # `create` statements with no `if not exists` / `or replace`, so if reset
+      # really did replay onto the live post-`start` database, `create table
+      # public.profiles` would have errored "already exists" on every one of
+      # the four green investigation runs. It didn't.
+      #
+      # What it actually buys, which is worth the ~24 s:
+      #  • Proves the migrations apply cleanly from zero **independently of the
+      #    image-pull step** — `supabase start` folds its first migration run
+      #    into a command that also pulls containers, so a migration failure
+      #    there is entangled with registry noise. Here it is not.
+      #  • Gives the graders a database in a known, empty, just-migrated state
+      #    rather than whatever `start` happened to leave behind.
+      #  • Exercises the seed path (`[db.seed]` in config.toml).
+      - name: supabase db reset (migrations replayed from an empty database)
         run: supabase db reset 2>&1 | tee supabase-reset.log
 
       # Run exactly as a developer runs it. The env flags live in the script,
@@ -460,15 +509,26 @@ jobs:
         if: always()
         run: |
           set +e
-          throttles=$(grep -c 'toomanyrequests\|Retrying after' supabase-start.log 2>/dev/null || echo 0)
+          # NOT `$(... || echo 0)`: `grep -c` prints "0" *and* exits 1 when it
+          # matches nothing, so the `||` branch fires too and the variable
+          # becomes the two-line string "0\n0" in the common healthy case.
+          # Capture, then default only if genuinely empty (missing file).
+          throttles=$(grep -c 'toomanyrequests\|Retrying after' supabase-start.log 2>/dev/null)
+          throttles=${throttles:-0}
           {
             echo "## Tier-B soak telemetry"
             echo ""
             echo "- job outcome so far: \`${{ job.status }}\`"
-            echo "- \`public.ecr.aws\` throttle/retry lines during \`supabase start\`: **${throttles}**"
+            echo "- \`public.ecr.aws\` throttle/retry **log lines** during \`supabase start\`: **${throttles}**"
+            echo ""
+            echo "That is a count of matching log *lines*, not of throttle events."
+            echo "The CLI prints roughly two lines per event (one"
+            echo "\`toomanyrequests\`, one \`Retrying after\`), so read it as"
+            echo "approximately 2x the real event count — useful for comparing"
+            echo "runs against each other, not as a precise number."
             echo ""
             echo "A red run that never got past \`supabase start\` **and** shows a"
-            echo "non-zero throttle count is a registry flake, not a grader failure."
+            echo "non-zero count is a registry flake, not a grader failure."
             echo "Count those separately when deciding Stage 2 (promotion to a"
             echo "required context) — see this file's header."
           } >> "$GITHUB_STEP_SUMMARY"

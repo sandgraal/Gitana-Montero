@@ -409,7 +409,9 @@ explicit `[TEST]` back-fill task before T501 rather than after.
 
 ### 5.5 New standing risk — 66 security graders are skipped by default and are not run in CI
 
-> **CLOSED 2026-09-01** (branch `fix/001-ci-tier-b-promote`). The premise below
+> **PARTIALLY CLOSED 2026-09-01** (branch `fix/001-ci-tier-b-promote`) — the
+> "not run in CI" half is closed; the "not enforced at merge" half is only
+> downgraded, and stays open until Stage 2. The premise below
 > — "CI has no Docker" — was never tested and turned out to be false. GitHub's
 > stock `ubuntu-latest` image ships Docker Engine 28.0.4 and Compose v2.38.2;
 > `supabase start` completes in 66–73 s and all 66 graders run green, four for
