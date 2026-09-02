@@ -704,7 +704,7 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   body, not by any grader in this file — **T2-404's reviewer must verify it by
   reading.**
 
-- [ ] **T2-401 [TEST]** Sharing graders: private-by-default proofs at the URL
+- [x] **T2-401 [TEST]** Sharing graders: private-by-default proofs at the URL
   level, per-record cost masking on public work-logs, showcase toggle
   round-trip, **and the typed grants of SHR-05..09**. Depends: T2-401a, T2-302.
   *(SHR-01..09)*
@@ -789,6 +789,34 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   *accepted*. The rule could become over-strict and reject a legitimate return
   shape with no test noticing, which is the direction that gets a security rule
   deleted rather than fixed. One fixture closes it.
+  <br>**Landed 2026-09-02.** Six new grader files (`share-grants`,
+  `share-delivery`, `receipt-signer`, `handles`, `public-pages`, plus the two
+  behavioural ones below), six new rules in `rules.ts`, three seam modules under
+  `src/lib/garage/` (`visibility`, `handles`, `share-link`), and `shares` +
+  `profiles.handle` declared in `USER_TABLES` behind a new `pending` marker so
+  every existing `it.each` sweep partitions instead of going red without a
+  marker. 15 mutants over the new rules, all killed. **Two findings the task
+  did not anticipate:**
+  <br>*(b) is worse than recorded — the inherited defence does not exist.* The
+  review's note assumed RLS on `vehicles` would save a mis-joined policy.
+  Verified against the running database: it does **not**. A policy reading
+  `exists (select 1 from public.vehicles v where records.vehicle_id is not null
+  and v.owner_id = auth.uid())` passes `isOwnerScoped` intact **and lets owner B
+  read owner A's records** — because RLS filters the subquery to B's own
+  vehicles, so `exists` degenerates into "does B own anything". Closed at both
+  tiers: `subqueryCorrelationIssues` (Tier A, requires the join to use the
+  contract's declared ownership column) and `policy-join-semantics.test.ts`,
+  which asserts the leak on a replica of the shipped shape so the property stays
+  recorded rather than assumed.
+  <br>*A live-target hazard in the Tier B harness.* The Supabase CLI gives every
+  project the same default ports, so `127.0.0.1:54321/54322` is whichever
+  checkout started first — observed on this machine, where an unrelated project
+  held them and monterogarage came up on 56321/56322. `assertLocalTarget`
+  answers "is this my machine", not "is this my project", and the PostgREST tier
+  creates and **deletes** accounts. `db.ts` checks the migration ledger before
+  it will run; `harness.ts` has no equivalent and is a live foot-gun for anyone
+  running `npm run test:garage` with a second stack up. Left for a follow-up
+  rather than fixed here — it is T2-201 harness surface, not T2-401's.
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*

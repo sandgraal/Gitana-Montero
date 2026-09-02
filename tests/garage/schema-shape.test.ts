@@ -36,8 +36,11 @@
  */
 import { describe, expect, it } from "vitest";
 import {
+  PENDING_USER_TABLES,
+  SHIPPED_USER_TABLES,
   TEST_TAXONOMY_IDENTITY,
   USER_TABLES,
+  columnRows,
   testReceiptPath,
   testVehicleName,
 } from "./contract.ts";
@@ -70,23 +73,48 @@ const RECORD_KINDS = ["work", "receipt", "note", "plan"] as const;
  * Tier A — declaration
  * ====================================================================== */
 
+/**
+ * The shipped half and the pending half of the same sweep.
+ *
+ * `contract.ts` gained two pending entries in T2-401 — `profiles.handle`
+ * (SHR-02, T2-402) and the whole of `shares` (SHR-05..08, T2-404) — and the
+ * sweeps below partition on that rather than dropping them. See
+ * `ColumnContract.pending`: a pending row that were simply left out of the
+ * table would be a requirement with no grader, and a pending row swept
+ * unmarked would be a red suite with no marker naming what it waits for.
+ */
+const SHIPPED = columnRows(false);
+const PENDING = columnRows(true);
+
 describe("every user-data table exists", () => {
-  it.each(USER_TABLES.map((table) => [table.name, table.requirement]))(
+  it.each(SHIPPED_USER_TABLES.map((table) => [table.name, table.requirement]))(
     "public.%s is created (%s)",
     (table) => {
       expect(createTableBody(migrationSql(), table)).not.toBeNull();
     }
   );
+
+  it.fails.each(
+    PENDING_USER_TABLES.map((table) => [
+      table.name,
+      table.requirement,
+      table.pending ?? "",
+    ])
+  )("public.%s is created (%s) — pending %s", (table) => {
+    expect(createTableBody(migrationSql(), table)).not.toBeNull();
+  });
 });
 
 describe("every column a requirement asks for is declared", () => {
-  const rows = USER_TABLES.flatMap((table) =>
-    table.columns.map(
-      (column) => [table.name, column.name, column.requirement, column] as const
-    )
-  );
+  const rows = SHIPPED;
 
   it.each(rows)("%s.%s exists (%s)", (table, column) => {
+    const body = createTableBody(migrationSql(), table);
+    expect(body).not.toBeNull();
+    expect(columnDefinition(body ?? "", column)).not.toBeNull();
+  });
+
+  it.fails.each(PENDING)("%s.%s exists (%s)", (table, column) => {
     const body = createTableBody(migrationSql(), table);
     expect(body).not.toBeNull();
     expect(columnDefinition(body ?? "", column)).not.toBeNull();
@@ -100,6 +128,24 @@ describe("every column a requirement asks for is declared", () => {
 
       expect(definition).not.toBeNull();
       expect(definition?.definition ?? "").toMatch(contract.type as RegExp);
+    }
+  );
+
+  it.fails.each(PENDING.filter(([, , , column]) => column.type !== undefined))(
+    "%s.%s has the type the requirement implies (%s)",
+    (table, column, _requirement, contract) => {
+      const body = createTableBody(migrationSql(), table);
+      const definition = columnDefinition(body ?? "", column);
+
+      expect(definition).not.toBeNull();
+      expect(definition?.definition ?? "").toMatch(contract.type as RegExp);
+    }
+  );
+
+  it.fails.each(PENDING.filter(([, , , column]) => column.notNull === true))(
+    "%s.%s cannot be null (%s)",
+    (table, column) => {
+      expect(isNotNullFor(migrationSql(), table, column)).toBe(true);
     }
   );
 
@@ -130,20 +176,26 @@ describe("optional columns stay optional — a record is allowed to be sparse", 
   // absence that way are flagged in contract.ts; a scalar like `cost_amount`
   // is not one of them, because `not null default 0` is not an empty value,
   // it is a claim that the job was free.
-  const optional = USER_TABLES.flatMap((table) =>
-    table.columns
-      .filter((column) => !column.notNull && column.defaultsTo === undefined)
-      .map(
-        (column) =>
-          [
-            table.name,
-            column.name,
-            column.absenceDefaultAllowed === true,
-          ] as const
+  const optionalOf = (pending: boolean) =>
+    columnRows(pending)
+      .filter(
+        ([, , , column]) => !column.notNull && column.defaultsTo === undefined
       )
+      .map(
+        ([table, column, , contract]) =>
+          [table, column, contract.absenceDefaultAllowed === true] as const
+      );
+
+  it.each(optionalOf(false))(
+    "%s.%s is optional",
+    (table, column, absenceDefaultAllowed) => {
+      expect(
+        isOptionalColumn(migrationSql(), table, column, absenceDefaultAllowed)
+      ).toBe(true);
+    }
   );
 
-  it.each(optional)(
+  it.fails.each(optionalOf(true))(
     "%s.%s is optional",
     (table, column, absenceDefaultAllowed) => {
       expect(
@@ -408,10 +460,40 @@ describe.skipIf(!live.available)(
 describe("the declaration graders above are reading a real contract", () => {
   // Unmarked: if `contract.ts` ever loses its column list, every `it.each`
   // above silently becomes zero graders and the suite still reports green.
-  it("grades at least thirty columns across the four tables", () => {
+  it("grades at least thirty columns across the user tables", () => {
     const columns = USER_TABLES.flatMap((table) => table.columns);
 
     expect(columns.length).toBeGreaterThanOrEqual(30);
+  });
+
+  it("BOTH partitions are non-empty — neither sweep is vacuous", () => {
+    // The guard on the partition T2-401 introduced. `it.each([])` registers no
+    // graders at all and reports nothing, so a bug that put every row on one
+    // side would silently delete half this file — the shipped half would look
+    // complete and the `it.fails` half would simply not exist. Asserted rather
+    // than assumed, because the failure is invisible in the reporter.
+    expect(SHIPPED.length).toBeGreaterThan(20);
+    expect(PENDING.length).toBeGreaterThan(0);
+    expect(SHIPPED.length + PENDING.length).toBe(
+      USER_TABLES.flatMap((table) => table.columns).length
+    );
+  });
+
+  it("every pending entry names the task that ships it", () => {
+    // A `pending: ""` would partition the row into the marked half and tell a
+    // reader nothing about what they are waiting for.
+    for (const table of USER_TABLES) {
+      if (table.pending !== undefined) {
+        expect(table.pending, table.name).toMatch(/^T2-\d+[a-z]?$/);
+      }
+      for (const column of table.columns) {
+        if (column.pending !== undefined) {
+          expect(column.pending, `${table.name}.${column.name}`).toMatch(
+            /^T2-\d+[a-z]?$/
+          );
+        }
+      }
+    }
   });
 
   it("grades at least one default-bearing column", () => {

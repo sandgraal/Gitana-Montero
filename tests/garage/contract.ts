@@ -64,6 +64,27 @@ export interface ColumnContract {
    * job was free (T2-201 review, F8).
    */
   readonly absenceDefaultAllowed?: boolean;
+  /**
+   * The task that ships this column, when it does not exist yet.
+   *
+   * ## Why a marker rather than "add it when it lands" (T2-401)
+   *
+   * The `it.each` sweeps in `schema-shape.test.ts`, `sharing-default.test.ts`,
+   * `rls-deny-by-default.test.ts` and `deletion-cascade.test.ts` are all driven
+   * from this file, and they are **unmarked and green** — they describe a
+   * schema that exists. Adding a column for a feature nobody has built turns
+   * every one of those into a red test with no `it.fails` on it, which is the
+   * failure mode the expected-failure convention exists to prevent: a suite
+   * that is red for a reason the reporter cannot name gets "fixed" by deleting
+   * the assertion.
+   *
+   * So a pending entry is still a full contract entry — it is swept, counted,
+   * and completeness-checked exactly like every other — but the sweeps
+   * partition on this field and run the pending half under `it.fails`. The
+   * implementer activates it by deleting the `pending` line here and the
+   * `.fails` markers that quote it, and nothing else moves.
+   */
+  readonly pending?: string;
 }
 
 /** One table T2-202's DDL must create, with the ownership path RLS uses. */
@@ -72,6 +93,8 @@ export interface TableContract {
   readonly name: string;
   /** The requirement that puts this table in the schema. */
   readonly requirement: string;
+  /** The task that ships this table, when it does not exist yet. */
+  readonly pending?: string;
   /**
    * How a row reaches its owning user, as a chain of foreign keys ending at
    * `auth.users.id`. `["owner_id"]` means the table carries the owner
@@ -85,19 +108,23 @@ export interface TableContract {
 }
 
 /**
- * The four user-data tables. `profiles` exists because a user needs a row of
- * their own that is not `auth.users` (which no client may read).
+ * The user-data tables. `profiles` exists because a user needs a row of their
+ * own that is not `auth.users` (which no client may read).
  *
- * **Not graded here, and deliberately: SHR-02's public handle.** "a stable
- * public URL under their handle" implies a unique, immutable-ish,
- * reserved-word-screened identifier, and every one of those properties is a
- * grader of its own — uniqueness under concurrent signup, case folding,
- * whether `admin` and `api` are takeable, what happens to a published URL when
- * a handle changes. None of that is in T2-201's scope (ACC-01, ACC-03,
- * SHR-01, GAR-05′), and half-pinning it would be worse than leaving it open:
- * T2-202 would build to a contract that stops short of the hard parts.
- * **It belongs to T2-401 [TEST], with T2-402's public pages.** Named here so
- * nobody reads this file's silence as "handles are unconstrained".
+ * **SHR-02's public handle, taken up by T2-401.** T2-201 deferred it here by
+ * name — "a stable public URL under their handle" implies a unique,
+ * case-folded, reserved-word-screened identifier, and every one of those
+ * properties is a grader of its own. `profiles.handle` is now declared
+ * (pending T2-402) and the properties that make it safe are graded in
+ * `handles.test.ts`; the constants they read are at the foot of this file.
+ *
+ * **`shares` is declared here (pending T2-404), not exempted.** The
+ * `ungradedTableIssues` sweep goes red for any table in `public` that is
+ * neither enumerated here nor in `EXEMPT_PUBLIC_TABLES`, and that sweep is the
+ * whole of AGENTS.md's "every user table ships with row-level security proven
+ * by graders before content flows". Exempting the grants table — the one table
+ * in the schema that holds bearer secrets — to keep a build quiet would
+ * re-open the exact hole the sweep was added to close.
  */
 export const USER_TABLES: readonly TableContract[] = [
   {
@@ -115,6 +142,21 @@ export const USER_TABLES: readonly TableContract[] = [
         name: "deleted_at",
         requirement: "ACC-03 (the 30-day recovery window needs a mark)",
         type: /timestamptz|timestamp with time zone/,
+      },
+      {
+        // Nullable on purpose: a user who has never published anything needs
+        // no public identity, and forcing one on them at signup would make
+        // every account permanently addressable in a namespace SHR-01 says is
+        // private by default. The handle is claimed when a page is published.
+        //
+        // What is *not* optional is everything around it — uniqueness under
+        // concurrent signup, case folding, the reserved list, and what a
+        // rename does to a URL somebody already shared. Those are graded in
+        // `handles.test.ts`, because none of them is expressible as a column
+        // shape.
+        name: "handle",
+        requirement: "SHR-02 (a stable public URL under their handle)",
+        pending: "T2-402",
       },
     ],
   },
@@ -257,6 +299,119 @@ export const USER_TABLES: readonly TableContract[] = [
       { name: "issued_on", requirement: "GAR-05′", type: /date/ },
       { name: "amount", requirement: "GAR-05′", type: /numeric|int/ },
       { name: "currency", requirement: "GAR-05′" },
+    ],
+  },
+  {
+    /**
+     * The grants table (SHR-05..08) — declared by T2-401 [TEST], created by
+     * T2-404 [PLATFORM].
+     *
+     * ## Why it is a user table and not infrastructure
+     *
+     * A row here is a decision one owner made about one truck: who may look,
+     * at what, until when. It is owned, it is private, it cascades on account
+     * deletion, and it is the single most sensitive table in the schema
+     * because it holds the material a bearer presents. Every property the
+     * other four tables get — forced RLS, an owner-scoped policy in both
+     * `using` and `with check`, no anonymous grant, a cascade to `auth.users`
+     * — it gets too, and it gets them from the same sweeps rather than from
+     * hand-written one-offs.
+     *
+     * ## Ownership goes through the vehicle, not through a `granted_by`
+     *
+     * SHR-08 says the grant is revocable "by its issuer", and the issuer is
+     * the vehicle's owner. Hanging ownership off `vehicle_id` rather than off
+     * a second user column means there is exactly one answer to "whose grant
+     * is this", so a vehicle that changes hands cannot leave a live grant
+     * behind that answers to the previous owner — and the RLS predicate is the
+     * `records` predicate with one table name changed, a shape already proved
+     * against the whole cross-user matrix.
+     */
+    name: "shares",
+    requirement: "SHR-05 (a revocable, expiring, capability-scoped grant)",
+    pending: "T2-404",
+    ownershipPath: ["vehicle_id", "owner_id"],
+    columns: [
+      {
+        name: "id",
+        requirement: "SHR-05",
+        type: /uuid/,
+        notNull: true,
+        pending: "T2-404",
+      },
+      {
+        name: "vehicle_id",
+        requirement: "SHR-05 (a grant admits its holder to ONE vehicle)",
+        type: /uuid/,
+        notNull: true,
+        pending: "T2-404",
+      },
+      {
+        // `bytea`, not `text`: `digest(token, 'sha256')` returns bytea, and
+        // storing it as text invites a hex/base64 mismatch between the writer
+        // and the reader that fails open exactly once — on the comparison that
+        // was supposed to reject a stranger.
+        name: "token_hash",
+        requirement: "SHR-05 (the stored value is not the bearer secret)",
+        type: /bytea/,
+        notNull: true,
+        pending: "T2-404",
+      },
+      {
+        // SHR-05: "A grant SHALL carry a `kind` naming its preset
+        // (`mechanic`, `buyer`), and the preset SHALL be a label over explicit
+        // capability fields, never a branch in consuming code." The column
+        // exists so a grant can be *described*; it must never be what a reader
+        // switches on. `share-grants.test.ts` grades both halves.
+        name: "kind",
+        requirement: "SHR-05 (a preset label over explicit capabilities)",
+        notNull: true,
+        pending: "T2-404",
+      },
+      {
+        name: "includes_costs",
+        requirement: "SHR-06 (costs and receipts are two decisions, not one)",
+        type: /bool/,
+        notNull: true,
+        defaultsTo: "false",
+        pending: "T2-404",
+      },
+      {
+        name: "includes_receipts",
+        requirement: "SHR-06 (receipts open INDEPENDENTLY of costs)",
+        type: /bool/,
+        notNull: true,
+        defaultsTo: "false",
+        pending: "T2-404",
+      },
+      {
+        // `not null`: SHR-08 says every grant "SHALL carry an expiry", and a
+        // nullable expiry is a grant that never ends wearing the same column
+        // name as one that does. "Until revoked" (003 MEC-06) is a far date,
+        // not a null — a null is the state nobody notices until it is years
+        // old.
+        name: "expires_at",
+        requirement: "SHR-08 (every grant SHALL carry an expiry)",
+        type: /timestamptz|timestamp with time zone/,
+        notNull: true,
+        pending: "T2-404",
+      },
+      {
+        // Nullable, and that is the point: null means live. A revocation is a
+        // timestamp, not a delete, so "this grant was revoked on the 3rd"
+        // survives for the owner to see.
+        name: "revoked_at",
+        requirement: "SHR-08 (revocable by its issuer at any time)",
+        type: /timestamptz|timestamp with time zone/,
+        pending: "T2-404",
+      },
+      {
+        name: "created_at",
+        requirement: "SHR-08 (an owner cannot audit grants they cannot date)",
+        type: /timestamptz|timestamp with time zone/,
+        notNull: true,
+        pending: "T2-404",
+      },
     ],
   },
 ] as const;
@@ -445,6 +600,45 @@ export const PENDING_USER_TABLES: readonly TableContract[] = [
 ];
 
 /**
+ * The tables whose graders run unmarked, because the tables exist.
+ *
+ * Every `it.each` sweep over the contract partitions on this — see
+ * `ColumnContract.pending` for why the pending half is not simply left out.
+ */
+export const SHIPPED_USER_TABLES = USER_TABLES.filter(
+  (table) => table.pending === undefined
+);
+
+/** The tables a later task ships. Swept under `it.fails`, never dropped. */
+export const PENDING_USER_TABLES = USER_TABLES.filter(
+  (table) => table.pending !== undefined
+);
+
+/**
+ * Every `[table, column, requirement, contract]` row in the contract, split by
+ * whether the thing it describes exists yet.
+ *
+ * One helper rather than four copies of the same `flatMap` + partition, so a
+ * sweep cannot accidentally use the shipped half's predicate on the pending
+ * half's rows — which would report an expected failure as a pass.
+ */
+export function columnRows(
+  pending: boolean
+): readonly (readonly [string, string, string, ColumnContract])[] {
+  return USER_TABLES.flatMap((table) =>
+    table.columns
+      .filter(
+        (column) =>
+          ((table.pending ?? column.pending) !== undefined) === pending
+      )
+      .map(
+        (column) =>
+          [table.name, column.name, column.requirement, column] as const
+      )
+  );
+}
+
+/**
  * Every column whose *default* is the privacy guarantee. SHR-01 says
  * "everything a user stores SHALL default to private"; a boolean that is
  * nullable, or defaults to true, or has no default at all, breaks it — so all
@@ -454,6 +648,8 @@ export const SHARE_FLAG_COLUMNS: readonly {
   readonly table: string;
   readonly column: string;
   readonly requirement: string;
+  /** The task that ships it, when it does not exist yet. */
+  readonly pending?: string;
 }[] = USER_TABLES.flatMap((table) =>
   table.columns
     .filter((column) => column.defaultsTo === "false")
@@ -461,6 +657,7 @@ export const SHARE_FLAG_COLUMNS: readonly {
       table: table.name,
       column: column.name,
       requirement: column.requirement,
+      pending: table.pending ?? column.pending,
     }))
 );
 
@@ -856,17 +1053,194 @@ export const GRANT_REVOCATION_COLUMN = "revoked_at";
  * finding — "an ungraded table", which is what the constitution's "every user
  * table ships with row-level security proven by graders" forbids.
  *
- * **Empty today, and deliberately so.** The four tables that exist are all
- * enumerated. In particular `shares` is *not* exempt: when T2-404 creates it,
- * this sweep goes red until T2-401 adds it to `USER_TABLES`, which is exactly
- * the ordering the task list already encodes (T2-401 merges before T2-404).
- * Exempting it here to keep the build quiet would re-open the hole this map
- * was added to close.
+ * **Empty today, and deliberately so.** Every table that exists is enumerated,
+ * and so is every table a named task is going to create. In particular
+ * `shares` is *not* exempt — T2-401 added it to `USER_TABLES` as a pending
+ * entry, which is the ordering the task list encodes (T2-401 merges before
+ * T2-404). Exempting it here to keep a build quiet would re-open the hole this
+ * map was added to close.
  */
 export const EXEMPT_PUBLIC_TABLES: ReadonlyMap<string, string> = new Map<
   string,
   string
 >([]);
+
+/**
+ * `table.column` boolean columns that may default to **true**, and why.
+ *
+ * The companion to `optimisticBooleanDefaultIssues`, which sweeps every
+ * boolean in the schema rather than every boolean whose *name* looks like a
+ * visibility flag. That inversion is the whole point: the flag nobody told the
+ * guard about is, by construction, the one that does not follow the naming
+ * convention the guard was matching on.
+ *
+ * **Empty, and it should stay that way.** SHR-01 makes "defaults to private"
+ * the schema's posture, and a boolean that starts life `true` is a decision
+ * made on the user's behalf. Adding a row here is a deliberate diff in a file
+ * called `contract.ts`, reviewed beside the migration that needs it — which is
+ * exactly the visibility a default-open column should have to earn.
+ */
+export const OPTIMISTIC_BOOLEAN_DEFAULTS: ReadonlyMap<string, string> = new Map<
+  string,
+  string
+>([]);
+
+/* -------------------------------------------------------------------------
+ * Typed share grants, continued (SHR-05..09) — declared by T2-401 [TEST]
+ * ---------------------------------------------------------------------- */
+
+/**
+ * > **SHR-05** … A grant SHALL carry a `kind` naming its preset (`mechanic`,
+ * > `buyer`), and the preset SHALL be a label over explicit capability fields,
+ * > **never a branch in consuming code**.
+ *
+ * A closed set, in the style of `records.kind`: two presets and no third. The
+ * second half of the requirement is the half that is easy to lose, so it is
+ * graded separately — a reader whose body says `if kind = 'mechanic'` has made
+ * the label load-bearing, and the capability columns beside it decorative.
+ */
+export const SHARE_GRANT_KINDS = ["mechanic", "buyer"] as const;
+
+/**
+ * The capability columns a grant opens **independently** (SHR-06).
+ *
+ * Two, not one, and the graders check each against the other: a reader that
+ * refuses receipts only when costs are also shut has collapsed two decisions
+ * into one, which is precisely what SHR-06 forbids. That is a defect no schema
+ * grader can see — both columns exist and both default to false — so it is
+ * graded behaviourally, one cell per combination.
+ */
+export const SHARE_CAPABILITY_COLUMNS = [
+  "includes_costs",
+  "includes_receipts",
+] as const;
+
+/**
+ * The two authenticated RPCs an owner uses to manage grants.
+ *
+ * Named here for the same reason the readers are: a grader has to name
+ * something, and one line in this file is cheaper to renegotiate than five
+ * test files. What is not negotiable is that **revocation is never gated** —
+ * SHR-08 and 003 MON-02 both say so, and the grader for it asks whether the
+ * body consults anything but the caller's ownership of the vehicle.
+ */
+export const SHARE_CREATE_FUNCTION = "create_share_grant";
+export const SHARE_REVOKE_FUNCTION = "revoke_share_grant";
+
+/**
+ * The Edge Function that signs a receipt for a grant holder (T2-404).
+ *
+ * A Postgres function cannot mint a Supabase signed URL, so authorization
+ * stays in Postgres — the anon RPC validates the token and *resolves* the path
+ * — and the Edge Function signs the path it was handed back. The one rule that
+ * makes that split safe is that **the signer never accepts a caller-supplied
+ * path**; if it did, the authorization in Postgres would be advisory.
+ */
+export const RECEIPT_SIGNER_DIR = "supabase/functions/sign-receipt";
+
+/**
+ * The window a signed receipt URL may live for, in seconds.
+ *
+ * ## Why there is a ceiling at all
+ *
+ * A signed URL is a bearer credential that has left the building: it carries
+ * no session, it is not revocable, and it works for whoever holds it. SHR-08
+ * makes revocation take effect "on the next request" — but a signature already
+ * minted *is* the previous request's answer, and nothing recalls it. The TTL is
+ * therefore the only thing bounding a leaked signature, which makes the ceiling
+ * a security parameter and not a tuning knob.
+ *
+ * ## Why there is a floor
+ *
+ * A URL that dies before the image finishes loading on a bad connection in a
+ * workshop is a feature that does not work, and the fix somebody reaches for
+ * under pressure is a much larger number. 60 seconds is the smallest window
+ * that survives a slow mobile fetch; 300 is the largest that still bounds a
+ * leak to "minutes".
+ */
+export const SIGNED_URL_TTL_SECONDS = { min: 60, max: 300 } as const;
+
+/* -------------------------------------------------------------------------
+ * Public handles (SHR-02) — declared by T2-401 [TEST]
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The shape a handle may take.
+ *
+ * Lower-case, digits, and single interior hyphens. No dots (they make a handle
+ * look like a hostname and break the `x-default` hreflang pairing), no
+ * underscores (indistinguishable from a hyphen in a printed URL), no leading
+ * or trailing hyphen, and a floor of two characters so single letters stay
+ * available for the site's own routes.
+ */
+export const HANDLE_PATTERN = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+export const HANDLE_LENGTH = { min: 2, max: 32 } as const;
+
+/**
+ * Handles nobody may take, beyond the site's own route segments.
+ *
+ * ## Why this list is not the whole answer
+ *
+ * The dangerous collision is not `admin` — it is whatever route segment
+ * somebody adds next year. So the reserved set is graded as **a superset of
+ * the route segments that actually exist**, computed from `src/pages/` at test
+ * time, rather than as a hand-written list checked against itself. This
+ * constant is only the part a filesystem scan cannot know: words that would let
+ * an account impersonate the site or its operators.
+ *
+ * `admin` and `api` are named in the task brief and are both here. They are
+ * **not** takeable, and neither is any locale code, because `/es/` and a user
+ * called `es` are the same string in the same position of the same URL.
+ */
+export const RESERVED_HANDLES = [
+  // Impersonation. A handle is the only part of a garage URL a stranger types.
+  "admin",
+  "administrator",
+  "api",
+  "root",
+  "support",
+  "help",
+  "official",
+  "staff",
+  "moderator",
+  "security",
+  "billing",
+  "montero",
+  "monterogarage",
+  "gitana",
+  "www",
+  "mail",
+  "static",
+  "assets",
+  "_astro",
+  // The locales. `/es/` and a user called `es` are the same string in the same
+  // position of the same URL.
+  "en",
+  "es",
+  // Every route segment the site serves today, both locales, extracted from
+  // `src/i18n/routes.ts` and checked against it by `handles.test.ts` so this
+  // half cannot fall behind the site.
+  //
+  // **Reserved even though the handle's position in the URL is T2-402's to
+  // decide.** If handles turn out to be nested under the garage segment, these
+  // cost one Costa Rican owner the handle `taller`; if they turn out to be
+  // top-level, not reserving them is a site-breaking collision and an
+  // impersonation surface. The asymmetry is not close, and un-reserving later
+  // is safe in a way that reserving later is not — somebody already holds it by
+  // then.
+  "glossary",
+  "glosario",
+  "community",
+  "comunidad",
+  "sign-in",
+  "ingresar",
+  "garage",
+  "taller",
+  "problems",
+  "problemas",
+  "parts",
+  "repuestos",
+] as const;
 
 /* -------------------------------------------------------------------------
  * Synthetic fixture namespace
@@ -980,3 +1354,29 @@ export const TEST_TAXONOMY_IDENTITY = {
   model_year: 2002,
   engine_id: "6g74-sohc",
 } as const;
+
+/**
+ * A synthetic public handle for slot `slot` and run `runId`.
+ *
+ * Lower-case and hyphenated so it satisfies `HANDLE_PATTERN` — a fixture the
+ * format rule would reject on its own could never test uniqueness, case
+ * folding, or reservation, because the first rule would answer first. Still
+ * unmistakably synthetic: nothing a real owner would choose, and it carries the
+ * run id so two concurrent runs cannot collide on the unique index and turn a
+ * uniqueness proof into a provisioning failure.
+ */
+export function testHandle(slot: string, runId: string): string {
+  return `${TEST_NAMESPACE.toLowerCase()}-${slot}-${runId}`;
+}
+
+/**
+ * A synthetic bearer token — **not** a credential, and obviously so.
+ *
+ * A real grant token is 256 bits from `gen_random_bytes(32)`. This is a
+ * labelled string, because a fixture that looked like a real token would become
+ * one the day somebody pasted it into an issue. It is only ever presented to a
+ * grader as "the wrong token", or hashed into a row that same grader created.
+ */
+export function testShareToken(slot: string, runId: string): string {
+  return `${TEST_NAMESPACE}-SHARE-TOKEN-${slot.toUpperCase()}-${runId}`;
+}

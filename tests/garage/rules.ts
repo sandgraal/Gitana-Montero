@@ -72,6 +72,7 @@ import {
   GRANT_REVOCATION_COLUMN,
   PENDING_USER_TABLES,
   PLAINTEXT_TOKEN_COLUMNS,
+  SHARE_GRANT_KINDS,
   SHARE_TOKEN_HASH_COLUMN,
   USER_TABLES,
   USER_TABLE_NAMES,
@@ -1588,6 +1589,430 @@ export function plaintextTokenColumnIssues(normalized: string): string[] {
           `not holding every live grant`
       );
     }
+  }
+  return issues;
+}
+
+/* -------------------------------------------------------------------------
+ * T2-401 — the typed-grant rules (SHR-05, SHR-06, SHR-08)
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The preset must be a **label**, never a branch.
+ *
+ * > **SHR-05** A grant SHALL carry a `kind` naming its preset (`mechanic`,
+ * > `buyer`), and the preset SHALL be **a label over explicit capability
+ * > fields, never a branch in consuming code**.
+ *
+ * The requirement is unusually specific about a mechanism, and the reason is
+ * worth stating: a reader that says `if kind = 'mechanic' then …` has made the
+ * label load-bearing and the capability columns decorative. Adding a third
+ * preset then means editing every reader — and, far worse, a grant whose
+ * capability columns say one thing and whose `kind` says another resolves to
+ * whatever the branch decided. Two sources of truth for one permission.
+ *
+ * So an anon-reachable routine may **return** `kind` (to show the holder what
+ * they were given) but must not **compare** it to anything.
+ */
+export function presetBranchIssues(routine: FunctionDefinition): string[] {
+  const body = routine.body;
+  const issues: string[] = [];
+  const comparisons = [
+    /\bkind\s*(?:=|<>|!=)\s*'/,
+    /\bkind\s+in\s*\(/,
+    /\bcase\s+(?:[a-z0-9_]+\.)?kind\b/,
+    /\bwhen\s+(?:[a-z0-9_]+\.)?kind\s*=/,
+  ];
+  if (comparisons.some((pattern) => pattern.test(body))) {
+    issues.push(
+      `${routine.identity}: branches on the grant's \`kind\` — SHR-05 makes ` +
+        `the preset a label over the capability columns, never a branch; two ` +
+        `sources of truth for one permission is one too many`
+    );
+  }
+  // The other direction of the same mistake: a preset name hard-coded inside
+  // an access decision, without the word `kind` appearing beside it.
+  for (const preset of SHARE_GRANT_KINDS) {
+    if (new RegExp(`'${preset}'`).test(body)) {
+      issues.push(
+        `${routine.identity}: names the preset '${preset}' in its body — the ` +
+          `capability columns decide, not the label (SHR-05)`
+      );
+    }
+  }
+  return issues;
+}
+
+/**
+ * A grant's capabilities are two independent decisions, and both are gated.
+ *
+ * > **SHR-06** Capabilities SHALL be scoped per grant and SHALL **open
+ * > independently**: costs and receipts are two decisions, not one.
+ *
+ * Deliberately narrow, because the interesting half of SHR-06 is not statically
+ * decidable — a fully-named `jsonb_build_object` that includes the cost columns
+ * is textually indistinguishable from legitimate projection, which T2-401a
+ * recorded as the limit of the projection rule. What *is* decidable:
+ *
+ * - a routine that returns a cost column must **test** `includes_costs`;
+ * - a routine that returns receipt data must **test** `includes_receipts`;
+ * - and neither test may stand behind the other — `includes_receipts` reachable
+ *   only when `includes_costs` is also true is the two-decisions-collapsed
+ *   defect, written in SQL.
+ *
+ * "Test" means compared, not merely selected — the same distinction
+ * `expiryCheckIssues` draws, and for the same reason: a column that is returned
+ * and never compared is a comment.
+ */
+export function capabilityGateIssues(routine: FunctionDefinition): string[] {
+  const body = routine.body;
+  const issues: string[] = [];
+  const tests = (column: string): boolean =>
+    new RegExp(
+      `(?:[a-z0-9_]+\\.)?${column}\\s*(?:=|is\\s+(?:not\\s+)?true)` +
+        `|\\band\\s+(?:[a-z0-9_]+\\.)?${column}\\b(?!\\s*,)` +
+        `|\\bwhere\\s+(?:[a-z0-9_]+\\.)?${column}\\b(?!\\s*,)`
+    ).test(body);
+
+  const mentionsCosts = /\bcost_amount\b|\bcost_currency\b/.test(body);
+  if (mentionsCosts && !tests("includes_costs")) {
+    issues.push(
+      `${routine.identity}: returns cost columns without testing ` +
+        `\`includes_costs\` — SHR-06 says the fields are omitted entirely ` +
+        `where the grant does not open them`
+    );
+  }
+
+  const mentionsReceipts = /\bstorage_path\b|\bpublic\.receipts\b/.test(body);
+  if (mentionsReceipts && !tests("includes_receipts")) {
+    issues.push(
+      `${routine.identity}: returns receipt data without testing ` +
+        `\`includes_receipts\` — receipts open independently of costs (SHR-06)`
+    );
+  }
+
+  if (
+    mentionsReceipts &&
+    !mentionsCosts &&
+    /includes_costs[\s\S]{0,80}\band\b[\s\S]{0,30}includes_receipts|includes_receipts[\s\S]{0,30}\band\b[\s\S]{0,80}includes_costs/.test(
+      body
+    )
+  ) {
+    issues.push(
+      `${routine.identity}: gates receipts behind \`includes_costs\` as well ` +
+        `— SHR-06 makes them two decisions, not one`
+    );
+  }
+  return issues;
+}
+
+/**
+ * The refusal must not be an existence oracle — the **Tier A smell check**.
+ *
+ * > **SHR-08** IF a grant is expired, revoked, or unknown, THEN the refusal
+ * > SHALL be **indistinguishable across all three cases** — same status, same
+ * > body, same shape — so that the surface is not an existence oracle.
+ *
+ * ## What this can and cannot claim
+ *
+ * It **cannot** prove the property. Indistinguishability is behavioural — it is
+ * about status codes and response bodies over the wire — and the real proof is
+ * in `share-grants.test.ts`'s Tier B cells, which put all three refusals side
+ * by side and compare them. T2-401a's hand-off asked for the pair, explicitly
+ * never the substitute.
+ *
+ * What it **can** do is catch the likeliest mistake on every PR with no Docker:
+ * a body that raises more than one distinct message, or whose refusal text
+ * names which of the three cases it hit.
+ */
+export function refusalShapeIssues(routine: FunctionDefinition): string[] {
+  const body = routine.body;
+  const issues: string[] = [];
+
+  const raised = [
+    ...body.matchAll(
+      /\braise\s+(?:[a-z_]+\s+)?(?:using\s+message\s*=\s*)?'([^']*)'/g
+    ),
+  ].map((match) => match[1]);
+  const distinct = [...new Set(raised)];
+  if (distinct.length > 1) {
+    issues.push(
+      `${routine.identity}: raises ${distinct.length} distinct messages ` +
+        `(${distinct.map((message) => `"${message}"`).join(", ")}) — SHR-08 ` +
+        `requires one refusal, not a taxonomy of them`
+    );
+  }
+
+  // ## Scoped to the raised MESSAGES, not to the body (T2-401 probe G21)
+  //
+  // The first version scanned the whole body, and the accept-case control
+  // caught it immediately: `if not found then raise …` is plpgsql's built-in
+  // `FOUND` variable, the idiomatic way to test a `select … into`, and it
+  // appears in every correct implementation of this routine. A rule that
+  // reported on it would have fired on the one shape the requirement actually
+  // wants, which is precisely how a security rule gets deleted rather than
+  // fixed. The rule is about what the *caller is told*, so it reads what the
+  // caller is told.
+  for (const message of distinct) {
+    const telling =
+      /\b(expired|revoked|not found|no such|unknown token|already used)\b/.exec(
+        message
+      );
+    if (!telling) continue;
+    issues.push(
+      `${routine.identity}: its refusal text says "${telling[1]}" — that is ` +
+        `an existence oracle, and SHR-08 forbids distinguishing the three cases`
+    );
+  }
+  return issues;
+}
+
+/**
+ * Revocation is never gated. On anything.
+ *
+ * > **SHR-08** … Revocation SHALL take effect on the next request and SHALL
+ * > **never be gated by payment, by plan, or by any other condition**.
+ * > **003 MON-02** Revocation SHALL never be gated.
+ *
+ * "Any other condition" is the load-bearing phrase, so this is a deny-list of
+ * what a revoke path must not consult rather than an allow-list of what it may:
+ * the moment a `subscriptions` or `entitlements` table exists (003 MON-08),
+ * joining it here is one line and reads like prudence.
+ */
+export function revocationGatingIssues(routine: FunctionDefinition): string[] {
+  const forbidden = [
+    "subscription",
+    "entitlement",
+    "plan_id",
+    "billing",
+    "stripe",
+    "customer_id",
+    "quota",
+  ];
+  return forbidden
+    .filter((token) => new RegExp(`\\b${token}`).test(routine.body))
+    .map(
+      (token) =>
+        `${routine.identity}: consults \`${token}\` — revocation is never ` +
+        `gated by payment, by plan, or by any other condition (SHR-08, ` +
+        `003 MON-02)`
+    );
+}
+
+/**
+ * `alter default privileges … grant … to anon|public` is banned outright.
+ *
+ * T2-401a's recorded hand-off (F5): `grants()` already parses and replays every
+ * ADP statement, and the graders read the **revoke** half. Nothing rejected the
+ * grant half — one line in one migration that hands every *future* object in
+ * the schema to an anonymous caller, and the one privilege change that leaves
+ * no trace on any object existing today, so neither the created-table sweep nor
+ * the function sweep can see it.
+ *
+ * `live-acl.test.ts`'s birth probe catches the same class behaviourally, by
+ * looking at what a new table is actually born holding. Both, deliberately:
+ * this half runs on every PR with no Docker.
+ */
+export function defaultPrivilegeGrantIssues(normalized: string): string[] {
+  return grants(normalized)
+    .defaultPrivileges.filter(
+      (record) =>
+        record.action === "grant" &&
+        record.roles.some((role) =>
+          (ANONYMOUS_ROLES as readonly string[]).includes(role)
+        )
+    )
+    .map(
+      (record) =>
+        `alter default privileges … grant on ${record.objectType} to ` +
+        `${record.roles.join(", ")} — every FUTURE object in the schema, ` +
+        `handed to an anonymous caller by one line, with no trace on any ` +
+        `object that exists today`
+    );
+}
+
+/* -------------------------------------------------------------------------
+ * T2-401 — blind spot (b): correlation is not the same as a correct join
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Every finding against a policy that correlates **textually** but not **by
+ * key**.
+ *
+ * ## The blind spot, and what verifying it actually showed
+ *
+ * `isOwnerScoped` asks whether a subquery *mentions* the outer row
+ * (`isCorrelated`, the D1 rule). It cannot ask whether the mention is a
+ * **join**. So this predicate passes the whole declaration tier intact:
+ *
+ * ```sql
+ * using (
+ *   exists (
+ *     select 1 from public.vehicles v
+ *      where records.vehicle_id is not null      -- mentions the outer row
+ *        and v.owner_id = (select auth.uid())    -- compares to the caller
+ *   )
+ * )
+ * ```
+ *
+ * The T2-202 review recorded this as a blind spot and recorded a belief
+ * alongside it: that RLS on `vehicles` applies inside the subquery, so a
+ * nonsense join still could not reach another owner's row — "defence that was
+ * inherited, not designed" — and asked T2-401 to **verify rather than rely on
+ * it**.
+ *
+ * **Verified 2026-09-02 against the running database, and the belief is
+ * false.** With that policy added, owner B read owner A's record. RLS on
+ * `vehicles` does filter `v` to B's own vehicles — which is exactly why the
+ * leak happens: `exists` becomes "does B own *any* vehicle", which is true, so
+ * every row of `records` passes. The same is true of the shape the review
+ * described literally, `exists (select 1 from public.vehicles v where
+ * records.vehicle_id is not null)` — though that one has no `auth.uid()` in
+ * the subquery at all and `isOwnerScoped` already rejects it.
+ *
+ * So there is no inherited defence. The declaration tier is the only thing
+ * between the schema and that leak, and until this rule the declaration tier
+ * could not see it. `policy-join-semantics.test.ts` holds the behavioural
+ * proof; this is the Tier A half, and the two are deliberately redundant.
+ *
+ * ## What the rule requires
+ *
+ * When ownership rests on a subquery rather than on a comparison against the
+ * row itself, the subquery must **equate the outer row's declared ownership
+ * column to a column of the relation it reads** — `v.id = records.vehicle_id`,
+ * with `vehicle_id` coming from `contract.ts`'s `ownershipPath`, not from a
+ * guess. That is precise enough to reject both failing shapes above *and*
+ * `v.id = records.id` — a join on the wrong pair of columns, which happens not
+ * to leak today only because no vehicle id equals a record id.
+ */
+export function subqueryCorrelationIssues(
+  normalized: string,
+  tables: readonly string[]
+): string[] {
+  const issues: string[] = [];
+
+  for (const policy of policies(normalized)) {
+    if (!tables.includes(policy.table) || !policy.permissive) continue;
+    const contract = USER_TABLES.find((entry) => entry.name === policy.table);
+    const key = contract?.ownershipPath[0];
+    if (key === undefined) continue;
+
+    const clauses: [string, string | null][] = [
+      ["using", policy.usingExpr],
+      ["with check", effectiveCheck(policy)],
+    ];
+
+    for (const [clause, expr] of clauses) {
+      if (expr === null) continue;
+      const canonical = canonicalizeAuthUid(expr);
+      const { outer, subqueries } = stripSubqueries(canonical);
+      // A comparison against the row itself needs no join at all.
+      if (authUidComparands(outer).length > 0) continue;
+      if (subqueries.length === 0) continue;
+
+      const qualified = `[a-z0-9_]+\\.[a-z0-9_]+`;
+      const outerKey = `${policy.table}\\.${key}`;
+      const correlates = new RegExp(
+        `${qualified}\\s*=\\s*${outerKey}\\b|\\b${outerKey}\\s*=\\s*${qualified}`
+      );
+      if (subqueries.some((subquery) => correlates.test(subquery))) continue;
+
+      issues.push(
+        `${policy.table} policy "${policy.name}" (for ${policy.command}): ` +
+          `\`${clause}\` rests on a subquery that never joins on ` +
+          `${policy.table}.${key} — mentioning the outer row is not the same ` +
+          `as joining to it, and RLS on the inner table does NOT save you ` +
+          `(verified: owner B read owner A's record through exactly this shape)`
+      );
+    }
+  }
+  return issues;
+}
+
+/* -------------------------------------------------------------------------
+ * T2-401 — the optimistic-default sweep, inverted
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Every boolean in the schema that defaults to **true**, unless it is named.
+ *
+ * ## The rule this replaces was name-shaped, and that is why it missed
+ *
+ * `sharing-default.test.ts` used to sweep for
+ * `/(is_[a-z_]*(public|shared|visible)[a-z_]*)[^,)]*default true/`. It needed
+ * three things at once — an `is_` prefix, one of three words in the middle, and
+ * the default — which means it was not a sweep for optimistic defaults at all.
+ * It was a sweep for *one naming convention* of optimistic default, and it
+ * existed precisely to catch "a fifth flag this file does not know about" — the
+ * flag nobody told it about being, by construction, the one that does not
+ * follow the convention.
+ *
+ * Both of these walked straight past it, verified against the shipped rule:
+ *
+ * ```sql
+ * includes_costs boolean not null default true   -- SHR-06, opens every cost
+ * is_active      boolean not null default true   -- no `public|shared|visible`
+ * ```
+ *
+ * The first is not hypothetical: it is a capability column this very task adds
+ * to `shares`, and defaulting it to `true` would open every grant's costs to
+ * every holder — SHR-06's exact prohibition — while the guard that exists to
+ * notice reported nothing.
+ *
+ * ## So the question is inverted
+ *
+ * Every boolean column that defaults to true is a finding, and the exceptions
+ * are enumerated with reasons in `contract.ts`'s
+ * `OPTIMISTIC_BOOLEAN_DEFAULTS`. That direction cannot be dodged by a name,
+ * because it does not read the name. SHR-01 says everything a user stores
+ * defaults to private; a boolean that starts life `true` is a decision made on
+ * the user's behalf, and if there is a good reason for one, the reason belongs
+ * in a diff somebody reviews.
+ *
+ * Nullable columns are swept too, though the requirement names `not null`: a
+ * nullable boolean defaulting to true is strictly worse, since it has the
+ * optimistic default *and* a third state.
+ */
+export function optimisticBooleanDefaultIssues(
+  normalized: string,
+  allowed: ReadonlyMap<string, string>
+): string[] {
+  const issues: string[] = [];
+  const explain =
+    `SHR-01: everything a user stores defaults to private. If this default is ` +
+    `right, name it in OPTIMISTIC_BOOLEAN_DEFAULTS with a reason`;
+
+  for (const table of createdTables(normalized)) {
+    const body = createTableBody(normalized, table.name);
+    if (!body) continue;
+    for (const column of columnDefinitions(body)) {
+      if (!/\bbool/.test(column.definition)) continue;
+      if (defaultExpression(column.definition) !== "true") continue;
+      const key = `${table.name}.${column.name}`;
+      if (allowed.has(key)) continue;
+      issues.push(
+        `${table.identity}.${column.name}: boolean defaulting to true — ${explain}`
+      );
+    }
+  }
+
+  // The second spelling, and the one a `create table` sweep cannot see: a
+  // column created honest and flipped later. `alter table … alter column …
+  // set default true` is one line in a migration nobody reads twice, and it
+  // changes every row inserted after it.
+  for (const statement of statements(normalized)) {
+    const altered =
+      /^alter table (?:if exists )?(?:only )?([a-z0-9_.]+) alter(?: column)? ([a-z0-9_]+) set default true\b/.exec(
+        statement
+      );
+    if (!altered) continue;
+    const table = altered[1].split(".").pop() ?? altered[1];
+    const key = `${table}.${altered[2]}`;
+    if (allowed.has(key)) continue;
+    issues.push(
+      `${altered[1]}.${altered[2]}: default flipped to true by a later ` +
+        `\`alter table\` — ${explain}`
+    );
   }
   return issues;
 }

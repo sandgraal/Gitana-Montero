@@ -31,12 +31,14 @@
  * against a local `supabase start`. Neither substitutes for the other; the
  * full argument is in `harness.ts`.
  *
- * **Claim 3 is graded at the declaration tier only, and that is a known gap.**
- * Proving it behaviourally means creating a throwaway table at test time,
- * which needs a direct SQL connection rather than PostgREST — i.e. a Postgres
- * driver this repo does not carry. Named here rather than faked: a grader
- * that re-read the same SQL and called itself behavioural would be worse than
- * no grader.
+ * **Claim 3's gap is closed as of T2-401.** It used to be graded at the
+ * declaration tier only, because proving it behaviourally means creating a
+ * throwaway table at test time — a direct SQL connection rather than
+ * PostgREST, i.e. a Postgres driver this repo did not carry. It carries one
+ * now (`db.ts`, loopback only, project-identity checked), and the proof lives
+ * in `live-acl.test.ts`: a table created inside a rolled-back transaction is
+ * born with no privilege for `anon`, `public`, or `authenticated`. The
+ * mutation run that pins it is recorded there.
  *
  * ## Expected-failure convention
  *
@@ -47,6 +49,8 @@
  */
 import { describe, expect, it } from "vitest";
 import {
+  PENDING_USER_TABLES,
+  SHIPPED_USER_TABLES,
   USER_TABLE_NAMES,
   testReceiptPath,
   testVehicleName,
@@ -66,6 +70,7 @@ import {
 } from "./harness.ts";
 import {
   coveredCommands,
+  subqueryCorrelationIssues,
   tableGrantIssues,
   ungradedTableIssues,
   userTablePolicyIssues,
@@ -80,19 +85,98 @@ import {
 
 const live = await detectLiveStack();
 
+/**
+ * The tables that exist, and the tables a named task will create.
+ *
+ * The sweeps below partition on this rather than dropping the pending half —
+ * see `ColumnContract.pending` in `contract.ts`. `shares` (T2-404) is the
+ * table this file's own G10 probe was written about: a grants table with
+ * `for all to anon using (true)` and no `force`, invisible to every grader
+ * because nothing enumerated it. It is enumerated now, before it exists.
+ */
+const SHIPPED = SHIPPED_USER_TABLES.map((table) => [table.name] as const);
+const PENDING = PENDING_USER_TABLES.map(
+  (table) => [table.name, table.pending ?? ""] as const
+);
+const SHIPPED_NAMES = SHIPPED_USER_TABLES.map((table) => table.name);
+
 /* =========================================================================
  * Tier A — declaration
  * ====================================================================== */
 
 describe("RLS is declared on every user table", () => {
-  it.each(USER_TABLE_NAMES.map((table) => [table]))(
-    "public.%s has row level security enabled",
+  it.each(SHIPPED)("public.%s has row level security enabled", (table) => {
+    expect(enablesRls(migrationSql(), table)).toBe(true);
+  });
+
+  it.fails.each(PENDING)(
+    "public.%s has row level security enabled — pending %s",
     (table) => {
       expect(enablesRls(migrationSql(), table)).toBe(true);
     }
   );
 
-  it.each(USER_TABLE_NAMES.map((table) => [table]))(
+  it.fails.each(PENDING)(
+    "public.%s has row level security FORCED — pending %s",
+    (table) => {
+      expect(forcesRls(migrationSql(), table)).toBe(true);
+    }
+  );
+
+  it.fails.each(PENDING)(
+    "every %s policy is owner-scoped in BOTH `using` and `with check` — pending %s",
+    (table) => {
+      expect(userTablePolicyIssues(migrationSql(), [table])).toEqual([]);
+    }
+  );
+
+  it.each(SHIPPED)(
+    "every %s policy JOINS on the ownership column, not merely mentions it",
+    (table) => {
+      // ## Added by T2-401. Blind spot (b) from the T2-202 review.
+      //
+      // `isOwnerScoped` asks whether a subquery *mentions* the outer row. It
+      // cannot ask whether the mention is a join, so
+      //   using (exists (select 1 from public.vehicles v
+      //                   where records.vehicle_id is not null
+      //                     and v.owner_id = (select auth.uid())))
+      // passes every grader above. The review recorded a belief that RLS on
+      // `vehicles` would save it anyway. **Verified 2026-09-02: it does not** —
+      // owner B read owner A's record through exactly that policy. The proof,
+      // and the two shapes it covers, are in `policy-join-semantics.test.ts`.
+      //
+      // The rule is additive: it does not touch `isOwnerScoped`, and today's
+      // schema answers it, because both subquery policies already join on the
+      // column `contract.ts` declares as the ownership path.
+      expect(subqueryCorrelationIssues(migrationSql(), [table])).toEqual([]);
+    }
+  );
+
+  it.fails.each(PENDING)(
+    "every %s policy JOINS on the ownership column — pending %s",
+    (table) => {
+      expect(subqueryCorrelationIssues(migrationSql(), [table])).toEqual([]);
+      // A table with no policy at all produces no finding from this rule —
+      // correctly, since it grades the shape of a policy that exists. The
+      // marker therefore has to rest on the policy existing, which is the
+      // claim `userTablePolicyIssues` makes above.
+      expect(userTablePolicyIssues(migrationSql(), [table])).toEqual([]);
+    }
+  );
+
+  it.fails.each(PENDING)(
+    "public.%s covers select, insert, update, and delete — pending %s",
+    (table) => {
+      const covered = coveredCommands(migrationSql(), table);
+      expect(
+        ["select", "insert", "update", "delete"].filter(
+          (command) => !covered.has(command)
+        )
+      ).toEqual([]);
+    }
+  );
+
+  it.each(SHIPPED)(
     "public.%s has row level security FORCED, not merely enabled",
     (table) => {
       // `enable` exempts the table's owner role, and Supabase migrations run
@@ -103,7 +187,7 @@ describe("RLS is declared on every user table", () => {
     }
   );
 
-  it.each(USER_TABLE_NAMES.map((table) => [table]))(
+  it.each(SHIPPED)(
     "every %s policy is owner-scoped in BOTH `using` and `with check`",
     (table) => {
       // The finding that rebuilt this file (T2-201 review, F1). The previous
@@ -126,6 +210,11 @@ describe("RLS is declared on every user table", () => {
   it("grants no policy to anon or public on any user table", () => {
     // `roles.length === 0` counts as a leak on purpose: a `create policy`
     // with no `to` clause defaults to `public`, which includes `anon`.
+    // Every table, shipped or pending: the finding this filters for is
+    // "granted to anon/public", and a pending table with no policy at all
+    // produces a different finding that this filter drops. So the sweep can
+    // stay whole — it goes red the day a leaking policy appears on `shares`,
+    // not the day `shares` appears.
     const leaks = userTablePolicyIssues(migrationSql(), [
       ...USER_TABLE_NAMES,
     ]).filter((issue) => issue.includes("granted to"));
@@ -139,7 +228,7 @@ describe("RLS is declared on every user table", () => {
     // select and update but no delete makes ACC-03's "a user SHALL be able
     // to delete their account" impossible to perform as the user.
     const missing: string[] = [];
-    for (const table of USER_TABLE_NAMES) {
+    for (const table of SHIPPED_NAMES) {
       const covered = coveredCommands(migrationSql(), table);
       for (const command of ["select", "insert", "update", "delete"]) {
         if (!covered.has(command)) missing.push(`${table}.${command}`);
@@ -178,10 +267,18 @@ describe("deny-by-default is declared, not assumed", () => {
     //
     // The list is the union of what is enumerated and what is **created**, so
     // a fifth table cannot dodge the question by not being in the contract.
+    //
+    // The list is the union of what is **shipped** and what is **created** —
+    // shipped rather than enumerated, because `tableGrantIssues` correctly
+    // reports "the end-state ACL is unknown" for a table no statement ever
+    // mentions, and a table that does not exist yet has no ACL to be known.
+    // The `createdTables` half is what makes this airtight anyway: the day
+    // T2-404 creates `shares`, it joins this sweep from the other side whether
+    // anyone remembers to move it or not.
     const sql = migrationSql();
     const tables = [
       ...new Set([
-        ...USER_TABLE_NAMES,
+        ...SHIPPED_NAMES,
         ...createdTables(sql).map((table) => table.name),
       ]),
     ];
@@ -246,7 +343,7 @@ describe("every table that exists is a table the graders know about", () => {
 describe.skipIf(!live.available)(
   liveTitle("anonymous clients read nothing private", live),
   () => {
-    it.each(USER_TABLE_NAMES.map((table) => [table]))(
+    it.each(SHIPPED)(
       "anon selects zero rows from %s even when rows exist",
       async (table) => {
         const scenario = await provisionScenario(stackOf(live));

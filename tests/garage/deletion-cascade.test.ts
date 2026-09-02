@@ -80,7 +80,17 @@ const live = await detectLiveStack();
  * Tier A — declaration
  * ====================================================================== */
 
-/** Every foreign-key hop that must cascade, one row per grader. */
+/**
+ * Every foreign-key hop that must cascade, one row per grader.
+ *
+ * `shares` joins the chain in T2-401 as a **pending** hop (T2-404 creates the
+ * table). It is on the list before it exists for the same reason the
+ * completeness guard below exists at all: a grants table that outlives the
+ * vehicle it grants access to is not an orphan a reader would notice — it is a
+ * live bearer credential pointing at a row that has gone, and the failure mode
+ * is whatever the reader does with the dangling reference. ACC-03 says *all*
+ * of a deleted account's data goes.
+ */
 const CASCADE_HOPS = [
   ["profiles", "id", "auth.users"],
   ["vehicles", "owner_id", "auth.users"],
@@ -88,7 +98,23 @@ const CASCADE_HOPS = [
   ["receipts", "record_id", "records"],
 ] as const;
 
+/** The hops a named task still has to ship. Marked, never dropped. */
+const PENDING_CASCADE_HOPS = [
+  ["shares", "vehicle_id", "vehicles", "T2-404"],
+] as const;
+
 describe("the ownership chain is declared to cascade", () => {
+  it.fails.each(PENDING_CASCADE_HOPS)(
+    "%s.%s references %s on delete cascade — pending %s",
+    (table, column, target) => {
+      const fk = foreignKeyFor(migrationSql(), table, column);
+
+      expect(fk, `${table}.${column} has no foreign key`).not.toBeNull();
+      expect(fk?.target).toContain(target.replace("auth.users", "users"));
+      expect(fk?.cascades).toBe(true);
+    }
+  );
+
   it.each(CASCADE_HOPS)(
     "%s.%s references %s on delete cascade",
     (table, column, target) => {
@@ -114,12 +140,34 @@ describe("the ownership chain is declared to cascade", () => {
   // above from silently missing a table — a fifth one joining the schema
   // without joining the delete path would otherwise never be noticed here.
   it("covers every table in the contract, so the table above is complete", () => {
-    const onChain = new Set<string>(CASCADE_HOPS.map(([table]) => table));
+    // Both hop tables, because both are the delete path: a pending hop that
+    // fell off this guard would be a table with no cascade grader at all, and
+    // it would be missing on exactly the day the table appeared. The guard
+    // grades `contract.ts` against the union, not against the shipped half.
+    const onChain = new Set<string>([
+      ...CASCADE_HOPS.map(([table]) => table),
+      ...PENDING_CASCADE_HOPS.map(([table]) => table),
+    ]);
 
     expect(
       USER_TABLES.map((table) => table.name).filter(
         (name) => !onChain.has(name)
       )
+    ).toEqual([]);
+  });
+
+  it("no hop is on both lists — a hop is shipped or pending, not both", () => {
+    // Without this, moving a hop from pending to shipped by copying rather
+    // than moving would leave an `it.fails` that has started passing, which
+    // Vitest reports as a failure whose message is about the wrong thing.
+    const shipped = new Set<string>(
+      CASCADE_HOPS.map(([table, column]) => `${table}.${column}`)
+    );
+
+    expect(
+      PENDING_CASCADE_HOPS.map(
+        ([table, column]) => `${table}.${column}`
+      ).filter((hop) => shipped.has(hop))
     ).toEqual([]);
   });
 });

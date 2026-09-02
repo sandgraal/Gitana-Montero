@@ -26,7 +26,15 @@
  */
 import { describe, expect, it } from "vitest";
 import {
+  GRANT_EXPIRY_COLUMN,
+  GRANT_REVOCATION_COLUMN,
+  PENDING_USER_TABLES,
+  PLAINTEXT_TOKEN_COLUMNS,
+  SHARE_CAPABILITY_COLUMNS,
   SHARE_FLAG_COLUMNS,
+  SHARE_GRANT_KINDS,
+  SHARE_TOKEN_HASH_COLUMN,
+  SHIPPED_USER_TABLES,
   USER_TABLES,
   USER_TABLE_NAMES,
   testEmail,
@@ -469,13 +477,73 @@ describe("foreignKey", () => {
  * ---------------------------------------------------------------------- */
 
 describe("the declared contract is internally coherent", () => {
-  it("names the four user-data tables T2-202 must ship", () => {
+  it("names the user-data tables, shipped and pending", () => {
+    // A hard equality on purpose, and it is a *contract* assertion rather than
+    // a schema one: it fixes the set some other file's `it.each` iterates. When
+    // T2-401 added `shares` (SHR-05, pending T2-404) this line had to move in
+    // the same commit, which is the point — a table joining the contract is a
+    // deliberate edit here and not a silently wider sweep somewhere else.
     expect(USER_TABLE_NAMES).toEqual([
       "profiles",
       "vehicles",
       "records",
       "receipts",
+      "shares",
     ]);
+  });
+
+  it("splits into a shipped half and a pending half, both non-empty", () => {
+    // The partition every `it.each` in this directory now depends on. If
+    // either half emptied, a whole sweep would register zero graders and
+    // report nothing at all — the failure mode `it.each` makes invisible.
+    expect(SHIPPED_USER_TABLES.map((table) => table.name)).toEqual([
+      "profiles",
+      "vehicles",
+      "records",
+      "receipts",
+    ]);
+    expect(PENDING_USER_TABLES.map((table) => table.name)).toEqual(["shares"]);
+    expect(SHIPPED_USER_TABLES.length + PENDING_USER_TABLES.length).toBe(
+      USER_TABLES.length
+    );
+  });
+
+  it("pins the grant columns the SQL rules resolve by name", () => {
+    // `rules.ts` compares a reader's body against these three constants, and
+    // `contract.ts` declares columns with the same names on `shares`. Nothing
+    // made them the same string. A rename on one side would leave
+    // `expiryCheckIssues` looking for a column the schema does not have and
+    // reporting the absence of a check that is right there — which reads as a
+    // grader defect and gets the rule turned off.
+    const shares = USER_TABLES.find((table) => table.name === "shares");
+    const columns = (shares?.columns ?? []).map((column) => column.name);
+
+    expect(columns).toContain(SHARE_TOKEN_HASH_COLUMN);
+    expect(columns).toContain(GRANT_EXPIRY_COLUMN);
+    expect(columns).toContain(GRANT_REVOCATION_COLUMN);
+    expect(columns).toEqual(
+      expect.arrayContaining([...SHARE_CAPABILITY_COLUMNS])
+    );
+  });
+
+  it("never declares a plaintext token column on any contract table", () => {
+    // The deny list `plaintextTokenColumnIssues` sweeps the migrations for,
+    // applied to the contract itself. A `shares.token` declared here would tell
+    // T2-404 to build the exact thing that rule exists to reject, and the two
+    // files would disagree with no test between them.
+    const declared = USER_TABLES.flatMap((table) =>
+      table.columns.map((column) => column.name)
+    );
+
+    expect(
+      declared.filter((column) =>
+        (PLAINTEXT_TOKEN_COLUMNS as readonly string[]).includes(column)
+      )
+    ).toEqual([]);
+  });
+
+  it("keeps the grant presets a closed set of two (SHR-05)", () => {
+    expect([...SHARE_GRANT_KINDS]).toEqual(["mechanic", "buyer"]);
   });
 
   it("traces every table and every column to a requirement", () => {

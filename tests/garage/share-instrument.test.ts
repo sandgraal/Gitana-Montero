@@ -74,7 +74,7 @@ import {
   PRIVILEGED_FUNCTIONS,
   SHARE_READER_FUNCTIONS,
   SHARE_READER_NAMES,
-  USER_TABLE_NAMES,
+  SHIPPED_USER_TABLES,
 } from "./contract.ts";
 import {
   anonFunctionAllowListIssues,
@@ -303,10 +303,16 @@ describe("privileges are graded at the END of the directory", () => {
     // *created*, so a fifth table cannot dodge the ACL question by not being
     // in the contract — which is the same hole defect (2) is about, reached
     // from the privilege side.
+    // Shipped names rather than every enumerated name: `tableGrantIssues`
+    // correctly reports "the end-state ACL is unknown" for a table no
+    // statement ever mentions, and a table T2-404 has not created yet has no
+    // ACL for anything to be known about. The `createdTables` half is what
+    // keeps this airtight anyway — the day `shares` exists it joins this sweep
+    // from the other side, whether or not anyone remembers to move it.
     const sql = migrationSql();
     const tables = [
       ...new Set([
-        ...USER_TABLE_NAMES,
+        ...SHIPPED_USER_TABLES.map((table) => table.name),
         ...createdTables(sql).map((table) => table.name),
       ]),
     ];
