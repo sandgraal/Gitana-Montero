@@ -128,9 +128,10 @@ squash message, so the failure is invisible until someone reads the
 squash commit afterward. This has happened twice in one session, on two
 different PRs, with two different wrong field names — read the line
 above character-for-character rather than guessing a plausible name.
-Verify after merging: `git log origin/main -1 --format=%B` should show
-your intended body, not an auto-concatenation of the source commits'
-messages.
+Verify after merging: `git fetch origin main && git log origin/main -1
+--format=%B` should show your intended body, not an auto-concatenation of
+the source commits' messages — a stale local `origin/main` ref will show
+you the pre-merge commit and produce a false negative.
 
 Do NOT use `gh pr merge` (and never `--admin`, never bypass protection):
 `gh pr merge` checks out the base branch locally after merging — from a

@@ -404,7 +404,8 @@ would make that pass mechanical.
 > mutant battery had not caught (T207: dimension sign scoping leaked across
 > unit families, the FSM anti-reproduction cap read only half the prose
 > object, no ratchet existed for safety-critical subjects lacking a
-> `GLOSSARY_SYSTEMS` id; T208: two more findings, addressed the same wave).
+> `GLOSSARY_SYSTEMS` id; T208: two more findings, addressed in the same
+> wave).
 > Each finding then got an independent `[PLATFORM]` activation fix from a
 > *different* implementer instance than the one who wrote the original
 > code, with T207's safety-critical F3 finding additionally receiving the
