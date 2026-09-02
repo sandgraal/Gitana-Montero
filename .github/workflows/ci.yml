@@ -259,19 +259,50 @@ jobs:
       # step above (plain `dist/`, no `E2E_EXPECT_CONFIGURED`) still skips
       # cleanly, and so does `npm run test:e2e` locally.
       #
-      # `tests/e2e/hidden-guard.spec.ts` (T2-303 review F10) joins this step
-      # for the same reason: its garage- and sign-in-page cases only exercise
-      # real markup once `SUPABASE_BROWSER_CONFIG` is set, so they need this
-      # build too. Its other cases (glossary, community, problems) already
-      # ran, for real, in the plain-`dist/` step above — this run just adds
-      # its two configured-only pages, and its own `E2E_EXPECT_CONFIGURED`
-      # module-level check follows the same F1 convention.
-      - name: End-to-end (Playwright, garage unreachable + hidden-guard — configured build)
+      - name: End-to-end (Playwright, garage unreachable — configured build)
         env:
           E2E_DIST: dist-configured
           E2E_PORT: 4323
           E2E_EXPECT_CONFIGURED: "1"
-        run: npx playwright test tests/e2e/garage-unreachable.spec.ts tests/e2e/hidden-guard.spec.ts
+        run: npx playwright test tests/e2e/garage-unreachable.spec.ts
+
+      # `tests/e2e/hidden-guard.spec.ts` (T2-303 review F10): only its garage-
+      # and sign-in-page cases (`test.describe` titles ending `(configured)`)
+      # need this build — same reasoning as the step above, since those two
+      # pages only render their real, `[hidden]`-carrying markup once
+      # `SUPABASE_BROWSER_CONFIG` is set. Its other cases (glossary,
+      # community, problems) do not branch on that flag at all and already
+      # ran, for real, in the plain-`dist/` step above (`npx playwright test`
+      # with no filter runs every spec file, this one included).
+      #
+      # `--grep '\(configured\)'` is load-bearing, not decoration: without it
+      # this step would re-run the *whole* file — including the six
+      # glossary/community/problems cases that already ran once, for real,
+      # against plain `dist/` above. That is redundant CI time rather than a
+      # correctness bug (those six cases are just as true against either
+      # build, so running them twice never hides anything) — but it directly
+      # contradicts what this step is documented as doing, so a stale filter
+      # here would be exactly the kind of drift this file's other comments
+      # warn about elsewhere. Scoped to the one describe-title substring only
+      # `CONFIGURED_ONLY_PAGES` cases carry, so a page added to
+      # `UNCONDITIONAL_PAGES` never accidentally starts matching here.
+      #
+      # `E2E_EXPECT_CONFIGURED=1` is the same second, independent claim as the
+      # garage-unreachable step above (review F1): the spec's own
+      # markup-sniffing detectors (`data-garage-gate`, `data-signin-signed-in`
+      # in the built HTML) could silently stop matching, and without this
+      # variable that reads as "this must be the plain build" — skip-green,
+      # regression coverage gone dark. With it set, "detector says
+      # unconfigured" on a run CI declared configured fails the file outright
+      # instead. The plain-`dist/` step above still skips those four cases
+      # cleanly with no `E2E_EXPECT_CONFIGURED` set, and so does
+      # `npm run test:e2e` locally.
+      - name: End-to-end (Playwright, hidden-guard configured-only cases — configured build)
+        env:
+          E2E_DIST: dist-configured
+          E2E_PORT: 4323
+          E2E_EXPECT_CONFIGURED: "1"
+        run: npx playwright test tests/e2e/hidden-guard.spec.ts --grep '\(configured\)'
   # ── Where the deploy job went (T2-102, 002 MIG-02) ──────────────────────
   #
   # A `deploy` job used to live here: on a push to `main`, after all three
