@@ -324,23 +324,34 @@ export interface SupersessionView {
   readonly otherPredecessors: readonly PartIdentity[];
 }
 
-/** The empty view — no chain, nothing rendered. */
-const NO_SUPERSESSION: SupersessionView = {
-  show: false,
-  rows: [],
-  forked: false,
-  otherPredecessors: [],
-};
-
+/**
+ * `null` means "we could not resolve this chain" — an unknown id, a
+ * dangling pointer or a cycle, {@link supersessionChain}'s own three
+ * "cannot answer" cases — and is a *different value* from any resolved view,
+ * including a resolved standalone part's `{ show: false, rows: [self] }`.
+ *
+ * An earlier version folded all three failure cases into a fixed empty
+ * object (`{ show: false, rows: [], forked: false, otherPredecessors: [] }`)
+ * that looked like, but was not, "a part with no history". The distinction
+ * mattered because the only question either template actually asks is "is
+ * this the number to order" — `chainRows.every(...)` over that object's
+ * empty `rows` is vacuously `true`, so a chain the page failed to resolve
+ * rendered as the *most* confident answer available, not a neutral one
+ * (T501 audit, F5; `.claude/GRADER-PRINCIPLES.md`, "unknown is not zero").
+ * Both `[partSlug].astro` and `[partsSegment].astro` now branch on `null`
+ * before asking that question at all.
+ *
+ * `validate-parts` fails the build before any of the three failure corpora
+ * reaches a render, so this is defense-in-depth today, not a live path —
+ * see `tests/pages/parts-unknown-chain.render.test.ts` for why it is graded
+ * anyway.
+ */
 export function supersessionView(
   id: string,
   index: PartsIndex
-): SupersessionView {
+): SupersessionView | null {
   const chain = supersessionChain(id, index);
-  // `null` means an unknown id, a dangling pointer or a loop — all three are
-  // build errors, so this is unreachable in a build that got as far as
-  // rendering. Rendering nothing is the safe answer either way.
-  if (chain === null) return NO_SUPERSESSION;
+  if (chain === null) return null;
 
   const onChain = new Set(chain.chain.map((part) => part.id));
   const rows = chain.chain.map((part, position, all) => ({
