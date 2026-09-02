@@ -503,7 +503,7 @@ describe("a diagnostic step may not contradict itself — PRB-01", () => {
     expect(outcome.success, JSON.stringify(issuePaths(outcome))).toBe(true);
   });
 
-  it.fails("refuses a step that rules the same cause both in and out", () => {
+  it("refuses a step that rules the same cause both in and out", () => {
     // "Rules in: worn bushing" and "rules out: worn bushing" on one step is
     // an authoring contradiction, not a diagnostic: whichever way the result
     // goes, the reader is told the opposite thing at the same time. Both ids
@@ -516,7 +516,7 @@ describe("a diagnostic step may not contradict itself — PRB-01", () => {
     expect(issuePaths(outcome)).toContain("diagnosticSteps.0.rulesOut.0");
   });
 
-  it.fails("refuses one cause named twice inside a step's rulesIn", () => {
+  it("refuses one cause named twice inside a step's rulesIn", () => {
     // `checkDuplicateIds` sweeps the four top-level lists only; the id lists
     // *inside* a step are not swept, so `["test-cause", "test-cause"]` passes
     // today. Same rule, one level down: an id is a key, and keys are unique.
@@ -526,7 +526,7 @@ describe("a diagnostic step may not contradict itself — PRB-01", () => {
     expect(issuePaths(outcome)).toContain("diagnosticSteps.0.rulesIn.1");
   });
 
-  it.fails("refuses one cause named twice inside a step's rulesOut", () => {
+  it("refuses one cause named twice inside a step's rulesOut", () => {
     const outcome = schema.safeParse(
       withStep({ rulesOut: ["test-cause", "test-cause"] })
     );
