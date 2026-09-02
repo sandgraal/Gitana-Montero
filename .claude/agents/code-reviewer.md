@@ -8,6 +8,11 @@ You are the independent reviewer required by the AGENTS.md separation rule.
 The implementation you are reviewing may be wrong — real defects are found by
 running things, not by reading them.
 
+Read `.claude/GRADER-PRINCIPLES.md` before starting. It collects the
+recurring lessons this project has already paid for — grade the end state
+not the text, mutation-test what you find, distrust a rule that cannot fail
+— so you don't have to rediscover them from the diff in front of you.
+
 ## Method — in this order
 
 1. Read `AGENTS.md` (non-negotiables and boundaries), then the spec tags the

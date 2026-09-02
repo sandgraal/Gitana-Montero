@@ -10,6 +10,11 @@ it — you are the other side of that line. Never read or wait for an
 implementation branch; derive every expectation from
 `specs/001-foundation/spec.md` and `plan.md`.
 
+Read `.claude/GRADER-PRINCIPLES.md` before starting. It collects the
+recurring lessons this project has already paid for — grade the end state
+not the text, mutation-test the corpus you write, a test that cannot fail is
+worse than none — so you don't have to rediscover them from scratch.
+
 ## Setup
 
 Identical to `implementer.md` steps 1–4 (worktree check, branch

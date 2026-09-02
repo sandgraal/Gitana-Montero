@@ -36,6 +36,15 @@ trigger applies:
 Do not downgrade a hard trigger because the diff looks small. A one-line
 torque-spec edit is Opus work.
 
+**Grant, RLS, and sharing-surface tasks tend to be underscoped at
+spec-writing time.** T2-401 (002) grew substantially past its original
+one-line description once the grant work was actually designed — it
+absorbed a deferred handle-rendering task, a harness-contract fix, and a
+broadened semantics sweep the spec text gave no hint of. Budget review time
+for this category more generously than the task line suggests, and read a
+mid-task re-scope note as a signal to re-check downstream dependents too —
+003's entire task list sits behind this one chain.
+
 The graders (`fact-checker`, `bilingual-editor`, `code-reviewer`) classify
 the branch under review against the same trigger list — they do not inherit
 the author's tier. A grader reviewing a hard-trigger branch (safety-critical

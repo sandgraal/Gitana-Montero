@@ -135,6 +135,17 @@ Specs of record: `specs/001-foundation/spec.md` (reference platform),
 - **Cite what you actually read.** A source you did not open is not a source.
   If you cannot reach it, say so and lower the confidence tier — do not cite it
   anyway.
+- **A failure is not a zero.** When a fetch, a query, or anything that can
+  fail returns nothing because it *failed*, that state must be structurally
+  distinguishable from a genuine empty or zero result — never coalesce an
+  unknown answer to `0`, `[]`, `{}`, or an empty map. A reader shown a
+  confident zero cannot tell "we checked and there is nothing" from "we
+  could not check." This mistake shipped three separate times in 002 (a
+  failed receipts fetch rendering as "no receipts"; a stale vehicle switch
+  rendering another vehicle's real odometer reading as this one's; a slow
+  failure overwriting an already-successful load) before it was named as a
+  standing rule rather than fixed once per surface. See
+  `.claude/GRADER-PRINCIPLES.md` for the concrete typing pattern.
 
 ### Safety and legal
 
@@ -203,6 +214,16 @@ Stop and ask before any of these:
   content, and phase-closing reviews are Opus work regardless of diff size.
 - A content entry's author, its fact-checker, and its bilingual-editor are three
   different agent instances. This is the same separation rule three times.
+- A `[PLATFORM]` task (or a `[CONTENT]` task's platform half) may ship
+  without a paired `[TEST]` task only as a named, dated exception recorded
+  on the task's own `tasks.md` line — never silently. The record states what
+  independent assurance was substituted (a mutation-battery count, an
+  audit pass) and counts against a standing debt the conductor is
+  responsible for working down, not letting grow unchecked. As of
+  2026-09-01 that debt was T207, T208, T401, and T501, addressed the same
+  day via independent audit passes (see the 2026-09-01 harness
+  retrospective). The next occurrence should close debt, not add to it,
+  without a deliberate, stated reason to do otherwise.
 - A clean fact-check, a clean bilingual edit, and all required branch-protection
   checks authorize the `pr-shepherd` to merge without another confirmation.
 - Never `--no-verify`, never a bare force-push, never `gh pr merge --admin`,
