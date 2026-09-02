@@ -34,14 +34,14 @@
  * body).
  *
  * **F3 — the safety-critical corpus has no ratchet.** AGENTS.md's
- * safety-critical list names SRS/airbags, towing, and jacking/lifting points;
- * `GLOSSARY_SYSTEMS` has no id for any of the three, so `isSafetyCritical()`
- * cannot derive them from `system` and `src/lib/safety.ts` says so in its own
- * docstring. The only thing making today's five such entries correct is an
- * author having remembered `safetyCritical: true` by hand — "which is the
- * exact remembering-dependence `src/lib/safety.ts` names as the failure mode a
- * derived default exists to remove" (tasks.md, T207 review F3). Nothing
- * catches the sixth entry that forgets.
+ * safety-critical list names SRS/airbags, towing, jacking/lifting points and
+ * load ratings; `GLOSSARY_SYSTEMS` has no id for any of them, so
+ * `isSafetyCritical()` cannot derive them from `system` and `src/lib/safety.ts`
+ * says so in its own docstring. The only thing making today's **six** such
+ * entries correct is an author having remembered `safetyCritical: true` by hand
+ * — "which is the exact remembering-dependence `src/lib/safety.ts` names as the
+ * failure mode a derived default exists to remove" (tasks.md, T207 review F3).
+ * Nothing catches the seventh entry that forgets.
  *
  * Widening `GLOSSARY_SYSTEMS` is a taxonomy change and an AGENTS.md
  * stop-and-ask; it is deliberately **not** what these graders ask for.
@@ -60,9 +60,11 @@
  * and must stay green after the fix — the legitimate case the rule must not
  * catch. F3's corpus sweep is green today on purpose: it is a ratchet over
  * real shipped content, and a ratchet that starts red is a finding, not a
- * gate. It carries its own anti-vacuity control (the sweep must match the
- * five known entries) and its own regression control (the sweep, run over a
- * synthetic corpus with the flag removed, reports it).
+ * gate. It carries its own anti-vacuity control (the sweep must match the six
+ * known entries), its own regression control (the sweep, run over a synthetic
+ * corpus with the flag removed, reports it), and a derived census control
+ * (every entry the corpus flags by hand must be *visible* to the keyword
+ * table — the grader that closes review F-A).
  *
  * Implementers must not otherwise edit this file (AGENTS.md separation rule,
  * audited by T901).
@@ -82,6 +84,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { z } from "astro/zod";
 import { issuePaths } from "../helpers/schema-outcome.ts";
+import { SAFETY_CRITICAL_SYSTEMS } from "../../src/lib/safety.ts";
 import {
   ANGLE_UNITS,
   DIMENSION_UNITS,
@@ -188,6 +191,13 @@ describe("F1 — a dimension's sign rule follows its unit family", () => {
       // Exactly one field is wrong, and it is the one the author must change:
       // the twin below proves the rest of the entry is well-formed, so this
       // cannot be red for an unrelated reason.
+      //
+      // What this does NOT do (review F-C): it does not constrain the fix to
+      // any particular schema shape. An earlier note claimed the exact path
+      // ruled out a `z.union` over unit families; it does not, because Zod
+      // reports a failed union through its best-matching branch and the path
+      // survives. The assertion is about SCF-04 — the error names the field —
+      // and the implementer is free to choose the shape.
       expect(pathsOf(outcome)).toEqual(["dimension.value"]);
     }
   );
@@ -283,24 +293,58 @@ describe("F1 — a dimension's sign rule follows its unit family", () => {
     ).toBe(true);
   });
 
-  it("does not break any dimension figure in the shipped corpus", () => {
-    // The fix must be a no-op for real content. Every `dimension` entry on
-    // main states a positive figure, angles included, so nothing here is
-    // load-bearing for the corpus and the rule can be tightened freely.
-    const nonPositive = referenceCorpus()
+  it("does not break any MAGNITUDE figure in the shipped corpus", () => {
+    // The fix must be a no-op for real content: no shipped `dimension` entry
+    // states a non-positive length or mass, so the rule can be tightened
+    // freely.
+    //
+    // **Angle figures are skipped, and that is the whole point of the file.**
+    // An earlier draft of this guard asserted that *no* dimension figure
+    // anywhere is <= 0, angles included — which contradicts the rule the rest
+    // of this describe block pins and would have gone red the day the first
+    // real camber spec shipped (review F-B). Since implementers may not edit a
+    // `[TEST]` file, that would have landed as a separation-rule incident
+    // rather than a one-line fix, which is why a corpus guard must be written
+    // against the rule it guards and not against today's corpus contents.
+    const nonPositiveMagnitudes = referenceCorpus()
       .filter((entry) => entry.data.kind === "dimension")
       .flatMap((entry) => {
         const figure = (entry.data.dimension ?? {}) as Record<string, unknown>;
+        if (
+          typeof figure.unit !== "string" ||
+          !MAGNITUDE_DIMENSION_UNITS.includes(figure.unit)
+        ) {
+          return [];
+        }
         return (["value", "min", "max"] as const)
           .filter(
             (key) =>
               typeof figure[key] === "number" && (figure[key] as number) <= 0
           )
           .map(
-            (key) => `${entry.id}.dimension.${key} = ${String(figure[key])}`
+            (key) =>
+              `${entry.id}.dimension.${key} = ${String(figure[key])} ` +
+              `${figure.unit}`
           );
       });
-    expect(nonPositive).toEqual([]);
+    expect(nonPositiveMagnitudes).toEqual([]);
+  });
+
+  it("has magnitude figures in the corpus to have checked", () => {
+    // Anti-vacuity for the guard above: skipping angles must not turn it into
+    // a sweep over nothing. Both families are really present on main.
+    const units = referenceCorpus()
+      .filter((entry) => entry.data.kind === "dimension")
+      .map((entry) => {
+        const figure = (entry.data.dimension ?? {}) as Record<string, unknown>;
+        return typeof figure.unit === "string" ? figure.unit : "";
+      });
+    expect(
+      units.filter((unit) => MAGNITUDE_DIMENSION_UNITS.includes(unit)).length
+    ).toBeGreaterThan(0);
+    expect(
+      units.filter((unit) => SIGNED_DIMENSION_UNITS.includes(unit)).length
+    ).toBeGreaterThan(0);
   });
 });
 
@@ -460,8 +504,19 @@ describe("F2 — cite the FSM, never reproduce it, in the title as well", () => 
  * matches `toward` and `\blift\w*` matches `lifter` (a valve lifter is an
  * engine part, not a hoist). ES stems are unambiguous enough to prefix-match.
  * The ES terms are the glossary's canonical Costa Rican ones — `gata`,
- * `soportes de seguridad`, `bolsa de aire` — not the regional variants, which
+ * `bolsa de aire`, `peso bruto vehicular` — not the regional variants, which
  * the glossary keeps in `aliases`.
+ *
+ * **Load ratings (review F-A).** AGENTS.md's list says "tires and load
+ * ratings", and the first draft of this table had no row for them: it named
+ * five by-hand entries when the corpus has **six**, and the reviewer stripped
+ * `safetyCritical` from `dimension-gen3-lwb-max-gross-vehicle-weight` — a
+ * maximum gross vehicle weight, which is a load rating — and watched all 2,515
+ * tests stay green, this ratchet included. A category the sweep has no row for
+ * is a category the sweep cannot see, so the fix is a row per spelling and not
+ * a broader prefix: `\bcarga\b` alone, for one, matches "sin carga" (unladen)
+ * in a ground-clearance heading, and `\bweight\b` alone matches a curb weight,
+ * which is a published mass and not a rating anyone loads a truck to.
  */
 const SAFETY_SUBJECT_TERMS: readonly { label: string; pattern: RegExp }[] = [
   { label: "towing (en)", pattern: /\btow(s|ing|ed|ball|balls|bar|bars)?\b/ },
@@ -469,24 +524,43 @@ const SAFETY_SUBJECT_TERMS: readonly { label: string; pattern: RegExp }[] = [
   { label: "lifting (en)", pattern: /\blift(s|ing|ed)?\b/ },
   { label: "srs (en)", pattern: /\bsrs\b/ },
   { label: "airbag (en)", pattern: /\bairbags?\b/ },
+  {
+    label: "gross weight rating (en)",
+    pattern: /\bgross (vehicle|combination|axle|train) (weight|mass)\b/,
+  },
+  { label: "gvw/gcm abbreviations (en)", pattern: /\b(gvwr?|gvm|gcwr?|gcm)\b/ },
+  { label: "payload (en)", pattern: /\bpayloads?\b/ },
+  { label: "axle rating (en)", pattern: /\baxle (load|rating|capacity)\b/ },
   { label: "remolque (es)", pattern: /\bremol(c|qu)\w*\b/ },
   { label: "gata (es)", pattern: /\bgat[ao]s?\b/ },
   { label: "elevador (es)", pattern: /\belevador(es)?\b/ },
   { label: "puntos de apoyo (es)", pattern: /\bpuntos? de apoyo\b/ },
   { label: "bolsa de aire (es)", pattern: /\bbolsas? de aire\b/ },
   { label: "levantar (es)", pattern: /\blevant\w*\b/ },
+  { label: "peso bruto (es)", pattern: /\bpesos? brutos?\b/ },
+  { label: "carga util (es)", pattern: /\bcargas? utiles?\b/ },
+  { label: "capacidad de carga (es)", pattern: /\bcapacidad de carga\b/ },
 ];
 
 /**
- * The five entries on `main` that AGENTS.md's system list cannot reach and
+ * The **six** entries on `main` that AGENTS.md's system list cannot reach and
  * that carry the manual flag today. Pinned by id so that a keyword table which
  * silently stops matching is a red test rather than a sweep over nothing — the
  * "unknown is not zero" rule applied to a grader's own corpus.
+ *
+ * This list is a **floor**, asserted as a subset so that growing the corpus
+ * never turns a `[TEST]` file red on correct content. The census itself is
+ * derived rather than remembered: a separate grader below reads every entry the
+ * corpus flags by hand and requires the keyword table to *see* it, which is the
+ * assertion the first draft was missing — its count was wrong by one, and the
+ * one it missed (a maximum gross vehicle weight) was invisible to every row in
+ * the table, so nothing said a word (review F-A).
  */
 const KNOWN_SAFETY_CRITICAL_BY_HAND: readonly string[] = [
   "dimension-gen3-au-towball-download",
   "dimension-gen3-au-towing-braked",
   "dimension-gen3-au-towing-unbraked",
+  "dimension-gen3-lwb-max-gross-vehicle-weight",
   "fsm-gen3-00-lifting-jacking",
   "fsm-gen3-52-interior-srs",
 ];
@@ -577,7 +651,7 @@ describe("F3 — the safety-critical ratchet over shipped reference content", ()
     );
   });
 
-  it("matches the five entries the system list cannot reach", () => {
+  it("matches the six entries the system list cannot reach", () => {
     // Anti-vacuity and drift control together: if a keyword stops matching,
     // the sweep below would pass having examined nothing.
     const matched = referenceCorpus()
@@ -589,10 +663,41 @@ describe("F3 — the safety-critical ratchet over shipped reference content", ()
     );
   });
 
+  it("CENSUS: every by-hand safety flag is visible to the keyword table", () => {
+    // The grader that would have caught review F-A, and the reason the census
+    // is derived instead of remembered. An entry the corpus flags by hand is a
+    // category an author judged safety-critical and `GLOSSARY_SYSTEMS` cannot
+    // reach; if no row here matches its subject, the ratchet is blind to that
+    // whole category and the *next* entry in it ships unflagged in silence.
+    // That is exactly how a maximum gross vehicle weight — AGENTS.md's "load
+    // ratings" — sat outside this table while every test stayed green.
+    //
+    // Derived from the corpus, so a seventh entry in a category already
+    // covered passes silently and only a genuinely new category is red. That
+    // asymmetry is deliberate: implementers may not edit a `[TEST]` file, so a
+    // grader that goes red on correct content is a separation-rule incident.
+    const invisible = referenceCorpus()
+      .filter((entry) => entry.data.safetyCritical === true)
+      .filter(
+        (entry) =>
+          typeof entry.data.system !== "string" ||
+          !(SAFETY_CRITICAL_SYSTEMS as readonly string[]).includes(
+            entry.data.system
+          )
+      )
+      .filter((entry) => safetySubjectMatches(entry).length === 0)
+      .map(
+        (entry) =>
+          `${entry.file}: flagged by hand, but no SAFETY_SUBJECT_TERMS row ` +
+          `matches its subject`
+      );
+    expect(invisible).toEqual([]);
+  });
+
   it("RATCHET: every safety-critical subject in the corpus is flagged", () => {
-    // Green today (the five are all flagged by hand) and the point of the
-    // file: the sixth entry that forgets is a red test, not a silent omission
-    // of the standing bilingual safety notice AGENTS.md requires.
+    // Green today (the six are all flagged by hand) and the point of the
+    // file: the seventh entry that forgets is a red test, not a silent
+    // omission of the standing bilingual safety notice AGENTS.md requires.
     expect(safetyRatchetViolations(referenceCorpus())).toEqual([]);
   });
 
@@ -656,6 +761,83 @@ describe("F3 — the safety-critical ratchet over shipped reference content", ()
     expect(safetyRatchetViolations([ordinary])).toEqual([]);
   });
 
+  it("REPORTS a clone of the load-rating entry with the flag removed", () => {
+    // Review F-A's own repro, kept as a permanent grader: the reviewer stripped
+    // `safetyCritical` from the maximum gross vehicle weight and the whole
+    // 2,515-test suite stayed green, this ratchet included, because no keyword
+    // row could see a load rating at all.
+    const gvw = referenceCorpus().find(
+      (entry) => entry.id === "dimension-gen3-lwb-max-gross-vehicle-weight"
+    );
+    expect(gvw).toBeDefined();
+    const withoutFlag = { ...(gvw as CorpusEntry).data };
+    delete withoutFlag.safetyCritical;
+    const violations = safetyRatchetViolations([
+      {
+        id: "TEST-dimension-gen9-max-gross-vehicle-weight",
+        file: "TEST-dimension-gen9-max-gross-vehicle-weight.json",
+        data: withoutFlag,
+      },
+    ]);
+    expect(violations).toHaveLength(1);
+    expect(violations[0]).toMatch(/gross weight rating \(en\)/);
+    expect(violations[0]).toMatch(/peso bruto \(es\)/);
+  });
+
+  it.each([
+    ["gvwr (en)", "TEST GVWR — gross combination mass", "TEST"],
+    ["payload (en)", "TEST payload rating", "TEST"],
+    ["carga util (es)", "TEST", "Capacidad de carga útil de prueba"],
+  ])("matches the load-rating spelling %s", (_label, titleEn, titleEs) => {
+    // One row per spelling, each asserted: "enumerate the category, not one
+    // spelling of it" (GRADER-PRINCIPLES). A table with a row that never fires
+    // is a category with a bypass built in.
+    const entry: CorpusEntry = {
+      id: "TEST-dimension-gen9-load-rating",
+      file: "TEST-dimension-gen9-load-rating.json",
+      data: {
+        kind: "dimension",
+        system: "general",
+        prose: {
+          en: { title: titleEn, summary: "TEST." },
+          es: { title: titleEs, summary: "TEST." },
+        },
+      },
+    };
+    expect(safetySubjectMatches(entry).length).toBeGreaterThan(0);
+  });
+
+  it.each([
+    [
+      "curb weight — a published mass, not a rating",
+      "Curb weight — 2002 US Montero XLS",
+      "Peso en vacío — Montero XLS 2002 de Estados Unidos",
+    ],
+    [
+      "unladen ground clearance — `sin carga` is not a load rating",
+      "Ground clearance, unladen — long-wheelbase GDI petrol",
+      "Altura libre sin carga — carrocería larga con motor GDI de gasolina",
+    ],
+  ])("does not flag %s", (_label, titleEn, titleEs) => {
+    // The precision half of review F-A's fix, taken verbatim from the two real
+    // corpus headings nearest the new load-rating rows. A bare `\bweight\b` or
+    // `\bcarga\b` would flag both, and a ratchet that cries wolf on a curb
+    // weight is one an author learns to write around.
+    const entry: CorpusEntry = {
+      id: "TEST-dimension-gen9-mass-not-a-rating",
+      file: "TEST-dimension-gen9-mass-not-a-rating.json",
+      data: {
+        kind: "dimension",
+        system: "general",
+        prose: {
+          en: { title: titleEn, summary: "TEST." },
+          es: { title: titleEs, summary: "TEST." },
+        },
+      },
+    };
+    expect(safetySubjectMatches(entry)).toEqual([]);
+  });
+
   it("does not mistake a valve lifter or a town for a hoist or a tow", () => {
     // The word-boundary half of the rule, asserted directly: prefix matching
     // would flag both of these and teach authors to write around the gate.
@@ -685,10 +867,11 @@ describe("F3 — the safety-critical ratchet over shipped reference content", ()
     return testEnvelope({
       id: "TEST-dimension-gen9-towing-braked",
       kind: "dimension",
-      // `general` is the system these five real entries carry: AGENTS.md's
-      // towing / jacking / SRS categories have no GLOSSARY_SYSTEMS id, which
-      // is the whole finding. Widening that vocabulary is a taxonomy change
-      // and an AGENTS.md stop-and-ask, so it is not what this asks for.
+      // `general` is the system five of the six real entries carry (the
+      // sixth is `interior`): AGENTS.md's towing / jacking / SRS / load-rating
+      // categories have no GLOSSARY_SYSTEMS id, which is the whole finding.
+      // Widening that vocabulary is a taxonomy change and an AGENTS.md
+      // stop-and-ask, so it is not what this asks for.
       system: "general",
       dimension: { value: 3000, unit: "kg" },
       prose: {
