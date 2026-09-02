@@ -1456,6 +1456,27 @@ describe("F3 — a decoded model year needs a window that DISAMBIGUATES it", () 
    * `decodesTo.modelYear` is stated, `fitment.years` states BOTH `from` and
    * `to`, and `to - from < 30`.
    *
+   * **RATIFIED (conductor ruling, 2026-09-01) — this rule ships as written.**
+   * The graders below were authored before it was ruled on, so the ruling is
+   * recorded here, in the artifact, rather than only in a dispatch report.
+   * Three parts:
+   *
+   * - `to - from < 30` is the correct predicate, not a guess: a closed window
+   *   disambiguates the thirty-year cipher **iff** it contains no pair thirty
+   *   years apart, which for integer bounds is exactly this inequality.
+   * - It needs **no content migration**. All seven real entries carrying
+   *   `decodesTo.modelYear` (`vin-code-gen3-us-year-2001`…`-2006` and
+   *   `vin-code-gen3-export-year-1`) already state single-year closed windows.
+   * - It is deliberately scoped to rows that state `decodesTo.modelYear`, and
+   *   must **not** be generalized to `fitment.years` at large: seven real
+   *   entries elsewhere use half-open windows legitimately and a global rule
+   *   would break them.
+   *
+   * **Recorded follow-up, NOT required for correctness:** whether the window
+   * should further be generation-scoped (tighter than the full cipher period)
+   * is open and is a nice-to-have. Cipher-safety is sufficient; do not treat
+   * that question as blocking this fix.
+   *
    * The `it.fails` lines below are the current defect, pinned. The three
    * unmarked tests are the positive controls and pass today and after.
    */
@@ -1509,9 +1530,15 @@ describe("F3 — a decoded model year needs a window that DISAMBIGUATES it", () 
   });
 
   it("accepts the widest window that still disambiguates (1990–2019)", () => {
-    // `to - from === 29`: no two years in it are thirty apart. This is the
-    // positive control for the width rule — it must not drift to `<= 29`
-    // years of span or the rule starts refusing correct content.
+    // `to - from === 29`, which is **30 model years** inclusive — the largest
+    // window holding no two years thirty apart, so it is exactly on the right
+    // side of the line the test above is on the wrong side of.
+    //
+    // Note that `to - from < 30` and `to - from <= 29` are the same predicate
+    // over integers; either spelling is correct. The drift this positive
+    // control exists to catch is a rule tightened one step further — to
+    // `to - from < 29` — which would start rejecting correct thirty-model-year
+    // windows that disambiguate perfectly well.
     expect(
       schema.safeParse(yearRow(2002, { from: 1990, to: 2019 })).success
     ).toBe(true);

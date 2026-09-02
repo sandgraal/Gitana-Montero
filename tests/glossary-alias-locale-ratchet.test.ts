@@ -22,15 +22,21 @@
  *
  * Nothing in the repo pinned `locale: "en"` on those two aliases before this
  * file. **The failure mode is not silence — it is worse than silence.**
- * Measured on this branch: flipping `Pajero` to `locale: "es"` turns
- * `check:glossary` red in twenty-four places at once — eight `reference`
- * entries, eight `vehicles` entries, two `community` entries, one glossary
- * entry, and five ES UI strings including `siteTagline` and `homeIntro`. Not
- * one of those messages names the alias's `locale` field. Every one of them
- * says the ES prose is wrong, so the cheapest reading of that wall is
- * "paraphrase Pajero out of twenty-four files" — which is precisely the pass
- * the 2026-09-01 review reverted, at eight times the scale, and which would
- * take the plant's registered name and the manual's printed title with it.
+ *
+ * Measured, and re-derivable: set the `Pajero` alias to `locale: "es"` and run
+ * `npm run check:glossary`. It exits 1 with **36 Pajero messages across 24
+ * content files plus 5 ES UI strings** in `src/i18n/ui.ts` (`siteTagline`,
+ * `homeIntro`, `communityIntro`, `garageEmptyBody`, `partsIntro`). By
+ * collection: `reference` 8 files / 8 messages, `vehicles` 9 / 9, `community`
+ * 6 / 13, `glossary` 1 / 1. Counts are messages-per-field, so a file whose EN
+ * and ES summaries both trip the scan appears more than once — hence 36
+ * messages over 24 files rather than one apiece.
+ *
+ * Not one of those 36 messages names the alias's `locale` field. Every one of
+ * them says the ES prose is wrong. So the cheapest reading of that wall is
+ * "paraphrase Pajero out of 24 files" — precisely the pass the 2026-09-01
+ * review reverted, at eight times the scale, and it would take the plant's
+ * registered name and the manual's printed title with it.
  *
  * This file's job is to make the flip fail *at the flip*, naming the one
  * field that moved, before anybody starts editing prose.
