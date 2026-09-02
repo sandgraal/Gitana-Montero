@@ -64,15 +64,37 @@
  *
  * refs specs/002-montero-garage (SHR-01, SHR-03, GAR-05′, ACC-03)
  */
-import { USER_TABLES } from "./contract.ts";
 import {
+  ANONYMOUS_ROLES,
+  CONTRACT_SCHEMA,
+  EXEMPT_PUBLIC_TABLES,
+  GRANT_EXPIRY_COLUMN,
+  GRANT_REVOCATION_COLUMN,
+  PLAINTEXT_TOKEN_COLUMNS,
+  SHARE_TOKEN_HASH_COLUMN,
+  USER_TABLES,
+  USER_TABLE_NAMES,
+} from "./contract.ts";
+import {
+  balancedAt,
   createTableBody,
+  createdTables,
+  createdViews,
   columnDefinition,
+  columnDefinitions,
   defaultExpression,
+  enablesRls,
+  forcesRls,
+  functions,
+  grants,
   parenExpression,
   policies,
+  privilegeVerdict,
   representsAbsence,
+  rolePrivileges,
   statements,
+  type FunctionDefinition,
+  type GrantState,
   type PolicyDefinition,
 } from "./sql.ts";
 
@@ -683,3 +705,876 @@ export function isOptionalColumn(
 
 /** Re-exported so the probe suite can reach the parser it is grading. */
 export { parenExpression };
+
+/* =========================================================================
+ * T2-401a — rules over FUNCTIONS and GRANTS
+ *
+ * The rules above judge policies, which is the whole story only while every
+ * path to user data goes through RLS. A `security definer` function granted to
+ * `anon` is a path that does not: it runs as its owner, RLS on the tables it
+ * reads is not consulted, and whatever its body checks is the access control.
+ *
+ * Same shape as the policy rules, for the same reasons: pure functions over
+ * DDL text returning a list of findings, so the graders stay thin, a rule can
+ * be fixed in one place, and every rule is itself gradeable against DDL with a
+ * known answer — which is what `reviewer-probes.test.ts` does to all of them.
+ *
+ * refs specs/002-montero-garage (SHR-01, SHR-05, SHR-06, SHR-07, SHR-08)
+ * ====================================================================== */
+
+/* -------------------------------------------------------------------------
+ * `security definer` hygiene
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Every `security definer` routine must carry `set search_path = ''`.
+ *
+ * Codifies what T2-202 already does in all four of its functions, which is the
+ * moment to codify it: a practice that is universal and ungraded is a practice
+ * one hurried migration away from not being universal.
+ *
+ * The reason it is not style. A definer function runs with its owner's
+ * privileges and resolves unqualified names through the *caller's*
+ * `search_path`. A caller who can create a schema can therefore put their own
+ * `records` table ahead of `public.records` and have privileged code read it.
+ * `set search_path = ''` removes the ambiguity by removing the search path:
+ * every name in the body must then be schema-qualified, which is a cost worth
+ * paying and a diff worth seeing.
+ *
+ * Accepted spellings are `''` and `pg_catalog` alone — both mean "resolve
+ * nothing implicitly from a schema a caller controls". Anything else,
+ * including `public`, is a finding.
+ */
+export function definerSearchPathIssues(normalized: string): string[] {
+  const issues: string[] = [];
+  for (const routine of functions(normalized)) {
+    if (!routine.securityDefiner) continue;
+    const searchPath = routine.searchPath;
+    if (searchPath === null) {
+      issues.push(
+        `${routine.identity}: security definer with no \`set search_path\` — ` +
+          `unqualified names resolve through the caller's search path`
+      );
+      continue;
+    }
+    const value = searchPath.replace(/^'|'$/g, "").trim();
+    if (value !== "" && value !== "pg_catalog") {
+      issues.push(
+        `${routine.identity}: security definer with ` +
+          `\`set search_path = ${searchPath}\` — must be '' so every name is ` +
+          `schema-qualified`
+      );
+    }
+  }
+  return issues;
+}
+
+/* -------------------------------------------------------------------------
+ * The closed allow-list of anon-executable functions
+ * ---------------------------------------------------------------------- */
+
+/**
+ * `true` when `anon` or `public` can execute `routine` at the end of the
+ * migration directory — **including when the text does not say**.
+ *
+ * An `"unknown"` verdict counts as executable on purpose. Postgres grants
+ * `EXECUTE` on a new function to `PUBLIC` by default; a routine whose ACL no
+ * migration ever emptied is therefore reachable by `anon` in the running
+ * database while being silent in the file. Reading that silence as "not
+ * granted" is the single easiest way for this whole instrument to be
+ * decorative, so it reads as "granted" and the fix is one `revoke` line.
+ */
+export function isAnonExecutable(
+  state: GrantState,
+  routine: FunctionDefinition
+): boolean {
+  return ANONYMOUS_ROLES.some(
+    (role) =>
+      privilegeVerdict(state, routine.identity, role, "execute") !== "none"
+  );
+}
+
+/** Every routine `anon` or `public` can reach, at the end of the directory. */
+export function anonExecutableFunctions(
+  normalized: string
+): FunctionDefinition[] {
+  const state = grants(normalized);
+  return functions(normalized).filter((routine) =>
+    isAnonExecutable(state, routine)
+  );
+}
+
+/**
+ * Does `routine` bear this contract's `name`, **in this contract's schema**?
+ *
+ * ## The gap this closes (PR #74 review)
+ *
+ * Every comparison in this suite used to be `routine.name === name`, which
+ * matches half an identity. A routine is `(schema, name, argument types)`, and
+ * two of those were being thrown away. The consequence was worst on the half
+ * of the allow-list that is live today:
+ *
+ * ```sql
+ * -- `share_read_records` is a declared share reader, so the "unexpected"
+ * -- filter waved this through — a security definer function in a schema
+ * -- nothing in this contract has ever mentioned, executable by anon.
+ * create function private.share_read_records(p_token text) …
+ * grant execute on function private.share_read_records(text) to anon;
+ * ```
+ *
+ * It cut the other way too: that same routine satisfied the *completeness*
+ * half, so the graders would have reported the public reader present when only
+ * a wrong-schema impostor existed, and the seam guard would have handed the
+ * marked tests an object from a schema they were never describing.
+ *
+ * One predicate, used everywhere a contract name meets a parsed routine, so a
+ * single mutation moves every caller — the same de-duplication argument as
+ * `aclKnownFor`.
+ */
+export function isContractRoutine(
+  routine: FunctionDefinition,
+  name: string
+): boolean {
+  return routine.schema === CONTRACT_SCHEMA && routine.name === name;
+}
+
+/**
+ * The declared share readers present in `normalized`, and the names that are
+ * absent — matched by schema **and** name, never by name alone.
+ *
+ * Lives here rather than in the grader file so the schema-scoping is reachable
+ * by the probe corpus: a rule that only the seam guard could exercise is a rule
+ * the corpus cannot mutation-test.
+ */
+export function findShareReaders(
+  normalized: string,
+  names: readonly string[]
+): { readonly found: FunctionDefinition[]; readonly missing: string[] } {
+  const declared = functions(normalized);
+  const found: FunctionDefinition[] = [];
+  const missing: string[] = [];
+  for (const name of names) {
+    const routine = declared.find((entry) => isContractRoutine(entry, name));
+    if (routine) found.push(routine);
+    else missing.push(`${CONTRACT_SCHEMA}.${name}`);
+  }
+  return { found, missing };
+}
+
+/**
+ * The closed allow-list, as two independently-failing halves.
+ *
+ * `unexpected` is the security half and it is live today: anything reachable
+ * by `anon` that is not a named share reader. `missing` is the completeness
+ * half and it is the expected failure until T2-404 ships — a share reader that
+ * does not exist, or exists and was never granted, cannot serve anybody.
+ *
+ * Kept apart because they fail for opposite reasons and a caller that merged
+ * them would have to choose which one to be wrong about.
+ *
+ * Both halves match on **schema and name** — see `isContractRoutine` for the
+ * impostor this rejects.
+ */
+export function anonFunctionAllowListIssues(
+  normalized: string,
+  allowed: readonly string[]
+): { readonly unexpected: string[]; readonly missing: string[] } {
+  const state = grants(normalized);
+  const declared = functions(normalized);
+  const reachable = declared.filter((routine) =>
+    isAnonExecutable(state, routine)
+  );
+
+  const unexpected = reachable
+    .filter(
+      (routine) => !allowed.some((name) => isContractRoutine(routine, name))
+    )
+    .map((routine) => {
+      const verdicts = ANONYMOUS_ROLES.map(
+        (role) =>
+          `${role}=${privilegeVerdict(state, routine.identity, role, "execute")}`
+      ).join(" ");
+      const impostor = allowed.includes(routine.name)
+        ? ` — it bears a declared share reader's name but lives in ` +
+          `${routine.schema}, not ${CONTRACT_SCHEMA}`
+        : "";
+      return (
+        `${routine.identity}: executable by an anonymous caller (${verdicts}) ` +
+        `but is not a declared share reader` +
+        (routine.securityDefiner ? " — and it is security definer" : "") +
+        impostor
+      );
+    });
+
+  const missing = allowed
+    .filter(
+      (name) => !reachable.some((routine) => isContractRoutine(routine, name))
+    )
+    .map((name) => {
+      const exists = declared.some((routine) =>
+        isContractRoutine(routine, name)
+      );
+      return exists
+        ? `${CONTRACT_SCHEMA}.${name}: declared share reader exists but is not executable by anon`
+        : `${CONTRACT_SCHEMA}.${name}: declared share reader does not exist in the migrations`;
+    });
+
+  return { unexpected, missing };
+}
+
+/* -------------------------------------------------------------------------
+ * The token triple — three rules, because they fail independently
+ * ---------------------------------------------------------------------- */
+
+/** The routine's body with `select … for update` locking clauses removed. */
+function bodyWithoutLockClauses(routine: FunctionDefinition): string {
+  return routine.body.replace(/\bfor\s+(?:no\s+key\s+)?update\b/g, " ");
+}
+
+/**
+ * **Rule 1 of 3.** The grant is looked up by *hash*, and the bearer token is
+ * never compared against a column holding it in the clear.
+ *
+ * Separate from expiry and revocation because it fails on its own and for its
+ * own reason: this one is about what a database leak costs. If the row holds
+ * the token, reading the table *is* holding every live grant.
+ */
+export function tokenHashIssues(routine: FunctionDefinition): string[] {
+  const issues: string[] = [];
+  const body = routine.body;
+  const where = routine.identity;
+
+  const hashes = /\b(?:digest|sha256|sha512|hmac|crypt|encode)\s*\(/.test(body);
+  if (!hashes) {
+    issues.push(
+      `${where}: never hashes the token — a lookup that does not hash is a ` +
+        `lookup against a plaintext secret`
+    );
+  }
+  if (!new RegExp(`\\b${SHARE_TOKEN_HASH_COLUMN}\\b`).test(body)) {
+    issues.push(
+      `${where}: does not compare against ${SHARE_TOKEN_HASH_COLUMN}`
+    );
+  }
+  for (const column of PLAINTEXT_TOKEN_COLUMNS) {
+    // `token_hash` is not `token`: `\b` will not match across the underscore,
+    // so the hash column cannot be mistaken for the plaintext one.
+    const compared = new RegExp(
+      `\\b${column}\\s*=|=\\s*(?:[a-z0-9_]+\\.)?${column}\\b`
+    );
+    if (compared.test(body)) {
+      issues.push(
+        `${where}: compares a plaintext token column \`${column}\` — the ` +
+          `stored value must be a hash, never the bearer secret`
+      );
+    }
+  }
+  return issues;
+}
+
+/**
+ * **Rule 2 of 3.** The grant's `expires_at` is tested.
+ *
+ * SHR-08: "Every grant … SHALL carry an expiry". A column nobody reads is not
+ * an expiry, it is a comment. Requires the column to appear in a comparison,
+ * not merely to appear — the F1 lesson, one surface over.
+ */
+export function expiryCheckIssues(routine: FunctionDefinition): string[] {
+  const body = bodyWithoutLockClauses(routine);
+  const column = GRANT_EXPIRY_COLUMN;
+  const compared =
+    new RegExp(`\\b${column}\\b\\s*(?:>|<|>=|<=|is\\b)`).test(body) ||
+    new RegExp(`(?:>|<|>=|<=)\\s*(?:[a-z0-9_]+\\.)?${column}\\b`).test(body);
+  if (compared) return [];
+  return [
+    `${routine.identity}: does not test ${column} — ` +
+      (new RegExp(`\\b${column}\\b`).test(body)
+        ? `the column is mentioned but never compared`
+        : `an expiry nothing reads is not an expiry (SHR-08)`),
+  ];
+}
+
+/**
+ * **Rule 3 of 3, and the one most likely to be the real defect.** The grant's
+ * `revoked_at` is tested.
+ *
+ * SHR-08: revocation "SHALL take effect on the next request and SHALL never be
+ * gated by payment, by plan, or by any other condition". A reader that
+ * validates the hash and checks the expiry and skips this is a grant that
+ * **cannot be revoked** — and it passes every hand-test, because a grant you
+ * have not revoked behaves identically either way. Its own finding for exactly
+ * that reason: merged into the other two, a green expiry check would carry it.
+ */
+export function revocationCheckIssues(routine: FunctionDefinition): string[] {
+  const body = bodyWithoutLockClauses(routine);
+  const column = GRANT_REVOCATION_COLUMN;
+  const compared =
+    new RegExp(`\\b${column}\\b\\s*is\\s+(?:not\\s+)?null\\b`).test(body) ||
+    new RegExp(`\\b${column}\\b\\s*(?:>|<|>=|<=)`).test(body) ||
+    new RegExp(`(?:>|<|>=|<=)\\s*(?:[a-z0-9_]+\\.)?${column}\\b`).test(body) ||
+    new RegExp(`\\bcoalesce\\s*\\([^)]*\\b${column}\\b`).test(body);
+  if (compared) return [];
+  return [
+    `${routine.identity}: does not test ${column} — ` +
+      `a grant that cannot be revoked (SHR-08)`,
+  ];
+}
+
+/* -------------------------------------------------------------------------
+ * Column projection, not row projection
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Words that follow a table name in a `from`/`join` clause and are **not** an
+ * alias. Without this list, `from public.records where …` reads `where` as the
+ * alias and the whole-row rules start hunting for `where.*`.
+ */
+const NOT_AN_ALIAS = new Set([
+  "where",
+  "on",
+  "join",
+  "inner",
+  "left",
+  "right",
+  "full",
+  "outer",
+  "cross",
+  "natural",
+  "lateral",
+  "group",
+  "order",
+  "limit",
+  "offset",
+  "having",
+  "union",
+  "using",
+  "returning",
+  "select",
+  "and",
+  "or",
+  "as",
+  "into",
+  "for",
+  "loop",
+  "with",
+  "intersect",
+  "except",
+  "fetch",
+  "window",
+  "values",
+  "distinct",
+  "tablesample",
+  "end",
+  "then",
+  "else",
+  "when",
+  "case",
+  "is",
+  "not",
+  "null",
+  "returns",
+  "begin",
+  "declare",
+]);
+
+/** Words that may precede a relation in a `from` item, and are not the relation. */
+const RELATION_PREFIXES = new Set(["lateral", "only"]);
+
+function skipSpace(text: string, index: number): number {
+  let cursor = index;
+  while (cursor < text.length && /\s/.test(text[cursor])) cursor += 1;
+  return cursor;
+}
+
+/** The `[schema.]name` or bare identifier at `index`, unquoted. */
+function readReference(
+  text: string,
+  index: number
+): { readonly word: string; readonly next: number } {
+  const match = /^[a-z0-9_."]+/.exec(text.slice(index));
+  if (!match) return { word: "", next: index };
+  return { word: match[0].replace(/"/g, ""), next: index + match[0].length };
+}
+
+/**
+ * Read ONE relation of a `from`/`join` list, binding whatever name the rest of
+ * the query would use to refer to its rows.
+ *
+ * Returns the index just past the relation, or `null` when there is no
+ * relation here — which is how the comma loop knows to stop.
+ */
+function readRelation(
+  body: string,
+  index: number,
+  aliases: Set<string>
+): number | null {
+  let cursor = skipSpace(body, index);
+
+  // `lateral (…)`, `only public.t`
+  for (;;) {
+    const prefix = readReference(body, cursor);
+    if (!RELATION_PREFIXES.has(prefix.word)) break;
+    cursor = skipSpace(body, prefix.next);
+  }
+
+  let bound: string | null = null;
+  if (body[cursor] === "(") {
+    // A subquery or a parenthesised join. Its own `from` is found separately
+    // by the scan below; what matters here is the alias the outer query uses.
+    const group = balancedAt(body, cursor);
+    if (!group) return null;
+    cursor = skipSpace(body, group.close + 1);
+  } else {
+    const relation = readReference(body, cursor);
+    if (!relation.word) return null;
+    bound = relation.word.split(".").pop() ?? relation.word;
+    cursor = skipSpace(body, relation.next);
+  }
+
+  // An explicit `as` is not itself the alias.
+  const maybeAs = readReference(body, cursor);
+  if (maybeAs.word === "as") cursor = skipSpace(body, maybeAs.next);
+
+  const maybeAlias = readReference(body, cursor);
+  if (
+    maybeAlias.word &&
+    !NOT_AN_ALIAS.has(maybeAlias.word) &&
+    /^[a-z_][a-z0-9_]*$/.test(maybeAlias.word)
+  ) {
+    bound = maybeAlias.word;
+    cursor = maybeAlias.next;
+    // A column alias list — `f(x) as t(a, b)` — belongs to the alias, not to
+    // the next relation.
+    const afterAlias = skipSpace(body, cursor);
+    if (body[afterAlias] === "(") {
+      const group = balancedAt(body, afterAlias);
+      if (group) cursor = group.close + 1;
+    }
+  }
+
+  if (bound) aliases.add(bound);
+  return cursor;
+}
+
+/**
+ * The row aliases a query body binds — `from public.records r` → `r`,
+ * `from public.records` → `records`.
+ *
+ * Needed because whole-row projection is spelled *through* an alias, and the
+ * only way to tell `to_jsonb(r)` (the entire row) from `to_jsonb(payload)` (a
+ * column) is to know which names are rows. **A name this misses is a whole row
+ * that leaves the database unexamined**, so it errs toward binding too much:
+ * an over-bound name can only cause a false finding, and an under-bound one
+ * causes silence.
+ *
+ * ## Two defects this replaces (round-2 review, D2 — both confirmed, not theoretical)
+ *
+ * The first version was one regex —
+ * `\b(?:from|join)\s+(?:(\w+)\.)?(\w+)(?:\s+(?:as\s+)?(\w+))?` — and it under-bound
+ * in two ways that each let a whole row through:
+ *
+ * ```sql
+ * -- 1. COMMA JOINS. Only `from` and `join` introduce a relation to that regex,
+ * --    so the second relation of a comma list was never bound at all:
+ * select to_jsonb(s) from public.records r, public.shares s …
+ * --    bound {r}; `to_jsonb(s)` — the whole grants row, token hash included —
+ * --    produced ZERO findings.
+ *
+ * -- 2. AN UNALIASED FIRST RELATION. The optional alias group happily matched
+ * --    the word `join`, consuming it, so the scan never saw the second
+ * --    relation as a join at all:
+ * select to_jsonb(s) from public.records join public.shares s on …
+ * --    bound {records} and nothing else.
+ * ```
+ *
+ * So the `from` list is now *parsed* rather than pattern-matched: split on
+ * top-level commas, each item read as an optional prefix, a relation or a
+ * parenthesised subquery, an optional `as`, and an alias that is refused if it
+ * is a keyword. Every `from` and `join` in the body is scanned, at any nesting
+ * depth, so a subquery's own relations are bound too.
+ */
+export function rowAliases(body: string): string[] {
+  const aliases = new Set<string>();
+
+  for (const keyword of body.matchAll(/\b(from|join)\b/g)) {
+    let cursor = keyword.index + keyword[0].length;
+    for (;;) {
+      const next = readRelation(body, cursor, aliases);
+      if (next === null) break;
+      cursor = next;
+      // `join` takes exactly one relation; only a `from` list continues.
+      if (keyword[1] === "join") break;
+      const afterItem = skipSpace(body, cursor);
+      if (body[afterItem] !== ",") break;
+      cursor = afterItem + 1;
+    }
+  }
+
+  return [...aliases];
+}
+
+/**
+ * Functions that serialise an entire row into one value.
+ *
+ * Every one of these turns "name your columns" into a formality: the output is
+ * the row, whatever the row happens to contain today.
+ */
+const ROW_SERIALIZERS = [
+  "to_jsonb",
+  "to_json",
+  "row_to_json",
+  "jsonb_agg",
+  "json_agg",
+  "array_agg",
+  "row",
+];
+
+/**
+ * An anon-reachable routine must name the columns it returns.
+ *
+ * > **SHR-06** WHERE a grant does not open costs, THE data returned SHALL omit
+ * > the cost fields entirely rather than blanking them at render time.
+ *
+ * `select *` and `returns setof public.records` both make that impossible to
+ * honour: the shape is the table's shape, so every column the table gains
+ * later — a cost, a note, a private flag — is served to every grant holder
+ * from the moment the migration lands, with no diff in the function at all.
+ * The rule is about *columns*; RLS and the token checks are about rows, and
+ * neither says anything about width.
+ *
+ * ## Why a literal `*` is not the whole rule (round-2 review, F3)
+ *
+ * The first version tested for `*` and nothing else, so **every** whole-row
+ * spelling walked past it and the full `anonSurfaceIssues` sweep returned
+ * zero findings:
+ *
+ * ```sql
+ * select to_jsonb(r) from public.records r …   -- every column, as JSON
+ * select row_to_json(r) …                      -- same
+ * select jsonb_agg(r) …                        -- same, aggregated
+ * select r.* …                                 -- same, spelled out
+ * select r from public.records r …             -- same, as a composite
+ * ```
+ *
+ * That is a bypass *easier to write* than the thing the rule caught — and it
+ * is precisely the single-JSON-reader shape that `contract.ts`'s three-reader
+ * note argues against, which means the architecture argument was resting on a
+ * rule that did not enforce it. So the rule now asks the real question: does
+ * anything here hand back a whole row, however it is spelled.
+ */
+export function projectionIssues(routine: FunctionDefinition): string[] {
+  const issues: string[] = [];
+  const where = routine.identity;
+  const body = routine.body;
+  const explain =
+    `an anon-reachable routine must name its columns, or every column the ` +
+    `table gains later is served with it (SHR-06)`;
+
+  if (/\bselect\s+(?:distinct\s+)?(?:[a-z0-9_]+\.)?\*/.test(body)) {
+    issues.push(`${where}: selects \`*\` — ${explain}`);
+  }
+
+  for (const alias of rowAliases(body)) {
+    // `r.*` anywhere, not just directly after `select` — it is just as whole
+    // inside `jsonb_build_object('r', r.*)` or a function argument.
+    if (new RegExp(`\\b${alias}\\.\\*`).test(body)) {
+      issues.push(`${where}: references \`${alias}.*\` — ${explain}`);
+    }
+    // A whole-row serialiser applied to the alias.
+    const serializer = new RegExp(
+      `\\b(${ROW_SERIALIZERS.join("|")})\\s*\\(\\s*${alias}(?:\\.\\*)?\\s*\\)`
+    ).exec(body);
+    if (serializer) {
+      issues.push(
+        `${where}: \`${serializer[1]}(${alias})\` serialises the whole row — ${explain}`
+      );
+    }
+    // A bare alias in the select list is the composite row itself.
+    if (
+      new RegExp(
+        `\\bselect\\s+(?:distinct\\s+)?${alias}\\s*(?:,|\\bfrom\\b|$)`
+      ).test(body)
+    ) {
+      issues.push(`${where}: selects the bare row \`${alias}\` — ${explain}`);
+    }
+  }
+
+  const setof = /\bsetof\s+(?:public\.)?([a-z0-9_]+)/.exec(
+    `${routine.returns} ${routine.header}`
+  );
+  if (setof && USER_TABLE_NAMES.includes(setof[1])) {
+    issues.push(
+      `${where}: returns \`setof ${setof[1]}\` — the return shape is the ` +
+        `whole user table, so cost fields cannot be omitted (SHR-06)`
+    );
+  }
+  return issues;
+}
+
+/**
+ * An anon-reachable routine must not write.
+ *
+ * > **SHR-07** THE holder of a grant SHALL NOT be required to have an account,
+ * > and the accountless path SHALL be read-only. WHILE a request carries no
+ * > authenticated session, no grant SHALL admit any write.
+ *
+ * Read literally: the property is of the *path*, so it is graded on the path —
+ * every routine an anonymous caller can execute — rather than on the three
+ * this file happens to name.
+ */
+export function anonWriteIssues(routine: FunctionDefinition): string[] {
+  const body = bodyWithoutLockClauses(routine);
+  const writes = [
+    ["insert", /\binsert\s+into\b/],
+    ["update", /\bupdate\s+(?:only\s+)?[a-z0-9_"]+\s+set\b/],
+    ["delete", /\bdelete\s+from\b/],
+    ["truncate", /\btruncate\b/],
+    ["ddl", /\b(?:create|drop|alter)\s+(?:table|view|function|policy|role)\b/],
+  ] as const;
+  return writes
+    .filter(([, pattern]) => pattern.test(body))
+    .map(
+      ([verb]) =>
+        `${routine.identity}: anon-reachable routine performs a ${verb} — ` +
+        `the accountless path is read-only (SHR-07)`
+    );
+}
+
+/**
+ * Every finding against the routines an anonymous caller can execute.
+ *
+ * The sweep that makes the rules above apply to whatever T2-404 actually
+ * ships, rather than to the three names this repo currently guesses at. It is
+ * vacuous today — nothing is anon-reachable — and that vacuity is itself
+ * pinned, by the `missing` half of the allow-list going red until the readers
+ * exist.
+ */
+export function anonSurfaceIssues(normalized: string): string[] {
+  return anonExecutableFunctions(normalized).flatMap((routine) => [
+    ...projectionIssues(routine),
+    ...anonWriteIssues(routine),
+    ...tokenHashIssues(routine),
+    ...expiryCheckIssues(routine),
+    ...revocationCheckIssues(routine),
+    ...(routine.securityDefiner && routine.searchPath === null
+      ? [`${routine.identity}: security definer with no \`set search_path\``]
+      : []),
+  ]);
+}
+
+/* -------------------------------------------------------------------------
+ * DEFECT FIX (1) — the end-state ACL, not a count of revokes
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Every finding against the **end-state** privileges on the named user tables.
+ *
+ * Replaces a grader that counted `revoke … from anon` statements and asserted
+ * the count was above zero. A directory containing
+ *
+ * ```sql
+ * revoke all on public.records from anon;
+ * grant select on public.records to anon;
+ * ```
+ *
+ * scored 1 and passed — verified 2026-08-31. The count answers "was a revoke
+ * written", which is not a security property; this answers "who can reach the
+ * table when the migrations finish", which is.
+ *
+ * Three findings, all of which are one wrong line away:
+ *
+ * - an anonymous role holding **anything**;
+ * - an ACL the text never emptied, so an inherited Supabase grant may survive
+ *   (`"unknown"` — the shape of T2-202's near-miss, where nobody granted the
+ *   privilege that nearly shipped the hole);
+ * - `authenticated` holding more than the four verbs the schema means to give
+ *   it. `TRUNCATE` is the one that matters and the one RLS does not filter.
+ */
+export function tableGrantIssues(
+  normalized: string,
+  tables: readonly string[]
+): string[] {
+  const state = grants(normalized);
+  const issues: string[] = [];
+  const expected = ["select", "insert", "update", "delete"];
+
+  for (const table of tables) {
+    const identity = `public.${table}`;
+
+    for (const role of ANONYMOUS_ROLES) {
+      const held = rolePrivileges(state, identity, role);
+      if (held.verdict === "granted") {
+        issues.push(
+          `${identity}: ${role} holds ${held.privileges.join(", ")} at the ` +
+            `end of the migrations`
+        );
+      } else if (held.verdict === "unknown") {
+        issues.push(
+          `${identity}: nothing revokes ${role}'s inherited privileges — the ` +
+            `end-state ACL is unknown, and Supabase grants on public by default`
+        );
+      }
+    }
+
+    const authenticated = rolePrivileges(state, identity, "authenticated");
+    if (authenticated.verdict === "unknown") {
+      issues.push(
+        `${identity}: nothing revokes authenticated's inherited privileges ` +
+          `before granting — a grant adds to an ACL, it does not replace it`
+      );
+      continue;
+    }
+    const extra = authenticated.privileges.filter(
+      (privilege) => !expected.includes(privilege)
+    );
+    if (extra.length > 0) {
+      issues.push(
+        `${identity}: authenticated holds ${extra.join(", ")} beyond ` +
+          `select/insert/update/delete — RLS does not filter truncate`
+      );
+    }
+  }
+  return issues;
+}
+
+/**
+ * Every view in `public` must be created `with (security_invoker = true)`.
+ *
+ * ## The same hole class as a definer function, one object type over
+ *
+ * A view runs its query as the view's **owner** unless told otherwise, so RLS
+ * on the underlying tables is evaluated against the owner and not against the
+ * caller. A `public` view over `records` without this option is a
+ * `security definer` function with nicer syntax: `force row level security`,
+ * every owner-scoped predicate in this file, and `revoke all … from anon` all
+ * stop applying to the rows it returns.
+ *
+ * **The default is the unsafe direction.** `security_invoker` was added in
+ * PG15 and defaults to `false`, so a view is owner-executing unless somebody
+ * remembered a clause that did not exist a few releases ago. That is exactly
+ * the shape of invariant that needs a grader rather than a habit — the same
+ * argument as `force row level security`, which is the other option whose
+ * default is the wrong one.
+ *
+ * Vacuous today (no migration creates a view) and it starts paying the day one
+ * does. `viewGrantIssues` already covers the privilege half of this surface;
+ * this is the half that matters even when the grants are right, because a view
+ * `authenticated` may legitimately select from still must not hand that caller
+ * another owner's rows.
+ */
+export function viewSecurityInvokerIssues(normalized: string): string[] {
+  const issues: string[] = [];
+  for (const view of createdViews(normalized)) {
+    if (
+      !/\bwith\s*\([^)]*\bsecurity_invoker\s*=\s*(?:true|on)\b/.test(
+        view.statement
+      )
+    ) {
+      issues.push(
+        `${view.identity}: created without \`with (security_invoker = true)\` — ` +
+          `the view runs as its owner, so RLS on the underlying tables is ` +
+          `evaluated against the owner and not the caller`
+      );
+    }
+  }
+  return issues;
+}
+
+/** Every finding against the privileges on views in `public`. */
+export function viewGrantIssues(normalized: string): string[] {
+  const state = grants(normalized);
+  const issues: string[] = [];
+  for (const view of createdViews(normalized)) {
+    for (const role of ANONYMOUS_ROLES) {
+      const held = rolePrivileges(state, view.identity, role);
+      if (held.verdict === "granted") {
+        issues.push(
+          `${view.identity}: ${role} holds ${held.privileges.join(", ")} on a view`
+        );
+      }
+    }
+  }
+  return issues;
+}
+
+/* -------------------------------------------------------------------------
+ * DEFECT FIX (2) — what exists, cross-checked against what is enumerated
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Every finding against a table that exists but nothing grades.
+ *
+ * The constitution says *every* user table ships with RLS proven by graders.
+ * Every table-level grader in this suite is driven from `USER_TABLE_NAMES`, so
+ * before this, "every" meant "these four": a `shares` table with
+ * `for all to anon using (true)` and no `force` produced zero findings —
+ * verified 2026-08-31.
+ *
+ * The sweep runs the other way. It starts from `createdTables()` — what the
+ * directory actually leaves behind — and reports anything neither enumerated
+ * in `USER_TABLES` nor named in `EXEMPT_PUBLIC_TABLES`, in the style of
+ * `check-hreflang.mjs`'s `EXEMPT_PAGES`: an exemption is a decision with a
+ * reason attached, and everything else is a bug.
+ *
+ * RLS is checked on **every** created table, enumerated or not. A table nobody
+ * added to the contract is exactly the table whose `force` was forgotten, and
+ * making the RLS finding conditional on enumeration would put the check behind
+ * the door it exists to open.
+ */
+export function ungradedTableIssues(
+  normalized: string,
+  options: {
+    readonly enumerated?: readonly string[];
+    readonly exempt?: ReadonlyMap<string, string>;
+  } = {}
+): string[] {
+  const enumerated = options.enumerated ?? USER_TABLE_NAMES;
+  const exempt = options.exempt ?? EXEMPT_PUBLIC_TABLES;
+  const issues: string[] = [];
+
+  for (const table of createdTables(normalized)) {
+    const exemptReason = exempt.get(table.name);
+    if (!enumerated.includes(table.name) && exemptReason === undefined) {
+      issues.push(
+        `${table.identity}: created but not enumerated in USER_TABLES and not ` +
+          `named in EXEMPT_PUBLIC_TABLES — no grader knows it exists`
+      );
+    }
+    if (exemptReason !== undefined) continue;
+
+    if (!enablesRls(normalized, table.name)) {
+      issues.push(`${table.identity}: row level security is not enabled`);
+    }
+    if (!forcesRls(normalized, table.name)) {
+      issues.push(
+        `${table.identity}: row level security is not FORCED — the owner role ` +
+          `is exempt, and migrations run as the owner`
+      );
+    }
+  }
+  return issues;
+}
+
+/**
+ * Every finding against a table column that stores a bearer secret in the clear.
+ *
+ * A sweep over every created table rather than over a named `shares` table:
+ * the claim is that nothing anywhere holds a share token in plaintext, and
+ * naming the table would narrow it to a claim about one table's spelling.
+ */
+export function plaintextTokenColumnIssues(normalized: string): string[] {
+  const issues: string[] = [];
+  for (const table of createdTables(normalized)) {
+    const body = createTableBody(normalized, table.name);
+    if (!body) continue;
+    for (const column of columnDefinitions(body)) {
+      if (!PLAINTEXT_TOKEN_COLUMNS.includes(column.name as never)) continue;
+      issues.push(
+        `${table.identity}.${column.name}: a share token stored in the clear — ` +
+          `store ${SHARE_TOKEN_HASH_COLUMN} instead, so reading the table is ` +
+          `not holding every live grant`
+      );
+    }
+  }
+  return issues;
+}

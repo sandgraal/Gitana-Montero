@@ -508,7 +508,7 @@ second principal to a phase that was written for one, and the instrument work
 that implies is large enough to be its own task — hence T2-401a. T2-404 is new.
 Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
 
-- [ ] **T2-401a [TEST]** The instrument: grade functions and grants, not just
+- [x] **T2-401a [TEST]** The instrument: grade functions and grants, not just
   policies. Split from T2-401 so it is reviewed as harness work rather than
   feature work — the T2-201/T2-202 rationale. Depends: T2-302. *(SHR-01, SHR-05..08)*
   <br>**Why this exists.** The recommended architecture for SHR-07 is a
@@ -561,6 +561,46 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   proven by graders before content flows". Fix with a `createdTables()` sweep
   cross-checked against `USER_TABLES`, with a named-exemption map in the style
   of `check-hreflang.mjs`'s `EXEMPT_PAGES`.
+  <br>**Landed 2026-09-01** across two rounds. Round 2 added, on review: the
+  `security_invoker` rule for views (PG15+ defaults it **off**, so a `public`
+  view without it is the same hole class as a definer function); whole-row
+  projection detection (`to_jsonb(r)`, `row_to_json(r)`, `jsonb_agg(r)`, bare
+  `select r`, `alias.*` in any expression — each was a zero-finding bypass
+  easier to write than the literal `select *` the rule already caught); and
+  probes for the two tri-state halves that had none. 39 mutants, all killed.
+  <br>**Recorded here for the T2-401 and T2-404 briefs — NOT implemented by
+  T2-401a, and each is a deliberate scope hand-off rather than an oversight:**
+  <br>— **(F5) Ban `alter default privileges … grant … to anon|public`.**
+  `grants()` already parses and records every ADP statement, and the graders
+  read the *revoke* half. Nothing yet rejects the grant half, which would hand
+  every future object in `public` to an anonymous caller from one line in one
+  migration — and it is the one privilege change that leaves no trace on any
+  object that exists today, so the created-table and function sweeps cannot see
+  it. One rule over `GrantState.defaultPrivileges`; belongs with T2-404's
+  migration review.
+  <br>— **A Tier A refusal-shape smell-check, alongside T2-401's Tier B
+  SHR-08 proof.** SHR-08 requires unknown, expired, and revoked to be
+  *indistinguishable* — "same status, same body, same shape" — which is
+  genuinely behavioural and needs a running stack. But a weak Tier A proxy
+  catches the likeliest mistake on every PR with no Docker: reject any
+  anon-reachable routine whose body contains more than one distinct `raise`
+  message, or any text matching `expired|revoked|not found`. It cannot prove
+  the property and must not be described as if it does; it detects the
+  mistake, which is a different and still useful job. Pair it with the real
+  behavioural grader, never instead of it.
+  <br>— **The three-reader architecture is endorsed**, but note what makes it
+  real: `SHARE_READER_FUNCTIONS`' argument for three entry points over one JSON
+  reader rests entirely on the projection rule. Before round 2 that rule caught
+  only a literal `*`, so a single `to_jsonb(r)` reader would have satisfied
+  every grader while defeating the argument for splitting them.
+  <br>— **The limit of the projection rule, stated correctly.** It catches
+  whole-row projection in every spelling tested, including inside a builder and
+  inside a nested subquery. What it cannot do is enforce SHR-06's *capability
+  scoping*: a fully-named `jsonb_build_object` that includes the cost columns is
+  textually indistinguishable from legitimate projection. Where a grant does not
+  open costs, that guarantee is carried by the capability check in the reader's
+  body, not by any grader in this file — **T2-404's reviewer must verify it by
+  reading.**
 
 - [ ] **T2-401 [TEST]** Sharing graders: private-by-default proofs at the URL
   level, per-record cost masking on public work-logs, showcase toggle
@@ -621,6 +661,32 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   grader that writes a deliberately mis-joined policy and proves owner B still
   reads nothing. If that ever stops being true, the declaration tier will not
   notice.
+  <br>**Two defects in T2-401a's own projection rule, found in its round-2
+  review. (c) is FIXED on the T2-401a branch; (d) remains for this task.**
+  <br>*(c) `rowAliases` under-bound, so whole-row projection escaped.* **Fixed
+  2026-09-01.** The old single regex matched only relations introduced by
+  `from`/`join` and its optional alias group could swallow a following `join`,
+  so two shapes bound the wrong set and the whole-row projection over the
+  unbound relation produced **zero findings** — both confirmed against the
+  shipped rule: `from public.records r, public.shares s` bound only `r` (so
+  `select to_jsonb(s)`, a whole-row leak of the grants table, was silent), and
+  `from public.records join public.shares s on …` bound only `records`.
+  <br>The `from` list is now parsed rather than pattern-matched — split on
+  top-level commas, each item read as optional prefix / relation or
+  parenthesised subquery / optional `as` / alias refused if it is a keyword —
+  and every `from` and `join` is scanned at any nesting depth. **The guarantee
+  now covers comma joins, unaliased relations, `as` aliases, `lateral`, and
+  subquery aliases**, in addition to the single-relation and aliased-`join`
+  bodies it always covered. A third shape the reviewer raised, the subquery
+  alias, was previously caught only when the subquery happened to contain a
+  literal `*`; it is now caught on its own merits and pinned with a fixture
+  that contains no `*` at all. Nine mutants over the new clauses, all killed.
+  <br>*(d) No accept-case control on the `setof` rule.* `returns setof
+  <user table>` is rejected and pinned, but nothing asserts that
+  `returns setof <non-user-table>` — a composite type, a view, a domain — is
+  *accepted*. The rule could become over-strict and reject a legitimate return
+  shape with no test noticing, which is the direction that gets a security rule
+  deleted rather than fixed. One fixture closes it.
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*

@@ -440,6 +440,212 @@ export const PURGE_FUNCTION = "purge_expired_accounts";
 export const RECOVERY_WINDOW_DAYS = 30;
 
 /* -------------------------------------------------------------------------
+ * Typed share grants (SHR-05..08) — declared by T2-401a [TEST]
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The roles an anonymous visitor arrives as.
+ *
+ * `public` is in the list because it is not a role beside `anon` — it is
+ * *every* role, `anon` included. A privilege granted to `public` is a
+ * privilege `anon` holds, and a `revoke … from anon` does not take it away.
+ */
+export const ANONYMOUS_ROLES = ["anon", "public"] as const;
+
+/**
+ * One function a grant holder with **no account** may execute.
+ *
+ * ## Why this list is the whole allow-list, and why it is closed
+ *
+ * SHR-07 puts a reader on the far side of the database with no `auth.uid()`,
+ * which means RLS cannot be what protects it: the architecture decided for
+ * T2-404 is a `security definer` function granted to `anon`, and a definer
+ * function runs as its owner with RLS on the tables it reads **not consulted**.
+ * Whatever the body checks is the entire access control.
+ *
+ * So the question a grader has to be able to answer is not "are these three
+ * functions safe" but "is anything *else* reachable". That is only answerable
+ * against a closed set: the functions executable by `anon` or `public` must
+ * **equal** this list. The deny half is enumerated the same way
+ * `KNOWN_EXTERNAL_PROVIDERS` enumerates it for auth providers — an allow-list
+ * is only a guarantee when the complement is computed, not assumed.
+ *
+ * ## The names are this file's decision, and renegotiable in one line
+ *
+ * Exactly as for the table names above: T2-401a has to name something for the
+ * graders to be concrete, and it names it here rather than in five test files.
+ * If T2-404 prefers `share_records_read`, that is a one-line conversation with
+ * the conductor. What is **not** negotiable is the behaviour graded around
+ * them — definer, `set search_path = ''`, hash-not-plaintext, expiry,
+ * revocation, and a named column projection.
+ *
+ * ## Why three readers and not one
+ *
+ * SHR-06: "costs and receipts are two decisions, not one", and where a grant
+ * does not open costs "THE data returned SHALL omit the cost fields entirely
+ * rather than blanking them at render time". Two independent capability bits
+ * over one all-or-nothing payload is how a blanking bug gets written; separate
+ * entry points make the omission structural. The vehicle reader is separate
+ * again because §10's fourth ruling gives the accountless holder the 001
+ * reference "filtered to that exact vehicle by the fitment engine", and that
+ * needs the taxonomy identity and nothing else.
+ */
+/**
+ * The schema every unqualified name in this file lives in.
+ *
+ * ## Why this is a named constant and not the string `"public"` in six places
+ *
+ * Every routine name here is written unqualified, and a grader that matches an
+ * unqualified name against a parsed routine is matching **half an identity**.
+ * Postgres will happily hold a `private.share_read_records` beside a
+ * `public.share_read_records`; they are different functions with different
+ * ACLs, and a comparison on `name` alone cannot tell them apart. That is not a
+ * hypothetical — it is the shape a schema-qualified migration takes the first
+ * time someone moves a helper out of `public` to tidy the API surface.
+ *
+ * Named here so the schema half of every comparison comes from one place, and
+ * so a contract entry that ever needs a different schema is a one-line change
+ * rather than a hunt (PR #74 review).
+ */
+export const CONTRACT_SCHEMA = "public";
+
+export interface ShareReaderContract {
+  /** Unqualified function name, resolved in `CONTRACT_SCHEMA`. */
+  readonly name: string;
+  /** The requirement that puts this function on the anon surface. */
+  readonly requirement: string;
+  /** What it is for, in one line, for a finding message. */
+  readonly purpose: string;
+}
+
+export const SHARE_READER_FUNCTIONS: readonly ShareReaderContract[] = [
+  {
+    name: "share_read_vehicle",
+    requirement:
+      "SHR-05 + SHR-07 (§10 ruling 4: reference filtered by fitment)",
+    purpose:
+      "the vehicle's taxonomy identity, so the 001 fitment engine can filter " +
+      "the reference to this exact truck",
+  },
+  {
+    name: "share_read_records",
+    requirement: "SHR-05 + SHR-06 (history; cost fields omitted, not blanked)",
+    purpose:
+      "the vehicle's history, with cost columns present only when the grant opens them",
+  },
+  {
+    name: "share_read_receipts",
+    requirement: "SHR-06 (receipts open independently of costs)",
+    purpose:
+      "receipt metadata and the storage path the Edge signer resolves, only " +
+      "when the grant opens receipts",
+  },
+] as const;
+
+/** Convenience: the share-reader names. */
+export const SHARE_READER_NAMES = SHARE_READER_FUNCTIONS.map(
+  (reader) => reader.name
+);
+
+/**
+ * The enumerated deny half: routines that exist today and must never become
+ * executable by `anon` or `public`.
+ *
+ * The closed allow-list above already catches any of these by computing the
+ * complement, so this list is belt and braces — but it is the half that names
+ * *why* each one is dangerous, and a finding that says
+ * "purge_expired_accounts is anon-executable" is worth more than one that says
+ * "an unexpected function is anon-executable".
+ *
+ * A name absent from the migrations is not a finding here: this asks what is
+ * true of the routines that exist, not that they all still exist.
+ */
+export const PRIVILEGED_FUNCTIONS: readonly {
+  readonly name: string;
+  readonly why: string;
+}[] = [
+  {
+    name: "handle_new_user",
+    why: "inserts into profiles as its owner; anon-executable means anyone mints rows",
+  },
+  {
+    name: "request_account_deletion",
+    why: "ACC-03: marks an account for deletion — must require a session to name one",
+  },
+  {
+    name: "purge_expired_accounts",
+    why: "ACC-03: hard-deletes accounts whose window closed; service-role only",
+  },
+  {
+    name: "handle_vehicle_deleted",
+    why: "deletes storage objects as its owner",
+  },
+  {
+    name: "deny_password_login",
+    why: "ACC-01: GoTrue's auth hook; only supabase_auth_admin may call it",
+  },
+] as const;
+
+/**
+ * The column a share token is stored in — **a hash, never the token**.
+ *
+ * T2-404's architecture record: 256 bits from `gen_random_bytes(32)`, stored
+ * as `token_hash bytea not null unique` = `digest(token, 'sha256')`. Plain
+ * sha256 is deliberate and correct against a 256-bit keyspace; the point the
+ * graders pin is that the *stored* value is not the bearer secret, so a
+ * database leak is not a grant leak.
+ */
+export const SHARE_TOKEN_HASH_COLUMN = "token_hash";
+
+/**
+ * Column names that would mean the bearer secret is stored in the clear.
+ *
+ * Graded as a sweep over every created table rather than over a `shares` table
+ * this file has not declared: the claim is "no table anywhere stores a share
+ * token in plaintext", and naming the table would make it a claim about one.
+ */
+export const PLAINTEXT_TOKEN_COLUMNS = [
+  "token",
+  "token_plaintext",
+  "plain_token",
+  "share_token",
+  "secret",
+] as const;
+
+/**
+ * > **SHR-08** Every grant SHALL be revocable by its issuer at any time and
+ * > SHALL carry an expiry.
+ *
+ * Two columns, because they are two independent failures. A grant that
+ * validates the hash but never reads `revoked_at` is a grant that **cannot be
+ * revoked**, and SHR-08 says revocation "SHALL take effect on the next request"
+ * — which makes it the likeliest and the worst defect in the feature.
+ */
+export const GRANT_EXPIRY_COLUMN = "expires_at";
+export const GRANT_REVOCATION_COLUMN = "revoked_at";
+
+/**
+ * Tables that may exist in `public` without being user data.
+ *
+ * In the style of `check-hreflang.mjs`'s `EXEMPT_PAGES`: a *named* exemption
+ * with a reason, so the sweep over `createdTables()` stays closed. Anything
+ * created in `public` that is neither in `USER_TABLES` nor named here is a
+ * finding — "an ungraded table", which is what the constitution's "every user
+ * table ships with row-level security proven by graders" forbids.
+ *
+ * **Empty today, and deliberately so.** The four tables that exist are all
+ * enumerated. In particular `shares` is *not* exempt: when T2-404 creates it,
+ * this sweep goes red until T2-401 adds it to `USER_TABLES`, which is exactly
+ * the ordering the task list already encodes (T2-401 merges before T2-404).
+ * Exempting it here to keep the build quiet would re-open the hole this map
+ * was added to close.
+ */
+export const EXEMPT_PUBLIC_TABLES: ReadonlyMap<string, string> = new Map<
+  string,
+  string
+>([]);
+
+/* -------------------------------------------------------------------------
  * Synthetic fixture namespace
  * ---------------------------------------------------------------------- */
 

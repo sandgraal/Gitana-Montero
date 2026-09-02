@@ -46,32 +46,57 @@
  * refs specs/002-montero-garage (SHR-01, SHR-03, GAR-02′, GAR-05′, ACC-03)
  */
 import { describe, expect, it } from "vitest";
-import { RECEIPTS_BUCKET } from "./contract.ts";
+import { RECEIPTS_BUCKET, USER_TABLE_NAMES } from "./contract.ts";
 import {
+  anonExecutableFunctions,
+  anonFunctionAllowListIssues,
+  anonSurfaceIssues,
+  anonWriteIssues,
   authUidComparands,
   bucketPolicyIssues,
   bucketPrivacyIssues,
+  definerSearchPathIssues,
   effectiveCheck,
+  expiryCheckIssues,
+  findShareReaders,
+  isContractRoutine,
   isCorrelated,
   isOptionalColumn,
   isOwnerScoped,
   isTautological,
+  plaintextTokenColumnIssues,
+  projectionIssues,
+  revocationCheckIssues,
+  rowAliases,
   splitTopLevel,
   storagePolicyIssues,
   stripSubqueries,
   subqueryTables,
+  tableGrantIssues,
+  tokenHashIssues,
+  ungradedTableIssues,
   userTablePolicyIssues,
+  viewSecurityInvokerIssues,
 } from "./rules.ts";
 import {
+  canonicalArgumentTypes,
   columnDefinition,
   createTableBody,
+  createdTables,
+  dollarTagAt,
   enablesRls,
   foreignKeyFor,
   forcesRls,
+  functions,
+  grants,
   isNotNullFor,
   normalizeSql,
   policies,
+  privilegeVerdict,
   representsAbsence,
+  rolePrivileges,
+  statements,
+  type FunctionDefinition,
 } from "./sql.ts";
 
 const sql = (text: string) => normalizeSql(text);
@@ -1025,5 +1050,1464 @@ describe("the probe fixtures are real DDL, not empty strings", () => {
         "problem_ids"
       )
     ).not.toBeNull();
+  });
+});
+
+/* =========================================================================
+ * D. T2-401a — the FUNCTION and GRANT surface
+ *
+ * Same contract as the sections above, applied to the rules that grade
+ * `security definer` functions and end-state ACLs: a leaking variant that must
+ * be rejected, a correct variant that must be accepted, and each fixture
+ * minimal enough that only the rule under test can decide it.
+ *
+ * ## Mutation-verified, to this file's own standard
+ *
+ * Thirty-nine mutations were applied to `rules.ts` and `sql.ts` — each rule
+ * disabled or inverted in turn, each clause of the compound rules separately —
+ * and this suite went red for every one. That matters more here than anywhere
+ * else in the file, because these fixtures describe a surface that does not
+ * exist yet: a rule that quietly matched nothing would look exactly like a
+ * rule that is waiting, and `share-instrument.test.ts`'s `it.fails` markers
+ * would go on reporting "expected failure" either way.
+ *
+ * Seven mutations survived a first pass and the probes were strengthened until
+ * they did not, which is the only reason to run the exercise at all. Each
+ * survivor was a rule the corpus *appeared* to cover:
+ *
+ * - **`dollarTagAt` matching `$1`.** Relaxing the first character of a tag
+ *   name turns every plpgsql positional parameter into a dollar quote and
+ *   swallows the rest of the file. Pinned now as a direct table.
+ * - **`statements()` closing a body on any tag rather than its own.** The
+ *   entire reason named tags exist is a body containing `$$`; without one in
+ *   the corpus the rule was unreachable. Pinned by a `$function$` body with a
+ *   `$$` inside it.
+ * - **The `public` half of the ACL knowledge test** (round-2 F1). Flipping the
+ *   `&&` to `||` left all 516 tests green: every fixture revoked from `anon`
+ *   *and* `public`, so the forgot-`public` case had no probe at all. Pinned by
+ *   G12/G12b — and the test itself de-duplicated into one `aclKnownFor`, since
+ *   two copies meant neither mutant moved the other's callers.
+ * - **Expiry and revocation pinned only against ABSENCE** (round-2 F2). Every
+ *   fixture removed the column outright, so relaxing either comparison to a
+ *   bare-mention test stayed green — and `expiryCheckIssues`' own
+ *   "mentioned but never compared" branch was dead code no probe produced.
+ *   Pinned by G13, a reader returning both columns and testing neither.
+ * - **Whole-row projection** (round-2 F3). The rule caught a literal `*` and
+ *   nothing else, so `to_jsonb(r)`, `row_to_json(r)`, `jsonb_agg(r)`, bare
+ *   `select r`, and `r.*` inside a builder each returned **zero** findings
+ *   from the full sweep — a bypass easier to write than the thing the rule
+ *   caught. Pinned by G14, one probe per spelling, each clause of the widened
+ *   rule separately mutation-verified.
+ * - **`security_invoker` present but `false`.** Testing for the option's
+ *   presence accepts the value that turns it off — the F1 lesson on a view
+ *   option. Pinned by G15c.
+ *
+ * refs specs/002-montero-garage (SHR-01, SHR-05, SHR-06, SHR-07, SHR-08)
+ * ====================================================================== */
+
+/**
+ * The reference share reader: everything the spec asks for, spelled the way
+ * T2-404's architecture record says it will be spelled.
+ *
+ * The positive control for all five function rules at once. Without it, every
+ * rejection below is satisfied by a rule that dislikes functions.
+ */
+const CORRECT_SHARE_READER = sql(`
+  create function public.share_read_records(p_token text)
+  returns table (id uuid, occurred_on date, kind text)
+  language sql
+  stable
+  security definer
+  set search_path = ''
+  as $share$
+    select r.id, r.occurred_on, r.kind
+    from public.records r
+    join public.shares s on s.vehicle_id = r.vehicle_id
+    where s.token_hash = extensions.digest(p_token, 'sha256')
+      and s.revoked_at is null
+      and s.expires_at > now();
+  $share$;
+
+  revoke all on function public.share_read_records(text) from public;
+  revoke all on function public.share_read_records(text) from authenticated;
+  grant execute on function public.share_read_records(text) to anon;
+`);
+
+/**
+ * G17 — **PR #74 review**: the right name in the wrong schema.
+ *
+ * Byte-for-byte the reference reader with `public.` changed to `private.` in
+ * the create and both grants. Everything about it is otherwise impeccable: it
+ * hashes, it checks expiry and revocation, it names its columns, it is
+ * `security definer` with a pinned `search_path`. **Not one body rule can
+ * reject it** — which is exactly what makes it the right probe for a
+ * schema-scoping bug, because only the allow-list can be what catches it.
+ *
+ * Before the fix it satisfied both halves at once: the `unexpected` filter
+ * saw a declared reader's name and waved an anon-executable definer function
+ * through, and the `missing` filter counted it as the public reader being
+ * present.
+ */
+const G17_WRONG_SCHEMA_READER = sql(`
+  create function private.share_read_records(p_token text)
+  returns table (id uuid, occurred_on date, kind text)
+  language sql
+  stable
+  security definer
+  set search_path = ''
+  as $share$
+    select r.id, r.occurred_on, r.kind
+    from public.records r
+    join public.shares s on s.vehicle_id = r.vehicle_id
+    where s.token_hash = extensions.digest(p_token, 'sha256')
+      and s.revoked_at is null
+      and s.expires_at > now();
+  $share$;
+
+  revoke all on function private.share_read_records(text) from public;
+  revoke all on function private.share_read_records(text) from authenticated;
+  grant execute on function private.share_read_records(text) to anon;
+`);
+
+/** The one routine in the correct fixture, for the per-rule probes. */
+function readerOf(fixture: string): FunctionDefinition {
+  const [routine] = functions(fixture);
+  if (!routine) throw new Error("fixture declares no function");
+  return routine;
+}
+
+/** Rewrite one line of the reference reader — one property broken at a time. */
+function brokenReader(from: string, to: string): string {
+  const broken = CORRECT_SHARE_READER.replace(from, to);
+  if (broken === CORRECT_SHARE_READER) {
+    throw new Error(`probe fixture did not change: "${from}" not found`);
+  }
+  return broken;
+}
+
+/** G1 — a definer routine that leaves the search path to its caller. */
+const G1_DEFINER_NO_SEARCH_PATH = brokenReader("set search_path = '' ", "");
+
+/** G2 — a reader that never asks whether the grant has expired (SHR-08). */
+const G2_NO_EXPIRY_CHECK = brokenReader("and s.expires_at > now()", "");
+
+/** G3 — a reader that cannot be revoked. The likeliest defect (SHR-08). */
+const G3_NO_REVOCATION_CHECK = brokenReader("and s.revoked_at is null", "");
+
+/** G4 — row projection where SHR-06 requires column projection. */
+const G4_SELECT_STAR = brokenReader(
+  "select r.id, r.occurred_on, r.kind",
+  "select r.*"
+);
+
+/** G5 — the token compared against a column that holds it in the clear. */
+const G5_RAW_TOKEN = brokenReader(
+  "s.token_hash = extensions.digest(p_token, 'sha256')",
+  "s.token = p_token"
+);
+
+/** G6 — the return shape *is* the user table, so no column can be omitted. */
+const G6_SETOF_USER_TABLE = sql(`
+  create function public.share_read_records(p_token text)
+  returns setof public.records
+  language sql
+  stable
+  security definer
+  set search_path = ''
+  as $share$
+    select r.id, r.occurred_on
+    from public.records r
+    join public.shares s on s.vehicle_id = r.vehicle_id
+    where s.token_hash = extensions.digest(p_token, 'sha256')
+      and s.revoked_at is null
+      and s.expires_at > now();
+  $share$;
+
+  revoke all on function public.share_read_records(text) from public;
+  grant execute on function public.share_read_records(text) to anon;
+`);
+
+/** G7 — the accountless path admitting a write (SHR-07). */
+const G7_ANON_WRITE = sql(`
+  create function public.share_note(p_token text, p_body text)
+  returns void
+  language plpgsql
+  security definer
+  set search_path = ''
+  as $share$
+  begin
+    insert into public.records (vehicle_id, kind)
+    select s.vehicle_id, 'note'
+    from public.shares s
+    where s.token_hash = extensions.digest(p_token, 'sha256')
+      and s.revoked_at is null
+      and s.expires_at > now();
+  end;
+  $share$;
+
+  revoke all on function public.share_note(text, text) from public;
+  grant execute on function public.share_note(text, text) to anon;
+`);
+
+/**
+ * G8 — a definer routine nobody revoked.
+ *
+ * The quiet one. Postgres grants EXECUTE on a new function to `PUBLIC` by
+ * default, so this is reachable by `anon` in the running database while the
+ * migration text says nothing at all. A replay that read silence as "not
+ * granted" would report it clean, which is the shape of the near-miss T2-202's
+ * review found on the table side — the privilege that nearly shipped a hole
+ * was one **nobody granted**.
+ */
+const G8_NEVER_REVOKED = sql(`
+  create function public.share_read_everything(p_token text)
+  returns table (id uuid)
+  language sql
+  security definer
+  set search_path = ''
+  as $share$ select r.id from public.records r; $share$;
+`);
+
+/**
+ * G9 — **the recorded defect (1)**: a revoke, then a grant that undoes it.
+ *
+ * The grader this replaced counted statements matching
+ * `^revoke … from … anon` and asserted the count was above zero. This
+ * directory scores 1 and passed — verified 2026-08-31.
+ */
+const G9_REVOKE_THEN_GRANT = sql(`
+  revoke all on public.records from anon;
+  revoke all on public.records from public;
+  revoke all on public.records from authenticated;
+  grant select, insert, update, delete on public.records to authenticated;
+  grant select on public.records to anon;
+`);
+
+/** G9b — the same directory without the undo. The control. */
+const G9B_REVOKE_ONLY = sql(`
+  revoke all on public.records from anon;
+  revoke all on public.records from public;
+  revoke all on public.records from authenticated;
+  grant select, insert, update, delete on public.records to authenticated;
+`);
+
+/**
+ * G10 — **the recorded defect (2)**: a fifth user table nothing enumerates.
+ *
+ * `for all to anon using (true)` and no `force`. Every table-level grader is
+ * driven from `contract.ts`, so this produced zero findings — verified
+ * 2026-08-31.
+ */
+const G10_FIFTH_TABLE = sql(`
+  create table public.shares (
+    id uuid primary key,
+    vehicle_id uuid not null,
+    token_hash bytea not null
+  );
+  alter table public.shares enable row level security;
+  create policy "shares readable" on public.shares
+    for all to anon using (true);
+`);
+
+/**
+ * G12 — **round-2 F1**: a directory that revokes from `anon` and forgets
+ * `public`.
+ *
+ * The half of the tri-state that had no probe at all. `public` is not a role
+ * beside `anon` — it is every role — so a privilege `public` inherited from
+ * Supabase's role setup still reaches `anon`, and `revoke … from anon` does
+ * not touch it. The end-state ACL here is genuinely **unknown**, and the
+ * review proved the gap by flipping the `&&` in the knowledge test to `||` in
+ * either copy and watching all 516 garage tests stay green.
+ */
+const G12_REVOKE_ANON_ONLY = sql(`
+  revoke all on public.records from anon;
+  grant select, insert, update, delete on public.records to authenticated;
+`);
+
+/** G12b — a definer routine with the same omission. */
+const G12B_FUNCTION_REVOKE_ANON_ONLY = sql(`
+  create function public.share_read_records(p_token text)
+  returns table (id uuid)
+  language sql
+  stable
+  security definer
+  set search_path = ''
+  as $share$
+    select r.id from public.records r
+    join public.shares s on s.vehicle_id = r.vehicle_id
+    where s.token_hash = extensions.digest(p_token, 'sha256')
+      and s.revoked_at is null
+      and s.expires_at > now();
+  $share$;
+
+  revoke all on function public.share_read_records(text) from anon;
+`);
+
+/**
+ * G13 — **round-2 F2**: the columns are *returned* and never *tested*.
+ *
+ * The realistic defect shape, and the one the rules were not pinned against:
+ * every earlier probe removed the column entirely, so relaxing either
+ * comparison regex to a bare-mention test left the suite green. A reader that
+ * selects `expires_at` and `revoked_at` into its output — so a caller can see
+ * them — while filtering on neither is a grant that never expires and cannot
+ * be revoked, and it reads as careful.
+ */
+const G13_MENTIONED_NEVER_COMPARED = sql(`
+  create function public.share_read_records(p_token text)
+  returns table (id uuid, expires_at timestamptz, revoked_at timestamptz)
+  language sql
+  stable
+  security definer
+  set search_path = ''
+  as $share$
+    select r.id, s.expires_at, s.revoked_at
+    from public.records r
+    join public.shares s on s.vehicle_id = r.vehicle_id
+    where s.token_hash = extensions.digest(p_token, 'sha256');
+  $share$;
+
+  revoke all on function public.share_read_records(text) from public;
+  grant execute on function public.share_read_records(text) to anon;
+`);
+
+/**
+ * G14 — **round-2 F3**: whole-row projection, in every spelling that is not a
+ * literal `*`.
+ *
+ * Each of these returns every column of `records`, and every one of them
+ * produced **zero** findings from the full `anonSurfaceIssues` sweep. That is
+ * a bypass easier to write than the thing the rule caught.
+ */
+const G14_WHOLE_ROW_SPELLINGS = [
+  ["to_jsonb", "select to_jsonb(r)"],
+  ["to_jsonb(r.*)", "select to_jsonb(r.*)"],
+  ["row_to_json", "select row_to_json(r)"],
+  ["jsonb_agg", "select jsonb_agg(r)"],
+  ["bare alias", "select r"],
+  ["alias.*", "select r.*"],
+  // `r.*` buried in a builder that is NOT a whole-row serialiser. Its own
+  // entry because it is the only spelling the literal-`*` check and the
+  // serialiser check both miss — mutation-verified: dropping the `alias.*`
+  // rule while every other probe stayed green (round-2 self-check).
+  ["alias.* inside a builder", "select jsonb_build_object('all', r.*)"],
+] as const;
+
+const DEFAULT_READER_FROM =
+  "from public.records r join public.shares s on s.vehicle_id = r.vehicle_id";
+
+function wholeRowReader(
+  projection: string,
+  from: string = DEFAULT_READER_FROM
+): string {
+  return sql(`
+    create function public.share_read_records(p_token text)
+    returns jsonb
+    language sql
+    stable
+    security definer
+    set search_path = ''
+    as $share$
+      ${projection}
+      ${from}
+      where s.token_hash = extensions.digest(p_token, 'sha256')
+        and s.revoked_at is null
+        and s.expires_at > now();
+    $share$;
+
+    revoke all on function public.share_read_records(text) from public;
+    grant execute on function public.share_read_records(text) to anon;
+  `);
+}
+
+/**
+ * G16 — **round-2 D2**: the `from`-clause shapes `rowAliases` used to miss.
+ *
+ * Each binds a relation the old single-regex version never saw, and in each
+ * the whole-row projection over that relation produced **zero** findings.
+ * Confirmed against the shipped rule before the fix rather than derived from
+ * reading it — the same discipline as the two recorded grader defects.
+ */
+const G16_MISSED_ALIAS_SHAPES = [
+  [
+    "comma join, second relation",
+    "select to_jsonb(s)",
+    "from public.records r, public.shares s",
+  ],
+  [
+    "unaliased first relation, then join",
+    "select to_jsonb(s)",
+    "from public.records join public.shares s on s.id = records.id",
+  ],
+  [
+    "subquery alias",
+    "select to_jsonb(x)",
+    "from (select r.id, r.kind from public.records r) x join public.shares s on true",
+  ],
+] as const;
+
+/** G15 — a view that runs as its owner, so RLS is evaluated against the owner. */
+const G15_VIEW_WITHOUT_INVOKER = sql(`
+  create view public.vehicle_state as
+    select v.id, v.display_name from public.vehicles v;
+`);
+
+/** G15b — the same view, declared to run as its caller. */
+const G15B_VIEW_WITH_INVOKER = sql(`
+  create view public.vehicle_state with (security_invoker = true) as
+    select v.id, v.display_name from public.vehicles v;
+`);
+
+/**
+ * G15c — the option present and switched **off**.
+ *
+ * Its own fixture because "mentions security_invoker" and "runs as the
+ * caller" are different claims, and only the second one is the guarantee.
+ * Mutation-verified: relaxing the rule to a bare mention of the option
+ * survived G15 and G15b together (round-2 self-check).
+ */
+const G15C_VIEW_INVOKER_FALSE = sql(`
+  create view public.vehicle_state with (security_invoker = false) as
+    select v.id, v.display_name from public.vehicles v;
+`);
+
+/** G11 — the bearer secret stored in the clear. */
+const G11_PLAINTEXT_TOKEN_COLUMN = sql(`
+  create table public.shares (
+    id uuid primary key,
+    token text not null unique,
+    expires_at timestamptz not null
+  );
+  alter table public.shares enable row level security;
+  alter table public.shares force row level security;
+`);
+
+describe("WIDE-OPEN: the function surface", () => {
+  it("G1 rejects a `security definer` routine with no `set search_path`", () => {
+    expect(
+      definerSearchPathIssues(G1_DEFINER_NO_SEARCH_PATH).join(" | ")
+    ).toContain("no `set search_path`");
+  });
+
+  it("G1 rejects `set search_path = public` too — it is not empty", () => {
+    // `public` is a schema a caller may be able to create objects in. The
+    // rule accepts `''` and `pg_catalog` and nothing else.
+    const toPublic = brokenReader(
+      "set search_path = ''",
+      "set search_path = public"
+    );
+
+    expect(definerSearchPathIssues(toPublic).join(" | ")).toContain(
+      "must be ''"
+    );
+  });
+
+  it("G1: the reference reader passes the same rule", () => {
+    // Positive control. A rule that rejected every definer routine would
+    // satisfy both assertions above and mean nothing.
+    expect(definerSearchPathIssues(CORRECT_SHARE_READER)).toEqual([]);
+  });
+
+  it("G2 rejects a reader that never tests expires_at", () => {
+    expect(
+      expiryCheckIssues(readerOf(G2_NO_EXPIRY_CHECK)).join(" | ")
+    ).toContain("does not test expires_at");
+  });
+
+  it("G2 fails ONLY the expiry rule — the triple is three findings", () => {
+    // The whole reason the token triple is three graders. Dropping the expiry
+    // check must not disturb the hash rule or the revocation rule, or a
+    // reviewer reading one red test cannot tell which property is missing.
+    const routine = readerOf(G2_NO_EXPIRY_CHECK);
+
+    expect(tokenHashIssues(routine)).toEqual([]);
+    expect(revocationCheckIssues(routine)).toEqual([]);
+    expect(expiryCheckIssues(routine)).not.toEqual([]);
+  });
+
+  it("G3 rejects a grant that cannot be revoked", () => {
+    expect(
+      revocationCheckIssues(readerOf(G3_NO_REVOCATION_CHECK)).join(" | ")
+    ).toContain("does not test revoked_at");
+  });
+
+  it("G3 fails ONLY the revocation rule", () => {
+    // The likeliest real defect, and the one that hand-testing cannot find: a
+    // grant you have not revoked behaves identically whether or not the
+    // reader reads `revoked_at`.
+    const routine = readerOf(G3_NO_REVOCATION_CHECK);
+
+    expect(tokenHashIssues(routine)).toEqual([]);
+    expect(expiryCheckIssues(routine)).toEqual([]);
+    expect(revocationCheckIssues(routine)).not.toEqual([]);
+  });
+
+  it("G4 rejects `select *` in an anon-reachable routine", () => {
+    expect(projectionIssues(readerOf(G4_SELECT_STAR)).join(" | ")).toContain(
+      "selects `*`"
+    );
+  });
+
+  it("G5 rejects a raw-token comparison", () => {
+    const issues = tokenHashIssues(readerOf(G5_RAW_TOKEN)).join(" | ");
+
+    expect(issues).toContain("plaintext token column");
+    expect(issues).toContain("never hashes the token");
+  });
+
+  it("G5: `token_hash` is not read as the plaintext column `token`", () => {
+    // The word-boundary case, and it decides the whole rule: if `\btoken\b`
+    // matched inside `token_hash`, the correct reader would be rejected and
+    // the rule would be turned off within a day.
+    expect(tokenHashIssues(readerOf(CORRECT_SHARE_READER))).toEqual([]);
+  });
+
+  it("G6 rejects `returns setof` a user table", () => {
+    expect(
+      projectionIssues(readerOf(G6_SETOF_USER_TABLE)).join(" | ")
+    ).toContain("returns `setof records`");
+  });
+
+  it("G6: the finding is about the RETURN shape, not the body", () => {
+    // The body names its columns. Only the return type is wrong — so if this
+    // ever starts passing, it is the `returns` parser that broke, not the
+    // select-star rule covering for it.
+    const routine = readerOf(G6_SETOF_USER_TABLE);
+
+    expect(routine.body).not.toMatch(/select\s+[a-z]*\.?\*/);
+    expect(projectionIssues(routine)).toHaveLength(1);
+  });
+
+  it("G7 rejects a write on the accountless path (SHR-07)", () => {
+    expect(anonWriteIssues(readerOf(G7_ANON_WRITE)).join(" | ")).toContain(
+      "performs a insert"
+    );
+  });
+
+  it("G7: a read-only reader is not accused of writing", () => {
+    expect(anonWriteIssues(readerOf(CORRECT_SHARE_READER))).toEqual([]);
+  });
+
+  it("G8 counts a NEVER-REVOKED routine as anon-reachable", () => {
+    // Postgres grants EXECUTE to PUBLIC by default. Silence in the migration
+    // text is not evidence of absence, and a security rule that treats it as
+    // such is decorative.
+    expect(
+      anonExecutableFunctions(G8_NEVER_REVOKED).map((routine) => routine.name)
+    ).toEqual(["share_read_everything"]);
+  });
+
+  it("G8 is caught by the closed allow-list, by name", () => {
+    const { unexpected } = anonFunctionAllowListIssues(G8_NEVER_REVOKED, [
+      "share_read_records",
+    ]);
+
+    expect(unexpected.join(" | ")).toContain("share_read_everything");
+    expect(unexpected.join(" | ")).toContain("security definer");
+  });
+
+  it("G8: adding the revokes takes it back off the anon surface", () => {
+    // The control for the tri-state. If `unknown` and `none` were the same
+    // answer, this pair would agree and the rule would be reporting on
+    // nothing.
+    const revoked = `${G8_NEVER_REVOKED} revoke all on function public.share_read_everything(text) from public; revoke all on function public.share_read_everything(text) from anon;`;
+
+    expect(anonExecutableFunctions(revoked)).toEqual([]);
+  });
+});
+
+describe("WIDE-OPEN: the two recorded grader defects", () => {
+  it("G9 rejects revoke-then-grant — the END-STATE ACL, not a count", () => {
+    expect(
+      tableGrantIssues(G9_REVOKE_THEN_GRANT, ["records"]).join(" | ")
+    ).toContain("anon holds select");
+  });
+
+  it("G9: the grader this replaced scores it 1 and passes — the false pass", () => {
+    // Recorded verbatim so the regression cannot come back as a "simplification".
+    // The old rule was: count statements matching this pattern, assert > 0.
+    const revokes = statements(G9_REVOKE_THEN_GRANT).filter((statement) =>
+      /^revoke\b[\s\S]*\bfrom\b[\s\S]*\banon\b/.test(statement)
+    );
+
+    expect(revokes.length).toBeGreaterThan(0); // the old grader's verdict: PASS
+    expect(tableGrantIssues(G9_REVOKE_THEN_GRANT, ["records"])).not.toEqual([]); // the new one: FAIL
+  });
+
+  it("G9b: the same directory without the undo is accepted", () => {
+    expect(tableGrantIssues(G9B_REVOKE_ONLY, ["records"])).toEqual([]);
+  });
+
+  it("G9: order is what distinguishes them", () => {
+    // Both directories contain the same two statements. Only the order
+    // differs, and the whole point of a replay is that the order decides.
+    const grantThenRevoke = sql(`
+      grant select on public.records to anon;
+      revoke all on public.records from anon;
+      revoke all on public.records from public;
+    `);
+    const state = grants(grantThenRevoke);
+
+    expect(privilegeVerdict(state, "public.records", "anon", "select")).toBe(
+      "none"
+    );
+    expect(
+      privilegeVerdict(
+        grants(G9_REVOKE_THEN_GRANT),
+        "public.records",
+        "anon",
+        "select"
+      )
+    ).toBe("granted");
+  });
+
+  it("G9: a grant to `public` reaches anon, and a revoke from anon does not undo it", () => {
+    // `public` is not a role beside `anon` — it is every role. This is the
+    // spelling of the same hole that looks most like a fix.
+    const state = grants(
+      sql(`
+        revoke all on public.records from anon;
+        grant select on public.records to public;
+      `)
+    );
+
+    expect(privilegeVerdict(state, "public.records", "anon", "select")).toBe(
+      "granted"
+    );
+  });
+
+  it("G9: authenticated holding TRUNCATE is a finding — RLS does not filter it", () => {
+    // T2-202's review emptied `profiles` as `authenticated` against a schema
+    // whose declaration graders were all green.
+    const truncatable = sql(`
+      revoke all on public.records from anon;
+      revoke all on public.records from public;
+      revoke all on public.records from authenticated;
+      grant select, insert, update, delete, truncate on public.records to authenticated;
+    `);
+
+    expect(tableGrantIssues(truncatable, ["records"]).join(" | ")).toContain(
+      "truncate"
+    );
+  });
+
+  it("G9: an ACL nothing ever emptied is reported UNKNOWN, not clean", () => {
+    // The T2-202 lesson in one assertion: `grant select, … to authenticated`
+    // *adds to* whatever Supabase already granted. A directory that grants
+    // without revoking first has an ACL this module cannot see, and saying so
+    // is the only honest answer.
+    const noRevoke = sql(`
+      grant select, insert, update, delete on public.records to authenticated;
+    `);
+
+    expect(tableGrantIssues(noRevoke, ["records"]).join(" | ")).toContain(
+      "unknown"
+    );
+  });
+
+  it("G10 rejects a fifth table nothing enumerates", () => {
+    const issues = ungradedTableIssues(G10_FIFTH_TABLE).join(" | ");
+
+    expect(issues).toContain("public.shares");
+    expect(issues).toContain("not enumerated in USER_TABLES");
+    expect(issues).toContain("not FORCED");
+  });
+
+  it("G10: the graders it dodges report nothing about it — the false pass", () => {
+    // Recorded verbatim. `userTablePolicyIssues` filters to
+    // `USER_TABLE_NAMES`, so the wide-open `for all to anon using (true)`
+    // policy on `shares` is invisible to it. The finding has to come from the
+    // other direction — from what the directory *creates*.
+    const blind = userTablePolicyIssues(G10_FIFTH_TABLE, [...USER_TABLE_NAMES]);
+
+    expect(blind.filter((issue) => issue.includes("shares"))).toEqual([]);
+    expect(ungradedTableIssues(G10_FIFTH_TABLE)).not.toEqual([]);
+  });
+
+  it("G10: enumerating the table clears the enumeration finding, not the RLS one", () => {
+    // The fix is to grade it, not to list it. A table added to `USER_TABLES`
+    // still has to force RLS.
+    const issues = ungradedTableIssues(G10_FIFTH_TABLE, {
+      enumerated: [...USER_TABLE_NAMES, "shares"],
+    }).join(" | ");
+
+    expect(issues).not.toContain("not enumerated");
+    expect(issues).toContain("not FORCED");
+  });
+
+  it("G10: a NAMED exemption is accepted, an unnamed one is not", () => {
+    // The `EXEMPT_PAGES` mechanism, graded against a synthetic map so the
+    // real one can stay empty and still be proven to work.
+    const exempt = new Map([["shares", "not user data — a synthetic probe"]]);
+
+    expect(ungradedTableIssues(G10_FIFTH_TABLE, { exempt })).toEqual([]);
+    expect(
+      ungradedTableIssues(G10_FIFTH_TABLE, { exempt: new Map() })
+    ).not.toEqual([]);
+  });
+
+  it("G10: a correctly declared table produces nothing", () => {
+    const correct = sql(`
+      create table public.records (id uuid primary key);
+      alter table public.records enable row level security;
+      alter table public.records force row level security;
+    `);
+
+    expect(ungradedTableIssues(correct)).toEqual([]);
+  });
+
+  it("G12 rejects a revoke that forgets `public` — the ACL is UNKNOWN", () => {
+    // Round-2 F1. Revoking from `anon` alone says nothing about what `anon`
+    // can do, because a privilege `public` holds reaches every role.
+    const state = grants(G12_REVOKE_ANON_ONLY);
+
+    expect(rolePrivileges(state, "public.records", "anon").verdict).toBe(
+      "unknown"
+    );
+    expect(privilegeVerdict(state, "public.records", "anon", "select")).toBe(
+      "unknown"
+    );
+    expect(
+      tableGrantIssues(G12_REVOKE_ANON_ONLY, ["records"]).join(" | ")
+    ).toContain("nothing revokes public's inherited privileges");
+  });
+
+  it("G12: GRANT ALL then a PARTIAL revoke reports unknown, never none", () => {
+    // Locks in the answer to PR #74's third thread, and it is worth stating
+    // precisely because the intuitive reading is wrong in a reassuring
+    // direction.
+    //
+    // `grant all` records the token `all`; this module never expands it into
+    // the concrete privilege list, because that list is a Postgres version
+    // detail and guessing it would be inventing knowledge. So a later
+    // `revoke select` cannot subtract from it accurately, and the replay drops
+    // the whole entry rather than pretend — leaving every privilege on this
+    // object "unknown", *including the ones `all` plainly granted*.
+    //
+    // That is over-reporting, which is the safe direction and the one every
+    // caller treats as a finding. What it must never do is answer "none":
+    // a partial revoke is not evidence that an ACL is understood, and reading
+    // it that way would clear a role that still holds `insert` and `truncate`.
+    const partial = sql(`
+      grant all on public.records to anon;
+      revoke select on public.records from anon;
+    `);
+    const state = grants(partial);
+
+    for (const privilege of ["select", "insert", "truncate"]) {
+      expect(
+        privilegeVerdict(state, "public.records", "anon", privilege),
+        privilege
+      ).not.toBe("none");
+    }
+    expect(tableGrantIssues(partial, ["records"]).join(" | ")).toContain(
+      "unknown"
+    );
+  });
+
+  it("G12: adding the `public` revoke is what makes the answer knowable", () => {
+    // The control. One statement is the entire difference between "unknown"
+    // and "none", and if this pair ever agrees the tri-state has collapsed.
+    const complete = `${G12_REVOKE_ANON_ONLY} revoke all on public.records from public; revoke all on public.records from authenticated;`;
+
+    expect(
+      rolePrivileges(grants(complete), "public.records", "anon").verdict
+    ).toBe("none");
+    expect(tableGrantIssues(complete, ["records"])).toEqual([]);
+  });
+
+  it("G12b: a definer routine revoked from anon only stays anon-reachable", () => {
+    // The same omission on the surface where it costs most. The routine looks
+    // locked down — there is a revoke, and it names `anon` — and `public`
+    // still holds Postgres's default EXECUTE.
+    expect(
+      anonExecutableFunctions(G12B_FUNCTION_REVOKE_ANON_ONLY).map(
+        (routine) => routine.name
+      )
+    ).toEqual(["share_read_records"]);
+    expect(
+      anonFunctionAllowListIssues(
+        G12B_FUNCTION_REVOKE_ANON_ONLY,
+        []
+      ).unexpected.join(" | ")
+    ).toContain("security definer");
+  });
+
+  it("G13 rejects columns that are RETURNED but never TESTED", () => {
+    // Round-2 F2. Every earlier probe removed the column outright, so the
+    // rules were pinned only against absence — relaxing either comparison to
+    // a bare-mention test left the suite green.
+    const routine = readerOf(G13_MENTIONED_NEVER_COMPARED);
+
+    expect(expiryCheckIssues(routine).join(" | ")).toContain(
+      "mentioned but never compared"
+    );
+    expect(revocationCheckIssues(routine).join(" | ")).toContain(
+      "cannot be revoked"
+    );
+  });
+
+  it("G13: the hash check is fine — only the two time rules fire", () => {
+    // Each fixture must fail for the reason it was written. This one hashes
+    // correctly and projects named columns; only expiry and revocation are
+    // missing.
+    const routine = readerOf(G13_MENTIONED_NEVER_COMPARED);
+
+    expect(tokenHashIssues(routine)).toEqual([]);
+    expect(projectionIssues(routine)).toEqual([]);
+  });
+
+  it.each(G14_WHOLE_ROW_SPELLINGS)(
+    "G14 rejects whole-row projection spelled `%s`",
+    (_label, projection) => {
+      // Round-2 F3. Every one of these returns every column of `records` and
+      // every one produced zero findings before the rule was widened.
+      const fixture = wholeRowReader(projection);
+
+      expect(projectionIssues(readerOf(fixture))).not.toEqual([]);
+      // And it is caught by the sweep a reviewer actually reads, not only by
+      // the rule in isolation.
+      expect(anonSurfaceIssues(fixture)).not.toEqual([]);
+    }
+  );
+
+  it("G14: a named-column projection over the same query is accepted", () => {
+    // The control for the widened rule. `r.id, r.occurred_on` names its
+    // columns and must stay clean, or the rule is simply refusing joins.
+    const named = wholeRowReader("select r.id, r.occurred_on");
+
+    expect(projectionIssues(readerOf(named))).toEqual([]);
+    expect(anonSurfaceIssues(named)).toEqual([]);
+  });
+
+  it("G14: rowAliases reads the aliases the whole-row rules depend on", () => {
+    // If this returned nothing, every whole-row check above would be vacuous
+    // and the `it.each` would be asserting that literal `*` is still caught.
+    expect(
+      rowAliases(
+        "select r.id from public.records r join public.shares s on s.vehicle_id = r.vehicle_id"
+      )
+    ).toEqual(["r", "s"]);
+  });
+
+  it("G14: a keyword after a table name is not read as an alias", () => {
+    // `from public.records where …` must not bind `where` as a row alias, or
+    // the rule starts hunting for `where.*` and misses the real one.
+    expect(rowAliases("select id from public.records where id = 1")).toEqual([
+      "records",
+    ]);
+  });
+
+  it.each(G16_MISSED_ALIAS_SHAPES)(
+    "G16 rejects whole-row projection over a %s",
+    (_label, projection, from) => {
+      expect(
+        projectionIssues(readerOf(wholeRowReader(projection, from)))
+      ).not.toEqual([]);
+    }
+  );
+
+  it("G16: the subquery-alias finding is NOT coming from a literal `*`", () => {
+    // The honest version of the reviewer's third shape. Before D2 this was
+    // caught only when the subquery happened to contain `select *`; with named
+    // inner columns it was invisible. The fixture below names every inner
+    // column, so the literal-`*` clause cannot be what rejects it — the alias
+    // binding is.
+    const fixture = wholeRowReader(
+      "select to_jsonb(x)",
+      "from (select r.id, r.kind from public.records r) x join public.shares s on true"
+    );
+    const routine = readerOf(fixture);
+
+    expect(routine.body).not.toMatch(/\*/);
+    expect(rowAliases(routine.body)).toContain("x");
+    expect(projectionIssues(routine).join(" | ")).toContain("to_jsonb(x)");
+  });
+
+  it.each(G16_MISSED_ALIAS_SHAPES)(
+    "G16 CONTROL: naming the columns over the same %s is accepted",
+    (_label, _projection, from) => {
+      // Binding more relations must not make the rule reject correct queries —
+      // over-binding is the safe direction only if it stays quiet on a named
+      // projection.
+      const named = wholeRowReader("select r.id, r.kind", from);
+
+      expect(projectionIssues(readerOf(named))).toEqual([]);
+    }
+  );
+
+  it.each<[string, string, string[]]>([
+    [
+      "aliased join",
+      "select 1 from public.records r join public.shares s on true",
+      ["r", "s"],
+    ],
+    [
+      "comma join",
+      "select 1 from public.records r, public.shares s",
+      ["r", "s"],
+    ],
+    [
+      "three-way comma join",
+      "select 1 from public.records r, public.shares s, public.receipts t",
+      ["r", "s", "t"],
+    ],
+    [
+      "unaliased first relation",
+      "select 1 from public.records join public.shares s on true",
+      ["records", "s"],
+    ],
+    [
+      "neither relation aliased",
+      "select 1 from public.records join public.shares on true",
+      ["records", "shares"],
+    ],
+    ["explicit AS", "select 1 from public.records as r", ["r"]],
+    [
+      "subquery alias binds the alias AND the inner relation",
+      "select 1 from (select r.id from public.records r) x",
+      ["x", "r"],
+    ],
+    [
+      "lateral",
+      "select 1 from public.records r, lateral (select 1) y",
+      ["r", "y"],
+    ],
+    [
+      "no alias at all",
+      "select id from public.records where id = 1",
+      ["records"],
+    ],
+  ])("G16 rowAliases binds %s", (_label, body, expected) => {
+    // Graded directly as well as end-to-end: the whole-row rules are only as
+    // good as this, and a regression here would make all of them quietly
+    // vacuous rather than visibly wrong.
+    expect(rowAliases(body).sort()).toEqual([...expected].sort());
+  });
+
+  it("G16: a keyword is still never bound as an alias", () => {
+    // The half of the old behaviour that was right, and must survive the
+    // rewrite: `from public.records where …` must not bind `where`.
+    for (const keyword of ["where", "join", "left", "group", "order", "on"]) {
+      expect(
+        rowAliases(`select 1 from public.records ${keyword} x`),
+        keyword
+      ).not.toContain(keyword);
+    }
+  });
+
+  it("G17 rejects an anon-executable impostor in another schema", () => {
+    // PR #74 review, gap 1. The `unexpected` half is the one the PR body calls
+    // live today, and a name-only comparison let a `security definer` routine
+    // granted to `anon` through it on the strength of its name alone.
+    const { unexpected } = anonFunctionAllowListIssues(
+      G17_WRONG_SCHEMA_READER,
+      ["share_read_records"]
+    );
+
+    expect(unexpected.join(" | ")).toContain(
+      "private.share_read_records(text)"
+    );
+    expect(unexpected.join(" | ")).toContain("security definer");
+    // And the finding says WHY, so a reviewer is not left comparing strings.
+    expect(unexpected.join(" | ")).toContain("lives in private, not public");
+  });
+
+  it("G17: the impostor does not satisfy the COMPLETENESS half either", () => {
+    // The same bug cutting the other way — the graders would have reported the
+    // public reader present when only the wrong-schema one existed.
+    const { missing } = anonFunctionAllowListIssues(G17_WRONG_SCHEMA_READER, [
+      "share_read_records",
+    ]);
+
+    expect(missing).toEqual([
+      "public.share_read_records: declared share reader does not exist in the migrations",
+    ]);
+  });
+
+  it("G17 rejects the impostor at the SEAM GUARD too", () => {
+    // PR #74 review, gap 2. `requireShareReaders` resolves through this, so a
+    // pass here would hand every marked grader an object from a schema the
+    // contract never described — and they would report on it as if it were the
+    // real reader.
+    const { found, missing } = findShareReaders(G17_WRONG_SCHEMA_READER, [
+      "share_read_records",
+    ]);
+
+    expect(found).toEqual([]);
+    expect(missing).toEqual(["public.share_read_records"]);
+  });
+
+  it("G17: NO body rule rejects it — the allow-list is the only thing that can", () => {
+    // Attribution. The impostor is a correct reader in every respect except
+    // its schema, so if any of these ever started firing, the probes above
+    // would be passing for the wrong reason and the schema check could rot
+    // underneath them unnoticed.
+    const routine = readerOf(G17_WRONG_SCHEMA_READER);
+
+    expect(tokenHashIssues(routine)).toEqual([]);
+    expect(expiryCheckIssues(routine)).toEqual([]);
+    expect(revocationCheckIssues(routine)).toEqual([]);
+    expect(projectionIssues(routine)).toEqual([]);
+    expect(anonWriteIssues(routine)).toEqual([]);
+    expect(definerSearchPathIssues(G17_WRONG_SCHEMA_READER)).toEqual([]);
+  });
+
+  it("G17: isContractRoutine matches on schema AND name", () => {
+    // The predicate both gaps resolve through, graded directly.
+    const impostor = readerOf(G17_WRONG_SCHEMA_READER);
+    const genuine = readerOf(CORRECT_SHARE_READER);
+
+    expect(isContractRoutine(genuine, "share_read_records")).toBe(true);
+    expect(isContractRoutine(impostor, "share_read_records")).toBe(false);
+    // A right-schema routine with the wrong name is not a match either.
+    expect(isContractRoutine(genuine, "share_read_vehicle")).toBe(false);
+  });
+
+  it("G15 rejects a view created without `security_invoker`", () => {
+    // The option arrived in PG15 and defaults to `false`, so the default is
+    // the unsafe direction: the view runs as its owner and RLS on the
+    // underlying tables is evaluated against the owner, not the caller.
+    expect(
+      viewSecurityInvokerIssues(G15_VIEW_WITHOUT_INVOKER).join(" | ")
+    ).toContain("public.vehicle_state");
+  });
+
+  it("G15b accepts a view that runs as its caller", () => {
+    expect(viewSecurityInvokerIssues(G15B_VIEW_WITH_INVOKER)).toEqual([]);
+  });
+
+  it("G15c rejects `security_invoker = false` — mentioning it is not setting it", () => {
+    // The F1 lesson applied to a view option: a rule that tests for the
+    // presence of the word accepts the value that turns it off.
+    expect(
+      viewSecurityInvokerIssues(G15C_VIEW_INVOKER_FALSE).join(" | ")
+    ).toContain("public.vehicle_state");
+  });
+
+  it("G15: a table is not asked for `security_invoker`", () => {
+    // The rule applies to views only. If it fired on tables, the four real
+    // user tables would light up and someone would delete the rule.
+    expect(viewSecurityInvokerIssues(G10_FIFTH_TABLE)).toEqual([]);
+  });
+
+  it("G11 rejects a bearer secret stored in the clear", () => {
+    expect(
+      plaintextTokenColumnIssues(G11_PLAINTEXT_TOKEN_COLUMN).join(" | ")
+    ).toContain("public.shares.token");
+  });
+
+  it("G11: `token_hash` is not mistaken for a plaintext column", () => {
+    expect(plaintextTokenColumnIssues(G10_FIFTH_TABLE)).toEqual([]);
+  });
+});
+
+describe("CORRECT: the reference share reader must be accepted", () => {
+  it("is anon-reachable, and is the ONLY thing that is", () => {
+    expect(
+      anonExecutableFunctions(CORRECT_SHARE_READER).map(
+        (routine) => routine.name
+      )
+    ).toEqual(["share_read_records"]);
+  });
+
+  it("satisfies the closed allow-list in both directions", () => {
+    const { unexpected, missing } = anonFunctionAllowListIssues(
+      CORRECT_SHARE_READER,
+      ["share_read_records"]
+    );
+
+    expect(unexpected).toEqual([]);
+    expect(missing).toEqual([]);
+  });
+
+  it("satisfies the seam guard — schema-scoping did not break the real thing", () => {
+    // The control for G17. Tightening a matcher is only safe if the object it
+    // exists to find still resolves.
+    const { found, missing } = findShareReaders(CORRECT_SHARE_READER, [
+      "share_read_records",
+    ]);
+
+    expect(missing).toEqual([]);
+    expect(found.map((routine) => routine.identity)).toEqual([
+      "public.share_read_records(text)",
+    ]);
+  });
+
+  it("produces no finding from ANY of the anon-surface rules", () => {
+    // The single assertion that would catch a rule which has become
+    // over-strict. Every rejection above is only meaningful because this
+    // passes.
+    expect(anonSurfaceIssues(CORRECT_SHARE_READER)).toEqual([]);
+  });
+
+  it("parses as one definer routine with a pinned search path", () => {
+    const routine = readerOf(CORRECT_SHARE_READER);
+
+    expect(routine.identity).toBe("public.share_read_records(text)");
+    expect(routine.securityDefiner).toBe(true);
+    expect(routine.searchPath).toBe("''");
+    expect(routine.returns).toContain("table (");
+  });
+
+  it("every wide-open function/grant probe produces at least one finding", () => {
+    // The sweep, in the shape section A uses. A rule refactor that quietly
+    // stopped detecting one of these would otherwise show up as one silent
+    // green test.
+    const verdicts: [string, string[]][] = [
+      [
+        "G1 definer no search_path",
+        definerSearchPathIssues(G1_DEFINER_NO_SEARCH_PATH),
+      ],
+      ["G2 no expiry", expiryCheckIssues(readerOf(G2_NO_EXPIRY_CHECK))],
+      [
+        "G3 no revocation",
+        revocationCheckIssues(readerOf(G3_NO_REVOCATION_CHECK)),
+      ],
+      ["G4 select star", projectionIssues(readerOf(G4_SELECT_STAR))],
+      ["G5 raw token", tokenHashIssues(readerOf(G5_RAW_TOKEN))],
+      ["G6 setof user table", projectionIssues(readerOf(G6_SETOF_USER_TABLE))],
+      ["G7 anon write", anonWriteIssues(readerOf(G7_ANON_WRITE))],
+      [
+        "G8 never revoked",
+        anonFunctionAllowListIssues(G8_NEVER_REVOKED, []).unexpected,
+      ],
+      [
+        "G9 revoke then grant",
+        tableGrantIssues(G9_REVOKE_THEN_GRANT, ["records"]),
+      ],
+      ["G10 fifth table", ungradedTableIssues(G10_FIFTH_TABLE)],
+      [
+        "G11 plaintext token",
+        plaintextTokenColumnIssues(G11_PLAINTEXT_TOKEN_COLUMN),
+      ],
+      [
+        "G12 revoke forgets public",
+        tableGrantIssues(G12_REVOKE_ANON_ONLY, ["records"]),
+      ],
+      [
+        "G12b definer revoked from anon only",
+        anonFunctionAllowListIssues(G12B_FUNCTION_REVOKE_ANON_ONLY, [])
+          .unexpected,
+      ],
+      [
+        "G13 expiry mentioned never compared",
+        expiryCheckIssues(readerOf(G13_MENTIONED_NEVER_COMPARED)),
+      ],
+      [
+        "G13 revocation mentioned never compared",
+        revocationCheckIssues(readerOf(G13_MENTIONED_NEVER_COMPARED)),
+      ],
+      ...G14_WHOLE_ROW_SPELLINGS.map(
+        ([label, projection]): [string, string[]] => [
+          `G14 whole row via ${label}`,
+          anonSurfaceIssues(wholeRowReader(projection)),
+        ]
+      ),
+      [
+        "G15 view without security_invoker",
+        viewSecurityInvokerIssues(G15_VIEW_WITHOUT_INVOKER),
+      ],
+      [
+        "G15c view with security_invoker = false",
+        viewSecurityInvokerIssues(G15C_VIEW_INVOKER_FALSE),
+      ],
+      ...G16_MISSED_ALIAS_SHAPES.map(
+        ([label, projection, from]): [string, string[]] => [
+          `G16 whole row over ${label}`,
+          anonSurfaceIssues(wholeRowReader(projection, from)),
+        ]
+      ),
+      [
+        "G17 wrong-schema impostor (allow-list)",
+        anonFunctionAllowListIssues(G17_WRONG_SCHEMA_READER, [
+          "share_read_records",
+        ]).unexpected,
+      ],
+      [
+        "G17 wrong-schema impostor (seam guard)",
+        findShareReaders(G17_WRONG_SCHEMA_READER, ["share_read_records"])
+          .missing,
+      ],
+    ];
+
+    expect(
+      verdicts.filter(([, issues]) => issues.length === 0).map(([name]) => name)
+    ).toEqual([]);
+  });
+
+  it("every correct function/grant probe produces none", () => {
+    expect(
+      [
+        anonSurfaceIssues(CORRECT_SHARE_READER),
+        definerSearchPathIssues(CORRECT_SHARE_READER),
+        tableGrantIssues(G9B_REVOKE_ONLY, ["records"]),
+        plaintextTokenColumnIssues(G10_FIFTH_TABLE),
+        // Round-2 additions: the widened projection rule must still accept a
+        // named-column projection, and the view rule a caller-scoped view.
+        anonSurfaceIssues(wholeRowReader("select r.id, r.occurred_on")),
+        viewSecurityInvokerIssues(G15B_VIEW_WITH_INVOKER),
+      ].flat()
+    ).toEqual([]);
+  });
+});
+
+/* =========================================================================
+ * E. The function/grant parsers underneath, graded directly
+ * ====================================================================== */
+
+describe("dollar-quoted bodies", () => {
+  it("does not split a statement on a `;` inside a NAMED dollar tag", () => {
+    // `$$` was the only tag the first version understood. `pg_dump` writes a
+    // named tag whenever the body could contain `$$`, and a named tag made
+    // every `;` in a plpgsql body a statement boundary — so every
+    // function-level rule read a fragment.
+    const named = sql(`
+      create function public.f() returns void language plpgsql as $body$
+      begin
+        insert into public.t values (1);
+        insert into public.t values (2);
+      end;
+      $body$;
+      grant execute on function public.f() to anon;
+    `);
+
+    expect(statements(named)).toHaveLength(2);
+    expect(functions(named)).toHaveLength(1);
+  });
+
+  it("still handles the plain `$$` spelling", () => {
+    const plain = sql(`
+      create function public.f() returns void language plpgsql as $$
+      begin
+        insert into public.t values (1);
+      end;
+      $$;
+    `);
+
+    expect(statements(plain)).toHaveLength(1);
+    expect(functions(plain)[0].body).toContain("insert into public.t");
+  });
+
+  it("does not mistake a plpgsql positional parameter for a tag", () => {
+    // `$1` is not a dollar quote. If it were read as one, everything after it
+    // would vanish into a body that never closes.
+    const positional = sql(`
+      create function public.f(a int) returns int language sql as $$ select $1; $$;
+      grant execute on function public.f(int) to anon;
+    `);
+
+    expect(statements(positional)).toHaveLength(2);
+  });
+
+  it.each<[string, number, string | null]>([
+    ["$$", 0, "$$"],
+    ["$body$", 0, "$body$"],
+    ["$_x9$", 0, "$_x9$"],
+    // A tag name must start with a letter or underscore. Without that, `$1`
+    // is a tag and everything after a positional parameter disappears into a
+    // body that never closes — and `statements()` returns one giant fragment
+    // that no rule can read. Mutation-verified: relaxing the first character
+    // survives every end-to-end probe, so it is pinned here directly.
+    ["$1", 0, null],
+    ["$1$", 0, null],
+    ["select $1", 7, null],
+    ["nothing", 0, null],
+    ["a $$ b", 2, "$$"],
+  ])("dollarTagAt(%j, %i) → %j", (text, index, expected) => {
+    expect(dollarTagAt(text, index)).toBe(expected);
+  });
+
+  it("closes a body on its OWN tag, not on a different one inside it", () => {
+    // The entire reason named tags exist: `$function$` wraps a body that
+    // itself contains `$$`. A scanner that exited on any tag would end the
+    // body at the inner `$$`, and the `;` after it would split the statement —
+    // silently, with the rest of the function read as separate statements.
+    const nested = sql(`
+      create function public.f() returns void language plpgsql as $function$
+      begin
+        execute $$ select 1; $$;
+        insert into public.t values (2);
+      end;
+      $function$;
+      grant execute on function public.f() to anon;
+    `);
+
+    expect(statements(nested)).toHaveLength(2);
+    expect(functions(nested)).toHaveLength(1);
+    expect(functions(nested)[0].body).toContain("insert into public.t");
+  });
+});
+
+describe("canonicalArgumentTypes — a signature is the ACL key", () => {
+  it.each<[string, string[]]>([
+    ["p_now timestamptz default now()", ["timestamptz"]],
+    ["timestamp with time zone", ["timestamptz"]],
+    ["p_when timestamp with time zone", ["timestamptz"]],
+    ["event jsonb", ["jsonb"]],
+    ["jsonb", ["jsonb"]],
+    ["p_token text, p_id uuid", ["text", "uuid"]],
+    ["in p_token text", ["text"]],
+    ["variadic p_ids uuid[]", ["uuid[]"]],
+    ["p_flag boolean", ["bool"]],
+    ["p_n integer", ["int"]],
+    ["", []],
+  ])("reads `%s` as %j", (args, expected) => {
+    expect(canonicalArgumentTypes(args)).toEqual(expected);
+  });
+
+  it("drops OUT parameters — they are not part of the identity", () => {
+    expect(canonicalArgumentTypes("p_token text, out p_found bool")).toEqual([
+      "text",
+    ]);
+  });
+
+  it("resolves the CREATE and the GRANT to one identity", () => {
+    // The case that actually occurs in this repo: the create spells the type
+    // `timestamptz` and names the argument; the grant spells neither.
+    const fixture = sql(`
+      create function public.purge(p_now timestamp with time zone default now())
+      returns int language sql security definer set search_path = ''
+      as $$ select 1; $$;
+      revoke all on function public.purge(timestamptz) from public;
+      revoke all on function public.purge(timestamptz) from anon;
+    `);
+
+    expect(functions(fixture)[0].identity).toBe("public.purge(timestamptz)");
+    expect(anonExecutableFunctions(fixture)).toEqual([]);
+  });
+});
+
+describe("functions() replays create / replace / drop", () => {
+  it("keeps the LAST definition, as Postgres does", () => {
+    const replaced = sql(`
+      create function public.f() returns void language plpgsql
+      security definer set search_path = '' as $$ begin end; $$;
+      create or replace function public.f() returns void language plpgsql
+      security definer as $$ begin end; $$;
+    `);
+
+    expect(functions(replaced)).toHaveLength(1);
+    // The replacement dropped `set search_path`, and the end state is what
+    // gets graded — the `alter policy` lesson (D2) on the function surface.
+    expect(definerSearchPathIssues(replaced).join(" | ")).toContain(
+      "no `set search_path`"
+    );
+  });
+
+  it("`create or replace` does NOT reset the ACL — as in Postgres", () => {
+    // Replacing a function keeps its grants. A replay that re-initialised the
+    // ACL would report a granted function as ungranted and hide the grant.
+    const replaced = sql(`
+      create function public.f() returns void language sql as $$ select 1; $$;
+      revoke all on function public.f() from public;
+      grant execute on function public.f() to anon;
+      create or replace function public.f() returns void language sql as $$ select 2; $$;
+    `);
+
+    expect(
+      privilegeVerdict(grants(replaced), "public.f()", "anon", "execute")
+    ).toBe("granted");
+  });
+
+  it("a dropped function is gone from the end state", () => {
+    const dropped = sql(`
+      create function public.f() returns void language plpgsql
+      security definer as $$ begin end; $$;
+      drop function public.f();
+    `);
+
+    expect(functions(dropped)).toEqual([]);
+    expect(definerSearchPathIssues(dropped)).toEqual([]);
+  });
+});
+
+describe("grants() — the end-state ACL", () => {
+  it("applies `all functions in schema` to the functions declared before it", () => {
+    const bulk = sql(`
+      create function public.f() returns void language sql as $$ select 1; $$;
+      revoke all on all functions in schema public from public;
+      revoke all on all functions in schema public from anon;
+    `);
+
+    expect(anonExecutableFunctions(bulk)).toEqual([]);
+  });
+
+  it("records `alter default privileges` without replaying it into an ACL", () => {
+    // Default privileges apply to objects created afterwards *by the role
+    // that set them*, and this module cannot know which role runs a
+    // migration. T2-202's review is the reason for the caution: the first
+    // version of that migration assumed they had emptied the tables' ACLs and
+    // the running database disagreed.
+    const adp = sql(`
+      alter default privileges in schema public revoke all on tables from anon;
+      create table public.t (id uuid primary key);
+    `);
+    const state = grants(adp);
+
+    expect(state.defaultPrivileges).toHaveLength(1);
+    expect(state.defaultPrivileges[0]).toMatchObject({
+      action: "revoke",
+      schema: "public",
+      objectType: "tables",
+      roles: ["anon"],
+    });
+    // …and the table's own ACL is still unknown, because nothing revoked on it.
+    expect(rolePrivileges(state, "public.t", "anon").verdict).toBe("unknown");
+  });
+
+  it("reports a table nothing created and nothing granted as unknown", () => {
+    expect(
+      rolePrivileges(grants(sql(`select 1;`)), "public.ghost", "anon").verdict
+    ).toBe("unknown");
+  });
+
+  it("removes one privilege without emptying the ACL", () => {
+    const partial = sql(`
+      revoke all on public.records from anon;
+      revoke all on public.records from public;
+      grant select, insert on public.records to anon;
+      revoke insert on public.records from anon;
+    `);
+
+    expect(
+      rolePrivileges(grants(partial), "public.records", "anon").privileges
+    ).toEqual(["select"]);
+  });
+});
+
+describe("createdTables() — what exists, replayed", () => {
+  it("forgets a dropped table", () => {
+    const dropped = sql(`
+      create table public.tmp (id uuid primary key);
+      drop table public.tmp;
+    `);
+
+    expect(createdTables(dropped)).toEqual([]);
+  });
+
+  it("follows a rename", () => {
+    const renamed = sql(`
+      create table public.grants_old (id uuid primary key);
+      alter table public.grants_old rename to shares;
+    `);
+
+    expect(createdTables(renamed).map((table) => table.name)).toEqual([
+      "shares",
+    ]);
+  });
+
+  it("ignores tables outside the public schema", () => {
+    // `storage.objects` and `auth.users` are Supabase's; they have their own
+    // graders and are not this contract's to enumerate.
+    const other = sql(`
+      create table storage.buckets_extra (id text primary key);
+      create table public.shares (id uuid primary key);
+    `);
+
+    expect(createdTables(other).map((table) => table.identity)).toEqual([
+      "public.shares",
+    ]);
   });
 });
