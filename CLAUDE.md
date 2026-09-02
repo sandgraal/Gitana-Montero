@@ -37,8 +37,14 @@ conducts.
 - `npm run check:locales` / `check:citations` / `check:glossary` / `check:links`
 - `npm run gaps` — generates the content backlog report
 - `npm run test:garage` — the user-data graders. Tier A (parses the migration
-  text) runs anywhere; Tier B (hits a real local stack) needs `supabase start`
-  and Docker. CI has no Docker, so Tier A carries the merge gate.
+  text) runs anywhere and runs inside `verify`, so it carries the merge gate.
+  Tier B (hits a real local stack) needs `supabase start` and Docker — which
+  GitHub runners do have, contrary to what this line used to say. Since
+  2026-09-01 Tier B also runs in CI, as the **non-required, informational**
+  `tier-b` job in `ci.yml`: it reports red on every PR when the live RLS
+  proofs break, but it does not block merges. Promotion to a required check is
+  the owner's call after a soak period — see
+  `specs/001-foundation/audits/T901-tier-b-ci-investigation.md`.
 
 ## Environment — this machine is unusual
 

@@ -30,6 +30,34 @@ name: CI
 # also updates the required contexts on `main` (repo settings → branches).
 # That is why the Lighthouse budgets live in "Links + a11y" rather than in a
 # job of their own: they are merge-blocking today, with no settings change.
+#
+# ## The fourth job is a narrow, time-boxed exception — not a precedent
+#
+# "Tier-B RLS graders (live stack)" is advisory on purpose. **This is not a
+# general licence to add advisory jobs**, and the rule above still governs
+# every other gate: if you are adding a check that should block merges, it goes
+# inside one of the three jobs named above. The exception is granted here only
+# because all four of these are true at once, and it expires when they stop
+# being true:
+#
+#   1. The check is *already written and passing* — it is 66 existing graders
+#      that ran nowhere in CI, not new coverage being introduced advisory-first.
+#   2. It depends on an unauthenticated third-party container registry
+#      (`public.ecr.aws`) whose flake rate under GitHub's shared runner IPs has
+#      been observed but not yet measured over time.
+#   3. There is a written, dated plan to make it required — Stage 2 in
+#      `specs/001-foundation/audits/T901-tier-b-ci-investigation.md` — with a
+#      stated trigger (~15–20 PRs) and a stated metric, not a vague intention.
+#   4. Advisory is strictly better than the status quo it replaces, which was
+#      the check running on no CI path at all.
+#
+# Anything that cannot claim all four belongs in a required job from day one.
+#
+# Stage 2 — the owner adding this to `main`'s required contexts in repo
+# settings — is a settings change nobody should make from this file. Nothing in
+# this file marks any job required; required-status configuration lives only in
+# repo settings, and the three names above are documentation of that setting,
+# not a declaration of it.
 # ──────────────────────────────────────────────────────────────────────────
 
 on:
@@ -303,6 +331,235 @@ jobs:
           E2E_PORT: 4323
           E2E_EXPECT_CONFIGURED: "1"
         run: npx playwright test tests/e2e/hidden-guard.spec.ts --grep '\(configured\)'
+
+  # ── Tier-B RLS graders — advisory, Stage 1 of a staged promotion ────────
+  #
+  # 002 MIG-03's user data lives behind row-level security, and AGENTS.md's
+  # *Boundaries* promises "every user table ships with row-level security
+  # **proven by graders**". That proof has two tiers (`tests/garage/harness.ts`):
+  # Tier A reads T2-202's DDL off disk and has always run inside `verify`;
+  # Tier B talks to a real Postgres / GoTrue / Storage through their real HTTP
+  # surfaces as three actors (anon, owner A, owner B) and needs a live
+  # `supabase start` stack. Until this job, Tier B — the deny-by-default
+  # matrix, the private-object matrix, the ACC-03 deletion cascade, the SHR-01
+  # default — ran on no CI path at all, so the proof was a manual step someone
+  # had to remember (T901 phase-1/2 audit §5.5).
+  #
+  # `fix/001-ci-docker-investigation` measured whether a GitHub-hosted runner
+  # can do this, rather than continuing to assume it cannot. Four green runs on
+  # `ubuntu-latest`: Docker Engine 28.0.4 and Compose v2.38.2 are on the stock
+  # image, `supabase start` took 66–73 s, and `npm run test:garage` reported
+  # `555 passed | 9 expected fail` with a skip count of **zero** — the 66
+  # previously-dark graders ran for real. Full write-up, including the runner
+  # probe and the cost analysis, is in
+  # `specs/001-foundation/audits/T901-tier-b-ci-investigation.md`.
+  #
+  # Cost to the merge gate: zero seconds. This job takes ~2 m 05 s in parallel
+  # with "Links + a11y", which sets the pace at ~5 m 28 s.
+  #
+  # ## Why its own job, and why advisory
+  #
+  # The header of this file argues that a new gate belongs *inside* one of the
+  # three required jobs, because a new job is not a required context. Here that
+  # is the feature, not the cost:
+  #
+  #  • The staging is the point. Folding Tier B into "Verify" would make it
+  #    merge-blocking on day one with an unmeasured external dependency (see
+  #    the ECR note below). This job lands and reports for weeks *before*
+  #    anyone marks it required, so it can never be a required context that
+  #    has never reported — which is the hazard the header warns about.
+  #  • Failure attribution. A red "Verify" means the code is wrong. A red
+  #    "Verify" that might instead mean a container registry throttled a pull
+  #    is a worse signal for every contributor on every PR, forever.
+  #  • Isolation. Tier B is the only thing in this repo that wants Docker, a
+  #    third-party CLI, and eight containers. A Supabase CLI bump can never
+  #    take the type-check and the build down with it.
+  #
+  # **Stage 2 is the owner's call, not a code change.** After ~15–20 PRs, count
+  # the red runs that were registry flakes rather than real grader failures. If
+  # that count is at or near zero, add "Tier-B RLS graders (live stack)" to
+  # `main`'s required contexts in repo settings → branches. If the registry
+  # does flake it, leave it advisory and *also* schedule it on
+  # `link-check.yml`'s cron pattern so the proof runs on a clock. Either way,
+  # the "Soak telemetry" step below is what makes that count cheap to take.
+  #
+  # ## Three things that must not change here
+  #
+  #  • `npm run test:garage`, not a hand-rolled vitest invocation. The script
+  #    carries `GARAGE_LIVE=1 GARAGE_LIVE_REQUIRED=1` (package.json), which is
+  #    what makes "the stack did not come up" red instead of
+  #    green-with-66-skips.
+  #  • The CLI version stays pinned and checksum-verified. A merge-path job
+  #    that silently follows `latest` breaks on someone else's release
+  #    schedule.
+  #  • Nothing here may address a non-loopback host. `assertLocalTarget()` in
+  #    the harness already refuses one and is itself graded
+  #    (`harness-contract.test.ts`); this job must never introduce a
+  #    `SUPABASE_URL` that would test that guard for real. No hosted project,
+  #    no service key, and no production credential is involved.
+  tier-b:
+    name: Tier-B RLS graders (live stack)
+    runs-on: ubuntu-latest
+    # Generous against a job measured at ~2 m, but bounded: if a container pull
+    # ever wedges, this fails in 20 minutes instead of holding a runner for the
+    # 6-hour default.
+    timeout-minutes: 20
+    # ── Load-bearing. Do not delete this block. ──────────────────────────
+    # GitHub's default shell for a `run:` step is `bash -e {0}` — **without**
+    # `pipefail`. Naming `bash` explicitly gets
+    # `bash --noprofile --norc -eo pipefail {0}` instead. Two steps below pipe
+    # into `tee` to keep a log, and under the default shell the pipeline's exit
+    # status is `tee`'s (always 0), so `supabase start` could fail and the step
+    # would still go green — which would silently destroy this job's whole
+    # point *and* the failure-attribution rule stated above.
+    #
+    # This is not hypothetical: the investigation workflow this job was ported
+    # from handled it with `set +e` + `${PIPESTATUS[0]}` + a verdict step, and
+    # that control flow was lost in the port. Setting the default at the *job*
+    # level rather than per-step means a future step added here cannot
+    # reintroduce the same hole by forgetting a `shell:` key.
+    defaults:
+      run:
+        shell: bash
+    env:
+      # Pinned deliberately — bump this and the checksum step re-verifies the
+      # new release automatically. Investigation-proven version.
+      SUPABASE_CLI_VERSION: "2.116.0"
+      # `supabase/config.toml` enables the Google provider with
+      # `client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"`, and the
+      # CLI refuses to start when an enabled provider's id/secret is empty.
+      # These are placeholders and nothing more: the graders mint their own
+      # JWTs with the CLI's published local development secret and never
+      # contact Google (config.toml says so itself). They are literal and in
+      # the open on purpose — putting them in repository secrets would imply
+      # they were secrets.
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID: ci-placeholder-client-id
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET: ci-placeholder-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # Installed from the pinned upstream release rather than through
+      # `supabase/setup-cli`: one fewer third-party action on a job headed for
+      # the merge path, and a checksum this workflow verifies itself.
+      - name: Install Supabase CLI (pinned, checksum-verified)
+        run: |
+          base="https://github.com/supabase/cli/releases/download/v${SUPABASE_CLI_VERSION}"
+          deb="supabase_${SUPABASE_CLI_VERSION}_linux_amd64.deb"
+          curl -fsSL -o "$deb" "$base/$deb"
+          curl -fsSL -o checksums.txt "$base/checksums.txt"
+          grep " $deb\$" checksums.txt | sha256sum -c -
+          sudo dpkg -i "$deb"
+          rm -f "$deb" checksums.txt
+          supabase --version
+
+      # Image pulls + container boot + the first application of every migration
+      # in `supabase/migrations/`, all inside this one command. The log is kept
+      # because the "Soak telemetry" step below reads it to tell a registry
+      # throttle apart from a real failure.
+      - name: supabase start (images + boot + migrations)
+        run: supabase start 2>&1 | tee supabase-start.log
+
+      # `db reset` **drops and recreates the database**, then replays every
+      # migration from zero against the already-warm containers.
+      #
+      # Read that sentence before editing this step. An earlier version of this
+      # comment claimed the step catches "a migration that only fails on a
+      # second application" — a non-idempotent DDL edit. That is wrong and the
+      # step structurally cannot do it: because reset starts from an empty
+      # database, this is a second *fresh* application, not a second
+      # application onto the migrated schema. The migrations here contain 28
+      # `create` statements with no `if not exists` / `or replace`, so if reset
+      # really did replay onto the live post-`start` database, `create table
+      # public.profiles` would have errored "already exists" on every one of
+      # the four green investigation runs. It didn't.
+      #
+      # What it actually buys, which is worth the ~24 s:
+      #  • Proves the migrations apply cleanly from zero **independently of the
+      #    image-pull step** — `supabase start` folds its first migration run
+      #    into a command that also pulls containers, so a migration failure
+      #    there is entangled with registry noise. Here it is not.
+      #  • Gives the graders a database in a known, empty, just-migrated state
+      #    rather than whatever `start` happened to leave behind.
+      #  • Exercises the seed path (`[db.seed]` in config.toml).
+      - name: supabase db reset (migrations replayed from an empty database)
+        run: supabase db reset 2>&1 | tee supabase-reset.log
+
+      # Run exactly as a developer runs it. The env flags live in the script,
+      # not here — a divergence between the two would be worse than either.
+      - name: Tier-B graders (npm run test:garage, fail-closed)
+        run: npm run test:garage
+
+      # Stage 2's evidence, gathered automatically so the promotion decision is
+      # a count rather than an archaeology session. The Supabase CLI pulls its
+      # images from `public.ecr.aws`, which rate-limits anonymous pulls per
+      # source IP; GitHub's runners share IP space, so throttling is visible
+      # (3–11 retries per run in the investigation) even though the CLI's
+      # backoff recovered from every one. A red run whose throttle count is
+      # high and whose failure is `supabase start` is a flake; a red run that
+      # got past `supabase start` is a real grader failure. This step makes
+      # that distinction readable from the run summary alone.
+      - name: Soak telemetry (registry throttling, stack state)
+        if: always()
+        run: |
+          set +e
+          # NOT `$(... || echo 0)`: `grep -c` prints "0" *and* exits 1 when it
+          # matches nothing, so the `||` branch fires too and the variable
+          # becomes the two-line string "0\n0" in the common healthy case.
+          # Capture, then default only if genuinely empty (missing file).
+          throttles=$(grep -c 'toomanyrequests\|Retrying after' supabase-start.log 2>/dev/null)
+          throttles=${throttles:-0}
+          {
+            echo "## Tier-B soak telemetry"
+            echo ""
+            echo "- job outcome so far: \`${{ job.status }}\`"
+            echo "- \`public.ecr.aws\` throttle/retry **log lines** during \`supabase start\`: **${throttles}**"
+            echo ""
+            echo "That is a count of matching log *lines*, not of throttle events."
+            echo "The CLI prints roughly two lines per event (one"
+            echo "\`toomanyrequests\`, one \`Retrying after\`), so read it as"
+            echo "approximately 2x the real event count — useful for comparing"
+            echo "runs against each other, not as a precise number."
+            echo ""
+            echo "A red run that never got past \`supabase start\` **and** shows a"
+            echo "non-zero count is a registry flake, not a grader failure."
+            echo "Count those separately when deciding Stage 2 (promotion to a"
+            echo "required context) — see this file's header."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+
+      - name: Diagnostics on failure
+        if: failure()
+        run: |
+          set +e
+          echo "::group::docker ps -a"
+          docker ps -a
+          echo "::endgroup::"
+          for c in $(docker ps -a --format '{{.Names}}' | grep -i supabase); do
+            echo "::group::logs $c"
+            docker logs --tail 120 "$c" 2>&1
+            echo "::endgroup::"
+          done
+          exit 0
+
+      # Pinned to a commit SHA for the same reason the `site-dist` upload is.
+      - name: Upload stack logs
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: tier-b-stack-logs
+          path: |
+            supabase-start.log
+            supabase-reset.log
+          retention-days: 14
+          if-no-files-found: warn
+
   # ── Where the deploy job went (T2-102, 002 MIG-02) ──────────────────────
   #
   # A `deploy` job used to live here: on a push to `main`, after all three
