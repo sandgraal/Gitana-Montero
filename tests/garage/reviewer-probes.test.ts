@@ -58,6 +58,8 @@ import {
   definerSearchPathIssues,
   effectiveCheck,
   expiryCheckIssues,
+  findShareReaders,
+  isContractRoutine,
   isCorrelated,
   isOptionalColumn,
   isOwnerScoped,
@@ -1131,6 +1133,42 @@ const CORRECT_SHARE_READER = sql(`
   grant execute on function public.share_read_records(text) to anon;
 `);
 
+/**
+ * G17 — **PR #74 review**: the right name in the wrong schema.
+ *
+ * Byte-for-byte the reference reader with `public.` changed to `private.` in
+ * the create and both grants. Everything about it is otherwise impeccable: it
+ * hashes, it checks expiry and revocation, it names its columns, it is
+ * `security definer` with a pinned `search_path`. **Not one body rule can
+ * reject it** — which is exactly what makes it the right probe for a
+ * schema-scoping bug, because only the allow-list can be what catches it.
+ *
+ * Before the fix it satisfied both halves at once: the `unexpected` filter
+ * saw a declared reader's name and waved an anon-executable definer function
+ * through, and the `missing` filter counted it as the public reader being
+ * present.
+ */
+const G17_WRONG_SCHEMA_READER = sql(`
+  create function private.share_read_records(p_token text)
+  returns table (id uuid, occurred_on date, kind text)
+  language sql
+  stable
+  security definer
+  set search_path = ''
+  as $share$
+    select r.id, r.occurred_on, r.kind
+    from public.records r
+    join public.shares s on s.vehicle_id = r.vehicle_id
+    where s.token_hash = extensions.digest(p_token, 'sha256')
+      and s.revoked_at is null
+      and s.expires_at > now();
+  $share$;
+
+  revoke all on function private.share_read_records(text) from public;
+  revoke all on function private.share_read_records(text) from authenticated;
+  grant execute on function private.share_read_records(text) to anon;
+`);
+
 /** The one routine in the correct fixture, for the per-rule probes. */
 function readerOf(fixture: string): FunctionDefinition {
   const [routine] = functions(fixture);
@@ -1735,6 +1773,39 @@ describe("WIDE-OPEN: the two recorded grader defects", () => {
     ).toContain("nothing revokes public's inherited privileges");
   });
 
+  it("G12: GRANT ALL then a PARTIAL revoke reports unknown, never none", () => {
+    // Locks in the answer to PR #74's third thread, and it is worth stating
+    // precisely because the intuitive reading is wrong in a reassuring
+    // direction.
+    //
+    // `grant all` records the token `all`; this module never expands it into
+    // the concrete privilege list, because that list is a Postgres version
+    // detail and guessing it would be inventing knowledge. So a later
+    // `revoke select` cannot subtract from it accurately, and the replay drops
+    // the whole entry rather than pretend — leaving every privilege on this
+    // object "unknown", *including the ones `all` plainly granted*.
+    //
+    // That is over-reporting, which is the safe direction and the one every
+    // caller treats as a finding. What it must never do is answer "none":
+    // a partial revoke is not evidence that an ACL is understood, and reading
+    // it that way would clear a role that still holds `insert` and `truncate`.
+    const partial = sql(`
+      grant all on public.records to anon;
+      revoke select on public.records from anon;
+    `);
+    const state = grants(partial);
+
+    for (const privilege of ["select", "insert", "truncate"]) {
+      expect(
+        privilegeVerdict(state, "public.records", "anon", privilege),
+        privilege
+      ).not.toBe("none");
+    }
+    expect(tableGrantIssues(partial, ["records"]).join(" | ")).toContain(
+      "unknown"
+    );
+  });
+
   it("G12: adding the `public` revoke is what makes the answer knowable", () => {
     // The control. One statement is the entire difference between "unknown"
     // and "none", and if this pair ever agrees the tri-state has collapsed.
@@ -1926,6 +1997,74 @@ describe("WIDE-OPEN: the two recorded grader defects", () => {
     }
   });
 
+  it("G17 rejects an anon-executable impostor in another schema", () => {
+    // PR #74 review, gap 1. The `unexpected` half is the one the PR body calls
+    // live today, and a name-only comparison let a `security definer` routine
+    // granted to `anon` through it on the strength of its name alone.
+    const { unexpected } = anonFunctionAllowListIssues(
+      G17_WRONG_SCHEMA_READER,
+      ["share_read_records"]
+    );
+
+    expect(unexpected.join(" | ")).toContain(
+      "private.share_read_records(text)"
+    );
+    expect(unexpected.join(" | ")).toContain("security definer");
+    // And the finding says WHY, so a reviewer is not left comparing strings.
+    expect(unexpected.join(" | ")).toContain("lives in private, not public");
+  });
+
+  it("G17: the impostor does not satisfy the COMPLETENESS half either", () => {
+    // The same bug cutting the other way — the graders would have reported the
+    // public reader present when only the wrong-schema one existed.
+    const { missing } = anonFunctionAllowListIssues(G17_WRONG_SCHEMA_READER, [
+      "share_read_records",
+    ]);
+
+    expect(missing).toEqual([
+      "public.share_read_records: declared share reader does not exist in the migrations",
+    ]);
+  });
+
+  it("G17 rejects the impostor at the SEAM GUARD too", () => {
+    // PR #74 review, gap 2. `requireShareReaders` resolves through this, so a
+    // pass here would hand every marked grader an object from a schema the
+    // contract never described — and they would report on it as if it were the
+    // real reader.
+    const { found, missing } = findShareReaders(G17_WRONG_SCHEMA_READER, [
+      "share_read_records",
+    ]);
+
+    expect(found).toEqual([]);
+    expect(missing).toEqual(["public.share_read_records"]);
+  });
+
+  it("G17: NO body rule rejects it — the allow-list is the only thing that can", () => {
+    // Attribution. The impostor is a correct reader in every respect except
+    // its schema, so if any of these ever started firing, the probes above
+    // would be passing for the wrong reason and the schema check could rot
+    // underneath them unnoticed.
+    const routine = readerOf(G17_WRONG_SCHEMA_READER);
+
+    expect(tokenHashIssues(routine)).toEqual([]);
+    expect(expiryCheckIssues(routine)).toEqual([]);
+    expect(revocationCheckIssues(routine)).toEqual([]);
+    expect(projectionIssues(routine)).toEqual([]);
+    expect(anonWriteIssues(routine)).toEqual([]);
+    expect(definerSearchPathIssues(G17_WRONG_SCHEMA_READER)).toEqual([]);
+  });
+
+  it("G17: isContractRoutine matches on schema AND name", () => {
+    // The predicate both gaps resolve through, graded directly.
+    const impostor = readerOf(G17_WRONG_SCHEMA_READER);
+    const genuine = readerOf(CORRECT_SHARE_READER);
+
+    expect(isContractRoutine(genuine, "share_read_records")).toBe(true);
+    expect(isContractRoutine(impostor, "share_read_records")).toBe(false);
+    // A right-schema routine with the wrong name is not a match either.
+    expect(isContractRoutine(genuine, "share_read_vehicle")).toBe(false);
+  });
+
   it("G15 rejects a view created without `security_invoker`", () => {
     // The option arrived in PG15 and defaults to `false`, so the default is
     // the unsafe direction: the view runs as its owner and RLS on the
@@ -1981,6 +2120,19 @@ describe("CORRECT: the reference share reader must be accepted", () => {
 
     expect(unexpected).toEqual([]);
     expect(missing).toEqual([]);
+  });
+
+  it("satisfies the seam guard — schema-scoping did not break the real thing", () => {
+    // The control for G17. Tightening a matcher is only safe if the object it
+    // exists to find still resolves.
+    const { found, missing } = findShareReaders(CORRECT_SHARE_READER, [
+      "share_read_records",
+    ]);
+
+    expect(missing).toEqual([]);
+    expect(found.map((routine) => routine.identity)).toEqual([
+      "public.share_read_records(text)",
+    ]);
   });
 
   it("produces no finding from ANY of the anon-surface rules", () => {
@@ -2067,6 +2219,17 @@ describe("CORRECT: the reference share reader must be accepted", () => {
           anonSurfaceIssues(wholeRowReader(projection, from)),
         ]
       ),
+      [
+        "G17 wrong-schema impostor (allow-list)",
+        anonFunctionAllowListIssues(G17_WRONG_SCHEMA_READER, [
+          "share_read_records",
+        ]).unexpected,
+      ],
+      [
+        "G17 wrong-schema impostor (seam guard)",
+        findShareReaders(G17_WRONG_SCHEMA_READER, ["share_read_records"])
+          .missing,
+      ],
     ];
 
     expect(

@@ -490,8 +490,27 @@ export const ANONYMOUS_ROLES = ["anon", "public"] as const;
  * reference "filtered to that exact vehicle by the fitment engine", and that
  * needs the taxonomy identity and nothing else.
  */
+/**
+ * The schema every unqualified name in this file lives in.
+ *
+ * ## Why this is a named constant and not the string `"public"` in six places
+ *
+ * Every routine name here is written unqualified, and a grader that matches an
+ * unqualified name against a parsed routine is matching **half an identity**.
+ * Postgres will happily hold a `private.share_read_records` beside a
+ * `public.share_read_records`; they are different functions with different
+ * ACLs, and a comparison on `name` alone cannot tell them apart. That is not a
+ * hypothetical — it is the shape a schema-qualified migration takes the first
+ * time someone moves a helper out of `public` to tidy the API surface.
+ *
+ * Named here so the schema half of every comparison comes from one place, and
+ * so a contract entry that ever needs a different schema is a one-line change
+ * rather than a hunt (PR #74 review).
+ */
+export const CONTRACT_SCHEMA = "public";
+
 export interface ShareReaderContract {
-  /** Unqualified function name in the `public` schema. */
+  /** Unqualified function name, resolved in `CONTRACT_SCHEMA`. */
   readonly name: string;
   /** The requirement that puts this function on the anon surface. */
   readonly requirement: string;

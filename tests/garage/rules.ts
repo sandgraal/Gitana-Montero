@@ -66,6 +66,7 @@
  */
 import {
   ANONYMOUS_ROLES,
+  CONTRACT_SCHEMA,
   EXEMPT_PUBLIC_TABLES,
   GRANT_EXPIRY_COLUMN,
   GRANT_REVOCATION_COLUMN,
@@ -804,6 +805,63 @@ export function anonExecutableFunctions(
 }
 
 /**
+ * Does `routine` bear this contract's `name`, **in this contract's schema**?
+ *
+ * ## The gap this closes (PR #74 review)
+ *
+ * Every comparison in this suite used to be `routine.name === name`, which
+ * matches half an identity. A routine is `(schema, name, argument types)`, and
+ * two of those were being thrown away. The consequence was worst on the half
+ * of the allow-list that is live today:
+ *
+ * ```sql
+ * -- `share_read_records` is a declared share reader, so the "unexpected"
+ * -- filter waved this through — a security definer function in a schema
+ * -- nothing in this contract has ever mentioned, executable by anon.
+ * create function private.share_read_records(p_token text) …
+ * grant execute on function private.share_read_records(text) to anon;
+ * ```
+ *
+ * It cut the other way too: that same routine satisfied the *completeness*
+ * half, so the graders would have reported the public reader present when only
+ * a wrong-schema impostor existed, and the seam guard would have handed the
+ * marked tests an object from a schema they were never describing.
+ *
+ * One predicate, used everywhere a contract name meets a parsed routine, so a
+ * single mutation moves every caller — the same de-duplication argument as
+ * `aclKnownFor`.
+ */
+export function isContractRoutine(
+  routine: FunctionDefinition,
+  name: string
+): boolean {
+  return routine.schema === CONTRACT_SCHEMA && routine.name === name;
+}
+
+/**
+ * The declared share readers present in `normalized`, and the names that are
+ * absent — matched by schema **and** name, never by name alone.
+ *
+ * Lives here rather than in the grader file so the schema-scoping is reachable
+ * by the probe corpus: a rule that only the seam guard could exercise is a rule
+ * the corpus cannot mutation-test.
+ */
+export function findShareReaders(
+  normalized: string,
+  names: readonly string[]
+): { readonly found: FunctionDefinition[]; readonly missing: string[] } {
+  const declared = functions(normalized);
+  const found: FunctionDefinition[] = [];
+  const missing: string[] = [];
+  for (const name of names) {
+    const routine = declared.find((entry) => isContractRoutine(entry, name));
+    if (routine) found.push(routine);
+    else missing.push(`${CONTRACT_SCHEMA}.${name}`);
+  }
+  return { found, missing };
+}
+
+/**
  * The closed allow-list, as two independently-failing halves.
  *
  * `unexpected` is the security half and it is live today: anything reachable
@@ -813,6 +871,9 @@ export function anonExecutableFunctions(
  *
  * Kept apart because they fail for opposite reasons and a caller that merged
  * them would have to choose which one to be wrong about.
+ *
+ * Both halves match on **schema and name** — see `isContractRoutine` for the
+ * impostor this rejects.
  */
 export function anonFunctionAllowListIssues(
   normalized: string,
@@ -825,26 +886,37 @@ export function anonFunctionAllowListIssues(
   );
 
   const unexpected = reachable
-    .filter((routine) => !allowed.includes(routine.name))
+    .filter(
+      (routine) => !allowed.some((name) => isContractRoutine(routine, name))
+    )
     .map((routine) => {
       const verdicts = ANONYMOUS_ROLES.map(
         (role) =>
           `${role}=${privilegeVerdict(state, routine.identity, role, "execute")}`
       ).join(" ");
+      const impostor = allowed.includes(routine.name)
+        ? ` — it bears a declared share reader's name but lives in ` +
+          `${routine.schema}, not ${CONTRACT_SCHEMA}`
+        : "";
       return (
         `${routine.identity}: executable by an anonymous caller (${verdicts}) ` +
         `but is not a declared share reader` +
-        (routine.securityDefiner ? " — and it is security definer" : "")
+        (routine.securityDefiner ? " — and it is security definer" : "") +
+        impostor
       );
     });
 
   const missing = allowed
-    .filter((name) => !reachable.some((routine) => routine.name === name))
+    .filter(
+      (name) => !reachable.some((routine) => isContractRoutine(routine, name))
+    )
     .map((name) => {
-      const exists = declared.some((routine) => routine.name === name);
+      const exists = declared.some((routine) =>
+        isContractRoutine(routine, name)
+      );
       return exists
-        ? `${name}: declared share reader exists but is not executable by anon`
-        : `${name}: declared share reader does not exist in the migrations`;
+        ? `${CONTRACT_SCHEMA}.${name}: declared share reader exists but is not executable by anon`
+        : `${CONTRACT_SCHEMA}.${name}: declared share reader does not exist in the migrations`;
     });
 
   return { unexpected, missing };

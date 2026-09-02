@@ -126,9 +126,18 @@ export function readSupabaseConfig(): string {
 /**
  * Lower-case the SQL, drop `--` and block comments, collapse whitespace.
  *
- * String literals survive intact apart from the case fold, because a `--`
- * inside `'…'` is data, not a comment, and a normaliser that eats it would
- * corrupt exactly the policy expressions these graders read.
+ * String literals and dollar-quoted bodies are **not inspected**: comment
+ * stripping stops at their boundaries, because a `--` inside `'…'` is data,
+ * not a comment, and a normaliser that ate it would truncate exactly the
+ * policy expressions these graders read.
+ *
+ * Not inspected is not the same as unchanged. The last line case-folds and
+ * collapses whitespace across the whole output, literals and bodies included,
+ * so what survives is *structure and tokens* rather than the original bytes.
+ * Every rule in this suite matches lowercase keywords and is whitespace-
+ * agnostic, so that is the right trade — but a rule that needed a literal's
+ * exact text or a quoted identifier's casing could not be built on this
+ * (PR #74 review).
  */
 export function normalizeSql(sql: string): string {
   let out = "";
@@ -161,8 +170,15 @@ export function normalizeSql(sql: string): string {
       index = cursor + 1;
       continue;
     }
-    // Dollar-quoted bodies (functions) are copied through verbatim: their
-    // contents are SQL too, and the cascade/policy/function graders read them.
+    // Dollar-quoted bodies (functions) are copied through **uninspected** —
+    // comment stripping and quote scanning are skipped for their whole extent,
+    // so their structure and tokens arrive intact. They are not copied
+    // *verbatim*: the final line below case-folds and collapses whitespace
+    // across the entire output, this included. That is what the function
+    // graders want — they match lowercase keywords and are whitespace-agnostic
+    // — but a body is not byte-identical to its source, and a rule that needed
+    // original casing (a quoted identifier, a literal's exact text) could not
+    // rely on it (PR #74 review).
     const tag = dollarTagAt(sql, index);
     if (tag !== null) {
       const end = sql.indexOf(tag, index + tag.length);

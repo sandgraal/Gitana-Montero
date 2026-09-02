@@ -69,6 +69,7 @@
 import { describe, expect, it } from "vitest";
 import {
   ANONYMOUS_ROLES,
+  CONTRACT_SCHEMA,
   EXEMPT_PUBLIC_TABLES,
   PRIVILEGED_FUNCTIONS,
   SHARE_READER_FUNCTIONS,
@@ -81,6 +82,8 @@ import {
   anonWriteIssues,
   definerSearchPathIssues,
   expiryCheckIssues,
+  findShareReaders,
+  isContractRoutine,
   plaintextTokenColumnIssues,
   projectionIssues,
   revocationCheckIssues,
@@ -95,7 +98,9 @@ import {
   functions,
   grants,
   migrationSql,
+  normalizeSql,
   privilegeVerdict,
+  SEAM_SHARE_GRANTS,
   shareSeam,
   type FunctionDefinition,
 } from "./sql.ts";
@@ -106,22 +111,52 @@ import {
  * Every marked grader below goes through this, so each one fails with
  * `not implemented: T2-404` rather than with `undefined is not an object` —
  * the T2-201 discipline that makes an `it.fails` marker mean something.
+ *
+ * Resolution is by **schema and name** (`findShareReaders`), so a
+ * `private.share_read_records` cannot satisfy the guard and hand the marked
+ * graders below an object from a schema this contract never described
+ * (PR #74 review).
  */
-function requireShareReaders(): FunctionDefinition[] {
-  const declared = functions(migrationSql());
-  const found = SHARE_READER_NAMES.map((name) => ({
-    name,
-    routine: declared.find((routine) => routine.name === name) ?? null,
-  }));
-  const missing = found
-    .filter((entry) => entry.routine === null)
-    .map((entry) => entry.name);
+/**
+ * Each of these takes the SQL as an argument, defaulting to the real
+ * migrations.
+ *
+ * The default is what every grader below uses. The *argument* exists so the
+ * self-check suite at the foot of this file can point them at a fixture: these
+ * three are the file's own resolution layer, and while they read
+ * `migrationSql()` and nothing else, no probe could reach them — the real
+ * migrations contain no share readers and no second schema, so a
+ * schema-scoping regression here would be invisible in both the scoped and the
+ * unscoped spelling. Mutation-testing found exactly that (PR #74 review): the
+ * rule in `rules.ts` was pinned, and the wiring to it was not.
+ */
+function requireShareReaders(
+  normalized: string = migrationSql()
+): FunctionDefinition[] {
+  const { found, missing } = findShareReaders(normalized, SHARE_READER_NAMES);
   if (missing.length > 0) {
     throw shareSeam(
       `no function named ${missing.join(", ")} exists in supabase/migrations/`
     );
   }
-  return found.map((entry) => entry.routine as FunctionDefinition);
+  return found;
+}
+
+/** Every routine in the contract's schema bearing `name`. */
+function contractRoutines(
+  name: string,
+  normalized: string = migrationSql()
+): FunctionDefinition[] {
+  return functions(normalized).filter((routine) =>
+    isContractRoutine(routine, name)
+  );
+}
+
+/** The names of every routine declared in the contract's schema. */
+function contractRoutineNames(normalized: string = migrationSql()): string[] {
+  return functions(normalized)
+    .filter((routine) => routine.schema === CONTRACT_SCHEMA)
+    .map((routine) => routine.name);
 }
 
 /* =========================================================================
@@ -134,14 +169,15 @@ function requireShareReaders(): FunctionDefinition[] {
  * ====================================================================== */
 
 describe("the function parser reads the migrations that exist", () => {
-  it("finds the account-lifecycle and auth routines by name", () => {
-    const found = functions(migrationSql()).map((routine) => routine.name);
+  it("finds the account-lifecycle and auth routines by name AND schema", () => {
+    const found = contractRoutineNames();
 
     // Named rather than counted: T2-404 adds routines, and a grader that
     // asserted "exactly five" would have to be edited by the task it exists
-    // to constrain.
+    // to constrain. Scoped to the contract's schema so a same-named routine
+    // somewhere else cannot stand in for one of these (PR #74 review).
     for (const { name } of PRIVILEGED_FUNCTIONS) {
-      expect(found, `missing ${name}`).toContain(name);
+      expect(found, `missing ${CONTRACT_SCHEMA}.${name}`).toContain(name);
     }
   });
 
@@ -150,9 +186,7 @@ describe("the function parser reads the migrations that exist", () => {
     // is granted by `grant execute on function … (timestamptz)`. If those two
     // did not resolve to one identity, every ACL finding would be about a
     // routine that does not exist.
-    const purge = functions(migrationSql()).find(
-      (routine) => routine.name === "purge_expired_accounts"
-    );
+    const [purge] = contractRoutines("purge_expired_accounts");
 
     expect(purge?.identity).toBe("public.purge_expired_accounts(timestamptz)");
   });
@@ -162,16 +196,15 @@ describe("the function parser reads the migrations that exist", () => {
     // report green forever.
     const found = functions(migrationSql());
     const definers = found.filter((routine) => routine.securityDefiner);
+    const definerNames = definers
+      .filter((routine) => routine.schema === CONTRACT_SCHEMA)
+      .map((routine) => routine.name);
 
     expect(definers.length).toBeGreaterThan(0);
     expect(found.length).toBeGreaterThan(definers.length);
-    expect(definers.map((routine) => routine.name)).toContain(
-      "request_account_deletion"
-    );
+    expect(definerNames).toContain("request_account_deletion");
     // ACC-01's password hook is `stable`, not `definer` — the invoker side.
-    expect(definers.map((routine) => routine.name)).not.toContain(
-      "deny_password_login"
-    );
+    expect(definerNames).not.toContain("deny_password_login");
   });
 
   it("reads a body, not an empty string", () => {
@@ -221,6 +254,13 @@ describe("nothing an anonymous caller can execute is unaccounted for", () => {
       // reads says which dangerous routine opened rather than "an unexpected
       // function". A name absent from the migrations is not a finding: this
       // asks what is true of the routines that exist.
+      //
+      // Matched on NAME ALONE, deliberately, and this is the one place in the
+      // file that still is. Schema-scoping the *allow* direction closes a hole
+      // (a `private` impostor passing as a declared reader); schema-scoping a
+      // *deny* direction would open one, because a `private.purge_expired_
+      // accounts` is exactly as dangerous as the public one. Over-matching here
+      // can only add assertions, never drop them (PR #74 review).
       const state = grants(migrationSql());
       const matching = functions(migrationSql()).filter(
         (routine) => routine.name === name
@@ -375,11 +415,12 @@ describe("every table that exists is a table some grader knows about", () => {
 
 describe("typed share grants (SHR-05..08)", () => {
   it.fails("every declared share reader exists in the migrations", () => {
-    const declared = functions(migrationSql()).map((routine) => routine.name);
+    const declared = contractRoutineNames();
     const missing = SHARE_READER_FUNCTIONS.filter(
       (reader) => !declared.includes(reader.name)
     ).map(
-      (reader) => `${reader.name} (${reader.requirement}): ${reader.purpose}`
+      (reader) =>
+        `${CONTRACT_SCHEMA}.${reader.name} (${reader.requirement}): ${reader.purpose}`
     );
 
     expect(missing).toEqual([]);
@@ -460,5 +501,97 @@ describe("typed share grants (SHR-05..08)", () => {
     // see the unmarked sweep, which applies this to whatever is actually
     // reachable.
     expect(requireShareReaders().flatMap(anonWriteIssues)).toEqual([]);
+  });
+});
+
+/* =========================================================================
+ * This file's own resolution layer, graded. **Nothing here is marked.**
+ *
+ * `reviewer-probes.test.ts` grades the rules; this grades the three helpers
+ * above that connect this file to them. The distinction is not academic — the
+ * PR #74 mutation run killed every mutant in `rules.ts` and left the two in
+ * this file alive, because everything here reads the real migrations and the
+ * real migrations contain no share readers and no second schema. A wiring
+ * regression was therefore invisible: scoped and unscoped resolution give the
+ * same answer against a repo that has neither.
+ *
+ * So the helpers take their SQL as an argument and these tests hand them a
+ * fixture with a known answer. Same discipline as `harness-contract.test.ts`
+ * being the unmarked canary for the parsers.
+ * ====================================================================== */
+
+describe("the seam guard and name lookups are schema-scoped", () => {
+  /**
+   * The full declared reader set, in `schema` — correct in every respect
+   * except, for the impostor, the one property under test. Nothing else in the
+   * instrument can be what rejects it.
+   */
+  const readerSet = (schema: string): string =>
+    normalizeSql(
+      SHARE_READER_NAMES.map(
+        (name) => `
+          create function ${schema}.${name}(p_token text)
+          returns table (id uuid)
+          language sql
+          stable
+          security definer
+          set search_path = ''
+          as $share$
+            select r.id from public.records r
+            join public.shares s on s.vehicle_id = r.vehicle_id
+            where s.token_hash = extensions.digest(p_token, 'sha256')
+              and s.revoked_at is null
+              and s.expires_at > now();
+          $share$;
+
+          revoke all on function ${schema}.${name}(text) from public;
+          grant execute on function ${schema}.${name}(text) to anon;
+        `
+      ).join("\n")
+    );
+
+  const IMPOSTORS = readerSet("private");
+  const GENUINE = readerSet(CONTRACT_SCHEMA);
+
+  it("the seam guard refuses impostors in another schema", () => {
+    // Were this to pass, every marked grader above would receive routines from
+    // a schema this contract never described and report on them as if they
+    // were the real readers.
+    expect(() => requireShareReaders(IMPOSTORS)).toThrow(SEAM_SHARE_GRANTS);
+    expect(() => requireShareReaders(IMPOSTORS)).toThrow(
+      `${CONTRACT_SCHEMA}.share_read_records`
+    );
+  });
+
+  it("the seam guard accepts the genuine readers — the control", () => {
+    // Tightening a matcher is only safe if the objects it exists to find still
+    // resolve. Without this, the assertion above is satisfied by a guard that
+    // refuses everything.
+    expect(() => requireShareReaders(GENUINE)).not.toThrow();
+    expect(requireShareReaders(GENUINE).map((r) => r.name)).toEqual([
+      ...SHARE_READER_NAMES,
+    ]);
+  });
+
+  it("the name lookups do not see routines outside the contract's schema", () => {
+    expect(contractRoutineNames(IMPOSTORS)).toEqual([]);
+    expect(contractRoutines("share_read_records", IMPOSTORS)).toEqual([]);
+
+    expect(contractRoutineNames(GENUINE)).toEqual([...SHARE_READER_NAMES]);
+    expect(contractRoutines("share_read_records", GENUINE)).toHaveLength(1);
+  });
+
+  it("the allow-list rejects the impostors and accepts the genuine set", () => {
+    // The end-to-end pair, through this file's own entry point rather than
+    // the probe corpus's.
+    expect(
+      anonFunctionAllowListIssues(IMPOSTORS, SHARE_READER_NAMES).unexpected
+    ).toHaveLength(SHARE_READER_NAMES.length);
+    expect(
+      anonFunctionAllowListIssues(GENUINE, SHARE_READER_NAMES).unexpected
+    ).toEqual([]);
+    expect(
+      anonFunctionAllowListIssues(GENUINE, SHARE_READER_NAMES).missing
+    ).toEqual([]);
   });
 });
