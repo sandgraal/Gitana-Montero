@@ -77,7 +77,13 @@ describe("scan coverage (positive control)", () => {
 
   it("never descends into node_modules, dist, or the Astro build cache", async () => {
     const files = await listScannableFiles();
-    const relative = files.map((file) => path.relative(REPO_ROOT, file));
+    const relative = files.map((file) =>
+      // `path.relative` returns backslash-separated segments on Windows;
+      // normalize to forward slashes so these patterns match the walker's
+      // actual behavior on every platform, not just the one this suite
+      // happens to run on (r3910854923).
+      path.relative(REPO_ROOT, file).replace(/\\/g, "/")
+    );
     for (const file of relative) {
       expect(file).not.toMatch(/(^|\/)node_modules(\/|$)/);
       expect(file).not.toMatch(/(^|\/)dist(\/|$)/);
