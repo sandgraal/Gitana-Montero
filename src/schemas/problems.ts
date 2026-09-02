@@ -664,6 +664,15 @@ function checkDuplicateIds(
  * which is the difference between a diagnostic procedure and a list of chores.
  * If a step rules out something the entry does not list as a cause, that
  * something *is* a root cause of this problem — add it.
+ *
+ * A step must also not contradict itself. Naming one cause in both `rulesIn`
+ * and `rulesOut` states nothing informationally — whichever way the result
+ * goes, the reader is told the opposite thing at the same time — so it is the
+ * same defect as the empty step, written twice instead of not at all. Naming
+ * one cause twice inside a single half is the id-is-a-key rule of
+ * `checkDuplicateIds` one level down: the second mention adds no claim, and a
+ * step's two lists are the only place a cause id repeats without the
+ * top-level sweep seeing it.
  */
 function checkDiagnostics(
   entry: ProblemEntryShape,
@@ -719,6 +728,67 @@ function checkDiagnostics(
         });
       });
     }
+
+    checkStepSelfConsistency(index, rulesIn, rulesOut, ctx);
+  });
+}
+
+/**
+ * One diagnostic step's two id lists say two different things about distinct
+ * causes, or they say nothing (PRB-01).
+ *
+ * Reported on `rulesOut` for the contradiction case: it is the later of the
+ * two halves, and the half an author most often pastes in by mistake.
+ */
+function checkStepSelfConsistency(
+  index: number,
+  rulesIn: readonly unknown[],
+  rulesOut: readonly unknown[],
+  ctx: ProblemRefineContext
+): void {
+  const duplicate = (key: "rulesIn" | "rulesOut", id: string, at: number) => {
+    ctx.addIssue({
+      code: "custom",
+      path: ["diagnosticSteps", index, key, at],
+      message:
+        `\`${id}\` is named twice in this step's \`${key}\`. An id is a key, ` +
+        `and the second mention makes no second claim — the step already ` +
+        `rules that cause ${key === "rulesIn" ? "in" : "out"}. Remove it, or ` +
+        `name the other cause you meant. refs specs/001-foundation (PRB-01)`,
+    });
+  };
+
+  const ruledIn = new Set<string>();
+  rulesIn.forEach((id, position) => {
+    if (typeof id !== "string") return;
+    if (ruledIn.has(id)) {
+      duplicate("rulesIn", id, position);
+      return;
+    }
+    ruledIn.add(id);
+  });
+
+  const ruledOut = new Set<string>();
+  rulesOut.forEach((id, position) => {
+    if (typeof id !== "string") return;
+    if (ruledOut.has(id)) {
+      duplicate("rulesOut", id, position);
+      return;
+    }
+    ruledOut.add(id);
+    if (!ruledIn.has(id)) return;
+    ctx.addIssue({
+      code: "custom",
+      path: ["diagnosticSteps", index, "rulesOut", position],
+      message:
+        `this step rules \`${id}\` both in and out. PRB-01 asks each step to ` +
+        `state what a result rules in *or* out; a step that states both ` +
+        `about one cause tells the reader the opposite thing whichever way ` +
+        `the result goes, which is an authoring contradiction, not a ` +
+        `diagnostic. Decide which half is true for this step — if the ` +
+        `answer depends on something, that something is the step. ` +
+        `refs specs/001-foundation (PRB-01)`,
+    });
   });
 }
 
