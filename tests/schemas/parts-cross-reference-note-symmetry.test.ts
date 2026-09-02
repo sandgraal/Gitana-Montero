@@ -207,27 +207,27 @@ function messageFor(
  * ---------------------------------------------------------------------- */
 
 describe("a quality note ships in both locales or in neither (F1)", () => {
-  it.fails("rejects a `lower-grade` note written only in en", () => {
+  it("rejects a `lower-grade` note written only in en", () => {
     expectAsymmetryReported("lower-grade", "en");
   });
 
-  it.fails("rejects a `lower-grade` note written only in es", () => {
+  it("rejects a `lower-grade` note written only in es", () => {
     expectAsymmetryReported("lower-grade", "es");
   });
 
-  it.fails("rejects an `oem-supplier` note written only in en", () => {
+  it("rejects an `oem-supplier` note written only in en", () => {
     expectAsymmetryReported("oem-supplier", "en");
   });
 
-  it.fails("rejects an `oem-supplier` note written only in es", () => {
+  it("rejects an `oem-supplier` note written only in es", () => {
     expectAsymmetryReported("oem-supplier", "es");
   });
 
-  it.fails("rejects an `equivalent` note written only in en", () => {
+  it("rejects an `equivalent` note written only in en", () => {
     expectAsymmetryReported("equivalent", "en");
   });
 
-  it.fails("rejects an `equivalent` note written only in es", () => {
+  it("rejects an `equivalent` note written only in es", () => {
     expectAsymmetryReported("equivalent", "es");
   });
 
@@ -242,7 +242,7 @@ describe("a quality note ships in both locales or in neither (F1)", () => {
    * which half is missing differs. This holds whatever wording, punctuation
    * or interpolation order the fix chooses.
    */
-  it.fails("reports a different message in each direction", () => {
+  it("reports a different message in each direction", () => {
     const missingEs = messageFor("lower-grade", "en");
     const missingEn = messageFor("lower-grade", "es");
 
