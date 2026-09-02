@@ -125,8 +125,10 @@ const entries = await getCollection("parts");
  * The supersession graph, built once for the whole page. The build has
  * already refused a dangling pointer or a loop
  * (`src/integrations/validate-parts.ts`), so `supersessionChain` returning
- * `null` here is unreachable in a build that got this far — the fallback is
- * "no chain", never a guess.
+ * `null` here is unreachable in a build that got this far — kept as
+ * defense-in-depth anyway (T501 audit, F5): the card below renders a third
+ * "unknown" badge for it rather than folding the failure into the confident
+ * "order this one" state, which is what a bare `current ?? null` used to do.
  */
 const partsIndex = buildPartsIndex(readParts(entries.map((e) => e.data)));
 
@@ -143,7 +145,19 @@ const parts = entries
     } = entry.data;
     const local = prose[locale];
     const chain = supersessionChain(id, partsIndex);
-    const current = chain?.current ?? null;
+    /**
+     * Three states, not two: `chain === null` is `supersessionChain`'s own
+     * "cannot answer" case (an unknown id, a dangling pointer, a cycle), and
+     * has to stay a third value rather than fold into `current: null` —
+     * which used to read identically to a genuinely standalone, genuinely
+     * current part (T501 audit, F5).
+     */
+    const supersessionStatus: "current" | "superseded" | "unknown" =
+      chain === null
+        ? "unknown"
+        : chain.current.id === id
+          ? "current"
+          : "superseded";
 
     return {
       id,
@@ -162,9 +176,12 @@ const parts = entries
       systemLabel: glossarySystemLabel(strings, system),
       safetyCritical: isSafetyCritical(entry.data),
       quantityPerVehicle: quantityPerVehicle ?? null,
-      /** PRT-02, on the card: is this the number to order, or a replaced one? */
-      superseded: current !== null && current.id !== id,
-      currentNumber: current === null || current.id === id ? null : current,
+      /** PRT-02, on the card: is this the number to order, a replaced one, or unknown? */
+      supersessionStatus,
+      currentNumber:
+        supersessionStatus === "superseded" && chain !== null
+          ? chain.current
+          : null,
       fitment,
       genLabels: expandGenerations(fitment.gens, taxonomy).map((gen) =>
         isKnownGeneration(gen) ? generationLabel(strings, gen) : gen
@@ -284,25 +301,31 @@ const fitmentTable = buildFitmentTable(parts.map((part) => part.fitment));
                   <span
                     class:list={[
                       "part__badge",
-                      part.superseded
-                        ? "part__badge--superseded"
-                        : "part__badge--current",
+                      part.supersessionStatus === "current" &&
+                        "part__badge--current",
+                      part.supersessionStatus === "superseded" &&
+                        "part__badge--superseded",
+                      part.supersessionStatus === "unknown" &&
+                        "part__badge--unknown",
                     ]}
                   >
-                    {part.superseded
-                      ? strings.partsSupersededBadge
-                      : strings.partsCurrentBadge}
+                    {part.supersessionStatus === "current"
+                      ? strings.partsCurrentBadge
+                      : part.supersessionStatus === "superseded"
+                        ? strings.partsSupersededBadge
+                        : strings.partsSupersessionUnknownBadge}
                   </span>
                 </p>
 
-                {part.superseded && part.currentNumber !== null && (
-                  <p class="part__replacement">
-                    <span class="part__number-label">
-                      {strings.partsSupersessionCurrentLabel}
-                    </span>
-                    <span class="datum">{part.currentNumber.oemNumber}</span>
-                  </p>
-                )}
+                {part.supersessionStatus === "superseded" &&
+                  part.currentNumber !== null && (
+                    <p class="part__replacement">
+                      <span class="part__number-label">
+                        {strings.partsSupersessionCurrentLabel}
+                      </span>
+                      <span class="datum">{part.currentNumber.oemNumber}</span>
+                    </p>
+                  )}
 
                 <p class="part__summary">{part.summary}</p>
 
@@ -675,6 +698,18 @@ const fitmentTable = buildFitmentTable(parts.map((part) => part.fitment));
   .part__badge--superseded {
     color: var(--muted-strong);
     background: var(--chip);
+  }
+
+  /*
+   * The third badge state (T501 audit, F5): a chain `supersessionChain`
+   * could not resolve. Dashed, matching `ConfidenceCaveat`'s own "we are not
+   * fully sure" convention (HANDOFF-DESIGN, 1.5px dashed #A99C88) rather than
+   * either confident fill above.
+   */
+  .part__badge--unknown {
+    color: var(--muted-strong);
+    background: var(--panel);
+    border: 1.5px dashed var(--faint);
   }
 
   .part__summary {

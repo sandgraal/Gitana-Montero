@@ -166,7 +166,7 @@ function hrefFor(routePath: string | null): string | null {
 }
 
 /** Everything the chain rows need, including this row's own link and labels. */
-const chainRows = chain.rows.map((row) => ({
+const chainRows = (chain?.rows ?? []).map((row) => ({
   id: row.part.id,
   oemNumber: row.part.oemNumber,
   href:
@@ -177,16 +177,28 @@ const chainRows = chain.rows.map((row) => ({
   isOldest: row.isOldest,
 }));
 
-const otherPredecessors = chain.otherPredecessors.map((part) => ({
+const otherPredecessors = (chain?.otherPredecessors ?? []).map((part) => ({
   id: part.id,
   oemNumber: part.oemNumber,
   href: hrefFor(entryRoutePath("parts", part.id, locale)),
 }));
 
-/** The badge under the title: is this the number to order, or a replaced one? */
-const isCurrentNumber = chainRows.every(
-  (row) => !row.isCurrent || row.id === entryId
-);
+/**
+ * The badge under the title: is this the number to order, a replaced one,
+ * or — when `supersessionView` could not resolve the chain at all —
+ * unknown? `chain === null` is `supersessionChain`'s three "cannot answer"
+ * cases (an unknown id, a dangling pointer, a cycle); the previous version
+ * answered `chainRows.every(...)` over the resulting empty `rows: []`,
+ * which is vacuously `true` — a confident "order this one" derived from
+ * having failed to look (T501 audit, F5). `validate-parts` refuses that
+ * corpus at build time, so this is defense-in-depth, not a live path.
+ */
+const supersessionStatus: "current" | "superseded" | "unknown" =
+  chain === null
+    ? "unknown"
+    : chainRows.every((row) => !row.isCurrent || row.id === entryId)
+      ? "current"
+      : "superseded";
 
 /** Cross-references, joined to their per-locale note by `ref` (PRT-01). */
 const notes = local.crossReferenceNotes ?? {};
@@ -252,13 +264,17 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
         <span
           class:list={[
             "badge",
-            isCurrentNumber ? "badge--current" : "badge--superseded",
+            supersessionStatus === "current" && "badge--current",
+            supersessionStatus === "superseded" && "badge--superseded",
+            supersessionStatus === "unknown" && "badge--unknown",
           ]}
         >
           {
-            isCurrentNumber
+            supersessionStatus === "current"
               ? strings.partsCurrentBadge
-              : strings.partsSupersededBadge
+              : supersessionStatus === "superseded"
+                ? strings.partsSupersededBadge
+                : strings.partsSupersessionUnknownBadge
           }
         </span>
       </p>
@@ -319,7 +335,7 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
        * a list introduced as "each number was replaced by the one after it"
        * reads as "and then these", which is backwards.
        */
-      chain.show && (
+      chain !== null && chain.show && (
         <section class="section" aria-labelledby="supersession-heading">
           <h2 id="supersession-heading">{strings.partsSupersessionHeading}</h2>
           <p class="section__intro">{strings.partsSupersessionIntro}</p>
@@ -483,6 +499,7 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
     --rust-deep: #93441f;
     --green: #3e6b4f;
     --green-tint: #e4efe7;
+    --faint: #a99c88;
     --safety-chip-text: #7a2e2e;
     --safety-chip-bg: #f6e3d8;
     --safety-chip-border: #e4c4b0;
@@ -575,6 +592,18 @@ const indexHref = localeHref(locale, collectionRoutePath("parts", locale));
   .badge--superseded {
     color: var(--muted-strong);
     background: var(--chip);
+  }
+
+  /*
+   * The third badge state (T501 audit, F5): a chain `supersessionView`
+   * could not resolve. Dashed, matching `ConfidenceCaveat`'s own "we are not
+   * fully sure" convention (HANDOFF-DESIGN, 1.5px dashed #A99C88) rather than
+   * either confident fill above.
+   */
+  .badge--unknown {
+    color: var(--muted-strong);
+    background: var(--paper);
+    border: 1.5px dashed var(--faint);
   }
 
   .notice__line {

@@ -228,37 +228,25 @@ describe("the badge on a corpus that resolves", () => {
  * ---------------------------------------------------------------------- */
 
 describe("the detail page never says `order this one` from a failed lookup", () => {
-  it.fails(
-    "a dangling successor does not render the orderable badge in en",
-    async () => {
-      const body = text(await renderDetail("test-dangling", "en"));
-      expect(body).not.toContain(t("en").partsCurrentBadge);
-    }
-  );
+  it("a dangling successor does not render the orderable badge in en", async () => {
+    const body = text(await renderDetail("test-dangling", "en"));
+    expect(body).not.toContain(t("en").partsCurrentBadge);
+  });
 
-  it.fails(
-    "a dangling successor does not render the orderable badge in es",
-    async () => {
-      const body = text(await renderDetail("test-dangling", "es"));
-      expect(body).not.toContain(t("es").partsCurrentBadge);
-    }
-  );
+  it("a dangling successor does not render the orderable badge in es", async () => {
+    const body = text(await renderDetail("test-dangling", "es"));
+    expect(body).not.toContain(t("es").partsCurrentBadge);
+  });
 
-  it.fails(
-    "a part inside a supersession loop does not render the orderable badge in en",
-    async () => {
-      const body = text(await renderDetail("test-loop-a", "en"));
-      expect(body).not.toContain(t("en").partsCurrentBadge);
-    }
-  );
+  it("a part inside a supersession loop does not render the orderable badge in en", async () => {
+    const body = text(await renderDetail("test-loop-a", "en"));
+    expect(body).not.toContain(t("en").partsCurrentBadge);
+  });
 
-  it.fails(
-    "a part inside a supersession loop does not render the orderable badge in es",
-    async () => {
-      const body = text(await renderDetail("test-loop-a", "es"));
-      expect(body).not.toContain(t("es").partsCurrentBadge);
-    }
-  );
+  it("a part inside a supersession loop does not render the orderable badge in es", async () => {
+    const body = text(await renderDetail("test-loop-a", "es"));
+    expect(body).not.toContain(t("es").partsCurrentBadge);
+  });
 });
 
 /* -------------------------------------------------------------------------
@@ -266,41 +254,29 @@ describe("the detail page never says `order this one` from a failed lookup", () 
  * ---------------------------------------------------------------------- */
 
 describe("the index card never says `order this one` from a failed lookup", () => {
-  it.fails(
-    "a dangling successor does not get the current badge in en",
-    async () => {
-      expect(card(await renderIndex("en"), "test-dangling")).not.toContain(
-        "part__badge--current"
-      );
-    }
-  );
+  it("a dangling successor does not get the current badge in en", async () => {
+    expect(card(await renderIndex("en"), "test-dangling")).not.toContain(
+      "part__badge--current"
+    );
+  });
 
-  it.fails(
-    "a dangling successor does not get the current badge in es",
-    async () => {
-      expect(card(await renderIndex("es"), "test-dangling")).not.toContain(
-        "part__badge--current"
-      );
-    }
-  );
+  it("a dangling successor does not get the current badge in es", async () => {
+    expect(card(await renderIndex("es"), "test-dangling")).not.toContain(
+      "part__badge--current"
+    );
+  });
 
-  it.fails(
-    "a part inside a supersession loop does not get the current badge in en",
-    async () => {
-      expect(card(await renderIndex("en"), "test-loop-a")).not.toContain(
-        "part__badge--current"
-      );
-    }
-  );
+  it("a part inside a supersession loop does not get the current badge in en", async () => {
+    expect(card(await renderIndex("en"), "test-loop-a")).not.toContain(
+      "part__badge--current"
+    );
+  });
 
-  it.fails(
-    "a part inside a supersession loop does not get the current badge in es",
-    async () => {
-      expect(card(await renderIndex("es"), "test-loop-a")).not.toContain(
-        "part__badge--current"
-      );
-    }
-  );
+  it("a part inside a supersession loop does not get the current badge in es", async () => {
+    expect(card(await renderIndex("es"), "test-loop-a")).not.toContain(
+      "part__badge--current"
+    );
+  });
 });
 
 /* -------------------------------------------------------------------------

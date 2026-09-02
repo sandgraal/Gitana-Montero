@@ -685,6 +685,15 @@ export interface UiStrings
   /** The badge on the number a reader should order today (PRT-02). */
   readonly partsCurrentBadge: string;
   readonly partsSupersededBadge: string;
+  /**
+   * The third badge state — never merged into {@link partsCurrentBadge} —
+   * for a chain `src/lib/parts/index.ts`'s `supersessionChain` could not
+   * resolve (an unknown id, a dangling pointer, or a cycle). The build
+   * refuses that corpus (`validate-parts`), so this is defense-in-depth; it
+   * exists so "we could not follow this pointer" never renders as the
+   * confident "order this one" badge (T501 audit, F5).
+   */
+  readonly partsSupersessionUnknownBadge: string;
   readonly partsSupersessionHeading: string;
   readonly partsSupersessionIntro: string;
   readonly partsSupersessionOldestLabel: string;
@@ -1085,6 +1094,7 @@ const en: UiStrings = {
   partsFitsLabel: "Fits",
   partsCurrentBadge: "Order this one",
   partsSupersededBadge: "Replaced",
+  partsSupersessionUnknownBadge: "Verify before ordering",
   partsSupersessionHeading: "Supersession chain",
   partsSupersessionIntro:
     "Each number was replaced by the one after it. Only the last one can still be ordered.",
@@ -1555,6 +1565,7 @@ const es: UiStrings = {
   partsFitsLabel: "Le sirve a",
   partsCurrentBadge: "Pida este",
   partsSupersededBadge: "Reemplazado",
+  partsSupersessionUnknownBadge: "Verifique antes de pedir",
   partsSupersessionHeading: "Cadena de reemplazos",
   partsSupersessionIntro:
     "Cada número fue reemplazado por el siguiente. Solo el último se puede pedir hoy.",

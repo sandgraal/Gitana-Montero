@@ -289,12 +289,25 @@ describe("the chain a page renders (PRT-02)", () => {
  * missed the defect the first time.
  */
 describe("what a part page is told to render (PRT-02)", () => {
+  /**
+   * Narrows `SupersessionView | null` for TypeScript across every positive
+   * control below. `supersessionView` returns `null` for the three cases it
+   * cannot resolve (T501 audit, F5) — a resolved fixture returning `null`
+   * would itself be the bug `tests/lib/parts/supersession-unknown-state.test.ts`
+   * exists to catch, so throwing here rather than silently narrowing is the
+   * honest failure mode for a control that stops controlling.
+   */
+  function mustResolve(view: ReturnType<typeof supersessionView>) {
+    if (view === null) throw new Error("expected a resolved view");
+    return view;
+  }
+
   it("shows the section for an ordinary chain", () => {
     const index = buildPartsIndex([
       part("test-parts-alpha", "TEST-A0001", "test-parts-beta"),
       part("test-parts-beta", "TEST-A0002"),
     ]);
-    const view = supersessionView("test-parts-alpha", index);
+    const view = mustResolve(supersessionView("test-parts-alpha", index));
     expect(view.show).toBe(true);
     expect(view.rows.map((row) => row.part.oemNumber)).toEqual([
       "TEST-A0001",
@@ -313,7 +326,7 @@ describe("what a part page is told to render (PRT-02)", () => {
       part("test-parts-beta", "TEST-A0002", "test-parts-gamma"),
       part("test-parts-gamma", "TEST-A0003"),
     ]);
-    const view = supersessionView("test-parts-gamma", index);
+    const view = mustResolve(supersessionView("test-parts-gamma", index));
 
     expect(view.show).toBe(true);
     expect(view.rows).toHaveLength(1);
@@ -331,7 +344,7 @@ describe("what a part page is told to render (PRT-02)", () => {
       part("test-parts-gamma", "TEST-A0003", "test-parts-delta"),
       part("test-parts-delta", "TEST-A0004"),
     ]);
-    const view = supersessionView("test-parts-gamma", index);
+    const view = mustResolve(supersessionView("test-parts-gamma", index));
 
     expect(view.forked).toBe(true);
     // `TEST-A0003` has TEST-A0001 and TEST-A0002 behind it. Labelling it
@@ -342,7 +355,7 @@ describe("what a part page is told to render (PRT-02)", () => {
 
   it("hides the section for a part with no history at all", () => {
     const index = buildPartsIndex([part("test-parts-solo", "TEST-S0001")]);
-    const view = supersessionView("test-parts-solo", index);
+    const view = mustResolve(supersessionView("test-parts-solo", index));
     expect(view.show).toBe(false);
     expect(view.forked).toBe(false);
     expect(view.otherPredecessors).toEqual([]);
@@ -354,20 +367,32 @@ describe("what a part page is told to render (PRT-02)", () => {
       part("test-parts-beta", "TEST-A0002", "test-parts-gamma"),
       part("test-parts-gamma", "TEST-A0003"),
     ]);
-    const view = supersessionView("test-parts-gamma", index);
+    const view = mustResolve(supersessionView("test-parts-gamma", index));
     const rowIds = new Set(view.rows.map((row) => row.part.id));
     for (const other of view.otherPredecessors) {
       expect(rowIds.has(other.id)).toBe(false);
     }
   });
 
-  it("renders nothing for a corpus the build would have rejected", () => {
+  /*
+   * Updated by T501 F5's fix (disclosed here per the grader-edit convention
+   * this file's own header points to): this test used to assert
+   * `.show === false` for a corpus `supersessionChain` cannot resolve, which
+   * was exactly the bug — `supersessionView` folded "we could not answer
+   * this" into the same empty shape a genuinely history-less part gets, and
+   * every reader of that shape (both page templates' `.every([])`) read the
+   * failure as a confident "order this one". `supersessionView` now returns
+   * `null` for these three cases instead, a value distinct from any resolved
+   * view. See `tests/lib/parts/supersession-unknown-state.test.ts` for the
+   * full grader.
+   */
+  it("reports null — not a rendered empty section — for a corpus the build would have rejected", () => {
     const looped = buildPartsIndex([
       part("test-parts-alpha", "TEST-A0001", "test-parts-beta"),
       part("test-parts-beta", "TEST-A0002", "test-parts-alpha"),
     ]);
-    expect(supersessionView("test-parts-alpha", looped).show).toBe(false);
-    expect(supersessionView("test-parts-ghost", looped).show).toBe(false);
+    expect(supersessionView("test-parts-alpha", looped)).toBeNull();
+    expect(supersessionView("test-parts-ghost", looped)).toBeNull();
   });
 });
 

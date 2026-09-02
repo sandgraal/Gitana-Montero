@@ -127,6 +127,9 @@ describe("the layer that already gets this right", () => {
 
   it("still gives a standalone part its own row and no section", () => {
     const view = supersessionView("test-parts-solo", SOLO_INDEX);
+    // Narrows `SupersessionView | null` for TypeScript; a resolved fixture
+    // returning `null` would itself be the bug this file exists to catch.
+    if (view === null) throw new Error("expected a resolved view");
     expect(view.show).toBe(false);
     expect(view.forked).toBe(false);
     // Note the *one* row: a resolved standalone part is not an empty view.
@@ -140,6 +143,7 @@ describe("the layer that already gets this right", () => {
       part("test-parts-beta", "TEST-A0002"),
     ]);
     const view = supersessionView("test-parts-alpha", index);
+    if (view === null) throw new Error("expected a resolved view");
     expect(view.show).toBe(true);
     expect(view.rows.map((row) => row.part.oemNumber)).toEqual([
       "TEST-A0001",
@@ -192,25 +196,19 @@ describe("an unresolvable chain says so (F5)", () => {
     );
   });
 
-  it.fails(
-    "an unknown id is reported as unresolvable, not as an empty view",
-    () => {
-      expect(
-        isUnresolved(supersessionView("test-parts-ghost", SOLO_INDEX))
-      ).toBe(true);
-    }
-  );
+  it("an unknown id is reported as unresolvable, not as an empty view", () => {
+    expect(isUnresolved(supersessionView("test-parts-ghost", SOLO_INDEX))).toBe(
+      true
+    );
+  });
 
-  it.fails(
-    "a dangling pointer is reported as unresolvable, not as an empty view",
-    () => {
-      expect(
-        isUnresolved(supersessionView("test-parts-dangling", DANGLING_INDEX))
-      ).toBe(true);
-    }
-  );
+  it("a dangling pointer is reported as unresolvable, not as an empty view", () => {
+    expect(
+      isUnresolved(supersessionView("test-parts-dangling", DANGLING_INDEX))
+    ).toBe(true);
+  });
 
-  it.fails("a cycle is reported as unresolvable, not as an empty view", () => {
+  it("a cycle is reported as unresolvable, not as an empty view", () => {
     expect(
       isUnresolved(supersessionView("test-parts-loop-a", CYCLE_INDEX))
     ).toBe(true);
@@ -260,25 +258,17 @@ describe("`is this the number to order` is never answered by not looking", () =>
     expect(templateSaysCurrent("test-parts-alpha", index)).toBe(false);
   });
 
-  it.fails(
-    "does not answer `yes` for an id the index has never heard of",
-    () => {
-      expect(templateSaysCurrent("test-parts-ghost", SOLO_INDEX)).not.toBe(
-        true
-      );
-    }
-  );
+  it("does not answer `yes` for an id the index has never heard of", () => {
+    expect(templateSaysCurrent("test-parts-ghost", SOLO_INDEX)).not.toBe(true);
+  });
 
-  it.fails(
-    "does not answer `yes` for a part whose successor nobody wrote",
-    () => {
-      expect(
-        templateSaysCurrent("test-parts-dangling", DANGLING_INDEX)
-      ).not.toBe(true);
-    }
-  );
+  it("does not answer `yes` for a part whose successor nobody wrote", () => {
+    expect(templateSaysCurrent("test-parts-dangling", DANGLING_INDEX)).not.toBe(
+      true
+    );
+  });
 
-  it.fails("does not answer `yes` for a part inside a loop", () => {
+  it("does not answer `yes` for a part inside a loop", () => {
     expect(templateSaysCurrent("test-parts-loop-a", CYCLE_INDEX)).not.toBe(
       true
     );
