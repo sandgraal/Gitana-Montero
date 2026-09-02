@@ -893,7 +893,7 @@ const en: UiStrings = {
   garageIssueOdometerLarge:
     "That reading is higher than any odometer this site accepts.",
   garageBackToVehicles: "All vehicles",
-  garageStatEntries: "Entries",
+  garageStatEntries: "Records",
   garageStatPlanned: "Planned",
   garageStatUnrecorded: "Not recorded",
   garageTabsLabel: "Garage views",
