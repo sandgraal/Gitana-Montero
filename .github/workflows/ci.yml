@@ -258,12 +258,20 @@ jobs:
       # on a run CI declared configured fails the file outright instead. The
       # step above (plain `dist/`, no `E2E_EXPECT_CONFIGURED`) still skips
       # cleanly, and so does `npm run test:e2e` locally.
-      - name: End-to-end (Playwright, garage unreachable — configured build)
+      #
+      # `tests/e2e/hidden-guard.spec.ts` (T2-303 review F10) joins this step
+      # for the same reason: its garage- and sign-in-page cases only exercise
+      # real markup once `SUPABASE_BROWSER_CONFIG` is set, so they need this
+      # build too. Its other cases (glossary, community, problems) already
+      # ran, for real, in the plain-`dist/` step above — this run just adds
+      # its two configured-only pages, and its own `E2E_EXPECT_CONFIGURED`
+      # module-level check follows the same F1 convention.
+      - name: End-to-end (Playwright, garage unreachable + hidden-guard — configured build)
         env:
           E2E_DIST: dist-configured
           E2E_PORT: 4323
           E2E_EXPECT_CONFIGURED: "1"
-        run: npx playwright test tests/e2e/garage-unreachable.spec.ts
+        run: npx playwright test tests/e2e/garage-unreachable.spec.ts tests/e2e/hidden-guard.spec.ts
   # ── Where the deploy job went (T2-102, 002 MIG-02) ──────────────────────
   #
   # A `deploy` job used to live here: on a push to `main`, after all three

@@ -496,6 +496,26 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   `plannedQueue`. Left in place rather than deleted because T2-401's public
   work-log plausibly wants exactly "the plans, soonest first, unadorned"
   without the queue's grouping; if that lands elsewhere, delete it.
+  <br>· **F10 — fixed.** F9 patched three leaking elements per-selector; a
+  follow-up sweep found the same author `display: flex` beating `[hidden]`
+  trap on five more elements this page alone — `[data-garage-app]` itself
+  (a signed-out visitor was served the entire garage application, laid out
+  beneath the sign-in gate), `[data-garage-empty]`, `[data-garage-detail-view]`,
+  `[data-garage-form]` and `[data-garage-record-form]` — plus one on the
+  sign-in page (`[authSegment].astro`'s `.signin__status`, the "You're signed
+  in as ___" line, visible and empty while signed out). This is the fourth
+  time the class has shipped (glossary toolbar, community toolbar,
+  `.garage__gate`, F9's sheet trio), so it is now closed as a class rather
+  than patched again: one scoped rule per page —
+  `.garage [hidden] { display: none !important; }` and
+  `.signin [hidden] { display: none !important; }` — with F9's and the
+  earlier per-selector guards collapsed into it. Graded by
+  `tests/e2e/hidden-guard.spec.ts` (Playwright, `getComputedStyle` over every
+  `[hidden]` element on the garage, sign-in, glossary, community and problems
+  pages, both locales, gated to the configured build for the two pages that
+  need it); mutation-checked by removing the rule — the grader went red on
+  exactly the garage and sign-in cases, both locales, and green again once
+  restored.
 - [ ] **T2-304 [CONTENT+DESIGN]** Gitana Blanca seed — user page #1: owner
   interview (001 T303's content) entered as real records with receipts;
   conductor+owner refine the garage views against it before generalization.
