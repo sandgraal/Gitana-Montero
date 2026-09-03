@@ -70,16 +70,42 @@
  * - a **row per object**, not `records.media_paths text[]` — the array shape
  *   is what carries the lost-update race T2-304 found on `vehicles.photo_paths`
  *
- * ## Two things T2-305 must do beyond deleting `.fails`
+ * ## What T2-305 owes, in full
  *
- * The generic sweeps in `schema-shape.test.ts`, `rls-deny-by-default.test.ts`
- * and `deletion-cascade.test.ts` are driven from `USER_TABLES`, and
- * `record_media` is deliberately **not** in it yet — a contract for a table no
- * migration creates would turn those *unmarked* sweeps red, and an unmarked
- * red is indistinguishable from a broken suite. `PENDING_USER_TABLES` holds it
- * instead, and the marked grader `"record_media is enumerated in USER_TABLES"`
- * below fails until T2-305 promotes it. `contract.ts` spells out the three
- * edits promotion takes.
+ * **Graded here, activated by deleting a `.fails` and nothing else** — the
+ * bucket and its four policies; the MIME allow-list; the `record_media` table,
+ * its columns, its cascade and its closed `media_kind`; RLS enabled *and*
+ * forced with all four commands policed through the vehicle; the independence
+ * of receipt fields; **a delete trigger on `public.records` that reaches the
+ * media bucket and narrows to `old.id`**; and the account purge reaching the
+ * new bucket. The trigger is called out by name here because it is the one
+ * requirement that does not fall out of copying the photos migration —
+ * `on_vehicle_deleted` is a *vehicles* trigger, and cascade-deleting a record
+ * is not the same event.
+ *
+ * **Two things that need an edit beyond a `.fails`:**
+ *
+ * 1. **Promotion.** The generic sweeps in `schema-shape.test.ts`,
+ *    `rls-deny-by-default.test.ts` and `deletion-cascade.test.ts` are driven
+ *    from `USER_TABLES`, and `record_media` is deliberately **not** in it yet
+ *    — a contract for a table no migration creates would turn those *unmarked*
+ *    sweeps red, and an unmarked red is indistinguishable from a broken suite.
+ *    `PENDING_USER_TABLES` holds it instead, and the marked grader
+ *    `"record_media is enumerated in USER_TABLES"` fails until T2-305 promotes
+ *    it. `contract.ts` spells out the three edits promotion takes.
+ * 2. **The ACL.** Supabase's default privileges grant ALL on a new table in
+ *    `public`, and an explicit `grant` adds to that ACL rather than replacing
+ *    it (T2-202's F2). Revoke by name first, then grant the four verbs to
+ *    `authenticated` only, or the anonymous-privilege sweeps go red.
+ *
+ * **Nothing else in this file should need editing.** Every unmarked control
+ * here is written to stay true after T2-305 lands: two of them originally
+ * pinned *today's* migration state — "there is no records delete trigger" and
+ * "record_media is in `PENDING_USER_TABLES`" — which would have forced T2-305
+ * to edit a grader to do the right thing, the separation violation T901 audits
+ * for. Both were rewritten to assert the property rather than the calendar
+ * (review F1). If you find yourself needing to change a grader that is not
+ * marked, that is a defect in this file — say so rather than editing it.
  *
  * ## Expected-failure convention
  *
@@ -103,6 +129,7 @@ import {
   RECORD_MEDIA_KIND_NAMES,
   RECORD_MEDIA_TABLE,
   TEST_TAXONOMY_IDENTITY,
+  USER_TABLES,
   USER_TABLE_NAMES,
   VEHICLE_PHOTOS_BUCKET,
   testRecordMediaPath,
@@ -323,6 +350,75 @@ function parenAfter(statement: string, opener: RegExp): string | null {
   return balancedAt(statement, open)?.inner ?? null;
 }
 
+/**
+ * **Every** top-level tuple after `values`, not just the first.
+ *
+ * A multi-row insert is one statement with several rows —
+ * `values ('receipts', …), ('record-media', …)` — and reading only the first
+ * one and attributing it to every bucket the statement names is a rule that
+ * **fails open**: a migration that restricts `receipts` properly and creates
+ * `record-media` with `allowed_mime_types` null reports the media bucket as
+ * correctly restricted while it accepts any file at all. That is the exact
+ * "private general-purpose file host attached to a truck" this module exists
+ * to prevent, arriving through the module meant to catch it (review F2, and
+ * reproduced before it was fixed).
+ *
+ * The caller picks the right tuple by matching the `id` literal, and falls
+ * back to `unparsed` when it cannot — which is the only honest answer and the
+ * one that fails closed.
+ */
+function valueTuples(statement: string): string[] {
+  const match = /\bvalues\s*\(/.exec(statement);
+  if (!match) return [];
+
+  const tuples: string[] = [];
+  let index = match.index + match[0].length - 1;
+  while (index < statement.length && statement[index] === "(") {
+    const group = balancedAt(statement, index);
+    if (!group) break;
+    tuples.push(group.inner);
+
+    let cursor = group.close + 1;
+    while (cursor < statement.length && /\s/.test(statement[cursor])) {
+      cursor += 1;
+    }
+    if (statement[cursor] !== ",") break;
+    cursor += 1;
+    while (cursor < statement.length && /\s/.test(statement[cursor])) {
+      cursor += 1;
+    }
+    index = cursor;
+  }
+  return tuples;
+}
+
+/**
+ * The one tuple that inserts `bucket`, or `null` when that cannot be decided.
+ *
+ * A single-row insert is unambiguous — the statement names the bucket and has
+ * one row, so that row is the bucket's. Beyond that the row has to be picked
+ * by its `id` literal, and anything that leaves the choice unclear (no `id`
+ * column in the list, no row matching, two rows matching) returns `null` so
+ * the caller can report `unparsed`. Guessing here is what fails open.
+ */
+function tupleFor(
+  tuples: readonly string[],
+  columnNames: readonly string[],
+  bucket: string
+): string | null {
+  if (tuples.length === 1) return tuples[0];
+
+  const idIndex = columnNames.indexOf("id");
+  if (idIndex < 0) return null;
+
+  const matching = tuples.filter((tuple) => {
+    const parts = splitTopLevelItems(tuple);
+    if (idIndex >= parts.length) return false;
+    return parts[idIndex].trim().replace(/^'|'$/g, "") === bucket;
+  });
+  return matching.length === 1 ? matching[0] : null;
+}
+
 /** The `set …` clause of an update, cut at its top-level `where`. */
 function setClause(statement: string): string | null {
   const match = /\bset\b/.exec(statement);
@@ -419,18 +515,28 @@ function mimeRestriction(sql: string, bucket: string): MimeRestriction {
         statement,
         /insert into storage\.buckets\s*\(/
       );
-      const values = parenAfter(statement, /\bvalues\s*\(/);
-      if (columns === null || values === null) {
+      const tuples = valueTuples(statement);
+      if (columns === null || tuples.length === 0) {
         current = {
           state: "unparsed",
           raw: `insert without a readable column list: ${statement.slice(0, 120)}`,
         };
       } else {
         const names = splitTopLevelItems(columns).map((name) => name.trim());
-        const exprs = splitTopLevelItems(values);
-        const index = names.indexOf("allowed_mime_types");
-        if (index >= 0 && index < exprs.length) {
-          current = readMimeExpression(exprs[index], current);
+        const row = tupleFor(tuples, names, bucket);
+        if (row === null) {
+          current = {
+            state: "unparsed",
+            raw:
+              `a multi-row insert names ${bucket} but no single row can be ` +
+              `attributed to it: ${statement.slice(0, 120)}`,
+          };
+        } else {
+          const exprs = splitTopLevelItems(row);
+          const index = names.indexOf("allowed_mime_types");
+          if (index >= 0 && index < exprs.length) {
+            current = readMimeExpression(exprs[index], current);
+          }
         }
       }
       const conflict = assignedExpression(statement, "allowed_mime_types");
@@ -860,12 +966,39 @@ describe("deleting a record reaches its media objects", () => {
     ).toBe(true);
   });
 
-  it("POSITIVE CONTROL: there is no records delete trigger today", () => {
-    // The starting state, asserted rather than assumed — this is the gap
-    // T2-302 named for receipts and left open, and the reason the media path
-    // carries a record id at all. If this ever passes unexpectedly, the marked
-    // graders below stopped meaning what they say.
-    expect(deleteTriggerOn(migrationSql(), "records")).toBeUndefined();
+  it("POSITIVE CONTROL: the trigger finder discriminates by table", () => {
+    // Graded against **synthetic** DDL carrying only a vehicles trigger, not
+    // against today's migration directory.
+    //
+    // The first version asserted `deleteTriggerOn(migrationSql(), "records")`
+    // is undefined — true today, and a trap: it is unmarked, so T2-305 would
+    // have had to *edit a grader* to add the very trigger the marked graders
+    // below demand, which is the separation violation T901 audits for (review
+    // F1). The claim worth making is about the finder, not about the calendar:
+    // a trigger on one table must not be mistaken for a trigger on another,
+    // which is what makes "no records trigger" mean something. That claim
+    // stays true forever, before and after T2-305.
+    const onlyVehicles = normalizeSql(`
+      create trigger on_vehicle_deleted
+        after delete on public.vehicles
+        for each row execute function public.handle_vehicle_deleted();
+    `);
+
+    expect(deleteTriggerOn(onlyVehicles, "vehicles")).toBeDefined();
+    expect(deleteTriggerOn(onlyVehicles, "records")).toBeUndefined();
+  });
+
+  it("POSITIVE CONTROL: the finder does not mistake an insert trigger for a delete one", () => {
+    // The other way the finder could report a false positive, and the one
+    // that would make the marked graders below pass over a records trigger
+    // that never fires on a delete.
+    const insertOnly = normalizeSql(`
+      create trigger on_record_created
+        after insert on public.records
+        for each row execute function public.handle_record_created();
+    `);
+
+    expect(deleteTriggerOn(insertOnly, "records")).toBeUndefined();
   });
 
   it.fails("a delete trigger exists on public.records", () => {
@@ -913,10 +1046,20 @@ describe("deleting a record reaches its media objects", () => {
  * ====================================================================== */
 
 describe("record_media joins the tables every generic sweep already covers", () => {
-  it("POSITIVE CONTROL: it is declared, pending, and not silently forgotten", () => {
-    // Unmarked. `PENDING_USER_TABLES` is the difference between "declared,
-    // waiting for a migration" and "nobody wrote a contract for this".
-    expect(PENDING_USER_TABLES.map((table) => table.name)).toContain(TABLE);
+  it("POSITIVE CONTROL: it is declared somewhere, not silently forgotten", () => {
+    // Unmarked, and asserted against **both** lists on purpose.
+    //
+    // The first version asserted membership in `PENDING_USER_TABLES` alone,
+    // which is true today and goes red the moment T2-305 does exactly the
+    // promotion `contract.ts` prescribes — an unmarked grader that punishes
+    // the correct implementation and leaves no route to green but editing a
+    // grader (review F1). The claim that actually matters is "a contract for
+    // this table exists", and *where* it is recorded is what the marked
+    // grader below tracks. Together they still distinguish all three states:
+    // declared-and-promoted, declared-but-pending, and forgotten.
+    expect(
+      [...USER_TABLES, ...PENDING_USER_TABLES].map((table) => table.name)
+    ).toContain(TABLE);
     expect(RECORD_MEDIA_TABLE.ownershipPath).toEqual([
       "record_id",
       "vehicle_id",
@@ -1763,6 +1906,94 @@ describe("the MIME rule reads an end state, not a spelling", () => {
       types: [],
     });
     expect(issues).toContain("is empty — nothing can be uploaded");
+  });
+
+  it("MUTATION: a multi-row insert cannot hide a wide-open bucket (F2)", () => {
+    // The reviewer's reproduction, pinned so it cannot come back. One
+    // statement, two rows: `receipts` restricted to exactly the three declared
+    // categories, and `record-media` created with `allowed_mime_types` null —
+    // a bucket that accepts any file at all.
+    //
+    // Reading only the first tuple attributed the *receipts* restriction to
+    // `record-media` and reported it clean, so the marked grader
+    // "restricts the bucket to photo, video and audio and nothing else"
+    // PASSED over a private general-purpose file host. Failing open, in the
+    // one rule whose whole job is to catch that.
+    const multiRow = normalizeSql(`
+      insert into storage.buckets (id, name, public, allowed_mime_types)
+      values
+        ('receipts', 'receipts', false, array['image/jpeg', 'video/mp4', 'audio/mp4']),
+        ('record-media', 'record-media', false, null);
+    `);
+
+    expect(mimeRestriction(multiRow, BUCKET).state).toBe("unrestricted");
+    expect(mimeRestrictionIssues(multiRow, BUCKET).join(" ")).toContain(
+      "ends as null"
+    );
+    // And the other row is still read as its own row, not as this one's.
+    expect(mimeRestriction(multiRow, RECEIPTS_BUCKET)).toEqual({
+      state: "restricted",
+      types: ["image/jpeg", "video/mp4", "audio/mp4"],
+    });
+  });
+
+  it("picks the right row out of a multi-row insert when it is correct", () => {
+    // The positive control for the same code path: the fix must not turn
+    // every multi-row insert into a finding, or a perfectly ordinary
+    // two-bucket migration could never go green.
+    const multiRow = normalizeSql(`
+      insert into storage.buckets (id, name, public, allowed_mime_types)
+      values
+        ('receipts', 'receipts', false, array['image/jpeg', 'application/pdf']),
+        ('record-media', 'record-media', false, array['image/jpeg', 'video/mp4', 'audio/mp4']);
+    `);
+
+    expect(mimeRestrictionIssues(multiRow, BUCKET)).toEqual([]);
+    expect(
+      mimeRestrictionIssues(multiRow, RECEIPTS_BUCKET).join(" | ")
+    ).toContain("allows application/pdf");
+  });
+
+  it("refuses to guess when a multi-row insert has no id column", () => {
+    // Positional-ish: the rows cannot be attributed to a bucket without an
+    // `id` in the column list, so the answer is "we could not check" rather
+    // than whichever row happened to be first.
+    const headless = normalizeSql(`
+      insert into storage.buckets (name, public, allowed_mime_types)
+      values
+        ('receipts', false, array['image/jpeg', 'video/mp4', 'audio/mp4']),
+        ('record-media', false, null);
+    `);
+
+    expect(mimeRestriction(headless, BUCKET).state).toBe("unparsed");
+    expect(mimeRestrictionIssues(headless, BUCKET).join(" ")).toContain(
+      "cannot read"
+    );
+  });
+
+  it("refuses to guess when two rows claim the same bucket", () => {
+    // Legal SQL that would fail at runtime on the primary key, but a grader
+    // asked an ambiguous question must not answer it confidently.
+    const duplicated = normalizeSql(`
+      insert into storage.buckets (id, name, public, allowed_mime_types)
+      values
+        ('record-media', 'record-media', false, array['image/jpeg', 'video/mp4', 'audio/mp4']),
+        ('record-media', 'record-media', false, null);
+    `);
+
+    expect(mimeRestriction(duplicated, BUCKET).state).toBe("unparsed");
+  });
+
+  it("still reads a plain single-row insert with no id column", () => {
+    // The single-row case stays unambiguous: the statement names the bucket
+    // and has exactly one row, so tightening the multi-row path must not
+    // regress it.
+    const single = normalizeSql(`
+      insert into storage.buckets (name, public, allowed_mime_types)
+      values ('record-media', false, array['image/jpeg', 'video/mp4', 'audio/mp4']);
+    `);
+
+    expect(mimeRestrictionIssues(single, BUCKET)).toEqual([]);
   });
 
   it("refuses to guess at an insert with no column list", () => {
