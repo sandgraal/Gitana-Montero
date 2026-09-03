@@ -543,8 +543,8 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   production via the conductor's Supabase connection, with the owner's
   explicit sign-off on that write path; the 12th photo silently failed to
   reach storage (not a data-loss risk — nothing references it) and is a
-  loose end if anyone wants to chase it. **A real bug found in the process,
-  not yet ticketed:** uploading vehicle photos back-to-back fast enough
+  loose end if anyone wants to chase it. **A real bug found in the process
+  (ticketed below as T2-305):** uploading vehicle photos back-to-back fast enough
   triggers a lost-update race on `vehicles.photo_paths` — one upload's
   read-modify-write of the array can clobber another's, leaving a real
   storage object with no `photo_paths` entry pointing at it (recovered by
