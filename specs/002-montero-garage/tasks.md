@@ -553,7 +553,7 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   instead of a client-computed replacement array, or a serialized upload
   queue.
 
-- [ ] **T2-305a [TEST]** Graders for record media attachments (GAR-06′):
+- [x] **T2-305a [TEST]** Graders for record media attachments (GAR-06′):
   a private bucket for photo/video/audio; RLS scoped to owner via the
   vehicle→owner ownership path (same shape as T2-301a's photos and receipts);
   `allowed_mime_types` restricted to the three declared kinds only; a
