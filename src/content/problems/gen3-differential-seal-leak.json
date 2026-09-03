@@ -17,10 +17,18 @@
     "whine-that-changes-with-road-speed"
   ],
   "causes": [
-    { "id": "pinion-seal-hardened" },
-    { "id": "side-shaft-seal-hardened" },
-    { "id": "breather-blocked-and-pressurising-the-housing" },
-    { "id": "differential-already-damaged-by-low-oil" }
+    {
+      "id": "pinion-seal-hardened"
+    },
+    {
+      "id": "side-shaft-seal-hardened"
+    },
+    {
+      "id": "breather-blocked-and-pressurising-the-housing"
+    },
+    {
+      "id": "differential-already-damaged-by-low-oil"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -77,7 +85,7 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "Luso Overland — MONTERO Gen3 Differential Seal (front, pinion and side positions; MB393883, MB664285, MR350883, MR580530)",
+      "title": "Luso Overland — MONTERO Gen3 Differential Seal, four positions (MB393883, MB664285, MR350883, MR580530)",
       "url": "https://lusooverland.com/VP-MMC-M3-DS",
       "archiveUrl": "https://web.archive.org/web/20260902210034id_/https://lusooverland.com/VP-MMC-M3-DS",
       "accessed": "2026-09-02",
@@ -117,7 +125,7 @@
       "fixPaths": {
         "clear-the-breather-and-top-up": {
           "title": "Clear the breather and correct the level",
-          "detail": "The cheapest possible outcome, and it costs an hour to rule in. Do it before ordering seals, not after."
+          "detail": "The cheapest possible outcome, and it costs an hour to confirm. Do it before ordering seals, not after."
         },
         "replace-the-leaking-seal": {
           "title": "Replace the seal the trail points at",
@@ -154,7 +162,7 @@
       "fixPaths": {
         "clear-the-breather-and-top-up": {
           "title": "Destapar el respiradero y corregir el nivel",
-          "detail": "Es el desenlace más barato posible y cuesta una hora descartarlo. Hágalo antes de pedir retenedores, no después."
+          "detail": "Es el desenlace más barato posible y cuesta una hora confirmarlo. Hágalo antes de pedir retenedores, no después."
         },
         "replace-the-leaking-seal": {
           "title": "Cambiar el retenedor que señala el rastro",

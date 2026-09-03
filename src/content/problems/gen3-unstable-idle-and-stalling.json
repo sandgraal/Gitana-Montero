@@ -17,10 +17,18 @@
     "check-engine-light-with-a-misfire-code"
   ],
   "causes": [
-    { "id": "idle-air-control-dirty-or-failing" },
-    { "id": "vacuum-leak-at-the-intake" },
-    { "id": "worn-plugs-coils-or-leads" },
-    { "id": "fuel-delivery-restricted" }
+    {
+      "id": "idle-air-control-dirty-or-failing"
+    },
+    {
+      "id": "vacuum-leak-at-the-intake"
+    },
+    {
+      "id": "worn-plugs-coils-or-leads"
+    },
+    {
+      "id": "fuel-delivery-restricted"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -94,24 +102,17 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year (ODI 10041117, 10010812, 10003369, 10046283, 8008732: idle vibration, stalling, idle speed control replacement)",
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filings (ODI 10041117, 10010812, 10003369, 10398763, 10193583: idle vibration, stalling, idle control valve replacement)",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
       "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
       "accessed": "2026-09-02",
       "kind": "reference"
-    },
-    {
-      "title": "Luso Overland — MITSUBISHI / MONTERO Gen 3 (2001-2006) / Parts catalogue listing",
-      "url": "https://lusooverland.com/mitsubishi/montero-g3/parts/",
-      "archiveUrl": "https://web.archive.org/web/20260902210157id_/https://lusooverland.com/mitsubishi/montero-g3/parts/",
-      "accessed": "2026-09-02",
-      "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
       "title": "Shakes at idle and stalls at a stop",
-      "summary": "A recognisable cluster in the owner-complaint record for this generation: the engine vibrates at a standstill, the tachometer needle sinks towards zero as though the engine is about to die, and it either catches itself or stalls and restarts without drama. Several owners describe dealers replacing plugs and leads, then an idle speed control, before the fault settled. That history is the useful part — it says the symptom has more than one cause and that parts-swapping in the dark is expensive. The triage is drive-gently-repair-soon rather than drive-normally for one reason: an engine that stalls unpredictably will eventually do it pulling into traffic, and a stall takes the power steering assist and the brake booster pump with it. Get the codes read before anybody sells you an ignition service.",
+      "summary": "A recognisable cluster in the owner-complaint record for this generation: the engine vibrates at a standstill, the tachometer needle sinks towards zero as though the engine is about to die, and it either catches itself or stalls and restarts without drama. Several owners describe dealers replacing plugs and leads, then an idle control valve, before the fault settled; one lists plugs, wires, coils, a timing belt, an idler pulley and a thermostat and still had a check engine light. That history is the useful part — it says the symptom has more than one cause and that parts-swapping in the dark is expensive. The triage is drive-gently-repair-soon rather than drive-normally for one reason: an engine that stalls unpredictably will eventually do it pulling into traffic. Get the codes read before anybody sells you an ignition service.",
       "slug": "shakes-at-idle-and-stalls",
       "symptoms": {
         "engine-shakes-at-idle-and-nearly-stalls": "The engine shakes at idle and feels as if it is about to die",
@@ -147,13 +148,13 @@
         },
         "service-the-fuel-filter-and-check-delivery": {
           "title": "Service the fuel side and measure delivery",
-          "detail": "Last on the list because it is the most invasive, but a starved engine and a mis-fuelled one feel similar from the driver's seat."
+          "detail": "Last on the list because it is the most invasive, but an engine starved of fuel and one running on bad fuel feel similar from the driver's seat."
         }
       }
     },
     "es": {
       "title": "Tiembla en marcha mínima y se apaga en los altos",
-      "summary": "Es un grupo reconocible dentro del registro de quejas de dueños de esta generación: el motor vibra con el vehículo detenido, la aguja del tacómetro se cae hacia cero como si se fuera a apagar, y o se recupera sola o se apaga y vuelve a arrancar sin drama. Varios dueños describen concesionarios que cambiaron bujías y cables, luego un control de marcha mínima, y hasta entonces se calmó la falla. Esa historia es la parte útil: dice que el síntoma tiene más de una causa y que cambiar repuestos a ciegas sale caro. La clasificación es manejar suave y reparar pronto, y no manejar normal, por una razón: un motor que se apaga sin avisar tarde o temprano lo va a hacer al incorporarse al tráfico, y al apagarse se lleva consigo la asistencia de la dirección hidráulica y la bomba del booster de freno. Haga leer los códigos antes de que alguien le venda un servicio de encendido.",
+      "summary": "Es un grupo reconocible dentro del registro de quejas de dueños de esta generación: el motor vibra con el vehículo detenido, la aguja del tacómetro se cae hacia cero como si se fuera a apagar, y o se recupera sola o se apaga y vuelve a arrancar sin drama. Varios dueños describen concesionarios que cambiaron bujías y cables, luego una válvula de marcha mínima, y hasta entonces se calmó la falla; uno enumera bujías, cables, bobinas, faja de distribución, polea loca y termostato y aun así seguía con la luz de check encendida. Esa historia es la parte útil: dice que el síntoma tiene más de una causa y que cambiar repuestos a ciegas sale caro. La clasificación es manejar suave y reparar pronto, y no manejar normal, por una razón: un motor que se apaga sin avisar tarde o temprano lo va a hacer al incorporarse al tráfico. Haga leer los códigos antes de que alguien le venda un servicio de encendido.",
       "slug": "tiembla-en-marcha-minima-y-se-apaga",
       "symptoms": {
         "engine-shakes-at-idle-and-nearly-stalls": "El motor tiembla en marcha mínima y se siente como si se fuera a apagar",
@@ -189,7 +190,7 @@
         },
         "service-the-fuel-filter-and-check-delivery": {
           "title": "Atender el lado de combustible y medir la entrega",
-          "detail": "Va de último porque es lo más invasivo, pero un motor con hambre de combustible y uno mal encendido se sienten parecido desde el asiento del chofer."
+          "detail": "Va de último porque es lo más invasivo, pero un motor con hambre de combustible y uno andando con combustible malo se sienten parecido desde el asiento del chofer."
         }
       }
     }

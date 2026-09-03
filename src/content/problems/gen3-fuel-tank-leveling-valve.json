@@ -17,8 +17,12 @@
     "it-only-happens-with-a-full-tank"
   ],
   "causes": [
-    { "id": "leveling-valve-not-sealing" },
-    { "id": "filler-neck-or-hose-perished" }
+    {
+      "id": "leveling-valve-not-sealing"
+    },
+    {
+      "id": "filler-neck-or-hose-perished"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -84,17 +88,17 @@
       "kind": "vendor"
     },
     {
-      "title": "Luso Overland — MITSUBISHI / MONTERO Gen 3 (2001-2006) / Parts catalogue listing",
-      "url": "https://lusooverland.com/mitsubishi/montero-g3/parts/",
-      "archiveUrl": "https://web.archive.org/web/20260902210157id_/https://lusooverland.com/mitsubishi/montero-g3/parts/",
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filings (ODI 769049, 10105501: fuel leaking at the rear wheel well on three separate occasions, and a leak that returned after the campaign repair)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
       "accessed": "2026-09-02",
-      "kind": "vendor"
+      "kind": "reference"
     }
   ],
   "prose": {
     "en": {
       "title": "Fuel leaks onto the ground with a full tank on a slope",
-      "summary": "A factory safety recall, and one of the few faults on this truck that can start a fire without any warning light. The campaign describes it exactly: with the tank full and the vehicle parked facing forward on an upward slope, the fuel tank leveling valve may stop sealing if the fuel expands as the ambient temperature rises, and fuel can then leak onto the ground. The manufacturer's stated consequence is fire in the presence of an ignition source, and the remedy was to replace the valve. The pattern is what identifies it: no leak on level ground, no leak with half a tank, a puddle and a smell after the truck has sat nose-up in the sun on a full one. Costa Rican driveways and parking spots are rarely level, which makes this a more likely find here than the campaign's home market would suggest.",
+      "summary": "A factory safety recall, and one of the few faults on this truck that can start a fire without any warning light. The campaign describes it exactly: with the tank full and the vehicle parked facing forward on an upward slope, the fuel tank leveling valve may stop sealing if the fuel expands as the ambient temperature rises, and fuel can then leak onto the ground. The manufacturer's stated consequence is fire in the presence of an ignition source, and the remedy was to replace the valve. The pattern is what identifies it: no leak on level ground, no leak with half a tank, a puddle and a smell after the truck has sat nose-up in the sun on a full one. It is worth knowing that owners also report fuel leaking at the rear wheel well without that pattern, and one reports a leak that came back after the campaign repair — so a smell of fuel that does not fit the slope-and-full-tank picture still needs finding. Costa Rican driveways and parking spots are rarely level, which makes this a more likely find here than the campaign's home market would suggest.",
       "slug": "fuel-leak-full-tank-on-a-slope",
       "symptoms": {
         "petrol-smell-when-parked-facing-uphill": "A strong petrol smell after the truck has been parked nose-up",
@@ -103,7 +107,7 @@
       },
       "causes": {
         "leveling-valve-not-sealing": "The fuel tank leveling valve is no longer sealing as the fuel expands",
-        "filler-neck-or-hose-perished": "The filler neck or the rubber filler hose has perished and is weeping"
+        "filler-neck-or-hose-perished": "Another leak path in the tank plumbing — the filler neck, the rubber filler hose, or a fitting at the rear wheel well"
       },
       "diagnosticSteps": {
         "fill-the-tank-then-park-facing-uphill": "Fill the tank, park facing up a slope in the sun, and come back to look underneath",
@@ -127,7 +131,7 @@
     },
     "es": {
       "title": "Fuga de combustible con el tanque lleno en una cuesta",
-      "summary": "Es una campaña de seguridad de fábrica, y una de las pocas fallas de este vehículo que puede provocar un incendio sin encender ninguna luz de advertencia. La campaña la describe con precisión: con el tanque lleno y el vehículo parqueado de frente en una subida, la válvula niveladora del tanque puede dejar de sellar si el combustible se dilata al subir la temperatura ambiente, y entonces el combustible se derrama al suelo. La consecuencia que declara el fabricante es fuego si hay una fuente de ignición cerca, y la solución fue cambiar la válvula. Lo que la identifica es el patrón: no gotea en plano, no gotea con medio tanque, y aparece el charco y el olor cuando el carro pasó rato con la trompa arriba, al sol y con el tanque lleno. En Costa Rica los parqueos y las entradas de casa rara vez son planos, así que aquí es un hallazgo más probable de lo que sugeriría el mercado donde salió la campaña.",
+      "summary": "Es una campaña de seguridad de fábrica, y una de las pocas fallas de este vehículo que puede provocar un incendio sin encender ninguna luz de advertencia. La campaña la describe con precisión: con el tanque lleno y el vehículo parqueado de frente en una subida, la válvula niveladora del tanque puede dejar de sellar si el combustible se dilata al subir la temperatura ambiente, y entonces el combustible se derrama al suelo. La consecuencia que declara el fabricante es fuego si hay una fuente de ignición cerca, y la solución fue cambiar la válvula. Lo que la identifica es el patrón: no gotea en plano, no gotea con medio tanque, y aparece el charco y el olor cuando el carro pasó rato con la trompa arriba, al sol y con el tanque lleno. Conviene saber que también hay dueños que reportan fuga de combustible en el pase de rueda trasero sin ese patrón, y uno reporta una fuga que volvió después de la reparación de la campaña: un olor a combustible que no calce con el cuadro de la cuesta y el tanque lleno igual hay que ubicarlo. En Costa Rica los parqueos y las entradas de casa rara vez son planos, así que aquí es un hallazgo más probable de lo que sugeriría el mercado donde salió la campaña.",
       "slug": "fuga-de-combustible-tanque-lleno-en-cuesta",
       "symptoms": {
         "petrol-smell-when-parked-facing-uphill": "Olor fuerte a gasolina después de que el carro estuvo parqueado con la trompa hacia arriba",
@@ -136,7 +140,7 @@
       },
       "causes": {
         "leveling-valve-not-sealing": "La válvula niveladora del tanque ya no sella cuando el combustible se dilata",
-        "filler-neck-or-hose-perished": "El cuello de llenado o la manguera de hule de llenado está reseca y rezuma"
+        "filler-neck-or-hose-perished": "Otra vía de fuga en la tubería del tanque: el cuello de llenado, la manguera de hule de llenado, o una conexión en el pase de rueda trasero"
       },
       "diagnosticSteps": {
         "fill-the-tank-then-park-facing-uphill": "Llene el tanque, parquee de frente en una subida al sol y vuelva a revisar por debajo",

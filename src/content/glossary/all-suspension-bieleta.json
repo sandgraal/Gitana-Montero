@@ -1,5 +1,5 @@
 {
-  "id": "all-suspension-tensor-de-barra-estabilizadora",
+  "id": "all-suspension-bieleta",
   "fitment": {
     "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
   },
@@ -36,14 +36,14 @@
       "countries": ["US"]
     },
     {
-      "term": "bieleta",
+      "term": "tensor de barra estabilizadora",
       "locale": "es",
-      "countries": ["ES", "AR"]
+      "countries": ["CO", "AR"]
     },
     {
-      "term": "bieletas",
+      "term": "tensores de barra estabilizadora",
       "locale": "es",
-      "countries": ["ES", "AR"]
+      "countries": ["CO", "AR"]
     },
     {
       "term": "terminal de barra estabilizadora",
@@ -63,10 +63,10 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "Grupo Navcar (Costa Rica) — Tornillo Barra Estabilizadora, Chevrolet Trooper / Mitsubishi Montero (OEM MB-527385)",
-      "url": "https://www.gruponavcar.com/tornillo-barra-estabilizadora-chevrolet-trooper-mitsubishi-montero-mb527385/p",
-      "archiveUrl": "https://web.archive.org/web/20260902210517id_/https://www.gruponavcar.com/tornillo-barra-estabilizadora-chevrolet-trooper-mitsubishi-montero-mb527385/p",
-      "accessed": "2026-09-02",
+      "title": "Mitsubishi-Repuestos — «Terminales de la barra estabilizadora (bieletas) - PAR», catálogo en español para Mitsubishi Montero, Montero Sport, Nativa y Challenger",
+      "url": "https://mitsubishi-repuestos.com/repuestos-mitsubishi-montero-sport/46288-terminales-de-la-barra-estabilizadora-bieletas-par.html",
+      "archiveUrl": "https://web.archive.org/web/20260903020443id_/https://mitsubishi-repuestos.com/repuestos-mitsubishi-montero-sport/46288-terminales-de-la-barra-estabilizadora-bieletas-par.html",
+      "accessed": "2026-09-03",
       "kind": "vendor"
     },
     {
@@ -80,11 +80,11 @@
   "prose": {
     "en": {
       "title": "sway bar link",
-      "summary": "The short link, with a ball joint at each end, that connects the sway bar to the suspension at one corner. Left and right are usually different parts. A worn one knocks over small bumps and is one of the first noises a heavy truck develops."
+      "summary": "The short link, with a ball joint at each end, that connects the sway bar to the suspension at one corner. Left and right are usually different parts. A worn one knocks over small bumps and is one of the first noises a heavy truck develops. Spanish-language parts catalogues for the Montero list it as a bieleta."
     },
     "es": {
-      "title": "tensor de barra estabilizadora",
-      "summary": "El tensor corto, con una rótula en cada punta, que une la barra estabilizadora con la suspensión en una esquina del vehículo. El izquierdo y el derecho suelen ser piezas distintas. Cuando se gasta suena al pasar huecos pequeños, y es de los primeros ruidos que agarra un vehículo pesado. En las listas de repuestos ticas también aparece por el tornillo que lo sujeta, como tornillo de barra estabilizadora."
+      "title": "bieleta",
+      "summary": "La pieza corta, con una rótula en cada punta, que une la barra estabilizadora con la suspensión en una esquina del vehículo. La izquierda y la derecha suelen ser piezas distintas. Cuando se gasta suena al pasar huecos pequeños, y es de los primeros ruidos que agarra un vehículo pesado. Pídala así, como bieleta: es el término con que la listan los catálogos de repuestos Mitsubishi en español."
     }
   }
 }

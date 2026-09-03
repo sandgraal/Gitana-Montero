@@ -18,9 +18,15 @@
     "it-showed-up-while-towing-or-on-a-lifted-truck"
   ],
   "causes": [
-    { "id": "companion-shaft-circlip-letting-the-shaft-creep-out" },
-    { "id": "shaft-seal-hardened-and-leaking" },
-    { "id": "differential-damaged-by-running-low-on-oil" }
+    {
+      "id": "companion-shaft-circlip-letting-the-shaft-creep-out"
+    },
+    {
+      "id": "shaft-seal-hardened-and-leaking"
+    },
+    {
+      "id": "differential-damaged-by-running-low-on-oil"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -86,7 +92,7 @@
       "procedures": []
     }
   ],
-  "confidence": "community-consensus",
+  "confidence": "anecdotal",
   "sources": [
     {
       "title": "Pajero 4WD Club of Victoria — «NP Diff Problems» (rear axle shaft creeping out of the differential; MMAL field service notice and revised companion shafts)",
@@ -106,7 +112,7 @@
   "prose": {
     "en": {
       "title": "Rear axle shaft creeping out of the differential",
-      "summary": "Australian-market owners describe this one in detail: a shaft works its way partway out of the rear differential, gear oil escapes past it, and the first sign is usually the smell and a stain rather than a noise. Mitsubishi Australia issued a field service notice rather than a recall — meaning the revised companion shafts, fitted with heavier retaining circlips, are supplied when a shaft actually fails rather than pre-emptively. One dealer in the thread had seen around twenty of them. The reported pattern is towing heavy loads, a lift, or both. A healthy shaft has a few millimetres of movement at the differential; a failing one moves in and out to the limit of the constant-velocity joints, and that difference is the test. This is scoped as do-not-drive for the component rather than for the driver: nobody gets hurt, but a differential run without oil stops being a shaft-and-seal job and starts being a differential.",
+      "summary": "Australian-market owners describe this one in detail: a shaft works its way partway out of the rear differential, gear oil escapes past it, and the first sign is usually the smell and a stain rather than a noise. Mitsubishi Australia issued a field service notice rather than a recall — meaning the revised companion shafts, fitted with heavier retaining circlips, are supplied when a shaft actually fails rather than pre-emptively. One dealer in the thread had seen around twenty of them, and a second owner in the same thread was one of that dealer's cases. The reported pattern is towing heavy loads, a lift, or both. A healthy shaft has a few millimetres of movement at the differential; a failing one moves in and out to the limit of the constant-velocity joints, and that difference is the test. Read the tier on this entry before you act on it: everything here comes from one forum thread, which is why it is filed as an owner account rather than as settled community knowledge. It is scoped as do-not-drive for the component rather than for the driver — nobody gets hurt, but a differential run without oil stops being a shaft-and-seal job and starts being a differential.",
       "slug": "rear-axle-shaft-creeping-out-of-the-differential",
       "symptoms": {
         "gear-oil-smell-and-a-stain-at-the-rear-differential": "The distinct smell of gear oil, and a stain around the shaft where it enters the differential",
@@ -132,7 +138,7 @@
         },
         "fit-the-revised-companion-shafts": {
           "title": "Fit the revised companion shafts",
-          "detail": "The revised parts carry heavier retaining circlips. Owners report the change itself as quick once the parts are in hand; the cost is in the shafts, not the labour."
+          "detail": "Order them by the name the manufacturer uses — companion shaft — because an ordinary rear shaft is not the revised part. The revised parts carry heavier retaining circlips. Owners report the change itself as quick once the parts are in hand; the cost is in the shafts, not the labour."
         },
         "rebuild-or-replace-the-differential": {
           "title": "Rebuild or replace the differential",
@@ -142,33 +148,33 @@
     },
     "es": {
       "title": "El palier trasero se sale poco a poco del diferencial",
-      "summary": "Los dueños del mercado australiano describen esta falla con detalle: un palier se va saliendo parcialmente del diferencial trasero, el aceite de engranajes se escapa por ahí, y la primera seña suele ser el olor y la mancha, no un ruido. Mitsubishi Australia emitió un aviso de servicio en campo y no un llamado a revisión, lo que significa que los ejes revisados, con anillos de retención más gruesos, se entregan cuando un eje falla de verdad y no de forma preventiva. Un concesionario mencionado en el hilo llevaba unos veinte casos. El patrón reportado es remolcar cargas pesadas, tener levante de suspensión, o ambas cosas. Un eje sano tiene unos pocos milímetros de movimiento en el diferencial; uno malo entra y sale hasta el tope de las puntas de eje, y esa diferencia es la prueba. Esto se clasifica como no manejar por la pieza y no por la persona: nadie sale lastimado, pero un diferencial que corre sin aceite deja de ser un trabajo de eje y retenedor para volverse un diferencial completo.",
+      "summary": "Los dueños del mercado australiano describen esta falla con detalle: un palier se va saliendo parcialmente del diferencial trasero, el aceite de engranajes se escapa por ahí, y la primera seña suele ser el olor y la mancha, no un ruido. Mitsubishi Australia emitió un aviso de servicio en campo y no un llamado a revisión, lo que significa que los paliers revisados —los que la fábrica llama companion shafts, con anillos de retención más gruesos— se entregan cuando un palier falla de verdad y no de forma preventiva. Un concesionario mencionado en el hilo llevaba unos veinte casos, y un segundo dueño del mismo hilo fue uno de esos casos. El patrón reportado es remolcar cargas pesadas, tener levante de suspensión, o ambas cosas. Un palier sano tiene unos pocos milímetros de movimiento en el diferencial; uno malo entra y sale hasta el tope de las puntas de eje, y esa diferencia es la prueba. Lea el nivel de confianza de esta entrada antes de actuar: todo esto sale de un solo hilo de foro, y por eso queda archivado como el relato de unos dueños y no como conocimiento asentado de la comunidad. Se clasifica como no manejar por la pieza y no por la persona: nadie sale lastimado, pero un diferencial que corre sin aceite deja de ser un trabajo de palier y retenedor para volverse un diferencial completo.",
       "slug": "palier-trasero-saliendose-del-diferencial",
       "symptoms": {
-        "gear-oil-smell-and-a-stain-at-the-rear-differential": "El olor característico del aceite de engranajes y una mancha donde el eje entra al diferencial",
+        "gear-oil-smell-and-a-stain-at-the-rear-differential": "El olor característico del aceite de engranajes y una mancha donde el palier entra al diferencial",
         "oil-sprayed-along-the-back-of-the-vehicle": "Aceite regado por la parte trasera del vehículo o sobre lo que va remolcando",
-        "the-shaft-moves-in-and-out-at-the-differential": "El eje entra y sale en el diferencial en vez de quedarse firme",
+        "the-shaft-moves-in-and-out-at-the-differential": "El palier entra y sale en el diferencial en vez de quedarse firme",
         "it-showed-up-while-towing-or-on-a-lifted-truck": "Apareció en un viaje con carga pesada atrás, o en un vehículo con levante de suspensión"
       },
       "causes": {
-        "companion-shaft-circlip-letting-the-shaft-creep-out": "El anillo de retención del eje no está sosteniéndolo adentro",
-        "shaft-seal-hardened-and-leaking": "El retenedor del eje se endureció y está dejando pasar aceite",
+        "companion-shaft-circlip-letting-the-shaft-creep-out": "El anillo de retención del palier no lo está sosteniendo adentro del diferencial",
+        "shaft-seal-hardened-and-leaking": "El retenedor del palier se endureció y está dejando pasar aceite",
         "differential-damaged-by-running-low-on-oil": "El diferencial ya se dañó por haber trabajado bajo de aceite"
       },
       "diagnosticSteps": {
         "look-for-an-oil-stain-around-the-shaft-at-the-differential": "Revise dónde entra cada palier trasero al diferencial y busque un anillo húmedo o una mancha",
-        "lever-the-shaft-towards-the-differential-and-measure-the-movement": "Haga palanca contra un tornillo de la junta interna para empujar el eje hacia el diferencial y calcule cuánto recorre",
+        "lever-the-shaft-towards-the-differential-and-measure-the-movement": "Haga palanca contra un tornillo de la junta interna para empujar el palier hacia el diferencial y calcule cuánto recorre",
         "check-the-differential-oil-level-and-what-comes-out": "Revise el aceite del diferencial en el tapón de llenado y vea el color y si sale metal al drenarlo",
-        "ask-the-dealer-whether-the-field-service-notice-applies": "Pregunte en el concesionario si el aviso de servicio cubre este vehículo y si entregan los ejes revisados"
+        "ask-the-dealer-whether-the-field-service-notice-applies": "Pregunte en el concesionario si el aviso de servicio cubre este vehículo y si entregan los paliers revisados"
       },
       "fixPaths": {
         "push-the-shaft-back-in-as-a-get-home-measure": {
-          "title": "Empujar el eje de vuelta para llegar a un lugar seguro",
-          "detail": "Los dueños del hilo describen hacer palanca con un tornillo de la junta interna para devolver el eje hacia el diferencial. Es parar la sangría, no una reparación, y el nivel de aceite tiene que quedar correcto antes de que el vehículo se mueva."
+          "title": "Empujar el palier de vuelta para llegar a un lugar seguro",
+          "detail": "Los dueños del hilo describen hacer palanca con un tornillo de la junta interna para devolver el palier hacia el diferencial. Es parar la sangría, no una reparación, y el nivel de aceite tiene que quedar correcto antes de que el vehículo se mueva."
         },
         "fit-the-revised-companion-shafts": {
-          "title": "Montar los ejes revisados",
-          "detail": "Las piezas revisadas llevan anillos de retención más gruesos. Los dueños reportan que el cambio en sí es rápido una vez que tiene los repuestos en la mano; el costo está en los ejes, no en la mano de obra."
+          "title": "Montar los paliers revisados (companion shafts)",
+          "detail": "Pídalos por el nombre que usa la fábrica, companion shaft, porque un palier trasero cualquiera no es la pieza revisada. Las piezas nuevas llevan anillos de retención más gruesos. Los dueños reportan que el cambio en sí es rápido una vez que tiene los repuestos en la mano; el costo está en los paliers, no en la mano de obra."
         },
         "rebuild-or-replace-the-differential": {
           "title": "Reconstruir o cambiar el diferencial",

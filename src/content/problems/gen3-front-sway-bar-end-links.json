@@ -17,10 +17,18 @@
     "play-you-can-feel-by-hand-at-the-link"
   ],
   "causes": [
-    { "id": "end-link-ball-joint-worn-out" },
-    { "id": "end-link-broken-or-pulled-apart" },
-    { "id": "sway-bar-bushings-perished" },
-    { "id": "aftermarket-links-not-up-to-the-load" }
+    {
+      "id": "end-link-ball-joint-worn-out"
+    },
+    {
+      "id": "end-link-broken-or-pulled-apart"
+    },
+    {
+      "id": "sway-bar-bushings-perished"
+    },
+    {
+      "id": "aftermarket-links-not-up-to-the-load"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -85,10 +93,10 @@
       "kind": "vendor"
     },
     {
-      "title": "Grupo Navcar (Costa Rica) — Tornillo Barra Estabilizadora, Chevrolet Trooper / Mitsubishi Montero (OEM MB-527385)",
-      "url": "https://www.gruponavcar.com/tornillo-barra-estabilizadora-chevrolet-trooper-mitsubishi-montero-mb527385/p",
-      "archiveUrl": "https://web.archive.org/web/20260902210517id_/https://www.gruponavcar.com/tornillo-barra-estabilizadora-chevrolet-trooper-mitsubishi-montero-mb527385/p",
-      "accessed": "2026-09-02",
+      "title": "Mitsubishi-Repuestos — «Terminales de la barra estabilizadora (bieletas) - PAR», catálogo en español para Mitsubishi Montero, Montero Sport, Nativa y Challenger",
+      "url": "https://mitsubishi-repuestos.com/repuestos-mitsubishi-montero-sport/46288-terminales-de-la-barra-estabilizadora-bieletas-par.html",
+      "archiveUrl": "https://web.archive.org/web/20260903020443id_/https://mitsubishi-repuestos.com/repuestos-mitsubishi-montero-sport/46288-terminales-de-la-barra-estabilizadora-bieletas-par.html",
+      "accessed": "2026-09-03",
       "kind": "vendor"
     }
   ],
@@ -128,8 +136,8 @@
     },
     "es": {
       "title": "Golpeteo del tren delantero al pasar huecos pequeños",
-      "summary": "Los tensores que amarran la barra estabilizadora delantera a la suspensión son cortos, aguantan toda la carga de balanceo que genera la barra, y son de lo primero que empieza a sonar en este vehículo. El golpe se oye más fuerte en huecos pequeños y secos y casi no se oye en carretera lisa, que es lo que lo distingue de un buje gastado más adentro. El tensor izquierdo y el derecho son repuestos distintos, así que cambiar uno obliga a pedir el lado correcto, y la casa que vende los originales advierte que en vehículos con llantas más grandes los tensores no originales no aguantan la carga extra: conviene saberlo antes de comprar el par barato dos veces. Esta entrada está acotada a un tensor gastado que suena. Un tensor que de plano se soltó cambia cómo se comporta el vehículo en una maniobra de esquive, y eso ya no es cosa de manejar suave.",
-      "slug": "golpeteo-del-tren-delantero-tensores-estabilizadora",
+      "summary": "Las bieletas que amarran la barra estabilizadora delantera a la suspensión son cortas, aguantan toda la carga de balanceo que genera la barra, y son de lo primero que empieza a sonar en este vehículo. El golpe se oye más fuerte en huecos pequeños y secos y casi no se oye en carretera lisa, que es lo que lo distingue de un buje gastado más adentro. La bieleta izquierda y la derecha son repuestos distintos, así que cambiar una obliga a pedir el lado correcto, y la casa que vende las originales advierte que en vehículos con llantas más grandes las bieletas no originales no aguantan la carga extra: conviene saberlo antes de comprar el par barato dos veces. Esta entrada está acotada a una bieleta gastada que suena. Una bieleta que de plano se soltó cambia cómo se comporta el vehículo en una maniobra de esquive, y eso ya no es cosa de manejar suave.",
+      "slug": "golpeteo-del-tren-delantero-bieletas",
       "symptoms": {
         "knock-from-the-front-over-small-bumps": "Golpe o toqueteo del tren delantero al pasar huecos pequeños",
         "noise-worse-on-uneven-ground-than-on-smooth": "El ruido se oye fuerte en superficie irregular y desaparece en carretera lisa",
@@ -137,24 +145,24 @@
         "play-you-can-feel-by-hand-at-the-link": "Usted puede mover el tensor con la mano y sentirle el juego"
       },
       "causes": {
-        "end-link-ball-joint-worn-out": "La rótula del tensor de la barra estabilizadora está gastada y suena",
-        "end-link-broken-or-pulled-apart": "El tensor está quebrado o se soltó de la barra",
-        "sway-bar-bushings-perished": "Los hules que sujetan la barra a la carrocería están resecos",
-        "aftermarket-links-not-up-to-the-load": "Unos tensores no originales fallaron temprano por llantas grandes o uso fuera de carretera"
+        "end-link-ball-joint-worn-out": "La rótula de la bieleta está gastada y suena",
+        "end-link-broken-or-pulled-apart": "La bieleta está quebrada o se soltó de la barra estabilizadora",
+        "sway-bar-bushings-perished": "Los hules que sujetan la barra estabilizadora a la carrocería están resecos",
+        "aftermarket-links-not-up-to-the-load": "Unas bieletas no originales fallaron temprano por llantas grandes o uso fuera de carretera"
       },
       "diagnosticSteps": {
-        "grab-each-link-and-try-to-move-it": "Con el vehículo en el suelo, agarre cada tensor y trate de moverlo con la mano",
-        "pry-between-the-link-and-the-bar": "Haga palanca suave entre el tensor y la barra y observe la rótula, no la barra",
-        "look-at-the-rubber-mounts-that-clamp-the-bar": "Revise los hules que sujetan la barra a la carrocería buscando rajaduras, aplastamiento o corrimiento",
-        "check-what-brand-of-link-is-fitted-and-what-tires-it-carries": "Fíjese si los tensores montados son originales o no, y qué medida de llanta trae el vehículo"
+        "grab-each-link-and-try-to-move-it": "Con el vehículo en el suelo, agarre cada bieleta y trate de moverla con la mano",
+        "pry-between-the-link-and-the-bar": "Haga palanca suave entre la bieleta y la barra estabilizadora y observe la rótula, no la barra",
+        "look-at-the-rubber-mounts-that-clamp-the-bar": "Revise los hules que sujetan la barra estabilizadora a la carrocería buscando rajaduras, aplastamiento o corrimiento",
+        "check-what-brand-of-link-is-fitted-and-what-tires-it-carries": "Fíjese si las bieletas montadas son originales o no, y qué medida de llanta trae el vehículo"
       },
       "fixPaths": {
         "replace-both-front-links": {
-          "title": "Cambiar los dos tensores delanteros",
+          "title": "Cambiar las dos bieletas delanteras",
           "detail": "Siempre en pares y siempre pidiendo el lado correcto: la pieza izquierda y la derecha no son la misma. Apriete con la suspensión cargando el peso del vehículo, no colgando."
         },
         "replace-links-and-bar-bushings-together": {
-          "title": "Cambiar los tensores y los hules de la barra de una vez",
+          "title": "Cambiar las bieletas y los hules de la barra estabilizadora de una vez",
           "detail": "Los hules salen baratos y ya quedan a la vista cuando la barra está suelta. Hacerlo por aparte es pagar dos veces el mismo acceso."
         }
       }

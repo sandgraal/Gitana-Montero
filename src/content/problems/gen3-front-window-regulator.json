@@ -17,9 +17,15 @@
     "motor-runs-but-the-glass-does-not-move"
   ],
   "causes": [
-    { "id": "regulator-cable-or-guide-failed" },
-    { "id": "window-motor-failed" },
-    { "id": "switch-or-wiring-in-the-door-jamb-faulty" }
+    {
+      "id": "regulator-cable-or-guide-failed"
+    },
+    {
+      "id": "window-motor-failed"
+    },
+    {
+      "id": "switch-or-wiring-in-the-door-jamb-faulty"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -69,13 +75,6 @@
       "title": "Luso Overland — MONTERO Gen3 2004-2006 Window Regulator & Motor Assembly, FRONT (fits 2004-2006 only)",
       "url": "https://lusooverland.com/VP-LO-MN16727X",
       "archiveUrl": "https://web.archive.org/web/20260902210113id_/https://lusooverland.com/VP-LO-MN16727X",
-      "accessed": "2026-09-02",
-      "kind": "vendor"
-    },
-    {
-      "title": "Luso Overland — MITSUBISHI / MONTERO Gen 3 (2001-2006) / Parts catalogue listing",
-      "url": "https://lusooverland.com/mitsubishi/montero-g3/parts/",
-      "archiveUrl": "https://web.archive.org/web/20260902210157id_/https://lusooverland.com/mitsubishi/montero-g3/parts/",
       "accessed": "2026-09-02",
       "kind": "vendor"
     }
@@ -137,7 +136,7 @@
       "fixPaths": {
         "replace-the-regulator-and-motor-assembly": {
           "title": "Cambiar mecanismo elevador y motor como un solo conjunto",
-          "detail": "Compare los años modelo del listado contra su propio vehículo antes de pedir: el conjunto nuevo no cubre toda la generación. Sostenga el vidrio con cinta antes de aflojar nada."
+          "detail": "Compare los años modelo del listado contra su propio vehículo antes de pedir: el conjunto de los años más recientes no cubre toda la generación. Sostenga el vidrio con cinta antes de aflojar nada."
         },
         "repair-the-switch-or-the-door-jamb-loom": {
           "title": "Reparar el suiche o el cableado del marco de la puerta",

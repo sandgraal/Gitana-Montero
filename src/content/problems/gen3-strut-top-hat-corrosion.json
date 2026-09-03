@@ -17,9 +17,15 @@
     "steering-feels-notchy-at-low-speed"
   ],
   "causes": [
-    { "id": "top-hat-corroded-or-broken" },
-    { "id": "upper-strut-bushing-perished" },
-    { "id": "damper-dust-boot-split-and-damper-worn" }
+    {
+      "id": "top-hat-corroded-or-broken"
+    },
+    {
+      "id": "upper-strut-bushing-perished"
+    },
+    {
+      "id": "damper-dust-boot-split-and-damper-worn"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -91,10 +97,10 @@
       "kind": "vendor"
     },
     {
-      "title": "Luso Overland — MITSUBISHI / MONTERO Gen 3 (2001-2006) / Parts catalogue listing (front strut bushing kit, front shock damper / dust boot)",
-      "url": "https://lusooverland.com/mitsubishi/montero-g3/parts/",
-      "archiveUrl": "https://web.archive.org/web/20260902210157id_/https://lusooverland.com/mitsubishi/montero-g3/parts/",
-      "accessed": "2026-09-02",
+      "title": "Luso Overland — MONTERO Gen3 Front Shock Damper / Dust Boot (MR448172): «Rubber components play a critical part in your front struts and suspension by absorbing impact, maintaining height, and dampening vibration and noise… These dampers take a lot of abuse, particularly off-road and on heavier HD coil equipped vehicles»",
+      "url": "https://lusooverland.com/VP-MMC-MR448172",
+      "archiveUrl": "https://web.archive.org/web/20260903020011id_/https://lusooverland.com/VP-MMC-MR448172",
+      "accessed": "2026-09-03",
       "kind": "vendor"
     }
   ],

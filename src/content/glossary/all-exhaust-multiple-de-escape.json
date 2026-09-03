@@ -21,21 +21,26 @@
       "countries": ["US"]
     },
     {
+      "term": "manifold",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
       "term": "colector de escape",
       "locale": "es",
-      "countries": ["ES"]
+      "countries": ["ES", "CR"]
     },
     {
       "term": "colectores de escape",
       "locale": "es",
-      "countries": ["ES"]
+      "countries": ["ES", "CR"]
     }
   ],
   "relatedTerms": ["all-exhaust-catalizador", "all-exhaust-mufla"],
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "Truck Depot Costa Rica — Manifold / Colector / Múltiple de escape y accesorios",
+      "title": "Truck Depot Costa Rica — «Manifold / Colector / Múltiple de escape y accesorios», categoría de repuestos",
       "url": "https://truckdepot.cr/componentes-de-motor/motor/manifold-colector-multiple-de-escape-accesorios.html",
       "archiveUrl": "https://web.archive.org/web/20260902210346id_/https://truckdepot.cr/componentes-de-motor/motor/manifold-colector-multiple-de-escape-accesorios.html",
       "accessed": "2026-09-02",
@@ -56,7 +61,7 @@
     },
     "es": {
       "title": "múltiple de escape",
-      "summary": "La pieza de hierro fundido atornillada al cabezote que junta el escape de cada cilindro en un solo tubo. Un V6 lleva uno por banco. Se rajan con los años y con los ciclos de calor, y la rajadura suele avisar con un tictac que se apaga conforme el motor calienta. Las casas de repuestos ticas lo listan también en inglés, como manifold."
+      "summary": "La pieza de hierro fundido atornillada al cabezote que junta el escape de cada cilindro en un solo tubo. Un V6 lleva uno por banco. Se rajan con los años y con los ciclos de calor, y la rajadura suele avisar con un tictac que se apaga conforme el motor calienta. Pídalo así, como múltiple de escape: es el nombre con que lo listan las casas de repuestos ticas, aunque en el mostrador le entiendan también los otros dos que aparecen abajo."
     }
   }
 }

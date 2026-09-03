@@ -13,14 +13,22 @@
   "symptoms": [
     "the-rear-sits-visibly-low-when-loaded",
     "it-bottoms-out-over-bumps-with-people-or-gear-aboard",
-    "headlights-point-at-the-trees-when-towing",
-    "the-back-wallows-on-a-rough-road"
+    "the-back-wallows-on-a-rough-road",
+    "knock-and-rough-ride-from-the-back"
   ],
   "causes": [
-    { "id": "rear-springs-tired-and-sagging" },
-    { "id": "springs-rated-below-what-the-truck-now-carries" },
-    { "id": "rear-shock-absorbers-worn-out" },
-    { "id": "spring-pads-crushed-or-missing" }
+    {
+      "id": "rear-springs-tired-and-sagging"
+    },
+    {
+      "id": "springs-rated-below-what-the-truck-now-carries"
+    },
+    {
+      "id": "rear-shock-absorbers-worn-out"
+    },
+    {
+      "id": "spring-pads-crushed-or-missing"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -89,44 +97,51 @@
       "kind": "vendor"
     },
     {
-      "title": "Luso Overland — MITSUBISHI / MONTERO Gen 3 (2001-2006) / Parts catalogue listing (rear coil spring pads, rear dampers)",
-      "url": "https://lusooverland.com/mitsubishi/montero-g3/parts/",
-      "archiveUrl": "https://web.archive.org/web/20260902210157id_/https://lusooverland.com/mitsubishi/montero-g3/parts/",
-      "accessed": "2026-09-02",
+      "title": "Luso Overland — MONTERO Gen3 Rear Coil Spring Pads, Lower: «Out of all of the Montero's independent suspension bushings and pads, the Lower Coil Springs Pads take the most abuse by far… the original ones are likely worn all the way through creating metal to metal contact with the coil springs sitting directly on the rear control arms which makes for a rougher ride and often a lot of noise», and the 5,000-10,000 mile wear-through the supplier reports for the factory rubber pads",
+      "url": "https://lusooverland.com/VS-SP-SPF5410AK",
+      "archiveUrl": "https://web.archive.org/web/20251018113655id_/https://lusooverland.com/VS-SP-SPF5410AK",
+      "accessed": "2026-09-03",
+      "kind": "vendor"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 KONI Heavy Track Shock Absorber, Rear: «a huge upgrade over your original tired shocks», and the pairing with Lovells springs",
+      "url": "https://lusooverland.com/VS-KON-82-2506",
+      "archiveUrl": "https://web.archive.org/web/20260903020055id_/https://lusooverland.com/VS-KON-82-2506",
+      "accessed": "2026-09-03",
       "kind": "vendor"
     }
   ],
   "prose": {
     "en": {
-      "title": "The rear sits low and bottoms out under load",
-      "summary": "A Montero that squats when it is loaded is usually not broken — it is carrying more than the springs in it were chosen for. The spring supplier for this generation classifies its rear springs by load-carrying capacity as well as by height, and warns that even a difference in factory trim changes which spring suits a given truck, which tells you how sensitive the rear end is to what you have added. Every permanent accessory counts: a steel bumper, a winch, skid plates, a second battery, a drawer system, a full water tank. This matters beyond comfort. A rear that has run out of travel changes how the truck steers and brakes, aims the headlights at the trees, and gives a trailer somewhere to push the back end around — which is why suspension, load rating and towing all sit on the same safety list. Buy the rate for the truck you actually have, not the one you bought.",
+      "title": "The rear sits low, knocks and bottoms out under load",
+      "summary": "A Montero that squats when it is loaded is usually not broken — it is carrying more than the springs in it were chosen for. The spring supplier for this generation classifies its rear springs by load-carrying capacity as well as by ride height, and warns that even a difference in factory trim changes which spring suits a given truck, which tells you how sensitive the rear end is to what you have added. Every permanent accessory counts: a steel bumper, a winch, skid plates, a second battery, a drawer system, a full water tank. Before you buy springs, check the rubber pads the springs sit on. The same supplier says the lower rear pads take more abuse than any other bushing or pad on the truck, that by this point in a third generation's life the originals are likely worn all the way through, and that the result is the coil sitting directly on the rear control arm — metal on metal, a rougher ride and a lot of noise. A crushed pad makes a healthy spring look tired, and it is the cheapest thing on the list.",
       "slug": "rear-sits-low-and-bottoms-out",
       "symptoms": {
         "the-rear-sits-visibly-low-when-loaded": "The rear sits visibly lower than the front once the truck is loaded",
         "it-bottoms-out-over-bumps-with-people-or-gear-aboard": "It bottoms out over bumps with people or gear aboard",
-        "headlights-point-at-the-trees-when-towing": "The headlights point high, and oncoming drivers flash you, when there is weight or a trailer behind",
-        "the-back-wallows-on-a-rough-road": "The back wallows and keeps moving after a bump on a rough road"
+        "the-back-wallows-on-a-rough-road": "The back wallows and keeps moving after a bump on a rough road",
+        "knock-and-rough-ride-from-the-back": "A knock from the back and a harsher ride than the truck used to have"
       },
       "causes": {
         "rear-springs-tired-and-sagging": "The rear springs are tired and have lost their free height",
         "springs-rated-below-what-the-truck-now-carries": "The springs are rated below what the truck now permanently carries",
         "rear-shock-absorbers-worn-out": "The rear dampers are worn out and no longer control the spring",
-        "spring-pads-crushed-or-missing": "The rubber pads at the ends of the rear springs are crushed or missing"
+        "spring-pads-crushed-or-missing": "The lower rear spring pads are worn through, leaving the coil on bare metal"
       },
       "diagnosticSteps": {
         "measure-the-ride-height-at-each-rear-arch-empty-and-loaded": "Measure from the ground to each rear arch, empty, then again loaded as you normally drive it",
         "add-up-the-permanent-weight-that-has-been-added-to-the-truck": "List and add up every permanent accessory the truck now carries",
         "bounce-each-rear-corner-and-count-how-it-settles": "Bounce each rear corner hard and watch whether it settles in one movement",
-        "look-at-the-rubber-pads-at-each-end-of-the-rear-springs": "Look at the rubber pads at the ends of both rear springs for crushing, splitting or absence"
+        "look-at-the-rubber-pads-at-each-end-of-the-rear-springs": "Look at the rubber pads at both ends of each rear spring, and especially at the lower ones, for wear right through to the arm"
       },
       "fixPaths": {
         "renew-the-spring-pads": {
           "title": "Renew the spring pads",
-          "detail": "The cheapest thing on the list, and the only one that is worth doing on its own before you decide anything else. Crushed pads make a good spring look tired."
+          "detail": "The cheapest thing on the list and the only one worth doing on its own before you decide anything else. The supplier will not sell the factory rubber for the lower rear position at all, on the grounds that it wears through in a few thousand miles — the figure is in the citation."
         },
         "fit-springs-rated-for-what-the-truck-actually-carries": {
           "title": "Fit springs rated for the truck as it is now",
-          "detail": "The supplier publishes both a height and a load classification, so tell them what the truck carries rather than which model it is. A spring chosen for a bare truck will sag again under a loaded one."
+          "detail": "The supplier publishes both a ride-height and a load-carrying classification, so tell them what the truck carries rather than which model it is. A spring chosen for a bare truck will sag again under a loaded one."
         },
         "replace-the-rear-shock-absorbers": {
           "title": "Replace the rear dampers",
@@ -135,39 +150,39 @@
       }
     },
     "es": {
-      "title": "La parte trasera se sienta y toca fondo con carga",
-      "summary": "Una Montero que se sienta atrás cuando va cargada normalmente no está dañada: está cargando más de lo que los resortes que trae fueron elegidos para llevar. El proveedor de resortes para esta generación clasifica los traseros tanto por altura como por capacidad de carga, y advierte que hasta una diferencia de acabado de fábrica cambia cuál resorte le sirve a un vehículo determinado, lo que dice mucho de lo sensible que es la parte trasera a lo que usted le agregó. Todo accesorio permanente cuenta: bumper de acero, winch, protector de cárter, segunda batería, sistema de gavetas, un tanque de agua lleno. Esto importa más allá de la comodidad. Una parte trasera que se quedó sin recorrido cambia cómo dirige y cómo frena el vehículo, apunta los faroles a los árboles, y le da a un remolque dónde empujar la cola, que es por lo que suspensión, capacidad de carga y remolque están en la misma lista de seguridad. Compre la capacidad para el vehículo que tiene hoy, no para el que compró.",
+      "title": "La parte trasera se sienta, golpea y toca fondo con carga",
+      "summary": "Una Montero que se sienta atrás cuando va cargada normalmente no está dañada: está cargando más de lo que los resortes que trae fueron elegidos para llevar. El proveedor de resortes para esta generación clasifica los traseros tanto por altura como por capacidad de carga, y advierte que hasta una diferencia de acabado de fábrica cambia cuál resorte le sirve a un vehículo determinado, lo que dice mucho de lo sensible que es la parte trasera a lo que usted le agregó. Todo accesorio permanente cuenta: bumper de acero, winch, protector de cárter, segunda batería, sistema de gavetas, un tanque de agua lleno. Antes de comprar resortes, revise los hules sobre los que el resorte se asienta. Esa misma casa dice que los hules traseros inferiores sufren más que cualquier otro buje o hule del vehículo, que a esta altura de la vida de una tercera generación los originales seguramente ya están gastados de lado a lado, y que el resultado es el resorte apoyado directo sobre la tijereta trasera: metal contra metal, marcha más dura y bastante ruido. Un hule aplastado hace ver cansado a un resorte sano, y es lo más barato de la lista.",
       "slug": "la-parte-trasera-se-sienta-con-carga",
       "symptoms": {
         "the-rear-sits-visibly-low-when-loaded": "La parte trasera queda visiblemente más baja que la delantera al cargar el vehículo",
         "it-bottoms-out-over-bumps-with-people-or-gear-aboard": "Toca fondo en los huecos cuando lleva gente o equipo",
-        "headlights-point-at-the-trees-when-towing": "Los faroles apuntan alto y los que vienen de frente le hacen luces cuando lleva peso o remolque",
-        "the-back-wallows-on-a-rough-road": "La cola se mece y sigue moviéndose después de un hueco en camino irregular"
+        "the-back-wallows-on-a-rough-road": "La cola se mece y sigue moviéndose después de un hueco en camino irregular",
+        "knock-and-rough-ride-from-the-back": "Un golpe atrás y una marcha más dura de la que el vehículo tenía antes"
       },
       "causes": {
         "rear-springs-tired-and-sagging": "Los resortes traseros están cansados y perdieron altura libre",
         "springs-rated-below-what-the-truck-now-carries": "Los resortes tienen menos capacidad de la que el vehículo carga hoy de forma permanente",
         "rear-shock-absorbers-worn-out": "Los amortiguadores traseros están acabados y ya no controlan el resorte",
-        "spring-pads-crushed-or-missing": "Los hules de asiento en los extremos de los resortes traseros están aplastados o faltan"
+        "spring-pads-crushed-or-missing": "Los hules inferiores del resorte trasero están gastados de lado a lado y el resorte quedó sobre metal pelado"
       },
       "diagnosticSteps": {
         "measure-the-ride-height-at-each-rear-arch-empty-and-loaded": "Mida del suelo a cada guardabarros trasero, vacío, y otra vez cargado como usted normalmente anda",
         "add-up-the-permanent-weight-that-has-been-added-to-the-truck": "Haga la lista y sume todo accesorio permanente que el vehículo carga hoy",
         "bounce-each-rear-corner-and-count-how-it-settles": "Hunda con fuerza cada esquina trasera y observe si se acomoda en un solo movimiento",
-        "look-at-the-rubber-pads-at-each-end-of-the-rear-springs": "Revise los hules de asiento en los extremos de ambos resortes traseros por aplastamiento, roturas o ausencia"
+        "look-at-the-rubber-pads-at-each-end-of-the-rear-springs": "Revise los hules en los dos extremos de cada resorte trasero, y sobre todo los de abajo, buscando desgaste que llegue hasta la tijereta"
       },
       "fixPaths": {
         "renew-the-spring-pads": {
-          "title": "Renovar los hules de asiento",
-          "detail": "Es lo más barato de la lista y lo único que vale hacer por aparte antes de decidir otra cosa. Un hule aplastado hace ver cansado a un resorte sano."
+          "title": "Renovar los hules del resorte",
+          "detail": "Es lo más barato de la lista y lo único que vale hacer por aparte antes de decidir otra cosa. La casa especializada ni siquiera vende el hule de fábrica para la posición trasera inferior, porque dice que se gasta de lado a lado en pocos miles de kilómetros; la cifra está en la fuente citada."
         },
         "fit-springs-rated-for-what-the-truck-actually-carries": {
-          "title": "Montar resortes con la capacidad que el vehículo tiene hoy",
-          "detail": "El proveedor publica clasificación de altura y de carga, así que dígale qué carga el vehículo y no cuál modelo es. Un resorte escogido para un vehículo pelado se vuelve a sentar bajo uno cargado."
+          "title": "Montar resortes con la capacidad de carga que el vehículo tiene hoy",
+          "detail": "El proveedor publica una clasificación de altura y otra de capacidad de carga, así que dígale qué carga el vehículo y no cuál modelo es. Un resorte escogido para un vehículo pelado se vuelve a sentar bajo uno cargado."
         },
         "replace-the-rear-shock-absorbers": {
           "title": "Cambiar los amortiguadores traseros",
-          "detail": "Una cola que se mece pueden ser los amortiguadores con resortes perfectamente sanos. Si de todos modos va a cambiar la capacidad del resorte, escoja amortiguadores acordes en vez de reutilizar los que están."
+          "detail": "Una cola que se mece pueden ser los amortiguadores con resortes perfectamente sanos. Si de todos modos va a cambiar la dureza del resorte, escoja amortiguadores acordes en vez de reutilizar los que están."
         }
       }
     }

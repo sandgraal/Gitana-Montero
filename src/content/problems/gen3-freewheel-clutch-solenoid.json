@@ -17,10 +17,18 @@
     "steering-binds-on-dry-pavement"
   ],
   "causes": [
-    { "id": "vacuum-solenoid-stuck" },
-    { "id": "cracked-or-disconnected-vacuum-hose" },
-    { "id": "freewheel-clutch-actuator-diaphragm-torn" },
-    { "id": "freewheel-clutch-stuck-from-disuse" }
+    {
+      "id": "vacuum-solenoid-stuck"
+    },
+    {
+      "id": "cracked-or-disconnected-vacuum-hose"
+    },
+    {
+      "id": "freewheel-clutch-actuator-diaphragm-torn"
+    },
+    {
+      "id": "freewheel-clutch-stuck-from-disuse"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -158,7 +166,7 @@
         "green-front-wheel-symbols-blinking": "Los símbolos verdes de las ruedas delanteras parpadean en vez de quedarse fijos",
         "four-wheel-drive-will-not-engage": "Al seleccionar doble tracción no pasa nada en el eje delantero",
         "it-will-not-go-back-to-two-wheel-drive": "La tracción delantera no se suelta una vez que acopló",
-        "steering-binds-on-dry-pavement": "La dirección se traba y las llantas patinan en curvas cerradas sobre asfalto seco"
+        "steering-binds-on-dry-pavement": "La dirección se traba y las llantas se arrastran en curvas cerradas sobre asfalto seco"
       },
       "causes": {
         "vacuum-solenoid-stuck": "La válvula solenoide de control del embrague de rueda libre está pegada y no deja pasar el vacío",

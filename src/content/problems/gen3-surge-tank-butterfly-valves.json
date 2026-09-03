@@ -14,13 +14,18 @@
   "symptoms": [
     "rattle-from-the-top-of-the-engine-at-idle",
     "vacuum-leak-and-an-unsteady-idle",
-    "rough-running-with-no-obvious-cause",
-    "high-mileage-with-the-intake-never-opened"
+    "rough-running-with-no-obvious-cause"
   ],
   "causes": [
-    { "id": "butterfly-rod-bushings-worn-and-leaking" },
-    { "id": "butterfly-valve-or-screw-loose-in-the-runner" },
-    { "id": "surge-tank-gaskets-leaking" }
+    {
+      "id": "butterfly-rod-bushings-worn-and-leaking"
+    },
+    {
+      "id": "butterfly-valve-or-screw-loose-in-the-runner"
+    },
+    {
+      "id": "surge-tank-gaskets-leaking"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -94,7 +99,7 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "Luso Overland — MONTERO Gen3 Surgetank Butterfly Delete Discs (2-pack): the 3.8L variable intake runner and what it does when it fails",
+      "title": "Luso Overland — MONTERO Gen3 Surgetank Butterfly Delete Discs (2-pack): «The 3.8L V6 suffers from a variable intake runner that after around 100,000 miles can create some very serious problems», and the bushings, screws and butterfly valves that can fall into the combustion chambers",
       "url": "https://lusooverland.com/VP-LO-M3-BDD",
       "archiveUrl": "https://web.archive.org/web/20260902205507id_/https://lusooverland.com/VP-LO-M3-BDD",
       "accessed": "2026-09-02",
@@ -111,13 +116,12 @@
   "prose": {
     "en": {
       "title": "Variable intake butterfly valves rattling on the 3.8",
-      "summary": "This one belongs to the larger petrol V6 fitted to the later trucks, and the specialist supplier states the age at which it starts: the variable intake runner can create very serious problems once the engine has covered high mileage. The failure is mechanical — the butterfly rod bushings wear, the rod leaks air, and the screws, bushings and butterfly valves in the surge tank can end up in the combustion chambers. Enthusiasts have a nickname for it that tells you the stakes better than any severity rating. The choices are to rebuild the assembly, to remove it entirely and blank the rod port, or to buy a replacement surge tank, and the supplier is honest that deleting it costs a noticeable amount of torque. That trade is yours to make; what is not optional is finding out which state yours is in before something small goes down an intake runner.",
+      "summary": "This one belongs to the larger petrol V6 fitted to the later trucks, and the specialist supplier states the mileage at which it starts — the figure is in the citation below rather than in this paragraph, so it is written down once. The failure is mechanical: the butterfly rod bushings wear, the rod leaks air, and the screws, bushings and butterfly valves in the surge tank can end up in the combustion chambers. Enthusiasts have a nickname for it that tells you the stakes better than any severity rating. This entry is deliberately scoped to a truck that is already telling you something — a rattle, an unsteady idle, rough running — rather than to mileage alone; high mileage on its own is a reason to inspect, not a reason to stop driving. Once it does rattle, the hardware is loose upstream of open valves, and that is the point at which the truck should stay parked. The choices are to rebuild the assembly, to remove it entirely and blank the rod port, or to buy a replacement surge tank, and the supplier is honest that deleting it costs a noticeable amount of torque.",
       "slug": "variable-intake-butterfly-valves-3-8",
       "symptoms": {
         "rattle-from-the-top-of-the-engine-at-idle": "A rattle from the top of the engine at idle that changes with throttle",
         "vacuum-leak-and-an-unsteady-idle": "An unsteady idle that behaves like a vacuum leak",
-        "rough-running-with-no-obvious-cause": "Rough running that survives plugs, coils and a fuel service",
-        "high-mileage-with-the-intake-never-opened": "High mileage and no record of the intake ever having been opened"
+        "rough-running-with-no-obvious-cause": "Rough running that survives plugs, coils and a fuel service"
       },
       "causes": {
         "butterfly-rod-bushings-worn-and-leaking": "The butterfly rod bushings are worn and letting air past the rod",
@@ -146,13 +150,12 @@
     },
     "es": {
       "title": "Mariposas del múltiple de admisión variable sonando en el 3.8",
-      "summary": "Esta falla es del V6 de gasolina más grande que montan los vehículos posteriores, y la casa especializada dice a qué altura empieza: el múltiple de admisión variable puede generar problemas muy serios una vez que el motor lleva bastante kilometraje. La falla es mecánica: los bujes del eje de las mariposas se desgastan, el eje deja pasar aire, y los tornillos, bujes y mariposas del depósito de admisión pueden terminar dentro de las cámaras de combustión. Entre aficionados tiene un apodo que explica el riesgo mejor que cualquier clasificación de severidad. Las opciones son reconstruir el conjunto, quitarlo por completo y tapar el orificio del eje, o comprar un depósito de admisión de repuesto, y la misma casa admite con honestidad que eliminarlo cuesta una pérdida notable de torque. Ese cambio lo decide usted; lo que no es opcional es averiguar en qué estado está el suyo antes de que algo pequeño se vaya por un conducto de admisión.",
+      "summary": "Esta falla es del V6 de gasolina más grande que montan los vehículos posteriores, y la casa especializada indica el kilometraje a partir del cual empieza; la cifra está en la fuente citada abajo y no en este párrafo, para que quede escrita una sola vez. La falla es mecánica: los bujes del eje de las mariposas se desgastan, el eje deja pasar aire, y los tornillos, bujes y mariposas del depósito de admisión pueden terminar dentro de las cámaras de combustión. Entre aficionados tiene un apodo que explica el riesgo mejor que cualquier clasificación de severidad. Esta entrada está acotada a propósito a un vehículo que ya le está avisando algo —un traqueteo, marcha mínima inestable, motor disparejo— y no al kilometraje solo: kilometraje alto por sí mismo es razón para inspeccionar, no para dejar de manejar. Una vez que traquetea, hay tornillería suelta antes de unas válvulas abiertas, y ese es el punto en que el vehículo se queda parqueado. Las opciones son reconstruir el conjunto, quitarlo por completo y tapar el orificio del eje, o comprar un depósito de admisión de repuesto, y la misma casa admite con honestidad que eliminarlo cuesta una pérdida notable de torque.",
       "slug": "mariposas-del-multiple-de-admision-3-8",
       "symptoms": {
         "rattle-from-the-top-of-the-engine-at-idle": "Un traqueteo en la parte alta del motor en marcha mínima que cambia con el acelerador",
         "vacuum-leak-and-an-unsteady-idle": "Marcha mínima inestable que se comporta como una entrada de aire falsa",
-        "rough-running-with-no-obvious-cause": "El motor corre disparejo aunque ya se cambiaron bujías, bobinas y se hizo servicio de combustible",
-        "high-mileage-with-the-intake-never-opened": "Kilometraje alto y ningún registro de que la admisión se haya abierto alguna vez"
+        "rough-running-with-no-obvious-cause": "El motor corre disparejo aunque ya se cambiaron bujías, bobinas y se hizo servicio de combustible"
       },
       "causes": {
         "butterfly-rod-bushings-worn-and-leaking": "Los bujes del eje de las mariposas están gastados y dejan pasar aire por el eje",
