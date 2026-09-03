@@ -1,11 +1,11 @@
 {
   "id": "gen2-body-tailgate-hinge-corrosion",
   "fitment": {
-    "gens": ["gen2", "gen2-5"],
+    "gens": ["gen2"],
     "markets": ["us"],
     "years": {
-      "from": 1992,
-      "to": 1999
+      "from": 1996,
+      "to": 1996
     }
   },
   "system": "body",
@@ -100,7 +100,7 @@
   "prose": {
     "en": {
       "title": "Tailgate hinges rust and the gate drops",
-      "summary": "Owner reports filed with the United States road safety agency for this generation include rear door hinges corroding badly enough to need replacing. It is a small fault next to most of what is on this site, and it earns its place because of what it tells you rather than what it costs. The tailgate carries a heavy spare wheel on a side-hinged door, and those hinges are bolted to a panel that sits at the back of the truck collecting everything the rear wheels throw at it. When the hinges have gone, the water that killed them has been sitting there for years, which means the panel behind them and the bottom of the gate itself are worth looking at before anyone orders parts. The trap is ordering hinges for a truck whose problem is the panel they bolt to: new hinges on soft metal sag again in a season and the money is gone. There is a genuinely cheap version of this and it is worth trying first — a gate that has dropped a little often latches again after the striker is adjusted, and a gate whose drains are clear stops feeding the rust that started all of it.",
+      "summary": "Owner reports filed with the United States road safety agency include rear door hinges corroding badly enough to need replacing. There are two of them and both are from one model year, so the fitment above is narrowed to that year rather than spread across the generation — the same rule applied elsewhere in this set, and the same caveat: if your truck is an adjacent year the inspection below still costs nothing, but nothing here claims your year is affected. The buyer's guide cited alongside establishes that these bodies rot at the arches, sills and mounts; it does not mention hinges, and is not the source for them. It is a small fault next to most of what is on this site, and it earns its place because of what it tells you rather than what it costs. The tailgate carries a heavy spare wheel on a side-hinged door, and those hinges are bolted to a panel that sits at the back of the truck collecting everything the rear wheels throw at it. When the hinges have gone, the water that killed them has been sitting there for years, which means the panel behind them and the bottom of the gate itself are worth looking at before anyone orders parts. The trap is ordering hinges for a truck whose problem is the panel they bolt to: new hinges on soft metal sag again in a season and the money is gone. There is a genuinely cheap version of this and it is worth trying first — a gate that has dropped a little often latches again after the striker is adjusted, and a gate whose drains are clear stops feeding the rust that started all of it.",
       "slug": "tailgate-hinges-rust",
       "symptoms": {
         "tailgate-drops-as-it-opens": "The tailgate drops at the outer edge as it swings open",
@@ -142,7 +142,7 @@
     },
     "es": {
       "title": "Las bisagras de la puerta trasera se oxidan y la puerta se cae",
-      "summary": "Los reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos para esta generación incluyen bisagras de puerta trasera corroídas al punto de tener que cambiarse. Es una falla pequeña al lado de casi todo lo que hay en este sitio, y se gana su lugar por lo que le dice a uno más que por lo que cuesta. La puerta trasera carga una llanta de repuesto pesada en una puerta con bisagras laterales, y esas bisagras van atornilladas a un panel que está en la parte de atrás del carro recogiendo todo lo que las ruedas traseras le tiran. Cuando las bisagras ya se fueron, el agua que las mató lleva años ahí, y eso significa que el panel detrás de ellas y el fondo de la puerta misma merecen una revisada antes de que alguien encargue repuestos. La trampa es encargar bisagras para un carro cuyo problema es el panel al que se atornillan: bisagras nuevas sobre lámina blanda se vuelven a caer en una temporada y la plata se fue. Hay una versión de verdad barata de esto y vale la pena probarla primero: una puerta que se cayó un poco muchas veces vuelve a cerrar después de ajustar el cerradero, y una puerta con los drenajes destapados deja de alimentar el óxido que empezó todo.",
+      "summary": "Los reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos incluyen bisagras de puerta trasera corroídas al punto de tener que cambiarse. Son dos y los dos son de un mismo año modelo, así que la compatibilidad de arriba se recorta a ese año en vez de repartirse por toda la generación: es la misma regla que se aplicó en otras entradas de este conjunto, con la misma advertencia: si su carro es de un año vecino, la revisión de abajo igual no cuesta nada, pero aquí no se afirma que su año esté afectado. La guía de compra que se cita al lado establece que estas carrocerías se pudren en guardabarros, estribos y soportes; no menciona bisagras, y no es la fuente para ellas. Es una falla pequeña al lado de casi todo lo que hay en este sitio, y se gana su lugar por lo que le dice a uno más que por lo que cuesta. La puerta trasera carga una llanta de repuesto pesada en una puerta con bisagras laterales, y esas bisagras van atornilladas a un panel que está en la parte de atrás del carro recogiendo todo lo que las ruedas traseras le tiran. Cuando las bisagras ya se fueron, el agua que las mató lleva años ahí, y eso significa que el panel detrás de ellas y el fondo de la puerta misma merecen una revisada antes de que alguien encargue repuestos. La trampa es encargar bisagras para un carro cuyo problema es el panel al que se atornillan: bisagras nuevas sobre lámina blanda se vuelven a caer en una temporada y la plata se fue. Hay una versión de verdad barata de esto y vale la pena probarla primero: una puerta que se cayó un poco muchas veces vuelve a cerrar después de ajustar el cerradero, y una puerta con los drenajes destapados deja de alimentar el óxido que empezó todo.",
       "slug": "bisagras-de-puerta-trasera-oxidadas",
       "symptoms": {
         "tailgate-drops-as-it-opens": "La puerta trasera se cae por el borde de afuera cuando se abre",

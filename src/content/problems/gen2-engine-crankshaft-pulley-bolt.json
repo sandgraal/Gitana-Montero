@@ -21,10 +21,18 @@
     "belts-thrown-off"
   ],
   "causes": [
-    { "id": "loose-crankshaft-pulley-bolt" },
-    { "id": "damaged-crankshaft-snout-or-keyway" },
-    { "id": "delaminated-harmonic-damper" },
-    { "id": "seized-accessory-pulley" }
+    {
+      "id": "loose-crankshaft-pulley-bolt"
+    },
+    {
+      "id": "damaged-crankshaft-snout-or-keyway"
+    },
+    {
+      "id": "delaminated-harmonic-damper"
+    },
+    {
+      "id": "seized-accessory-pulley"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -58,9 +66,12 @@
   ],
   "fixPaths": [
     {
-      "id": "retorque-with-the-improved-bolt",
+      "id": "torque-the-pulley-bolt",
       "difficulty": 4,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["loose-crankshaft-pulley-bolt"],
       "parts": [],
       "procedures": []
@@ -68,7 +79,10 @@
     {
       "id": "replace-the-damper",
       "difficulty": 4,
-      "cost": { "from": "moderate", "to": "significant" },
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
       "addresses": [
         "delaminated-harmonic-damper",
         "loose-crankshaft-pulley-bolt"
@@ -79,7 +93,10 @@
     {
       "id": "repair-or-replace-the-crankshaft",
       "difficulty": 5,
-      "cost": { "from": "significant", "to": "major" },
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
       "addresses": ["damaged-crankshaft-snout-or-keyway"],
       "parts": [],
       "procedures": []
@@ -102,7 +119,7 @@
       "kind": "reference"
     },
     {
-      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero",
+      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero — note the year's dataset also carries Montero Sport records, a different platform, which are excluded from what is relied on here",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
       "archiveUrl": "https://web.archive.org/web/20260902175240/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
       "accessed": "2026-09-02",
@@ -142,9 +159,9 @@
         "spin-each-accessory-by-hand": "With the belts off, turn the alternator, the steering pump, the water pump and each idler by hand and feel for roughness or drag"
       },
       "fixPaths": {
-        "retorque-with-the-improved-bolt": {
-          "title": "Fit the improved bolt and torque it correctly",
-          "detail": "This is the campaign's own remedy where the pulley and the crankshaft nose are undamaged: the improved bolt, tightened to the factory figure with a torque wrench, and the mating faces clean and dry. Guessing at this fastener is how the failure repeats — several owner reports describe exactly that."
+        "torque-the-pulley-bolt": {
+          "title": "Torque the pulley bolt to the factory figure, and replace it if it is damaged",
+          "detail": "This is the campaign's own remedy for this model where the pulley and the crankshaft nose are undamaged, and it is worth stating precisely because the campaign covers more than one vehicle and does not prescribe the same thing for all of them: on these trucks the bolt is tightened to the correct torque specification, and replaced only if it is found damaged. Two of the cited owner reports describe exactly that being done — one records the bolt inspected and never replaced, another simply that the mechanic tightened it. Use a torque wrench and clean, dry mating faces. Guessing at this fastener is how the failure repeats."
         },
         "replace-the-damper": {
           "title": "Replace the crankshaft pulley and damper",
@@ -165,7 +182,7 @@
         "wobbling-crank-pulley": "La polea de abajo bambolea o se mueve para adentro y para afuera con el motor en marcha mínima",
         "steering-suddenly-goes-heavy": "La dirección se pone pesada de repente mientras usted maneja",
         "charge-and-temperature-lamps-together": "Se enciende la luz de advertencia de carga y al mismo tiempo sube la aguja de temperatura",
-        "belts-thrown-off": "Las fajas se salen del motor"
+        "belts-thrown-off": "Las fajas salen despedidas del motor"
       },
       "causes": {
         "loose-crankshaft-pulley-bolt": "El perno de la polea del cigüeñal se aflojó",
@@ -181,9 +198,9 @@
         "spin-each-accessory-by-hand": "Con las fajas afuera, gire con la mano el alternador, la bomba de la dirección hidráulica, la bomba de agua y cada polea loca, y sienta si hay aspereza o resistencia"
       },
       "fixPaths": {
-        "retorque-with-the-improved-bolt": {
-          "title": "Poner el perno mejorado y apretarlo al torque correcto",
-          "detail": "Este es el remedio de la propia campaña cuando la polea y la punta del cigüeñal están sanas: el perno mejorado, apretado al valor de fábrica con llave de torque, y las caras de apoyo limpias y secas. Apretar este perno a puro cálculo es así como la falla se repite, y varios reportes de dueños describen exactamente eso."
+        "torque-the-pulley-bolt": {
+          "title": "Apretar el perno de la polea al torque de fábrica, y cambiarlo si está dañado",
+          "detail": "Este es el remedio de la propia campaña para este modelo cuando la polea y la punta del cigüeñal están sanas, y vale la pena decirlo con precisión porque la campaña cubre más de un vehículo y no receta lo mismo para todos: en estos carros el perno se aprieta al valor de torque correcto, y solo se cambia si se encuentra dañado. Dos de los reportes de dueños citados describen exactamente eso: uno deja constancia de que el perno se revisó y nunca se cambió, y otro de que el mecánico simplemente lo apretó. Use llave de torque y deje las caras de apoyo limpias y secas. Apretar este perno a puro cálculo es así como la falla se repite."
         },
         "replace-the-damper": {
           "title": "Cambiar la polea del cigüeñal con su amortiguador",

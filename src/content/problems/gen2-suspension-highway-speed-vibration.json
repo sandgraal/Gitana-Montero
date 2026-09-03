@@ -18,12 +18,24 @@
     "vibration-survives-new-tyres-and-balancing"
   ],
   "causes": [
-    { "id": "worn-front-upper-ball-joints" },
-    { "id": "worn-control-arm-bushings" },
-    { "id": "out-of-balance-or-out-of-round-tyre" },
-    { "id": "worn-driveshaft-universal-joints" },
-    { "id": "tired-front-shock-absorbers" },
-    { "id": "worn-steering-damper" }
+    {
+      "id": "worn-front-upper-ball-joints"
+    },
+    {
+      "id": "worn-control-arm-bushings"
+    },
+    {
+      "id": "out-of-balance-or-out-of-round-tyre"
+    },
+    {
+      "id": "worn-driveshaft-universal-joints"
+    },
+    {
+      "id": "tired-front-shock-absorbers"
+    },
+    {
+      "id": "worn-steering-damper"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -64,7 +76,10 @@
     {
       "id": "renew-the-front-joints-and-bushings",
       "difficulty": 4,
-      "cost": { "from": "moderate", "to": "significant" },
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
       "addresses": [
         "worn-front-upper-ball-joints",
         "worn-control-arm-bushings"
@@ -75,7 +90,10 @@
     {
       "id": "road-force-balance-or-replace-tyres",
       "difficulty": 1,
-      "cost": { "from": "minimal", "to": "significant" },
+      "cost": {
+        "from": "minimal",
+        "to": "significant"
+      },
       "addresses": ["out-of-balance-or-out-of-round-tyre"],
       "parts": [],
       "procedures": []
@@ -83,7 +101,9 @@
     {
       "id": "rebuild-the-driveshaft-joints",
       "difficulty": 4,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["worn-driveshaft-universal-joints"],
       "parts": [],
       "procedures": []
@@ -91,7 +111,9 @@
     {
       "id": "replace-the-front-dampers",
       "difficulty": 2,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["tired-front-shock-absorbers", "worn-steering-damper"],
       "parts": [],
       "procedures": []
@@ -100,7 +122,7 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero",
+      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero — note the year's dataset also carries Montero Sport records, a different platform, which are excluded from what is relied on here",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
       "archiveUrl": "https://web.archive.org/web/20260902175240/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
       "accessed": "2026-09-02",
@@ -197,7 +219,7 @@
         "swap-the-front-and-rear-wheels": "Pase las ruedas delanteras atrás y recorra la misma carretera, y note si el temblor se fue con ellas, se quedó, o cambió de carácter",
         "lever-each-front-ball-joint": "Con la rueda levantada y la suspensión apoyada en el punto correcto, haga palanca por debajo de la llanta y observe la rótula superior buscando que la bola se mueva dentro de su alojamiento",
         "lever-the-control-arm-bushings": "Haga palanca sobre cada tijereta contra su soporte y observe el buje buscando que el casquillo se mueva dentro del hule",
-        "twist-each-universal-joint": "Con el cardán montado, sujete cada extremo de una cruceta e intente torcerlo contra el otro, sintiendo el chasquido de una cruceta gastada",
+        "twist-each-universal-joint": "Con el cardán montado, sujete cada yugo de la cruceta e intente torcerlo contra su pareja, sintiendo el chasquido de una cruceta gastada",
         "bounce-and-inspect-the-front-shocks": "Hunda cada esquina delantera y cuente qué tan rápido se asienta; después revise los cuerpos de los amortiguadores y el amortiguador de dirección buscando aceite escurrido por el tubo"
       },
       "fixPaths": {

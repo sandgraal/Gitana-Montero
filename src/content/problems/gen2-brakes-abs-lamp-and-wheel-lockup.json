@@ -156,7 +156,7 @@
       },
       "causes": {
         "contaminated-or-failed-speed-sensor": "Sensor de velocidad de rueda contaminado por suciedad, aceite o corrosión",
-        "broken-sensor-wiring": "Cableado roto o desgastado entre un sensor y la unidad de control",
+        "broken-sensor-wiring": "Ramal roto o desgastado entre un sensor y la unidad de control",
         "low-brake-fluid": "Nivel bajo de líquido de frenos",
         "worn-out-friction-on-one-axle": "Pastillas de freno o zapatas de freno gastadas en un eje",
         "failed-abs-control-unit": "Unidad de control del ABS dañada"

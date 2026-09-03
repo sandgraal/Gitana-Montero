@@ -119,7 +119,7 @@
   "prose": {
     "en": {
       "title": "Runs hot in traffic or on a long climb",
-      "summary": "A buyer's guide written for this exact generation calls the cooling system one of the two things that decide whether a truck is worth buying at all, and it says why in one line: old radiators, old hoses and tired viscous fans cause overheating, and on the diesels the bill that arrives afterwards is a cracked or warped cylinder head. That is the whole reason this entry carries the severity it does. Overheating is not itself an expensive fault — a radiator, a fan coupling and a thermostat are ordinary parts. What is expensive is the head that was cooked while somebody drove another few kilometres hoping the gauge would come down. It does not come down, and the damage is done in that few kilometres rather than over the following month. The pattern of when the gauge rises is most of the diagnosis and it costs nothing to observe: hot only in traffic and at low speed points at airflow, which means the fan; hot only when working hard on the open road points at the radiator's ability to shed heat; hot everywhere and quickly points at circulation. Stop, let it cool, and do not open a hot system — the coolant in there is above its boiling point and held down only by the cap.",
+      "summary": "A buyer's guide written for this exact generation puts the cooling system on its inspection list and says why in one line: old radiators, old hoses and tired viscous fans cause overheating, and on the diesels the bill that arrives afterwards is a cracked or warped cylinder head. That is the whole reason this entry carries the severity it does. Overheating is not itself an expensive fault — a radiator, a fan coupling and a thermostat are ordinary parts. What is expensive is the head that was cooked while somebody drove another few kilometres hoping the gauge would come down. It does not come down, and the damage is done in that few kilometres rather than over the following month. The pattern of when the gauge rises is most of the diagnosis and it costs nothing to observe: hot only in traffic and at low speed points at airflow, which means the fan; hot only when working hard on the open road points at the radiator's ability to shed heat; hot everywhere and quickly points at circulation. Stop, let it cool, and do not open a hot system — the coolant in there is above its boiling point and held down only by the cap.",
       "slug": "runs-hot",
       "symptoms": {
         "gauge-climbs-in-traffic-or-on-a-climb": "The temperature gauge climbs in traffic or on a long climb and falls again when you get moving",
@@ -169,7 +169,7 @@
     },
     "es": {
       "title": "Se calienta en presa o en una subida larga",
-      "summary": "Una guía de compra escrita para esta misma generación llama al sistema de refrigeración una de las dos cosas que deciden si un carro vale la pena comprarlo, y explica por qué en una línea: radiadores viejos, mangueras viejas y ventiladores viscosos acabados provocan sobrecalentamiento, y en los motores diésel la cuenta que llega después es un cabezote rajado o pandeado. Esa es toda la razón de la severidad que lleva esta entrada. El sobrecalentamiento en sí no es una falla cara: un radiador, un acople de ventilador y un termostato son piezas corrientes. Lo caro es el cabezote que se cocinó mientras alguien manejaba unos kilómetros más esperando que la aguja bajara. No baja, y el daño se hace en esos pocos kilómetros y no en el mes siguiente. El patrón de cuándo sube la aguja es casi todo el diagnóstico y no cuesta nada observarlo: caliente solo en presa y a poca velocidad apunta al flujo de aire, o sea al ventilador; caliente solo cuando el carro trabaja en carretera abierta apunta a la capacidad del radiador para botar calor; caliente en todo lado y rápido apunta a la circulación. Pare, deje que enfríe, y no abra un sistema caliente: el refrigerante ahí adentro está por encima de su punto de ebullición y lo único que lo contiene es la tapa.",
+      "summary": "Una guía de compra escrita para esta misma generación pone el sistema de refrigeración en su lista de revisión y explica por qué en una línea: radiadores viejos, mangueras viejas y ventiladores viscosos acabados provocan sobrecalentamiento, y en los motores diésel la cuenta que llega después es un cabezote rajado o pandeado. Esa es toda la razón de la severidad que lleva esta entrada. El sobrecalentamiento en sí no es una falla cara: un radiador, un acople de ventilador y un termostato son piezas corrientes. Lo caro es el cabezote que se cocinó mientras alguien manejaba unos kilómetros más esperando que la aguja bajara. No baja, y el daño se hace en esos pocos kilómetros y no en el mes siguiente. El patrón de cuándo sube la aguja es casi todo el diagnóstico y no cuesta nada observarlo: caliente solo en presa y a poca velocidad apunta al flujo de aire, o sea al ventilador; caliente solo cuando el carro trabaja en carretera abierta apunta a la capacidad del radiador para botar calor; caliente en todo lado y rápido apunta a la circulación. Pare, deje que enfríe, y no abra un sistema caliente: el refrigerante ahí adentro está por encima de su punto de ebullición y lo único que lo contiene es la tapa.",
       "slug": "se-calienta",
       "symptoms": {
         "gauge-climbs-in-traffic-or-on-a-climb": "La aguja de temperatura sube en presa o en una subida larga y baja otra vez cuando el carro agarra camino",
@@ -179,7 +179,7 @@
         "sweet-smell-and-steam-at-the-front": "Olor dulce y vapor saliendo del frente del carro"
       },
       "causes": {
-        "clogged-or-split-radiator": "Panal del radiador tapado, o un tanque lateral partido",
+        "clogged-or-split-radiator": "Panal del radiador tapado, o un tanque de extremo partido",
         "tired-viscous-fan-coupling": "Acople viscoso del ventilador del radiador que ya no endurece cuando está caliente",
         "stuck-thermostat": "Termostato pegado cerrado, o una bolsa de aire detrás de él",
         "perished-hoses-or-weak-cap": "Mangueras cristalizadas o una tapa que ya no sostiene presión",
@@ -197,7 +197,7 @@
       "fixPaths": {
         "replace-the-radiator-and-service-the-system": {
           "title": "Cambiar el radiador y renovar con él las mangueras y la tapa",
-          "detail": "Un radiador con el panal tapado o con un tanque plástico partido se cambia, no se parcha. Las mangueras, la tapa y refrigerante nuevo van al mismo tiempo, porque todo eso envejeció junto y porque un radiador nuevo detrás de una tapa que ya no sostiene presión hierve a menor temperatura de la que debería."
+          "detail": "Un radiador con el panal tapado o con un tanque de extremo plástico partido se cambia, no se parcha. Las mangueras, la tapa y refrigerante nuevo van al mismo tiempo, porque todo eso envejeció junto y porque un radiador nuevo detrás de una tapa que ya no sostiene presión hierve a menor temperatura de la que debería."
         },
         "replace-the-fan-coupling": {
           "title": "Cambiar el acople viscoso del ventilador",

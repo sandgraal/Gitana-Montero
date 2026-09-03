@@ -18,10 +18,18 @@
     "damp-patch-on-inner-fender"
   ],
   "causes": [
-    { "id": "line-chafed-at-pass-through" },
-    { "id": "line-chafed-against-neighbouring-pipe" },
-    { "id": "corroded-rigid-line" },
-    { "id": "cracked-flexible-hose" }
+    {
+      "id": "line-chafed-at-pass-through"
+    },
+    {
+      "id": "line-chafed-against-neighbouring-pipe"
+    },
+    {
+      "id": "corroded-rigid-line"
+    },
+    {
+      "id": "cracked-flexible-hose"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -47,7 +55,9 @@
     {
       "id": "reposition-and-protect-the-line",
       "difficulty": 2,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": [
         "line-chafed-at-pass-through",
         "line-chafed-against-neighbouring-pipe"
@@ -58,7 +68,10 @@
     {
       "id": "replace-the-damaged-line",
       "difficulty": 4,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": [
         "line-chafed-at-pass-through",
         "line-chafed-against-neighbouring-pipe",
@@ -78,7 +91,7 @@
       "kind": "manufacturer"
     },
     {
-      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero",
+      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero — note the year's dataset also carries Montero Sport records, a different platform, which are excluded from what is relied on here",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
       "archiveUrl": "https://web.archive.org/web/20260902175240/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
       "accessed": "2026-09-02",

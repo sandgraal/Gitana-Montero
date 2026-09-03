@@ -175,7 +175,7 @@
       },
       "fixPaths": {
         "renew-the-linkage-joints": {
-          "title": "Renovar juntas las articulaciones gastadas del varillaje",
+          "title": "Renovar en conjunto las articulaciones gastadas del varillaje",
           "detail": "Las articulaciones de este varillaje se cambian en grupo y no de una en una: cambiar la peor solo le pasa la queja a la siguiente, y de todos modos hay que rehacer el alineamiento. En dirección, las chavetas y los valores de torque no son opcionales."
         },
         "adjust-or-rebuild-the-steering-box": {
