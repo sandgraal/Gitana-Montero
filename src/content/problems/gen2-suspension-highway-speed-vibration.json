@@ -1,0 +1,245 @@
+{
+  "id": "gen2-suspension-highway-speed-vibration",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "markets": ["us"],
+    "years": {
+      "from": 1996,
+      "to": 1999
+    }
+  },
+  "system": "suspension",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "steering-wheel-shimmy-at-highway-speed",
+    "vibration-comes-and-goes-with-speed",
+    "shaking-through-the-seat-and-floor",
+    "vibration-survives-new-tyres-and-balancing"
+  ],
+  "causes": [
+    {
+      "id": "worn-front-upper-ball-joints"
+    },
+    {
+      "id": "worn-control-arm-bushings"
+    },
+    {
+      "id": "out-of-balance-or-out-of-round-tyre"
+    },
+    {
+      "id": "worn-driveshaft-universal-joints"
+    },
+    {
+      "id": "tired-front-shock-absorbers"
+    },
+    {
+      "id": "worn-steering-damper"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "note-whether-it-is-speed-or-load-related",
+      "rulesIn": [
+        "out-of-balance-or-out-of-round-tyre",
+        "worn-driveshaft-universal-joints"
+      ],
+      "rulesOut": ["tired-front-shock-absorbers"]
+    },
+    {
+      "id": "swap-the-front-and-rear-wheels",
+      "rulesIn": ["out-of-balance-or-out-of-round-tyre"],
+      "rulesOut": ["worn-front-upper-ball-joints"]
+    },
+    {
+      "id": "lever-each-front-ball-joint",
+      "rulesIn": ["worn-front-upper-ball-joints"],
+      "rulesOut": ["out-of-balance-or-out-of-round-tyre"]
+    },
+    {
+      "id": "lever-the-control-arm-bushings",
+      "rulesIn": ["worn-control-arm-bushings"],
+      "rulesOut": ["worn-front-upper-ball-joints"]
+    },
+    {
+      "id": "twist-each-universal-joint",
+      "rulesIn": ["worn-driveshaft-universal-joints"],
+      "rulesOut": ["worn-control-arm-bushings"]
+    },
+    {
+      "id": "bounce-and-inspect-the-front-shocks",
+      "rulesIn": ["tired-front-shock-absorbers", "worn-steering-damper"],
+      "rulesOut": ["worn-driveshaft-universal-joints"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "renew-the-front-joints-and-bushings",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": [
+        "worn-front-upper-ball-joints",
+        "worn-control-arm-bushings"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "road-force-balance-or-replace-tyres",
+      "difficulty": 1,
+      "cost": {
+        "from": "minimal",
+        "to": "significant"
+      },
+      "addresses": ["out-of-balance-or-out-of-round-tyre"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "rebuild-the-driveshaft-joints",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["worn-driveshaft-universal-joints"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-front-dampers",
+      "difficulty": 2,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["tired-front-shock-absorbers", "worn-steering-damper"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero — note the year's dataset also carries Montero Sport records, a different platform, which are excluded from what is relied on here",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
+      "archiveUrl": "https://web.archive.org/web/20260902175240/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1998 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1998",
+      "archiveUrl": "https://web.archive.org/web/20260902205258/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1998",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1999 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "archiveUrl": "https://web.archive.org/web/20260902175310/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "Luso Overland — Montero Gen 2 / 2.5 IFS upper ball joint (Mitsubishi MB860829 left, MB860830 right)",
+      "url": "https://lusooverland.com/VP-MMC-MB8608XX",
+      "archiveUrl": "https://web.archive.org/web/20260902175857/https://lusooverland.com/VP-MMC-MB8608XX",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Shimmy and vibration at highway speed",
+      "summary": "This is the single most-reported chassis complaint filed with the United States road safety agency for the later trucks of this generation. Owners describe a steering wheel that has to be held with both hands, shaking that arrives in a narrow band of road speed, and — the part that matters for diagnosis — a fault that survived new tyres, repeated balancing and more than one visit to a workshop. One owner report goes further and names the front upper control arm joints and their bearings as what was eventually found — one report, not a pattern, and the causes below are ranked on how this failure usually goes rather than on that single account. The pattern worth trusting is the broader one: many owners, several model years, one complaint that survived the obvious fixes. When a vibration comes back after the wheels have been balanced twice, the wheels are usually not the story: something in the front end has enough freedom to let the wheel steer itself a little, and the tyre then feeds that movement back through the linkage. This is a heavy independent front end with torsion bars, and every joint in it is decades old. It is not dangerous the way a separated joint is dangerous, and the truck stays perfectly controllable at ordinary speeds — but shimmy is a symptom of looseness, and looseness in a front end is on a path that ends somewhere worse. Keep the speed down and get the joints measured.",
+      "slug": "highway-speed-shimmy",
+      "symptoms": {
+        "steering-wheel-shimmy-at-highway-speed": "The steering wheel shakes side to side once the truck is up at highway speed",
+        "vibration-comes-and-goes-with-speed": "The vibration appears in a band of speed and eases off above and below it",
+        "shaking-through-the-seat-and-floor": "Shaking felt through the seat and the floor as well as the wheel",
+        "vibration-survives-new-tyres-and-balancing": "It is still there after new tyres and after the wheels were balanced again"
+      },
+      "causes": {
+        "worn-front-upper-ball-joints": "Worn front upper ball joints",
+        "worn-control-arm-bushings": "Worn control arm bushings",
+        "out-of-balance-or-out-of-round-tyre": "A tyre out of balance or out of round",
+        "worn-driveshaft-universal-joints": "Worn universal joints in a driveshaft",
+        "tired-front-shock-absorbers": "Worn-out front shock absorbers",
+        "worn-steering-damper": "Worn steering damper"
+      },
+      "diagnosticSteps": {
+        "note-whether-it-is-speed-or-load-related": "Note whether the shake tracks road speed regardless of throttle, or whether it comes in under power and eases when you lift off",
+        "swap-the-front-and-rear-wheels": "Move the front wheels to the rear and drive the same road again, and note whether the shake moved with them, stayed, or changed character",
+        "lever-each-front-ball-joint": "With the wheel raised and the suspension supported at the correct point, lever under the tyre and watch the upper joint for the ball moving in its socket",
+        "lever-the-control-arm-bushings": "Lever each control arm against its mounting and watch the bushing for the sleeve moving inside the rubber",
+        "twist-each-universal-joint": "With the driveshaft in place, hold each yoke and try to twist it against its partner, feeling for the click of a worn cross",
+        "bounce-and-inspect-the-front-shocks": "Bounce each front corner and count how quickly it settles, then look at the shock bodies and the steering damper for oil weeping down the tube"
+      },
+      "fixPaths": {
+        "renew-the-front-joints-and-bushings": {
+          "title": "Renew the front upper joints and the control arm bushings",
+          "detail": "Joints and bushings are done in pairs across the axle, and the truck is aligned afterwards because replacing them changes where the wheel sits. Torsion bar front suspension holds real energy in the bar, and unloading it wrongly hurts people — if you have not done one before, this belongs with a qualified mechanic."
+        },
+        "road-force-balance-or-replace-tyres": {
+          "title": "Have the wheels balanced under load, or replace the tyre",
+          "detail": "An ordinary spin balance cannot see a tyre that is stiff in one spot. A balancer that presses the tyre against a roller can, and it is the cheapest way to take the wheels out of the argument before anything gets unbolted."
+        },
+        "rebuild-the-driveshaft-joints": {
+          "title": "Replace the driveshaft universal joints",
+          "detail": "Universal joints are replaced as a set on the shaft that has one worn, and the shaft is refitted in the same orientation it came out in. If the shake arrived with power rather than with speed, start here rather than at the front end."
+        },
+        "replace-the-front-dampers": {
+          "title": "Replace the front shock absorbers and the steering damper",
+          "detail": "Worn dampers rarely cause shimmy on their own, but they let it build instead of killing it. This is the cheap end of the list and worth doing while the front end is apart for anything else."
+        }
+      }
+    },
+    "es": {
+      "title": "Temblor y vibración a velocidad de carretera",
+      "summary": "Esta es la queja de chasis más reportada ante la agencia de seguridad vial de Estados Unidos para los carros tardíos de esta generación. Los dueños describen un volante que hay que sujetar con las dos manos, un temblor que aparece en una franja angosta de velocidad y —la parte que importa para el diagnóstico— una falla que sobrevivió a llantas nuevas, a varios balanceos y a más de una visita al taller. Un reporte de dueño va más allá y nombra las articulaciones de la tijereta superior delantera y sus rodamientos como lo que al final se encontró: un solo reporte, no un patrón, y las causas de abajo están ordenadas por cómo suele darse esta falla y no por ese caso aislado. El patrón que sí merece confianza es el otro: muchos dueños, varios años modelo, una sola queja que sobrevivió a los arreglos obvios. Cuando una vibración regresa después de balancear las ruedas dos veces, las ruedas casi nunca son el cuento: algo del tren delantero tiene suficiente libertad para dejar que la rueda se dirija sola un poquito, y la llanta después devuelve ese movimiento por el varillaje. Este es un tren delantero independiente y pesado, con barras de torsión, y cada articulación que lleva tiene décadas encima. No es peligroso como es peligrosa una rótula que se suelta, y el carro se mantiene perfectamente controlable a velocidades normales; pero el temblor es síntoma de holgura, y la holgura en un tren delantero va por un camino que termina en algo peor. Baje la velocidad y mande a medir las articulaciones.",
+      "slug": "temblor-a-velocidad-de-carretera",
+      "symptoms": {
+        "steering-wheel-shimmy-at-highway-speed": "El volante tiembla de lado a lado cuando el carro agarra velocidad de carretera",
+        "vibration-comes-and-goes-with-speed": "La vibración aparece en una franja de velocidad y se calma por arriba y por debajo de ella",
+        "shaking-through-the-seat-and-floor": "El temblor se siente por el asiento y por el piso, además del volante",
+        "vibration-survives-new-tyres-and-balancing": "Sigue ahí después de llantas nuevas y de volver a balancear las ruedas"
+      },
+      "causes": {
+        "worn-front-upper-ball-joints": "Rótulas superiores delanteras gastadas",
+        "worn-control-arm-bushings": "Bujes de la tijereta gastados",
+        "out-of-balance-or-out-of-round-tyre": "Una llanta desbalanceada o fuera de redondez",
+        "worn-driveshaft-universal-joints": "Crucetas gastadas en un cardán",
+        "tired-front-shock-absorbers": "Amortiguadores delanteros acabados",
+        "worn-steering-damper": "Amortiguador de dirección gastado"
+      },
+      "diagnosticSteps": {
+        "note-whether-it-is-speed-or-load-related": "Fíjese si el temblor sigue la velocidad del carro sin importar el acelerador, o si entra con carga de motor y se calma cuando usted suelta",
+        "swap-the-front-and-rear-wheels": "Pase las ruedas delanteras atrás y recorra la misma carretera, y note si el temblor se fue con ellas, se quedó, o cambió de carácter",
+        "lever-each-front-ball-joint": "Con la rueda levantada y la suspensión apoyada en el punto correcto, haga palanca por debajo de la llanta y observe la rótula superior buscando que la bola se mueva dentro de su alojamiento",
+        "lever-the-control-arm-bushings": "Haga palanca sobre cada tijereta contra su soporte y observe el buje buscando que el casquillo se mueva dentro del hule",
+        "twist-each-universal-joint": "Con el cardán montado, sujete cada yugo de la cruceta e intente torcerlo contra su pareja, sintiendo el chasquido de una cruceta gastada",
+        "bounce-and-inspect-the-front-shocks": "Hunda cada esquina delantera y cuente qué tan rápido se asienta; después revise los cuerpos de los amortiguadores y el amortiguador de dirección buscando aceite escurrido por el tubo"
+      },
+      "fixPaths": {
+        "renew-the-front-joints-and-bushings": {
+          "title": "Renovar las rótulas superiores delanteras y los bujes de tijereta",
+          "detail": "Rótulas y bujes se hacen en pareja por eje, y después se hace el alineamiento porque cambiarlos mueve la posición de la rueda. La suspensión delantera de barras de torsión guarda energía real en la barra, y descargarla mal lastima gente: si usted nunca ha hecho una, esto es trabajo para un mecánico calificado."
+        },
+        "road-force-balance-or-replace-tyres": {
+          "title": "Balancear las ruedas bajo carga, o cambiar la llanta",
+          "detail": "Un balanceo común no ve una llanta que está dura en un punto. Una balanceadora que presiona la llanta contra un rodillo sí, y es la manera más barata de sacar a las ruedas de la discusión antes de desarmar algo."
+        },
+        "rebuild-the-driveshaft-joints": {
+          "title": "Cambiar las crucetas del cardán",
+          "detail": "Las crucetas se cambian en juego en el cardán que tenga una gastada, y el cardán se vuelve a montar en la misma orientación en que salió. Si el temblor llegó con carga de motor y no con la velocidad, empiece por aquí y no por el tren delantero."
+        },
+        "replace-the-front-dampers": {
+          "title": "Cambiar los amortiguadores delanteros y el de dirección",
+          "detail": "Los amortiguadores acabados rara vez provocan el temblor por sí solos, pero dejan que crezca en vez de matarlo. Es la parte barata de la lista y vale la pena hacerlo mientras el tren delantero esté desarmado por otra cosa."
+        }
+      }
+    }
+  }
+}

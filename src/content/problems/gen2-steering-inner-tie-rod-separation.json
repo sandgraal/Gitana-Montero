@@ -1,0 +1,161 @@
+{
+  "id": "gen2-steering-inner-tie-rod-separation",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "markets": ["us"],
+    "years": {
+      "from": 1992,
+      "to": 1999
+    }
+  },
+  "system": "steering",
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "steering-goes-light-then-does-nothing",
+    "clonk-from-the-front-when-turning",
+    "wheel-turns-but-the-truck-does-not",
+    "sudden-change-in-toe-and-tyre-scrub"
+  ],
+  "causes": [
+    { "id": "inner-tie-rod-pulled-from-the-tube" },
+    { "id": "worn-tie-rod-end-joint" },
+    { "id": "loose-or-missing-clamp-on-the-adjuster" },
+    { "id": "worn-idler-arm" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "rock-the-steering-with-a-helper",
+      "rulesIn": ["worn-tie-rod-end-joint", "worn-idler-arm"],
+      "rulesOut": ["loose-or-missing-clamp-on-the-adjuster"]
+    },
+    {
+      "id": "grip-the-rod-either-side-of-the-adjuster",
+      "rulesIn": [
+        "inner-tie-rod-pulled-from-the-tube",
+        "loose-or-missing-clamp-on-the-adjuster"
+      ],
+      "rulesOut": ["worn-tie-rod-end-joint"]
+    },
+    {
+      "id": "check-the-thread-engagement-at-each-adjuster",
+      "rulesIn": ["inner-tie-rod-pulled-from-the-tube"],
+      "rulesOut": ["worn-idler-arm"]
+    },
+    {
+      "id": "look-at-the-tyre-shoulders",
+      "rulesIn": [
+        "inner-tie-rod-pulled-from-the-tube",
+        "loose-or-missing-clamp-on-the-adjuster"
+      ],
+      "rulesOut": ["worn-idler-arm"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-tie-rod-assembly",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": [
+        "inner-tie-rod-pulled-from-the-tube",
+        "worn-tie-rod-end-joint",
+        "loose-or-missing-clamp-on-the-adjuster"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-idler-arm",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": ["worn-idler-arm"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA owner complaint database — 1993 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1993",
+      "archiveUrl": "https://web.archive.org/web/20260902174904/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1993",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1995 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1995",
+      "archiveUrl": "http://web.archive.org/web/20260902175019/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1995",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Inner tie rod pulls out of its adjuster tube",
+      "summary": "Among the steering complaints filed with the United States road safety agency for this generation there is one that stands apart from ordinary wear: an inner tie rod described as having pulled out of the threaded tube it screws into, with the driver losing steering control at the moment it let go. Reports name it in more than one model year. It is worth separating from the everyday worn joint because the failure mode is different. A worn ball joint gets loose, then vague, then noisy, and gives you months of warning. A rod that unscrews from its adjuster gives you the same vague steering for a while and then nothing at all, and the difference between the two is not something you can feel from the seat — it is something you find by putting your hands on the linkage. This truck's steering linkage is long, exposed and full of adjusters that are held by clamps, and every one of those clamps has spent decades in water and grit. Any new looseness, clonk or change in how the truck tracks is checked before it is driven, not after. If the linkage has play and you are not equipped to measure it, that is a tow, not a test drive.",
+      "slug": "inner-tie-rod-pulls-out",
+      "symptoms": {
+        "steering-goes-light-then-does-nothing": "The steering suddenly goes light and then does nothing at all",
+        "clonk-from-the-front-when-turning": "A clonk from the front of the truck when you turn the wheel or change direction",
+        "wheel-turns-but-the-truck-does-not": "The wheel turns a noticeable amount before the truck starts to follow",
+        "sudden-change-in-toe-and-tyre-scrub": "One front tyre suddenly starts scrubbing its shoulder away"
+      },
+      "causes": {
+        "inner-tie-rod-pulled-from-the-tube": "The inner tie rod has unscrewed or pulled out of its adjuster tube",
+        "worn-tie-rod-end-joint": "Worn tie rod end joint",
+        "loose-or-missing-clamp-on-the-adjuster": "Loose, seized or missing clamp on an adjuster tube",
+        "worn-idler-arm": "Worn idler arm"
+      },
+      "diagnosticSteps": {
+        "rock-the-steering-with-a-helper": "With the truck on the ground and the engine running, have someone rock the wheel a little either side of centre while you watch each joint in the linkage for movement that does not pass through",
+        "grip-the-rod-either-side-of-the-adjuster": "With the truck safely raised and supported, grip the rod on both sides of each adjuster tube and try to pull, push and twist the two halves relative to each other",
+        "check-the-thread-engagement-at-each-adjuster": "Look at how much thread is showing at each end of every adjuster tube and compare the two sides of the truck",
+        "look-at-the-tyre-shoulders": "Look along both front tyres for a feathered or scrubbed shoulder that appeared recently"
+      },
+      "fixPaths": {
+        "replace-the-tie-rod-assembly": {
+          "title": "Replace the tie rod assembly and set the alignment",
+          "detail": "Rod ends and adjuster tubes are replaced as an assembly rather than rebuilt, clamps go on new, and the truck is aligned afterwards — a linkage that has been apart is never at the right toe by luck. This is steering: torque figures matter, split pins are not optional, and if you cannot align it afterwards it is work for a qualified mechanic."
+        },
+        "replace-the-idler-arm": {
+          "title": "Replace the idler arm",
+          "detail": "The idler arm carries one end of the linkage and wears in the same way the rod ends do. It is worth checking the pitman arm at the steering box at the same time, because a truck that has worn one has usually worn the other."
+        }
+      }
+    },
+    "es": {
+      "title": "La barra de dirección interna se sale de su tubo de ajuste",
+      "summary": "Entre las quejas de dirección presentadas ante la agencia de seguridad vial de Estados Unidos para esta generación hay una que se sale del desgaste corriente: una barra de dirección interna que, según el reporte, se salió del tubo roscado donde va enroscada, y el conductor perdió el control de la dirección en ese mismo momento. Los reportes la nombran en más de un año modelo. Vale la pena separarla de la rótula gastada de todos los días porque el modo de falla es distinto. Una rótula gastada se pone floja, luego imprecisa, luego ruidosa, y le da a uno meses de aviso. Una barra que se desenrosca de su ajuste le da a uno esa misma dirección imprecisa durante un rato y después nada, y la diferencia entre las dos no se siente desde el asiento: se encuentra poniéndole las manos al varillaje. El varillaje de dirección de este carro es largo, está expuesto y está lleno de ajustes sujetos con abrazaderas, y cada una de esas abrazaderas lleva décadas entre agua y arena. Cualquier juego nuevo, golpeteo o cambio en cómo se mantiene en línea el carro se revisa antes de manejarlo, no después. Si el varillaje tiene juego y usted no tiene con qué medirlo, eso es una grúa y no una vuelta de prueba.",
+      "slug": "barra-de-direccion-interna-se-sale",
+      "symptoms": {
+        "steering-goes-light-then-does-nothing": "La dirección se pone liviana de repente y después no hace nada",
+        "clonk-from-the-front-when-turning": "Un golpe seco adelante cuando usted gira el volante o cambia de dirección",
+        "wheel-turns-but-the-truck-does-not": "El volante gira un buen tanto antes de que el carro empiece a seguirlo",
+        "sudden-change-in-toe-and-tyre-scrub": "Una llanta delantera empieza de pronto a comerse el hombro"
+      },
+      "causes": {
+        "inner-tie-rod-pulled-from-the-tube": "La barra de dirección interna se desenroscó o se salió de su tubo de ajuste",
+        "worn-tie-rod-end-joint": "Terminal de dirección con la rótula gastada",
+        "loose-or-missing-clamp-on-the-adjuster": "Abrazadera del tubo de ajuste floja, pegada o faltante",
+        "worn-idler-arm": "Brazo loco gastado"
+      },
+      "diagnosticSteps": {
+        "rock-the-steering-with-a-helper": "Con el carro en el piso y el motor encendido, pida que alguien mueva el volante un poco a cada lado del centro mientras usted observa cada articulación del varillaje buscando movimiento que no se transmita",
+        "grip-the-rod-either-side-of-the-adjuster": "Con el carro levantado y apoyado sobre soportes de seguridad, agarre la barra a ambos lados de cada tubo de ajuste e intente jalar, empujar y torcer una mitad contra la otra",
+        "check-the-thread-engagement-at-each-adjuster": "Vea cuánta rosca queda a la vista en cada punta de cada tubo de ajuste y compare los dos lados del carro",
+        "look-at-the-tyre-shoulders": "Recorra con la vista las dos llantas delanteras buscando un hombro comido o aserrado que haya aparecido hace poco"
+      },
+      "fixPaths": {
+        "replace-the-tie-rod-assembly": {
+          "title": "Cambiar el conjunto de la barra de dirección y hacer el alineamiento",
+          "detail": "Los terminales de dirección y los tubos de ajuste se cambian como conjunto en vez de repararse, las abrazaderas van nuevas, y después se hace el alineamiento: un varillaje que estuvo desarmado nunca queda con la convergencia correcta por casualidad. Esto es dirección: los valores de torque importan, las chavetas no son opcionales, y si usted no puede alinearlo después, el trabajo es para un mecánico calificado."
+        },
+        "replace-the-idler-arm": {
+          "title": "Cambiar el brazo loco",
+          "detail": "El brazo loco sostiene una punta del varillaje y se gasta igual que los terminales de dirección. Vale la pena revisar al mismo tiempo el brazo pitman en la caja de dirección, porque un carro que gastó uno normalmente gastó el otro."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,208 @@
+{
+  "id": "gen2-brakes-front-brake-judder",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "markets": ["us"],
+    "years": {
+      "from": 1996,
+      "to": 1999
+    }
+  },
+  "system": "brakes",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "pedal-pulses-under-braking",
+    "steering-wheel-shakes-when-braking",
+    "judder-returns-soon-after-machining",
+    "one-front-wheel-much-hotter"
+  ],
+  "causes": [
+    {
+      "id": "uneven-disc-thickness"
+    },
+    {
+      "id": "sticking-caliper-slide"
+    },
+    {
+      "id": "uneven-wheel-nut-torque"
+    },
+    {
+      "id": "worn-hub-bearing-or-runout"
+    },
+    {
+      "id": "pad-material-transfer"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "feel-where-the-shake-arrives",
+      "rulesIn": ["uneven-disc-thickness", "pad-material-transfer"],
+      "rulesOut": ["worn-hub-bearing-or-runout"]
+    },
+    {
+      "id": "compare-wheel-temperature-after-a-drive",
+      "rulesIn": ["sticking-caliper-slide"],
+      "rulesOut": ["uneven-wheel-nut-torque"]
+    },
+    {
+      "id": "measure-disc-thickness-around-the-face",
+      "rulesIn": ["uneven-disc-thickness"],
+      "rulesOut": ["pad-material-transfer"]
+    },
+    {
+      "id": "check-hub-play-and-disc-runout",
+      "rulesIn": ["worn-hub-bearing-or-runout"],
+      "rulesOut": ["sticking-caliper-slide"]
+    },
+    {
+      "id": "check-how-the-wheel-was-last-tightened",
+      "rulesIn": ["uneven-wheel-nut-torque"],
+      "rulesOut": ["worn-hub-bearing-or-runout"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-discs-and-pads-in-pairs",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["uneven-disc-thickness", "pad-material-transfer"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "free-and-service-the-caliper",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["sticking-caliper-slide"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "clean-the-hub-face-and-torque-properly",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["uneven-wheel-nut-torque", "worn-hub-bearing-or-runout"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA owner complaint database — 1996 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "archiveUrl": "https://web.archive.org/web/20260902205122/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero — note the year's dataset also carries Montero Sport records, a different platform, which are excluded from what is relied on here",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
+      "archiveUrl": "https://web.archive.org/web/20260902175240/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1998 Mitsubishi Montero (further brake complaints in the fitment range)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1998",
+      "archiveUrl": "https://web.archive.org/web/20260902205258/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1998",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1999 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "archiveUrl": "https://web.archive.org/web/20260902175310/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Brake judder through the pedal and the steering wheel",
+      "summary": "Owner reports filed with the United States road safety agency return to this one across the later model years of the generation — the fitment above is set to the years those reports actually cover, not to the whole run: the pedal pulses, the steering wheel shakes when the brakes come on, the front discs get machined, and the judder is back well before the next set of pads is due. The repeat is the useful part of the story. A disc that is machined and then judders again was rarely the whole fault — something is still making one part of the disc face run hotter, or thicker, than the rest. This is a heavy truck on a front disc that was sized for a heavy truck, and the two usual culprits are a caliper that no longer slides freely and a wheel that was hammered on with an impact gun instead of torqued in sequence. It is uncomfortable rather than dangerous on its own: the brakes still work, and they still work well enough to stop the truck. What earns the caution is what tends to be underneath it — a caliper that drags is also cooking the fluid and the pads on that corner, and a bearing loose enough to show as judder is a different problem wearing a brake costume. Drive it gently, avoid long descents on the brakes, and get it looked at.",
+      "slug": "brake-judder",
+      "symptoms": {
+        "pedal-pulses-under-braking": "The pedal pushes back in a rhythm while you brake",
+        "steering-wheel-shakes-when-braking": "The steering wheel shakes side to side only when the brakes are applied",
+        "judder-returns-soon-after-machining": "The judder comes back not long after the discs were machined",
+        "one-front-wheel-much-hotter": "One front wheel is far hotter than the other after an ordinary drive"
+      },
+      "causes": {
+        "uneven-disc-thickness": "The disc no longer has the same thickness all the way round",
+        "sticking-caliper-slide": "The caliper slide pins are seized so the pads never fully release",
+        "uneven-wheel-nut-torque": "Wheel nuts tightened unevenly or over-tightened, distorting the disc",
+        "worn-hub-bearing-or-runout": "Worn hub bearing letting the disc wobble as it turns",
+        "pad-material-transfer": "Pad material baked onto the disc face in patches"
+      },
+      "diagnosticSteps": {
+        "feel-where-the-shake-arrives": "Brake gently from speed and notice whether the shake arrives at the steering wheel, at the pedal, or at both",
+        "compare-wheel-temperature-after-a-drive": "After an ordinary drive with no heavy braking, hold the back of your hand near each front wheel and compare how much heat comes off them",
+        "measure-disc-thickness-around-the-face": "Measure the disc with a micrometer at several points around the face, always at the same radius, and compare the readings",
+        "check-hub-play-and-disc-runout": "With the truck safely raised and supported on stands, rock the wheel top and bottom for play — top and bottom only, because side-to-side movement here is steering linkage and not the hub — then turn the disc against a dial gauge and watch the needle",
+        "check-how-the-wheel-was-last-tightened": "Look at the nuts and the hub face for gouging, rust scale or paint, and ask whether the wheel was last put on with an impact gun"
+      },
+      "fixPaths": {
+        "replace-discs-and-pads-in-pairs": {
+          "title": "Replace the front discs and pads as a pair",
+          "detail": "On a truck this old the disc is usually near its wear limit already, so machining buys one season and replacing buys several. Discs and pads are done as an axle pair, and the hub face is cleaned back to bare metal before the new disc goes on — a scale of rust under the disc puts it out of true on the first drive."
+        },
+        "free-and-service-the-caliper": {
+          "title": "Free off and service the caliper",
+          "detail": "Clean and regrease the slide pins, fit new boots, and check the piston retracts. If the caliper has been dragging, the pads on that corner are glazed and the fluid on that circuit has been cooked, so both come out with it."
+        },
+        "clean-the-hub-face-and-torque-properly": {
+          "title": "Clean the hub face and torque the wheel nuts properly",
+          "detail": "Nuts tightened in a criss-cross pattern with a torque wrench, to the factory figure, on a clean hub face. This is the cheapest fix on the list and the one most often skipped, and getting it wrong distorts a brand-new disc on the drive home."
+        }
+      }
+    },
+    "es": {
+      "title": "Vibración de frenos en el pedal y en el volante",
+      "summary": "Los reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos vuelven a este tema en los años modelo tardíos de la generación —la compatibilidad de arriba está puesta en los años que esos reportes de verdad cubren, no en toda la serie—: el pedal pulsa, el volante tiembla cuando entran los frenos, se rectifican los discos de freno delanteros, y la vibración regresa bastante antes de que toque el siguiente juego de pastillas de freno. Esa reincidencia es la parte útil de la historia. Un disco de freno que se rectifica y vuelve a vibrar rara vez era toda la falla: algo sigue haciendo que una parte de la cara del disco corra más caliente, o más gruesa, que el resto. Este es un carro pesado sobre un disco de freno delantero dimensionado para un carro pesado, y los dos culpables de siempre son un cáliper que ya no desliza libre y una rueda que se apretó a pistola de impacto en vez de apretarse en cruz con llave de torque. Por sí sola es más incómoda que peligrosa: los frenos siguen sirviendo y siguen alcanzando para detener el carro. Lo que justifica la precaución es lo que suele venir por debajo: un cáliper que arrastra también está cocinando el líquido de frenos y las pastillas de freno de esa esquina, y un rodamiento con suficiente juego como para sentirse como vibración es otro problema disfrazado de freno. Maneje suave, evite bajadas largas colgado del freno, y llévelo a revisar.",
+      "slug": "vibracion-de-frenos",
+      "symptoms": {
+        "pedal-pulses-under-braking": "El pedal devuelve un pulso rítmico mientras usted frena",
+        "steering-wheel-shakes-when-braking": "El volante tiembla de lado a lado solo cuando se aplican los frenos",
+        "judder-returns-soon-after-machining": "La vibración regresa al poco tiempo de haber rectificado los discos de freno",
+        "one-front-wheel-much-hotter": "Una rueda delantera queda mucho más caliente que la otra después de un manejo normal"
+      },
+      "causes": {
+        "uneven-disc-thickness": "El disco de freno ya no tiene el mismo grosor en toda la vuelta",
+        "sticking-caliper-slide": "Los pasadores deslizantes del cáliper están pegados y las pastillas de freno nunca sueltan del todo",
+        "uneven-wheel-nut-torque": "Tuercas de rueda apretadas disparejas o sobreapretadas, que deforman el disco de freno",
+        "worn-hub-bearing-or-runout": "Rodamiento de la maza gastado que deja bambolear el disco de freno al girar",
+        "pad-material-transfer": "Material de la pastilla de freno horneado por parches sobre la cara del disco"
+      },
+      "diagnosticSteps": {
+        "feel-where-the-shake-arrives": "Frene suave desde velocidad y note si el temblor llega al volante, al pedal, o a los dos",
+        "compare-wheel-temperature-after-a-drive": "Después de un manejo normal sin frenadas fuertes, acerque el dorso de la mano a cada rueda delantera y compare cuánto calor sale de cada una",
+        "measure-disc-thickness-around-the-face": "Mida el disco de freno con micrómetro en varios puntos de la vuelta, siempre al mismo radio, y compare las lecturas",
+        "check-hub-play-and-disc-runout": "Con el carro levantado y apoyado sobre soportes de seguridad, mueva la rueda de arriba abajo buscando juego —solo de arriba abajo, porque aquí el movimiento de lado a lado es del varillaje de dirección y no de la maza— y luego gire el disco de freno contra un reloj comparador observando la aguja",
+        "check-how-the-wheel-was-last-tightened": "Revise las tuercas de rueda y la cara de la maza buscando raspaduras, costra de óxido o pintura, y pregunte si la última vez la rueda se puso con pistola de impacto"
+      },
+      "fixPaths": {
+        "replace-discs-and-pads-in-pairs": {
+          "title": "Cambiar discos de freno y pastillas de freno delanteros en pareja",
+          "detail": "En un carro de esta edad el disco de freno normalmente ya anda cerca de su límite de desgaste, así que rectificar compra una temporada y cambiar compra varias. Discos de freno y pastillas de freno se hacen por eje completo, y la cara de la maza se limpia hasta el metal antes de montar el disco nuevo: una costra de óxido debajo lo deja fuera de plano desde la primera vuelta."
+        },
+        "free-and-service-the-caliper": {
+          "title": "Liberar y darle servicio al cáliper",
+          "detail": "Limpie y engrase los pasadores deslizantes, ponga guardapolvos nuevos y compruebe que el pistón retrocede. Si el cáliper venía arrastrando, las pastillas de freno de esa esquina quedaron vitrificadas y el líquido de frenos de ese circuito se cocinó, así que los dos salen con él."
+        },
+        "clean-the-hub-face-and-torque-properly": {
+          "title": "Limpiar la cara de la maza y apretar bien las tuercas de rueda",
+          "detail": "Tuercas apretadas en cruz con llave de torque, al valor de fábrica, sobre una cara de maza limpia. Es el arreglo más barato de la lista y el que más se salta, y hacerlo mal deforma un disco de freno nuevecito en el camino de vuelta a casa."
+        }
+      }
+    }
+  }
+}
