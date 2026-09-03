@@ -1,0 +1,674 @@
+---
+/**
+ * One modification's page (T601, MOD-01, MOD-02).
+ *
+ * > **MOD-01** THE `mods` collection SHALL hold, per entry: what it requires
+ * > (by entry ID), what it breaks or affects, cost band, difficulty, fitment,
+ * > honest tradeoffs prose in both locales, sources.
+ * >
+ * > **MOD-02** WHEN a mod requires another mod or part, THE requirement SHALL
+ * > be a typed reference that the build resolves.
+ *
+ * ## The URL is two registries composed (I18N-01, I18N-05)
+ *
+ * `/en/mods/two-inch-lift/` and `/es/modificaciones/levante-de-dos-pulgadas/`
+ * are the same page: the *segment* comes from `src/i18n/routes.ts` and the
+ * *slug* from `src/i18n/entry-slugs.ts`, joined by `entryRouteParams` /
+ * `entryRoutePaths`. Both halves are per-locale, so neither locale reads as a
+ * translation of the other, and `routePathByLocale` hands `BaseLayout` the
+ * URLs that were actually built.
+ *
+ * The registry is empty until T602, so this route builds zero pages today.
+ * That is the intended state and not a stub: the index below `/en/mods/`
+ * exists, is audited, and says so.
+ *
+ * ## Page order, and why the bill comes before the pitch
+ *
+ * Title and chips → **safety notice** (both languages in one band, page locale
+ * first) → confidence caveat → **what it needs first** → **what it breaks or
+ * affects** → the honest tradeoffs → numbered sources.
+ *
+ * The summary is the only part of this page that says what the mod *does*, and
+ * it is deliberately short. Everything with a heading is a cost: the
+ * prerequisites you have to buy first, the things that stop working, and the
+ * paragraph that says it plainly. A modifications section that led with
+ * capability and buried the consequences would be an advertisement, and
+ * MOD-01's own words — "honest tradeoffs" — are the reason the order is the
+ * other way round.
+ *
+ * ## The requirements are typed references, rendered as such (MOD-02)
+ *
+ * Each prerequisite carries the collection it points into, so this page knows
+ * which route registry to build its link from without guessing, and can say
+ * *what kind of thing* it is. A prerequisite the corpus cannot resolve is
+ * rendered as an unlinked row with a "not written up yet" label rather than
+ * dropped: the build refuses that corpus, but a page that silently omitted it
+ * would show a **shorter** requirements list than the entry declares, which is
+ * a confident answer derived from having failed to look (AGENTS.md, "a failure
+ * is not a zero").
+ *
+ * ## Safety is widened by what the mod touches
+ *
+ * `modSafety` (`src/lib/mods/safety.ts`), not `isSafetyCritical` alone: a
+ * dual-battery install is filed under `electrical`, and if it `breaks` the ABS
+ * module this is a brakes page whatever its own facet says. The widening only
+ * ever promotes — and the page renders **one notice per system that made it
+ * fire**, naming the actual hazard rather than the entry's filing (T601
+ * review, F1).
+ *
+ * refs specs/001-foundation (MOD-01, MOD-02, I18N-01, I18N-04, I18N-05, I18N-08)
+ */
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ConfidenceCaveat from "../../../components/ConfidenceCaveat.astro";
+import SafetyNotice from "../../../components/SafetyNotice.astro";
+import {
+  LOCALE_BCP47,
+  isLocale,
+  localeHref,
+  type Locale,
+} from "../../../i18n/routing";
+import {
+  collectionRoutePath,
+  entryRouteParams,
+  entryRoutePath,
+  entryRoutePaths,
+} from "../../../i18n/routes";
+import {
+  costBandLabel,
+  generationLabel,
+  glossarySystemLabel,
+  modImpactLabel,
+  modReferenceCollectionLabel,
+  sourceKindLabel,
+  t,
+} from "../../../i18n/ui";
+import { needsConfidenceCaveat } from "../../../lib/confidence";
+import { buildTaxonomy, expandGenerations } from "../../../lib/fitment";
+import { selectorTaxonomyData } from "../../../lib/vehicle-taxonomy";
+import { costBandAccessibleName, costBandGlyphs } from "../../../lib/problems";
+import { readReferencable, resolveRequirements } from "../../../lib/mods";
+import { modSafety } from "../../../lib/mods/safety";
+import { DIFFICULTY_MAX } from "../../../schemas/problems";
+import { MOD_REFERENCE_COLLECTIONS } from "../../../schemas/mods";
+import { GENERATION_IDS, type GenerationId } from "../../../schemas/vehicles";
+
+export function getStaticPaths() {
+  return entryRouteParams("mods", "modsSegment", "modSlug");
+}
+
+const { locale: param } = Astro.params;
+if (!isLocale(param)) {
+  throw new Error(`Unknown locale segment: ${String(param)}`);
+}
+const locale: Locale = param;
+const strings = t(locale);
+
+const { entryId } = Astro.props;
+
+const entries = await getCollection("mods");
+const entry = entries.find((candidate) => candidate.data.id === entryId);
+if (entry === undefined) {
+  // Unreachable in a build that ran `validate-mods`, which fails on a slug row
+  // naming no entry. Kept because a page that silently rendered nothing would
+  // be worse than one that names the broken row (SCF-04).
+  throw new Error(
+    `ENTRY_SLUGS.mods lists \`${entryId}\`, and no entry in ` +
+      `src/content/mods/ has that id (I18N-05). refs specs/001-foundation`
+  );
+}
+
+const routes = entryRoutePaths("mods", entryId);
+if (routes === null) {
+  throw new Error(
+    `no slug row for mods entry \`${entryId}\` (I18N-05). ` +
+      `refs specs/001-foundation`
+  );
+}
+
+const data = entry.data;
+const local = data.prose[locale];
+
+const taxonomy = buildTaxonomy(
+  selectorTaxonomyData(
+    (await getCollection("vehicles")).map((vehicle) => vehicle.data)
+  ).nodes
+);
+
+/** A `GENERATION_IDS` value if `id` is one, else the raw string unchanged. */
+function isKnownGeneration(id: string): id is GenerationId {
+  return (GENERATION_IDS as readonly string[]).includes(id);
+}
+
+const genLabels = expandGenerations(data.fitment.gens, taxonomy).map((gen) =>
+  isKnownGeneration(gen) ? generationLabel(strings, gen) : gen
+);
+
+/**
+ * A route path from `src/i18n/routes.ts` is **already this locale's own, and
+ * still unprefixed** — `entryRoutePath("parts", id, "es")` gives
+ * `/repuestos/bomba-de-agua-6g74/`, with the ES segment and the ES slug but
+ * no `/es` in front of it and no deploy base.
+ *
+ * Both halves matter, and the second is the one that bites. The path is *not*
+ * "the same in every locale" — the segment and the slug are translated, which
+ * is the whole of I18N-01/I18N-05. What it lacks is the locale **prefix**, and
+ * it lacks it on purpose: `BaseLayout` needs every locale's path side by side
+ * to build the hreflang pairs, so the prefix is added last, per rendered link,
+ * by `localeHref`.
+ *
+ * So anything going into an `href` goes through `localeHref` first. Without it
+ * every internal link on this page points at `/mods/x/` rather than
+ * `/en/mods/x/` — i.e. at a 404. That is the defect T501 shipped on both of
+ * its pages and the reason this one is graded
+ * (`tests/pages/mod-page.render.test.ts`, "never emits a bare, locale-less
+ * route").
+ */
+function hrefFor(routePath: string | null): string | null {
+  return routePath === null ? null : localeHref(locale, routePath);
+}
+
+/**
+ * The id sets a typed reference may resolve against, from the collections
+ * `MOD_REFERENCE_COLLECTIONS` names — built here rather than assumed, so a
+ * prerequisite whose target has not been written yet renders as unresolved
+ * instead of as a link to nothing.
+ */
+const referencable = (
+  await Promise.all(
+    MOD_REFERENCE_COLLECTIONS.map(async (collection) =>
+      (await getCollection(collection)).map((candidate) => ({
+        collection,
+        id: candidate.data.id,
+      }))
+    )
+  )
+).flat();
+const known = readReferencable(referencable);
+
+const requirements = resolveRequirements(data.requires, known).map((row) => ({
+  ...row,
+  kindLabel: modReferenceCollectionLabel(strings, row.collection),
+  href: row.resolved
+    ? hrefFor(entryRoutePath(row.collection, row.id, locale))
+    : null,
+}));
+
+/** Consequences, joined to their per-locale sentence by the row's handle. */
+const notes = local.affectsNotes ?? {};
+const affects = data.affects.map((row) => ({
+  ...row,
+  systemLabel: glossarySystemLabel(strings, row.system),
+  impactLabel: modImpactLabel(strings, row.impact),
+  note: notes[row.id] ?? null,
+  refHref:
+    row.ref === undefined
+      ? null
+      : hrefFor(entryRoutePath(row.ref.collection, row.ref.id, locale)),
+  refKindLabel:
+    row.ref === undefined
+      ? null
+      : modReferenceCollectionLabel(strings, row.ref.collection),
+}));
+
+const safety = modSafety(data);
+
+/**
+ * Which systems the standing bilingual safety notice is rendered **for** —
+ * one notice each.
+ *
+ * `safety.systems` is the *reason* the notice fires, and the first version of
+ * this page threw it away and named `data.system` instead. On the case this
+ * collection exists to model — a `body`-filed roof rack that `breaks` the
+ * brakes — that produced a heading reading "Safety notice — Body", as the
+ * region's `aria-labelledby` label too, while the actual hazard appeared only
+ * in a table row further down. That is not vague, it is wrong, and T602's own
+ * wave-1 list (dual battery → electrical/ABS; armour and roof storage →
+ * body/suspension) is made of exactly that shape (T601 review, F1).
+ *
+ * The fallback to `data.system` covers the one case with no system behind it:
+ * `safetyCritical: true` on an entry neither the system list nor the subject
+ * detector catches (SRS, load ratings). That is what `parts` and `reference`
+ * do for the same case, so this page is not inventing a fourth behaviour.
+ */
+const safetySystems =
+  safety.systems.length > 0 ? safety.systems : [data.system];
+
+const showCaveat = needsConfidenceCaveat(data.confidence);
+const indexHref = localeHref(locale, collectionRoutePath("mods", locale));
+const numbers = new Intl.NumberFormat(LOCALE_BCP47[locale]);
+
+const accessedDate = new Intl.DateTimeFormat(LOCALE_BCP47[locale], {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
+/** Parsed and formatted in UTC: an ISO date is a calendar day, not an instant. */
+function formatAccessed(iso: string): string {
+  return accessedDate.format(new Date(`${iso}T00:00:00Z`));
+}
+---
+
+<BaseLayout
+  locale={locale}
+  routePathByLocale={routes}
+  title={`${local.title} — ${strings.modsHeading}`}
+  description={local.summary}
+>
+  <article class="mod-page">
+    <nav class="mod-page__crumbs" aria-label={strings.modsHeading}>
+      <a href={indexHref}>{strings.modsBackToIndex}</a>
+    </nav>
+
+    <header class="mod-page__head">
+      <h1>{local.title}</h1>
+
+      <div class="mod-page__chips">
+        <span class="chip">{glossarySystemLabel(strings, data.system)}</span>
+        {
+          safety.safetyCritical && (
+            <span class="chip chip--safety">
+              {strings.safetyCriticalChipLabel}
+            </span>
+          )
+        }
+        <span class="mod-page__label">{strings.modsCostLabel}</span>
+        <span
+          class="chip datum"
+          aria-label={costBandAccessibleName(data.cost, (band) =>
+            costBandLabel(strings, band)
+          )}
+        >
+          {costBandGlyphs(data.cost)}
+        </span>
+        <span class="chip datum">
+          {
+            strings.modsDifficultyTemplate
+              .replace("{value}", numbers.format(data.difficulty))
+              .replace("{max}", numbers.format(DIFFICULTY_MAX))
+          }
+        </span>
+        <span class="mod-page__label">{strings.modsFitsLabel}</span>
+        {genLabels.map((label) => <span class="chip datum">{label}</span>)}
+      </div>
+    </header>
+
+    {
+      /*
+       * T401's component, not this page's own markup: PRB-03, PRC-02 and this
+       * page ask for the *same* band, and two templates drawing "the standing
+       * bilingual safety notice" are two warnings that can drift in wording,
+       * in colour and in reading order.
+       *
+       * **One notice per system that made the page safety-critical** — see
+       * `safetySystems` above. `SafetyNotice` was built for this: it derives
+       * `headingId` from `system` precisely so a page can carry several bands
+       * without two elements sharing one id and `aria-labelledby` resolving to
+       * the wrong one. Several notices, each naming one system, is the honest
+       * rendering; one combined heading is the thing no glossary label fits,
+       * and naming only the entry's own facet is simply false.
+       */
+      safety.safetyCritical &&
+        safetySystems.map((system) => (
+          <SafetyNotice locale={locale} system={system} />
+        ))
+    }
+
+    {showCaveat && <ConfidenceCaveat locale={locale} tier={data.confidence} />}
+
+    <p class="mod-page__summary">{local.summary}</p>
+
+    <section class="section" aria-labelledby="requires-heading">
+      <h2 id="requires-heading">{strings.modsRequiresHeading}</h2>
+      {
+        requirements.length === 0 ? (
+          <p class="section__intro">{strings.modsRequiresNone}</p>
+        ) : (
+          <>
+            <p class="section__intro">{strings.modsRequiresIntro}</p>
+            <ul class="requires">
+              {requirements.map((requirement) => (
+                <li
+                  class="requires__row"
+                  data-collection={requirement.collection}
+                  data-resolved={String(requirement.resolved)}
+                >
+                  <span class="requires__kind">{requirement.kindLabel}</span>
+                  {requirement.href === null ? (
+                    <span class="datum">{requirement.id}</span>
+                  ) : (
+                    <a class="datum" href={requirement.href}>
+                      {requirement.id}
+                    </a>
+                  )}
+                  {!requirement.resolved && (
+                    <span class="requires__unresolved">
+                      {strings.modsRequiresUnresolvedLabel}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </section>
+
+    <section class="section" aria-labelledby="affects-heading">
+      <h2 id="affects-heading">{strings.modsAffectsHeading}</h2>
+      {
+        affects.length === 0 ? (
+          <p class="section__intro">{strings.modsAffectsNone}</p>
+        ) : (
+          <>
+            <p class="section__intro">{strings.modsAffectsIntro}</p>
+            <table class="affects">
+              <thead>
+                <tr>
+                  <th scope="col">{strings.modsAffectsSystemLabel}</th>
+                  <th scope="col">{strings.modsAffectsImpactLabel}</th>
+                  <th scope="col">{strings.modsAffectsNoteLabel}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {affects.map((row) => (
+                  <tr id={`affects-${row.id}`} data-impact={row.impact}>
+                    <th scope="row">{row.systemLabel}</th>
+                    <td>
+                      <span class:list={["impact", `impact--${row.impact}`]}>
+                        {row.impactLabel}
+                      </span>
+                    </td>
+                    <td>
+                      {row.note}
+                      {row.ref !== undefined && (
+                        <span class="affects__ref">
+                          <span class="requires__kind">{row.refKindLabel}</span>
+                          {row.refHref === null ? (
+                            <span class="datum">{row.ref.id}</span>
+                          ) : (
+                            <a class="datum" href={row.refHref}>
+                              {row.ref.id}
+                            </a>
+                          )}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )
+      }
+    </section>
+
+    <section class="section" aria-labelledby="tradeoffs-heading">
+      <h2 id="tradeoffs-heading">{strings.modsTradeoffsHeading}</h2>
+      <p class="mod-page__tradeoffs">{local.tradeoffs}</p>
+    </section>
+
+    {
+      data.sources.length > 0 && (
+        <section class="section" aria-labelledby="sources-heading">
+          <h2 id="sources-heading">{strings.sourcesHeading}</h2>
+          <ol class="sources">
+            {data.sources.map((source) => (
+              <li>
+                <a href={source.url}>{source.title}</a>
+                <span class="sources__kind">
+                  {sourceKindLabel(strings, source.kind)}
+                </span>
+                <span class="sources__meta datum">
+                  <time datetime={source.accessed}>
+                    {strings.sourceAccessedTemplate.replace(
+                      "{date}",
+                      formatAccessed(source.accessed)
+                    )}
+                  </time>
+                  <a href={source.archiveUrl}>{strings.sourceArchiveLabel}</a>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  /* Tokens from specs/001-foundation/design/HANDOFF-DESIGN.md, page-scoped. */
+  .mod-page {
+    --panel: #ffffff;
+    --ink: #2b2620;
+    --muted: #6e6559;
+    --muted-strong: #55493c;
+    --line: #e4ddd1;
+    --chip: #efe9dd;
+    --rust-deep: #93441f;
+    --faint: #a99c88;
+    --safety-chip-text: #7a2e2e;
+    --safety-chip-bg: #f6e3d8;
+    --safety-chip-border: #e4c4b0;
+
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 60rem;
+  }
+
+  .datum {
+    font-family:
+      "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  .mod-page__crumbs {
+    font-size: 0.8125rem;
+  }
+
+  .mod-page__crumbs a {
+    color: var(--rust-deep);
+  }
+
+  .mod-page__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .mod-page__head h1 {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  .mod-page__chips {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .mod-page__label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .chip {
+    font-size: 0.75rem;
+    background: var(--chip);
+    border-radius: 4px;
+    padding: 0.125rem 0.5rem;
+    color: var(--muted-strong);
+  }
+
+  .chip--safety {
+    font-weight: 700;
+    color: var(--safety-chip-text);
+    background: var(--safety-chip-bg);
+    border: 1px solid var(--safety-chip-border);
+  }
+
+  .mod-page__summary,
+  .mod-page__tradeoffs {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--muted-strong);
+    max-width: 68ch;
+  }
+
+  .mod-page__tradeoffs {
+    color: var(--ink);
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1.25rem;
+  }
+
+  .section h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .section__intro {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+    max-width: 68ch;
+  }
+
+  .requires {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .requires__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .requires__kind {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted-strong);
+    background: var(--chip);
+    border-radius: 4px;
+    padding: 0.1875rem 0.5rem;
+  }
+
+  /* Dashed, matching `ConfidenceCaveat`'s "we are not fully sure" convention. */
+  .requires__unresolved {
+    font-size: 0.6875rem;
+    color: var(--muted-strong);
+    border: 1.5px dashed var(--faint);
+    border-radius: 4px;
+    padding: 0.125rem 0.5rem;
+  }
+
+  .affects {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.875rem;
+  }
+
+  .affects th,
+  .affects td {
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+    padding: 0.5rem 0.75rem 0.5rem 0;
+  }
+
+  .affects thead th {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  /* Weight, not colour alone — `breaks` has to read as the strongest claim. */
+  .impact {
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 0.125rem 0.5rem;
+  }
+
+  .impact--breaks {
+    color: var(--safety-chip-text);
+    background: var(--safety-chip-bg);
+    border: 1px solid var(--safety-chip-border);
+  }
+
+  .impact--degrades {
+    color: var(--muted-strong);
+    background: var(--chip);
+    border: 1px solid var(--line);
+  }
+
+  .impact--needs-adjustment {
+    color: var(--muted-strong);
+    background: var(--panel);
+    border: 1.5px dashed var(--faint);
+  }
+
+  .affects__ref {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.375rem;
+    margin-left: 0.5rem;
+  }
+
+  .sources {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .sources__kind {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted-strong);
+    background: var(--chip);
+    border-radius: 4px;
+    padding: 0.125rem 0.5rem;
+    margin-left: 0.5rem;
+  }
+
+  .sources__meta {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .sources__meta a {
+    margin-left: 0.5rem;
+  }
+</style>

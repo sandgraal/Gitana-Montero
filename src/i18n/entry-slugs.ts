@@ -30,7 +30,7 @@
  * per-locale string that is not prose and not a fact — the one field that fits
  * neither half of the data/prose split.
  *
- * ## For the agent adding entries (T503 and after)
+ * ## For the agent adding entries (T503, T602 and after)
  *
  * Add one row per entry, keyed by the entry's own `id`:
  *
@@ -70,16 +70,19 @@ import { validateSlugRegistry, type SlugRegistry } from "../schemas/slugs.ts";
 /**
  * `{ [collection]: { [entryId]: { en, es } } }`.
  *
- * Empty for `parts` today: T501 built the schema and the page template, and
- * T503 authors the entries. An empty table is a valid registry — it maps
- * every one of its zero entries to exactly one slug per locale — and the
- * build check below turns the first unlisted entry into a named error.
+ * Empty for both collections today: T501 and T601 built the schemas and the
+ * page templates, and T503 / T602 author the entries. An empty table is a
+ * valid registry — it maps every one of its zero entries to exactly one slug
+ * per locale — and the build checks (`src/integrations/validate-parts.ts`,
+ * `validate-mods.ts`) turn the first unlisted entry into a named error.
  */
 export const ENTRY_SLUGS: Readonly<
   Record<string, Readonly<Record<string, Readonly<Record<Locale, string>>>>>
 > = {
   /** PRT-01 — one page per part number. Populated by T503. */
   parts: {},
+  /** MOD-01 — one page per modification. Populated by T602. */
+  mods: {},
 };
 
 const registryIssues = validateSlugRegistry(ENTRY_SLUGS as SlugRegistry);

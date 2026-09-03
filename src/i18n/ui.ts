@@ -30,6 +30,7 @@ import type {
   ProblemSeverity,
 } from "../schemas/problems";
 import type { CrossReferenceQuality } from "../schemas/parts";
+import type { ModImpact, ModReferenceCollection } from "../schemas/mods";
 import type { DriveType, GenerationId } from "../schemas/vehicles";
 import type { OptionalSelectionFacet } from "../lib/fitment";
 import {
@@ -176,6 +177,30 @@ export type CrossReferenceQualityStrings = {
   ]: string;
 };
 
+/**
+ * One flat key per `MOD_IMPACTS` value (MOD-01) — the chip on every row of a
+ * mod page's "what it breaks or affects" table, and the second filter group on
+ * the index. Derived from the constant, for the reason every mapped type here
+ * is: adding a fourth impact without translating it is a type error, not an
+ * untranslated chip in the one table a reader is reading to decide whether to
+ * start.
+ */
+export type ModImpactStrings = {
+  readonly [Impact in ModImpact as `modImpact.${Impact}`]: string;
+};
+
+/**
+ * One flat key per `MOD_REFERENCE_COLLECTIONS` value (MOD-02) — the word beside
+ * a prerequisite saying *what kind of thing* it is, which is exactly the
+ * information the typed reference's discriminator carries and a bare id would
+ * not.
+ */
+export type ModReferenceCollectionStrings = {
+  readonly [
+    Collection in ModReferenceCollection as `modReferenceCollection.${Collection}`
+  ]: string;
+};
+
 export interface UiStrings
   extends
     GlossarySystemStrings,
@@ -190,7 +215,9 @@ export interface UiStrings
     ProblemSeverityStrings,
     DrivabilityStrings,
     CostBandStrings,
-    CrossReferenceQualityStrings {
+    CrossReferenceQualityStrings,
+    ModImpactStrings,
+    ModReferenceCollectionStrings {
   readonly siteTagline: string;
   readonly skipToContent: string;
   readonly navHome: string;
@@ -573,6 +600,14 @@ export interface UiStrings
   readonly problemsEmpty: string;
   /** `{shown}` / `{total}`, computed and interpolated — see `glossaryCountTemplate`. */
   readonly problemsCountTemplate: string;
+  /* Symptom-first navigation — T402, PRB-02 */
+  readonly problemsSearchLabel: string;
+  readonly problemsSearchPlaceholder: string;
+  /** `aria-label` for the symptom-pill group, same role as `glossaryFilterLabel`. */
+  readonly problemsSymptomIndexLabel: string;
+  /** The pill that clears a picked symptom, same role as `glossaryFilterAll`. */
+  readonly problemsSymptomIndexAll: string;
+  readonly problemsNoResults: string;
   readonly problemBreadcrumbLabel: string;
   readonly problemSymptomsHeading: string;
   readonly problemDiagnosticsHeading: string;
@@ -713,6 +748,55 @@ export interface UiStrings
   readonly partsVendorsHeading: string;
   readonly partsVendorsIntro: string;
   readonly partsBackToIndex: string;
+  /* Modifications — T601, MOD-01, MOD-02 */
+  readonly navMods: string;
+  readonly modsHeading: string;
+  readonly modsIntro: string;
+  readonly modsEmpty: string;
+  readonly modsNoResults: string;
+  /** `{shown}` / `{total}`, computed and interpolated — see `glossaryCountTemplate`. */
+  readonly modsCountTemplate: string;
+  readonly modsFilterSystemLabel: string;
+  readonly modsFilterSystemAll: string;
+  readonly modsFilterImpactLabel: string;
+  readonly modsFilterImpactAll: string;
+  readonly modsFitsLabel: string;
+  readonly modsBackToIndex: string;
+  /**
+   * `{value}` / `{max}` are `difficulty` and `DIFFICULTY_MAX`, both figures
+   * from shared data interpolated at render time — never typed into a locale
+   * (AGENTS.md). Deliberately **not** `problemDifficultyTemplate`: that key is
+   * T401's and reads as the difficulty of *fixing* something, which is a
+   * different sentence from the difficulty of *choosing to do* something.
+   */
+  readonly modsDifficultyTemplate: string;
+  readonly modsCostLabel: string;
+  /** MOD-01's "what it requires (by entry ID)" — MOD-02's typed references. */
+  readonly modsRequiresHeading: string;
+  readonly modsRequiresIntro: string;
+  readonly modsRequiresNone: string;
+  /**
+   * Beside a prerequisite whose target has not been written yet. The build
+   * refuses that corpus (`validate-mods`), so this is defense-in-depth — it
+   * exists so "we could not resolve this reference" never renders as a shorter
+   * list of requirements than the entry actually declares (AGENTS.md, "a
+   * failure is not a zero").
+   */
+  readonly modsRequiresUnresolvedLabel: string;
+  /** MOD-01's "what it breaks or affects". */
+  readonly modsAffectsHeading: string;
+  readonly modsAffectsIntro: string;
+  readonly modsAffectsNone: string;
+  readonly modsAffectsSystemLabel: string;
+  readonly modsAffectsImpactLabel: string;
+  readonly modsAffectsNoteLabel: string;
+  /** MOD-01's "honest tradeoffs prose in both locales". */
+  readonly modsTradeoffsHeading: string;
+  /**
+   * The chip on an index card counting an entry's declared consequences.
+   * `{count}` is `affects.length`, a figure computed at render time.
+   */
+  readonly modsAffectsCountTemplate: string;
 }
 
 const en: UiStrings = {
@@ -1111,6 +1195,45 @@ const en: UiStrings = {
   partsVendorsIntro:
     "Sellers from the community directory. Nobody pays to be listed here, and nothing on this page is an affiliate link.",
   partsBackToIndex: "All parts",
+
+  navMods: "Mods",
+  modsHeading: "Modifications",
+  modsIntro:
+    "What each modification asks of the truck before it goes on, and what it " +
+    "costs you afterwards. Nothing here is sold; the tradeoffs are the point.",
+  modsEmpty: "No modifications have been written up yet.",
+  modsNoResults: "No modifications match these filters.",
+  modsCountTemplate: "{shown} of {total} modifications",
+  modsFilterSystemLabel: "Filter by system",
+  modsFilterSystemAll: "All systems",
+  modsFilterImpactLabel: "Filter by consequence",
+  modsFilterImpactAll: "Any consequence",
+  modsFitsLabel: "Fits",
+  modsBackToIndex: "All modifications",
+  modsDifficultyTemplate: "Difficulty {value}/{max}",
+  modsCostLabel: "Cost",
+  modsRequiresHeading: "What it needs first",
+  modsRequiresIntro:
+    "Each of these has to be on the truck, or in your hands, before this one " +
+    "makes sense.",
+  modsRequiresNone: "Nothing else has to be done first.",
+  modsRequiresUnresolvedLabel: "Not written up yet",
+  modsAffectsHeading: "What it breaks or affects",
+  modsAffectsIntro:
+    "Everything below is a consequence of fitting this, not a reason against " +
+    "it. Read it before you buy, not after.",
+  modsAffectsNone: "Nothing has been documented as affected by this yet.",
+  modsAffectsSystemLabel: "System",
+  modsAffectsImpactLabel: "Consequence",
+  modsAffectsNoteLabel: "What happens",
+  modsTradeoffsHeading: "The honest tradeoffs",
+  modsAffectsCountTemplate: "{count} affected",
+  "modImpact.breaks": "Stops working",
+  "modImpact.degrades": "Gets worse",
+  "modImpact.needs-adjustment": "Has to be reset",
+  "modReferenceCollection.mods": "Modification",
+  "modReferenceCollection.parts": "Part",
+
   "crossReferenceQuality.oem-supplier": "Same maker as the OEM part",
   "crossReferenceQuality.equivalent": "Reported equivalent",
   "crossReferenceQuality.lower-grade": "Works, reported to wear out sooner",
@@ -1127,6 +1250,12 @@ const en: UiStrings = {
     "Start from what the truck is doing. Every entry says what is safe to do about it right now, what to check, what usually causes it, and what fixing it takes.",
   problemsEmpty: "No problems have been written up yet.",
   problemsCountTemplate: "{shown} of {total} problems",
+  problemsSearchLabel: "Search symptoms and problems",
+  problemsSearchPlaceholder:
+    "Search a symptom — grinding noise, hard shifting…",
+  problemsSymptomIndexLabel: "Browse by symptom",
+  problemsSymptomIndexAll: "All symptoms",
+  problemsNoResults: "No problems match that symptom or search.",
   problemBreadcrumbLabel: "Breadcrumb",
   problemSymptomsHeading: "Symptoms",
   problemDiagnosticsHeading: "Diagnostic steps",
@@ -1582,6 +1711,45 @@ const es: UiStrings = {
   partsVendorsIntro:
     "Vendedores tomados del directorio de comunidades. Nadie paga por aparecer aquí y en esta página no hay enlaces de afiliado.",
   partsBackToIndex: "Todos los repuestos",
+
+  navMods: "Modificaciones",
+  modsHeading: "Modificaciones",
+  modsIntro:
+    "Lo que cada modificación le exige al carro antes de montarla, y lo que " +
+    "le cuesta después. Aquí no se vende nada: los contras son el punto.",
+  modsEmpty: "Todavía no se ha documentado ninguna modificación.",
+  modsNoResults: "Ninguna modificación coincide con estos filtros.",
+  modsCountTemplate: "{shown} de {total} modificaciones",
+  modsFilterSystemLabel: "Filtre por sistema",
+  modsFilterSystemAll: "Todos los sistemas",
+  modsFilterImpactLabel: "Filtre por consecuencia",
+  modsFilterImpactAll: "Cualquier consecuencia",
+  modsFitsLabel: "Le sirve a",
+  modsBackToIndex: "Todas las modificaciones",
+  modsDifficultyTemplate: "Dificultad {value}/{max}",
+  modsCostLabel: "Costo",
+  modsRequiresHeading: "Lo que hay que tener antes",
+  modsRequiresIntro:
+    "Cada cosa de esta lista tiene que estar puesta en el carro, o en sus " +
+    "manos, antes de que esta modificación tenga sentido.",
+  modsRequiresNone: "No hay que hacer nada antes.",
+  modsRequiresUnresolvedLabel: "Todavía sin documentar",
+  modsAffectsHeading: "Lo que daña o afecta",
+  modsAffectsIntro:
+    "Todo lo de abajo es consecuencia de montar esto, no un argumento en " +
+    "contra. Léalo antes de comprar, no después.",
+  modsAffectsNone: "Todavía no se ha documentado nada afectado por esto.",
+  modsAffectsSystemLabel: "Sistema",
+  modsAffectsImpactLabel: "Consecuencia",
+  modsAffectsNoteLabel: "Qué pasa",
+  modsTradeoffsHeading: "Los contras, sin adornos",
+  modsAffectsCountTemplate: "{count} afectados",
+  "modImpact.breaks": "Deja de servir",
+  "modImpact.degrades": "Empeora",
+  "modImpact.needs-adjustment": "Hay que reajustarlo",
+  "modReferenceCollection.mods": "Modificación",
+  "modReferenceCollection.parts": "Repuesto",
+
   "crossReferenceQuality.oem-supplier": "Del mismo fabricante que el original",
   "crossReferenceQuality.equivalent": "Reportado como equivalente",
   "crossReferenceQuality.lower-grade": "Sirve, pero reportan que dura menos",
@@ -1598,6 +1766,12 @@ const es: UiStrings = {
     "Empiece por lo que está haciendo el carro. Cada entrada dice qué se puede hacer con seguridad en este momento, qué revisar, cuál suele ser la causa y qué implica la reparación.",
   problemsEmpty: "Todavía no hay problemas documentados.",
   problemsCountTemplate: "{shown} de {total} problemas",
+  problemsSearchLabel: "Busque síntomas y problemas",
+  problemsSearchPlaceholder:
+    "Busque un síntoma — ruido de rechinido, cambios duros…",
+  problemsSymptomIndexLabel: "Explore por síntoma",
+  problemsSymptomIndexAll: "Todos los síntomas",
+  problemsNoResults: "Ningún problema coincide con ese síntoma o esa búsqueda.",
   problemBreadcrumbLabel: "Ruta de navegación",
   problemSymptomsHeading: "Síntomas",
   problemDiagnosticsHeading: "Pasos de diagnóstico",
@@ -1763,6 +1937,26 @@ export function crossReferenceQualityLabel(
   quality: CrossReferenceQuality
 ): string {
   return strings[`crossReferenceQuality.${quality}`];
+}
+
+/**
+ * The label for a `MOD_IMPACTS` value (MOD-01) — the only supported way to
+ * read one, so the `modImpact.` prefix exists in exactly one place.
+ */
+export function modImpactLabel(strings: UiStrings, impact: ModImpact): string {
+  return strings[`modImpact.${impact}`];
+}
+
+/**
+ * The label for the collection half of a typed reference (MOD-02) — the word
+ * that tells a reader whether a prerequisite is something to buy or something
+ * to do.
+ */
+export function modReferenceCollectionLabel(
+  strings: UiStrings,
+  collection: ModReferenceCollection
+): string {
+  return strings[`modReferenceCollection.${collection}`];
 }
 
 /**

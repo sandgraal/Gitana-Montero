@@ -225,9 +225,17 @@ Stop and ask before any of these:
   gaps, and every finding has a merged `[TEST]` backfill plus a merged
   `[PLATFORM]` activation fix (T207 additionally required and received the
   safety-critical double-review, since its F3 finding was towing/jacking
-  derivation). The ledger is at zero. The next occurrence should close
-  debt, not add to it, without a deliberate, stated reason to do
-  otherwise.
+  derivation).
+  **The ledger is not at zero: T601 joined it on 2026-09-02** (mods schema,
+  no paired `[TEST]` task, graders self-authored; substituted assurance is a
+  22-mutation battery, recorded on its `tasks.md` line). It is owed an
+  independent grader pass on the same terms as the four above — and the
+  reason it is owed is on its own record: the independent code review found
+  the mod page naming the *entry's own* system in the safety notice where an
+  affected system was the actual hazard, **and found the self-authored
+  grader asserting that wrong system as correct**. A grader written by the
+  author of the code under test can pin a defect as the specification; that
+  is what this ledger exists to buy back.
 - A clean fact-check, a clean bilingual edit, and all required branch-protection
   checks authorize the `pr-shepherd` to merge without another confirmation.
 - Never `--no-verify`, never a bare force-push, never `gh pr merge --admin`,
