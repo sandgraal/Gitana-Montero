@@ -1703,6 +1703,42 @@ export function capabilityGateIssues(routine: FunctionDefinition): string[] {
         `— SHR-06 makes them two decisions, not one`
     );
   }
+
+  // ## One routine cannot serve both capabilities. Ever. (second review)
+  //
+  // The first version of this rule guarded the clause above with
+  // `!mentionsCosts` and called the gap a *stated limit*: a routine returning
+  // cost columns and receipt data was said to be off-architecture, and
+  // therefore somebody else's problem. **That was wrong, and the review proved
+  // it** — a reader with the contract's own approved name,
+  // `public.share_read_receipts`, returning `(id, cost_amount, storage_path)`
+  // behind `includes_costs = true and includes_receipts = true`, produced zero
+  // findings from every Tier A rule. The closed allow-list checks the function
+  // *name*; it has nothing to say about an extra column.
+  //
+  // It is not a heuristic either, which is why it is a rule rather than a
+  // caveat. A single query has **one** predicate governing **one** result set,
+  // so for the two mixed grants there is no correct form:
+  //
+  // - gated `costs AND receipts` → a `costs=false receipts=true` grant gets
+  //   nothing, and SHR-06 says receipts open independently;
+  // - gated `costs OR receipts`  → one of them is served to a grant that did
+  //   not open it, which is the leak;
+  // - gated on neither           → clauses 1 and 2 above already fire.
+  //
+  // So the shape is unsatisfiable, and `SHARE_READER_FUNCTIONS`' three entry
+  // points are not a style preference but the only arrangement that can honour
+  // the requirement. This makes the omission structural, which is what the
+  // contract claimed all along.
+  if (mentionsCosts && mentionsReceipts) {
+    issues.push(
+      `${routine.identity}: returns cost columns AND receipt data from one ` +
+        `routine — SHR-06 opens the two independently, and a single query has ` +
+        `one predicate for one result set, so no gating of it can serve a ` +
+        `grant that opens receipts but not costs. Split it, as ` +
+        `SHARE_READER_FUNCTIONS does`
+    );
+  }
   return issues;
 }
 

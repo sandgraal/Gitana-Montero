@@ -870,8 +870,41 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   in-repo signal.
   <br>*Corrected claim:* the first round said "15 mutants, all killed". True of
   the 15 written, but the battery did not cover every clause separately as
-  GRADER-PRINCIPLES requires — F2 and F7 are the proof. The battery is now 20
-  mutants across both rounds, per-clause, all killed.
+  GRADER-PRINCIPLES requires — F2 and F7 are the proof.
+  <br>**Round-3 review fixes (2026-09-03).** A second independent review
+  reproduced every round-2 fix, including running the F8 guard live against the
+  foreign stack in both directions, and found three more — all of the same
+  shape: *the guard can be deleted and the tests stay green*.
+  <br>— **M1. F8's detection logic was graded; its WIRING was not.** Two mutants
+  survived: deleting the refusal branch, and probing as `anon` instead of
+  `service_role`. The second is the nastier one — an anon probe enumerates
+  nothing against a correctly locked-down project, so one word silently
+  disables the entire wrong-project guard. `detectLiveStack` is now split into
+  a pure `liveDecisionFrom` plus an injectable observer, so the refusal path and
+  the probe role are both assertable without a stack. Five wiring mutants,
+  including the reviewer's two verbatim, all killed.
+  <br>— **M2. SHR-06's "cell that matters most" could pass while broken, and my
+  documented limit was wrong.** Round 2 guarded the collapse clause with
+  `!mentionsCosts` and called a both-kinds reader "off-architecture, therefore
+  somebody else's problem". The reviewer disproved it with a reader using the
+  contract's own approved name and one extra column: zero findings from all
+  seven Tier A rules, because the closed allow-list checks the function *name*.
+  It is a rule now, and a total one: one query has one predicate for one result
+  set, so no gating of that shape can serve a `costs=false receipts=true` grant.
+  Tier B was equally weak — a broken reader returning `200 []` satisfied
+  `ok === true` — so the open cells assert rows came back.
+  <br>— **M3. A "row unchanged" assertion was vacuously passable.** A failed
+  read-back left `rows[0]` undefined and `undefined).not.toBe(999_999)` passes.
+  The identical unknown-coalesced-to-zero mistake AGENTS.md names, in a file
+  whose own `refusalShape` uses a `-1` sentinel to avoid it.
+  <br>— **F-D/F-E (recorded, and fixed anyway).** A probe row reached its clause
+  only through a neighbouring pattern, and the revocation deny-list had one
+  probe for seven entries. F-F..F-K were documentation-only.
+  <br>*Final battery:* **45 mutants, one per clause plus the wiring, all
+  killed.* Tier B could not be re-soaked in round 3 (Docker down on the
+  machine); the changed Tier B lines sit inside `it.fails` markers that cannot
+  execute until T2-404 activates them, and the Tier A/pure paths are covered by
+  the battery.
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*

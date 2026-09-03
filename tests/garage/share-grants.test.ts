@@ -536,9 +536,15 @@ describe.skipIf(!live.available)(
 
           const history = await readAsHolder(scenario, grant.token);
           const rows = Array.isArray(history.body) ? history.body : [];
-          const row = (rows[0] ?? {}) as Record<string, unknown>;
 
+          // The fixture put exactly one record on this vehicle. Asserting the
+          // shape before reading a key out of it is what stops the cost
+          // assertion below being made against `{}` — an empty read would
+          // satisfy `hasOwn(...) === false` and look like correct omission.
           expect(history.ok).toBe(true);
+          expect(rows).toHaveLength(1);
+
+          const row = rows[0] as Record<string, unknown>;
           expect(Object.hasOwn(row, "cost_amount")).toBe(includesCosts);
 
           const receipts = await readAsHolder(
@@ -546,7 +552,24 @@ describe.skipIf(!live.available)(
             grant.token,
             SHARE_READER_NAMES[2]
           );
+          const receiptRows = Array.isArray(receipts.body) ? receipts.body : [];
+
+          // ## `ok` alone cannot tell working from broken (second review)
+          //
+          // A receipts reader that gates itself behind `includes_costs` as well
+          // returns **HTTP 200 with `[]`** for a `costs=false receipts=true`
+          // grant — the cell these files call the one that matters most — and
+          // `ok === true` is perfectly satisfied by it. The grader would have
+          // passed against precisely the defect it exists to catch.
+          //
+          // So the open case asserts rows came back, not merely that nothing
+          // errored. The fixture uploads one receipt, so the count is known.
           expect(receipts.ok).toBe(includesReceipts);
+          if (includesReceipts) {
+            expect(receiptRows.length).toBeGreaterThan(0);
+          } else {
+            expect(receiptRows).toHaveLength(0);
+          }
         } finally {
           await teardownScenario(scenario);
         }
@@ -663,9 +686,23 @@ describe.skipIf(!live.available)(
           `id=eq.${owned.recordId}`
         );
         const rows = Array.isArray(readBack.body) ? readBack.body : [];
-        expect(
-          (rows[0] as { odometer_km?: number } | undefined)?.odometer_km
-        ).not.toBe(999_999);
+
+        // ## The read-back has to be known-good before it proves anything
+        //
+        // Second review: without these two lines the assertion below is
+        // **vacuously passable**. A failed read leaves `rows` as `[]`,
+        // `rows[0]` is `undefined`, the optional chain yields `undefined`, and
+        // `undefined).not.toBe(999_999)` is trivially true — so a check that
+        // could not run reports as a check that passed.
+        //
+        // This is the same unknown-coalesced-to-zero mistake AGENTS.md names,
+        // and `share-fixtures.ts`'s `refusalShape` uses a `-1` sentinel
+        // specifically to avoid it. Got it right there, missed it here.
+        expect(readBack.ok).toBe(true);
+        expect(rows).toHaveLength(1);
+        expect((rows[0] as { odometer_km?: number }).odometer_km).not.toBe(
+          999_999
+        );
       } finally {
         await teardownScenario(scenario);
       }

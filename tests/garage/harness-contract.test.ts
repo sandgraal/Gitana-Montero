@@ -48,6 +48,8 @@ import {
   assertLocalTarget,
   decodeJwtPayload,
   detectLiveStack,
+  FINGERPRINT_PROBE_ROLE,
+  liveDecisionFrom,
   liveTitle,
   mintJwt,
   projectFingerprintIssue,
@@ -230,6 +232,138 @@ describe("detectLiveStack — skips are named, and can be made fatal", () => {
     // the stranger's one this exists to refuse.
     expect(projectFingerprintIssue(["anything"], [])).toContain(
       "nothing identifies this project"
+    );
+  });
+
+  /* ---------------------------------------------------------------------
+   * The fingerprint's WIRING, not just its logic.
+   *
+   * Second review, MEDIUM: `projectFingerprintIssue` was thoroughly graded and
+   * the code that acts on it was not. Two mutants survived — deleting the
+   * refusal branch, and probing as `anon` instead of `service_role` — and each
+   * restores exactly the hazard F8 was built to close. A guard whose only
+   * untested line is the one that acts on the finding is a guard that gets
+   * deleted in a review nobody questions.
+   * ------------------------------------------------------------------ */
+
+  const FOREIGN_STACK = {
+    url: "http://127.0.0.1:54321",
+    jwtSecret: "test-only-secret-at-least-32-characters-long",
+  };
+
+  it("REFUSES when the observation says another project — the wiring", () => {
+    // Drives the decision directly with the table list the real foreign stack
+    // returned. Kills the `if (false && wrongProject !== null)` mutant, which
+    // the pure-logic tests above could never see.
+    const decision = liveDecisionFrom(
+      {
+        unreachable: null,
+        exposed: ["subscriptions", "stripe_webhook_events"],
+      },
+      FOREIGN_STACK
+    );
+
+    expect(decision.available).toBe(false);
+    expect(decision.available === false && decision.reason).toContain(
+      "NOT this project's"
+    );
+  });
+
+  it("ACCEPTS when the observation says this project — the control", () => {
+    const decision = liveDecisionFrom(
+      {
+        unreachable: null,
+        exposed: ["profiles", "vehicles", "records", "receipts"],
+      },
+      FOREIGN_STACK
+    );
+
+    expect(decision.available).toBe(true);
+  });
+
+  it("ACCEPTS an uninformative observation rather than disabling the tier", () => {
+    // `exposed: null` is "the instance did not describe itself". Refusing on
+    // that would switch Tier B off for a version quirk.
+    expect(
+      liveDecisionFrom({ unreachable: null, exposed: null }, FOREIGN_STACK)
+        .available
+    ).toBe(true);
+  });
+
+  it("reports an unreachable stack as unreachable, not as wrong-project", () => {
+    const decision = liveDecisionFrom(
+      { unreachable: "fetch failed", exposed: null },
+      FOREIGN_STACK
+    );
+
+    expect(decision.available).toBe(false);
+    expect(decision.available === false && decision.reason).toContain(
+      SKIP_REASONS.unreachable
+    );
+  });
+
+  it("probes as service_role — an anon probe would disable the guard", () => {
+    // The second surviving mutant, and the nastier one: swapping this single
+    // word leaves every test green while the guard stops working, because a
+    // correctly locked-down project enumerates nothing to `anon`. Asserted by
+    // decoding the token `detectLiveStack` actually hands its observer.
+    expect(FINGERPRINT_PROBE_ROLE).toBe("service_role");
+  });
+
+  it("hands the observer a token minted with that role", async () => {
+    let seen: string | null = null;
+    await detectLiveStack(
+      { GARAGE_LIVE: "1", SUPABASE_URL: "http://127.0.0.1:54321" },
+      async (_stack, probeToken) => {
+        seen = probeToken;
+        return { unreachable: null, exposed: null };
+      }
+    );
+
+    expect(seen).not.toBeNull();
+    expect(decodeJwtPayload(seen ?? "").role).toBe("service_role");
+  });
+
+  it("the DEFAULT observer is still wired up and still reports unreachable", async () => {
+    // The one path the injected-observer tests above cannot reach: the real
+    // `observeStack`, which is now a default parameter rather than inline code.
+    // Moving it created a way for it to be broken invisibly — if it threw, or
+    // returned the wrong shape, every Tier B suite would *skip* rather than
+    // fail, and a tier that never runs is indistinguishable from a tier that
+    // passes.
+    //
+    // Pointed at a loopback port nothing is listening on, so it exercises the
+    // real fetch and the real catch with no stack and no Docker.
+    const decision = await detectLiveStack({
+      GARAGE_LIVE: "1",
+      SUPABASE_URL: "http://127.0.0.1:1",
+    });
+
+    expect(decision.available).toBe(false);
+    expect(decision.available === false && decision.reason).toContain(
+      SKIP_REASONS.unreachable
+    );
+    // Names the port, so a reader can tell which stack failed to answer.
+    expect(decision.available === false && decision.reason).toContain(
+      "127.0.0.1:1"
+    );
+  });
+
+  it("the wiring refuses END TO END, through detectLiveStack itself", async () => {
+    // Belt and braces on the two above: the same foreign observation, through
+    // the real entry point every suite calls, so a refactor that stopped
+    // calling `liveDecisionFrom` at all is caught too.
+    const decision = await detectLiveStack(
+      { GARAGE_LIVE: "1", SUPABASE_URL: "http://127.0.0.1:54321" },
+      async () => ({
+        unreachable: null,
+        exposed: ["subscriptions", "stripe_webhook_events"],
+      })
+    );
+
+    expect(decision.available).toBe(false);
+    expect(decision.available === false && decision.reason).toContain(
+      "NOT this project's"
     );
   });
 

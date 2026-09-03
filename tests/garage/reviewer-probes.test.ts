@@ -3068,7 +3068,11 @@ describe("T2-401: SHR-05, the preset is a label", () => {
     ["inequality", "and s.kind <> 'x'"],
     ["an IN list", "and s.kind in ('x', 'y')"],
     ["a CASE subject", "and (case s.kind when 'x' then true else false end)"],
-    ["a WHEN comparison", "and (case when s.kind = 'x' then true end)"],
+    // `= p_kind`, not `= 'x'`: with a quoted literal this row also matches the
+    // equality pattern, so it would pass even if the `when … kind =` pattern
+    // were deleted — the same confound as the IN row, one clause over
+    // (second review, F-D).
+    ["a WHEN comparison", "and (case when s.kind = p_kind then true end)"],
   ])("G19 rejects the preset branch spelled as %s", (_label, clause) => {
     // Every alternative in the rule, one probe each, and **none of them names a
     // real preset**. That is the point: the first version of this table used
@@ -3159,22 +3163,26 @@ describe("T2-401: SHR-06, capabilities gate what they return", () => {
     ).toBe(G20D_RECEIPTS_ALONE.body);
   });
 
-  it("STATED LIMIT: a reader returning BOTH kinds is not asked this question", () => {
-    // The clause is guarded by `!mentionsCosts`, deliberately, and the guard is
-    // a real limit rather than an oversight — so it is pinned here rather than
-    // left for a reader to discover by being wrong about it.
+  it("G20e rejects ONE routine serving both capabilities", () => {
+    // ## The "stated limit" that was not a limit (second review, MEDIUM)
     //
-    // A single routine returning cost columns *and* receipt data behind
-    // `includes_costs and includes_receipts` gates the costs correctly and the
-    // receipts wrongly, and telling those apart needs per-column analysis —
-    // the same limit T2-401a already recorded for `projectionIssues`. The
-    // architecture is what closes it: `SHARE_READER_FUNCTIONS` puts costs and
-    // receipts in **different readers**, so a routine returning both is
-    // off-architecture before this rule is consulted, and T2-404's reviewer is
-    // told to verify capability scoping by reading.
+    // The first version of this file asserted the opposite of this test. It
+    // guarded clause 3 with `!mentionsCosts`, declared a routine returning both
+    // kinds "off-architecture and therefore somebody else's problem", and
+    // pinned that as a deliberate limit.
+    //
+    // It was wrong. This is the reviewer's fixture, verbatim in shape: the
+    // contract's **own approved name**, one extra column, both gates present —
+    // and it produced zero findings from all seven Tier A rules. The closed
+    // allow-list checks the function name; it has nothing to say about an
+    // extra column. So the "architecture closes it" argument closed nothing.
+    //
+    // It is now a rule, and a total one rather than a heuristic: one query has
+    // one predicate for one result set, so a `costs=false receipts=true` grant
+    // cannot be served correctly by any gating of this shape.
     const both = readerOf(
       sql(`
-        create function public.share_read_everything(p_token text)
+        create function public.share_read_receipts(p_token text)
         returns table (id uuid, cost_amount numeric, storage_path text)
         language sql stable security definer set search_path = ''
         as $share$
@@ -3191,10 +3199,16 @@ describe("T2-401: SHR-06, capabilities gate what they return", () => {
       `)
     );
 
-    // Both gates are present, so clauses 1 and 2 are satisfied and clause 3 is
-    // skipped. Asserted, so that if the guard is ever widened this test says so
-    // rather than a T2-404 grader failing for a reason nobody can place.
-    expect(capabilityGateIssues(both)).toEqual([]);
+    expect(capabilityGateIssues(both).join(" | ")).toContain(
+      "returns cost columns AND receipt data from one routine"
+    );
+  });
+
+  it("G20e CONTROL: either kind ALONE, correctly gated, is accepted", () => {
+    // The pair. A rule that rejected both single-capability readers would
+    // reject the architecture it exists to enforce.
+    expect(capabilityGateIssues(G20B_GATED_COSTS)).toEqual([]);
+    expect(capabilityGateIssues(G20D_RECEIPTS_ALONE)).toEqual([]);
   });
 });
 
@@ -3243,6 +3257,37 @@ describe("T2-401: SHR-08 / 003 MON-02, revocation is never gated", () => {
     expect(revocationGatingIssues(G22_GATED_REVOCATION).join(" | ")).toContain(
       "subscription"
     );
+  });
+
+  it.each<[string]>([
+    ["subscription"],
+    ["entitlement"],
+    ["plan_id"],
+    ["billing"],
+    ["stripe"],
+    ["customer_id"],
+    ["quota"],
+  ])("G22 rejects a revoke that consults `%s`", (token) => {
+    // One probe per deny-list entry, not one probe for the list (second
+    // review, F-E). A single-token probe means six of the seven entries can be
+    // deleted with the suite staying green — and the entry most likely to be
+    // "tidied away" is whichever one nobody wrote a test for. "Any other
+    // condition" is SHR-08's phrase; the enumeration is how it is enforced.
+    const gated = readerOf(
+      sql(`
+        create function public.revoke_share_grant(p_share_id uuid)
+        returns void
+        language sql security definer set search_path = ''
+        as $revoke$
+          update public.shares s set revoked_at = now()
+           where s.id = p_share_id
+             and exists (select 1 from public.${token}s b
+                          where b.owner_id = (select auth.uid()));
+        $revoke$;
+      `)
+    );
+
+    expect(revocationGatingIssues(gated).join(" | ")).toContain(token);
   });
 
   it("G22 CONTROL: a revoke scoped to ownership alone is accepted", () => {

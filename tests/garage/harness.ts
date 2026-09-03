@@ -308,11 +308,109 @@ export type LiveDecision =
   | { readonly available: false; readonly reason: string };
 
 /**
+ * The role the fingerprint probe asks as.
+ *
+ * **`service_role`, and the choice is the guard.** See
+ * `projectFingerprintIssue`: probed as `anon`, a correctly locked-down project
+ * enumerates *nothing*, so an anon probe silently disables the whole
+ * wrong-project check while every test stays green. That is not hypothetical —
+ * it is a one-word mutation, and the second review demonstrated it surviving.
+ *
+ * It is also the honest question to ask: `service_role` is the credential the
+ * harness is about to create and delete accounts with, so probing with it asks
+ * *what would I be writing into?* rather than *what can a stranger read?*
+ *
+ * Named here, used once, and asserted by `harness-contract.test.ts` through an
+ * injected observer that decodes the token it was handed.
+ */
+export const FINGERPRINT_PROBE_ROLE: JwtClaims["role"] = "service_role";
+
+/** What one look at a candidate stack found. */
+export interface StackObservation {
+  /** `null` when the health endpoint answered; a sentence when it did not. */
+  readonly unreachable: string | null;
+  /**
+   * The relations the probe role can see, or `null` when the instance did not
+   * describe itself. `null` and `[]` are different answers — see
+   * `projectFingerprintIssue`.
+   */
+  readonly exposed: readonly string[] | null;
+}
+
+/**
+ * Turn an observation into a decision. **Pure.**
+ *
+ * ## Why this is split out (T2-401 second review)
+ *
+ * `projectFingerprintIssue` was well covered, and the code that *used* it was
+ * not: mutating `if (wrongProject !== null)` to `if (false && …)` left the
+ * whole suite green. The detection logic was graded; the refusal was not, and
+ * the refusal is the part that stops the harness writing into a stranger's
+ * database. A guard whose only untested line is the one that acts on the
+ * finding is a guard that can be deleted in a code review nobody questions.
+ *
+ * So the decision is a pure function of what was observed, and
+ * `harness-contract.test.ts` drives it directly with a foreign table list.
+ */
+export function liveDecisionFrom(
+  observation: StackObservation,
+  stack: LiveStack
+): LiveDecision {
+  if (observation.unreachable !== null) {
+    return {
+      available: false,
+      reason: `${SKIP_REASONS.unreachable} (${stack.url}: ${observation.unreachable})`,
+    };
+  }
+  const wrongProject =
+    observation.exposed === null
+      ? null
+      : projectFingerprintIssue(observation.exposed);
+  if (wrongProject !== null) {
+    return { available: false, reason: `${wrongProject} — ${stack.url}` };
+  }
+  return { available: true, stack };
+}
+
+/** Look at a stack: is it answering, and what does the probe role see? */
+async function observeStack(
+  stack: LiveStack,
+  probeToken: string
+): Promise<StackObservation> {
+  try {
+    const response = await fetch(`${stack.url}/auth/v1/health`, {
+      signal: AbortSignal.timeout(3000),
+      headers: { apikey: mintJwt({ role: "anon" }, stack.jwtSecret) },
+    });
+    if (!response.ok) {
+      return { unreachable: `→ ${response.status}`, exposed: null };
+    }
+  } catch (error) {
+    return { unreachable: (error as Error).message, exposed: null };
+  }
+  return {
+    unreachable: null,
+    exposed: await exposedTables(stack.url, probeToken),
+  };
+}
+
+/** How `detectLiveStack` looks at a stack. Injected so the wiring is gradeable. */
+export type StackObserver = (
+  stack: LiveStack,
+  probeToken: string
+) => Promise<StackObservation>;
+
+/**
  * Decide whether Tier B can run, without ever touching the network unless
  * someone asked for it by setting `GARAGE_LIVE`.
+ *
+ * `observe` is a parameter so a grader can hand this a stack that answers
+ * however the grader likes — and, critically, can decode the probe token it
+ * receives and assert the role it was minted with.
  */
 export async function detectLiveStack(
-  env: NodeJS.ProcessEnv = process.env
+  env: NodeJS.ProcessEnv = process.env,
+  observe: StackObserver = observeStack
 ): Promise<LiveDecision> {
   if (env.GARAGE_LIVE !== "1") {
     return { available: false, reason: SKIP_REASONS.notEnabled };
@@ -327,44 +425,15 @@ export async function detectLiveStack(
     };
   }
   const jwtSecret = env.SUPABASE_JWT_SECRET ?? DEFAULT_LOCAL_JWT_SECRET;
-  try {
-    const response = await fetch(`${url}/auth/v1/health`, {
-      signal: AbortSignal.timeout(3000),
-      headers: { apikey: mintJwt({ role: "anon" }, jwtSecret) },
-    });
-    if (!response.ok) {
-      return {
-        available: false,
-        reason: `${SKIP_REASONS.unreachable} (${url} → ${response.status})`,
-      };
-    }
-  } catch (error) {
-    return {
-      available: false,
-      reason: `${SKIP_REASONS.unreachable} (${url}: ${(error as Error).message})`,
-    };
-  }
+  const stack: LiveStack = { url, jwtSecret };
 
   // Loopback is not the same question as "this project" — see
   // `projectFingerprintIssue`. This runs before any grader provisions an
   // account, because provisioning is the irreversible half.
-  //
-  // Probed as `service_role` deliberately: that is the credential the harness
-  // is about to create and delete accounts with, so this asks the question that
-  // actually matters — *what would I be writing into?* A null answer means the
-  // instance did not describe itself and is treated as uninformative rather
-  // than as a refusal.
-  const exposed = await exposedTables(
-    url,
-    mintJwt({ role: "service_role" }, jwtSecret)
+  return liveDecisionFrom(
+    await observe(stack, mintJwt({ role: FINGERPRINT_PROBE_ROLE }, jwtSecret)),
+    stack
   );
-  const wrongProject =
-    exposed === null ? null : projectFingerprintIssue(exposed);
-  if (wrongProject !== null) {
-    return { available: false, reason: `${wrongProject} — ${url}` };
-  }
-
-  return { available: true, stack: { url, jwtSecret } };
 }
 
 /**
