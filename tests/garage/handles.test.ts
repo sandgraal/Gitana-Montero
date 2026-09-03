@@ -98,7 +98,23 @@ import {
 
 const live = await detectLiveStack();
 
-const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
+/**
+ * The route registry, resolved against this file rather than assembled from a
+ * root string.
+ *
+ * `new URL(relative, import.meta.url)` does the whole join in one step, so
+ * there is no intermediate whose trailing separator the path depends on. The
+ * separator was never actually at risk here — URL resolution guarantees it for
+ * a directory-ish specifier, and `new URL("../..", …)` yields `/repo/` exactly
+ * as `"../../"` does — but a later refactor to `path.resolve`/`dirname`, which
+ * do *not* add one, would silently produce `…/Gitana-Monterosrc/i18n/…`. One
+ * expression removes the trap and matches how `share-delivery.test.ts` builds
+ * its paths, so the two files this task added no longer resolve paths two
+ * different ways (PR #100 review).
+ */
+const ROUTES_MODULE = fileURLToPath(
+  new URL("../../src/i18n/routes.ts", import.meta.url)
+);
 
 /**
  * Every literal route segment the site serves, both locales.
@@ -110,7 +126,7 @@ const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
  * checked for vacuity below, which is the real risk with this technique.
  */
 function siteRouteSegments(): string[] {
-  const source = readFileSync(`${REPO_ROOT}src/i18n/routes.ts`, "utf8");
+  const source = readFileSync(ROUTES_MODULE, "utf8");
   const block =
     /COLLECTION_ROUTE_SEGMENTS\s*=\s*\{([\s\S]*?)\n\} as const/.exec(source);
   if (!block) return [];
