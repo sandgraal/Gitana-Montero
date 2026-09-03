@@ -573,6 +573,36 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   already fixed elsewhere first. Activates T2-305a graders. Depends: T2-305a
   merged. *(GAR-06′)*
 
+- [ ] **T2-306a [TEST]** Graders for the cover-photo designation (GAR-01′):
+  a nullable `vehicles.cover_photo_path` column (or equivalent) naming one entry already
+  present in `vehicles.photo_paths` as the cover; the value SHALL be validated as
+  membership in that same array (a cover path naming a photo the vehicle
+  does not have is a defect, not a user error to accept silently); removing
+  a photo that is the current cover SHALL clear the cover designation rather
+  than leave a dangling reference (same "unknown is not zero" discipline as
+  T2-303's supersession-state work in 001) — a delete-then-reselect race
+  between two tabs is the concrete case to grade for; setting a cover SHALL
+  be independent of upload order (the Nth photo added, not just the most
+  recent or the first, can become the cover). Depends: T2-301. *(GAR-01′)*
+- [ ] **T2-306 [PLATFORM]** Cover-photo UI (owner-approved addition,
+  2026-09-02): a "Set as cover" control per photo on the vehicle edit view,
+  a "Remove cover" affordance, and rendering the designated cover — never
+  just the first array entry — on the garage vehicle list card in place of
+  the current text-only row. No showcase-page consumer yet (SHR-02 is
+  unbuilt); design the render helper so T2-402 can reuse it without a
+  second cover-resolution implementation. Activates T2-306a graders.
+  Depends: T2-306a merged. *(GAR-01′)*
+  <br>**Added mid-session (2026-09-02):** surfaced when the owner uploaded
+  a real cover-candidate photo (a HEIC file, converted to JPEG by the
+  conductor before upload since most non-Safari browsers cannot render HEIC
+  directly — worth a passing thought for whoever builds this UI: does the
+  upload path need to warn on or convert HEIC itself, rather than relying on
+  every future photo happening to arrive pre-converted?) and there was
+  nowhere on the site to designate it as anything more than one photo among
+  several. The garage vehicle list currently renders no thumbnail at all for
+  any vehicle — this task is also the first thing to put an image on that
+  card.
+
 ## Phase P3 — Sharing
 
 **Re-scoped 2026-08-31** by spec 002 §10 (typed share grants). SHR-05..09 add a
