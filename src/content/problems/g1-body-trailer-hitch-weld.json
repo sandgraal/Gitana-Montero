@@ -1,0 +1,123 @@
+{
+  "id": "g1-body-trailer-hitch-weld",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us"],
+    "years": {
+      "from": 1991,
+      "to": 1991
+    }
+  },
+  "system": "body",
+  "safetyCritical": true,
+  "severity": "safety-critical",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "cracks-in-the-weld-around-the-receiver-tube",
+    "rust-bleeding-out-of-a-weld-line",
+    "receiver-tube-moves-under-hand-pressure",
+    "noise-from-the-hitch-when-towing"
+  ],
+  "causes": [
+    { "id": "failing-receiver-weld" },
+    { "id": "recalled-hitch-still-fitted" },
+    { "id": "corrosion-under-the-weld" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "wire-brush-and-inspect-every-weld",
+      "rulesIn": ["failing-receiver-weld", "corrosion-under-the-weld"],
+      "rulesOut": []
+    },
+    {
+      "id": "identify-the-hitch-brand-and-part-number",
+      "rulesIn": ["recalled-hitch-still-fitted"],
+      "rulesOut": []
+    },
+    {
+      "id": "lever-the-receiver-tube-by-hand",
+      "rulesIn": ["failing-receiver-weld"],
+      "rulesOut": ["corrosion-under-the-weld"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-hitch",
+      "difficulty": 3,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": [
+        "failing-receiver-weld",
+        "recalled-hitch-still-fitted",
+        "corrosion-under-the-weld"
+      ],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "US NHTSA vehicle-safety API — Mitsubishi Montero 1991 recall records, equipment campaign 93E023000 by Reese Products, Inc.: the weld on the receiver unit of the Class II trailer hitch, part no. 06070, can break; \"the trailer can separate from the towing vehicle, and could result in a vehicle crash without warning\"; remedy is to replace the trailer hitch",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "archiveUrl": "https://web.archive.org/web/20260902175130id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Trailer hitch receiver weld cracks",
+      "slug": "trailer-hitch-receiver-weld-cracks",
+      "summary": "A bolt-on trailer hitch sold for this truck was recalled because the weld holding the receiver tube could break, letting a trailer separate from the vehicle without warning. The recall was raised by the hitch maker, not by Mitsubishi, so it is filed under the vehicle in the federal database rather than in any Mitsubishi service literature — which is precisely why an owner is unlikely ever to hear about it. The brand and part number of the recalled hitch are recorded in the source cited below. Two things follow. If your truck wears that hitch, it should not tow anything until it has been replaced. And on any thirty-five-year-old truck, whatever the brand, the hitch welds are worth a wire brush and five minutes before the first trip of the season. The truck itself is fine to drive; it is towing that is the hazard here. Towing equipment is safety-critical: have a qualified mechanic inspect and replace it.",
+      "symptoms": {
+        "cracks-in-the-weld-around-the-receiver-tube": "A hairline crack running along the weld where the receiver tube meets the crossbar",
+        "rust-bleeding-out-of-a-weld-line": "A rust stain weeping out of one weld line while the rest of the hitch looks sound",
+        "receiver-tube-moves-under-hand-pressure": "The receiver tube shifts or springs when you lever it by hand",
+        "noise-from-the-hitch-when-towing": "A knock or groan from the hitch under load that was not there before"
+      },
+      "causes": {
+        "failing-receiver-weld": "The weld holding the receiver tube to the hitch body is cracking",
+        "recalled-hitch-still-fitted": "The truck still carries the recalled hitch, which was never replaced",
+        "corrosion-under-the-weld": "Corrosion has worked in under the weld and is lifting it from underneath"
+      },
+      "diagnosticSteps": {
+        "wire-brush-and-inspect-every-weld": "Wire-brush every weld on the hitch clean and inspect each one in good light for cracks and lifted edges",
+        "identify-the-hitch-brand-and-part-number": "Find the maker's label or stamping on the hitch and compare the brand and part number against the recall record cited below",
+        "lever-the-receiver-tube-by-hand": "Put a long bar in the receiver and lever it up, down and sideways while somebody watches the welds for movement"
+      },
+      "fixPaths": {
+        "replace-the-hitch": {
+          "title": "Replace the hitch",
+          "detail": "The remedy the recall published was replacement, not repair — and a cracked hitch weld is not something to re-weld at home in any case. Fit a hitch rated for what you actually tow, and check the frame mounting points for rust while the old one is off."
+        }
+      }
+    },
+    "es": {
+      "title": "Se raja la soldadura del receptor del enganche de remolque",
+      "slug": "soldadura-del-enganche-de-remolque-se-raja",
+      "summary": "Un enganche de remolque empernable que se vendía para este carro fue retirado del mercado porque la soldadura que sostiene el tubo receptor se podía quebrar y dejar que el remolque se separara del vehículo sin aviso. La campaña la levantó el fabricante del enganche, no Mitsubishi, así que aparece archivada bajo el vehículo en la base de datos federal y no en la literatura de servicio de Mitsubishi, que es justamente la razón por la que es casi imposible que un dueño se entere. La marca y el número de parte del enganche retirado están en la fuente que se cita abajo. De ahí salen dos cosas. Si su carro trae ese enganche, no debe halar nada hasta cambiarlo. Y en cualquier carro de treinta y cinco años, sea de la marca que sea, las soldaduras del enganche merecen un cepillo de alambre y cinco minutos antes del primer viaje de la temporada. El carro en sí se puede manejar; lo peligroso aquí es halar. El equipo de remolque es crítico para la seguridad: deje la revisión y el cambio en manos de un mecánico calificado.",
+      "symptoms": {
+        "cracks-in-the-weld-around-the-receiver-tube": "Una rajadura fina siguiendo la soldadura donde el tubo receptor se une al travesaño",
+        "rust-bleeding-out-of-a-weld-line": "Una mancha de herrumbre saliendo de una sola línea de soldadura mientras el resto del enganche se ve sano",
+        "receiver-tube-moves-under-hand-pressure": "El tubo receptor se mueve o rebota cuando usted lo hace palanca con la mano",
+        "noise-from-the-hitch-when-towing": "Un golpe o un quejido en el enganche bajo carga que antes no estaba"
+      },
+      "causes": {
+        "failing-receiver-weld": "La soldadura que sostiene el tubo receptor al cuerpo del enganche se está rajando",
+        "recalled-hitch-still-fitted": "El carro todavía trae el enganche retirado del mercado, que nunca se cambió",
+        "corrosion-under-the-weld": "La corrosión se metió por debajo de la soldadura y la está levantando desde adentro"
+      },
+      "diagnosticSteps": {
+        "wire-brush-and-inspect-every-weld": "Limpie con cepillo de alambre todas las soldaduras del enganche y revise cada una con buena luz buscando rajaduras y bordes levantados",
+        "identify-the-hitch-brand-and-part-number": "Ubique la etiqueta o el troquelado del fabricante en el enganche y compare la marca y el número de parte contra el registro de la campaña que se cita abajo",
+        "lever-the-receiver-tube-by-hand": "Meta una barra larga en el receptor y haga palanca hacia arriba, hacia abajo y a los lados mientras alguien observa si las soldaduras se mueven"
+      },
+      "fixPaths": {
+        "replace-the-hitch": {
+          "title": "Cambiar el enganche",
+          "detail": "Lo que la campaña publicó como solución fue el cambio, no la reparación, y de todos modos una soldadura rajada de enganche no es algo para volver a soldar en casa. Ponga un enganche con capacidad para lo que usted realmente hala, y aproveche que el viejo está afuera para revisar la herrumbre en los puntos de anclaje al chasis."
+        }
+      }
+    }
+  }
+}

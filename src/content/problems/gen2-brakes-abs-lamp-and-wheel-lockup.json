@@ -1,0 +1,187 @@
+{
+  "id": "gen2-brakes-abs-lamp-and-wheel-lockup",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "markets": ["us"],
+    "years": {
+      "from": 1992,
+      "to": 1999
+    }
+  },
+  "system": "brakes",
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "abs-lamp-stays-on",
+    "wheels-lock-and-the-truck-skids",
+    "no-pulsing-in-a-hard-stop",
+    "abs-lamp-only-after-a-few-minutes"
+  ],
+  "causes": [
+    { "id": "contaminated-or-failed-speed-sensor" },
+    { "id": "broken-sensor-wiring" },
+    { "id": "low-brake-fluid" },
+    { "id": "worn-out-friction-on-one-axle" },
+    { "id": "failed-abs-control-unit" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "identify-which-lamp-is-lit",
+      "rulesIn": [],
+      "rulesOut": ["low-brake-fluid"]
+    },
+    {
+      "id": "check-the-fluid-level-and-the-friction",
+      "rulesIn": ["low-brake-fluid", "worn-out-friction-on-one-axle"],
+      "rulesOut": []
+    },
+    {
+      "id": "read-the-stored-abs-codes",
+      "rulesIn": [
+        "contaminated-or-failed-speed-sensor",
+        "failed-abs-control-unit"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "pull-and-clean-each-speed-sensor",
+      "rulesIn": ["contaminated-or-failed-speed-sensor"],
+      "rulesOut": ["broken-sensor-wiring"]
+    },
+    {
+      "id": "wiggle-test-the-sensor-harness",
+      "rulesIn": ["broken-sensor-wiring"],
+      "rulesOut": ["contaminated-or-failed-speed-sensor"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "clean-or-replace-the-sensor",
+      "difficulty": 2,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["contaminated-or-failed-speed-sensor"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "repair-the-sensor-harness",
+      "difficulty": 3,
+      "cost": { "from": "minimal" },
+      "addresses": ["broken-sensor-wiring"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "restore-the-foundation-brakes",
+      "difficulty": 3,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["worn-out-friction-on-one-axle", "low-brake-fluid"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA owner complaint database — 1992 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1992",
+      "archiveUrl": "https://web.archive.org/web/20260902205108/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1992",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1995 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1995",
+      "archiveUrl": "http://web.archive.org/web/20260902175019/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1995",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1998 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1998",
+      "archiveUrl": "https://web.archive.org/web/20260902205258/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1998",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "ABS lamp on and wheels locking in a hard stop",
+      "summary": "The second generation's multi-mode anti-lock braking is one of the things it was sold on, and it is also a system that goes quiet when it fails. Owner reports filed with the United States road safety agency across several model years describe two things that belong together: the warning lamp staying on, and wheels locking so that the truck skids instead of stopping straight. When the control unit sees something it does not trust, it lights the lamp and hands the brakes back to you unassisted — the truck still stops, but it stops the way a truck without anti-lock brakes stops, which is not how this one is set up to behave on a loose or wet surface. The usual reason is one wheel-speed signal rather than the control unit: these sensors sit where road water, brake dust and gear oil reach them, and on a truck of this age the harness that carries the signal has been flexing for decades. Before any of that, settle which lamp you are actually looking at, because the truck has two and they mean different things — the anti-lock lamp is the one this entry is about, and the separate brake warning lamp is the one that comes on for a low fluid level or the parking brake. That distinction is free to make and it decides whether the rest of this page applies to you at all. This entry is written from owner reports in aggregate rather than from a factory bulletin, so treat the ranking of causes as a starting order, not a diagnosis. Anti-lock braking is work that is critical to safety: if the codes point past a sensor, take it to a qualified mechanic with the factory procedure.",
+      "slug": "abs-lamp-and-wheel-lockup",
+      "symptoms": {
+        "abs-lamp-stays-on": "The anti-lock warning lamp stays on after the truck starts moving",
+        "wheels-lock-and-the-truck-skids": "Wheels lock and the truck skids in a hard stop instead of staying straight",
+        "no-pulsing-in-a-hard-stop": "No pulsing at the pedal in an emergency stop where there used to be some",
+        "abs-lamp-only-after-a-few-minutes": "The lamp only comes on after a few minutes of driving, then stays on"
+      },
+      "causes": {
+        "contaminated-or-failed-speed-sensor": "Wheel-speed sensor contaminated by debris, oil or corrosion",
+        "broken-sensor-wiring": "Broken or chafed wiring between a sensor and the control unit",
+        "low-brake-fluid": "Low brake fluid level",
+        "worn-out-friction-on-one-axle": "Worn-out pads or shoes on one axle",
+        "failed-abs-control-unit": "Failed anti-lock control unit"
+      },
+      "diagnosticSteps": {
+        "identify-which-lamp-is-lit": "Work out which warning lamp is actually on — the anti-lock lamp, or the separate brake warning lamp that reports the parking brake and a low fluid level — and confirm it against the symbols in the handbook rather than from memory",
+        "check-the-fluid-level-and-the-friction": "Look at the fluid level in the reservoir and measure the pads and shoes on both axles, and do not top the fluid up until you know where it went",
+        "read-the-stored-abs-codes": "Read the stored anti-lock codes with a scan tool and write down which wheel each one names",
+        "pull-and-clean-each-speed-sensor": "Remove each wheel-speed sensor, clean its tip and its seat, and look for a build-up of metal dust or a wet, oily film",
+        "wiggle-test-the-sensor-harness": "With the codes on screen, flex the harness by hand along its run from the sensor to the body and watch for the reading to drop out"
+      },
+      "fixPaths": {
+        "clean-or-replace-the-sensor": {
+          "title": "Clean or replace the wheel-speed sensor the codes name",
+          "detail": "A contaminated sensor often reads correctly again once its tip and seat are clean. Clear the codes afterwards and drive the truck to see whether the fault returns, because a sensor replaced on a guess proves nothing."
+        },
+        "repair-the-sensor-harness": {
+          "title": "Repair the sensor wiring",
+          "detail": "Joints are soldered and sealed, not twisted and taped — this run lives under the truck in water and grit, and a joint that lets water in will fail again in a season."
+        },
+        "restore-the-foundation-brakes": {
+          "title": "Restore the ordinary brakes underneath",
+          "detail": "Anti-lock braking sits on top of the ordinary brakes and cannot make up for worn-out friction or a system that is short of fluid. Fix that layer first, find out where the fluid went, and then judge what the anti-lock system is still doing wrong."
+        }
+      }
+    },
+    "es": {
+      "title": "Luz de ABS encendida y ruedas que se traban al frenar fuerte",
+      "summary": "El freno antibloqueo multimodo de la segunda generación fue uno de sus argumentos de venta, y también es un sistema que se queda callado cuando falla. Reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos, a lo largo de varios años modelo, describen dos cosas que van juntas: la luz de advertencia que se queda encendida, y ruedas que se traban de modo que el carro patina en lugar de frenar derecho. Cuando la unidad de control ve algo que no le cuadra, enciende la luz y le devuelve a usted los frenos sin asistencia: el carro sigue frenando, pero frena como un carro sin ABS, que no es como este está pensado para comportarse en piso suelto o mojado. La razón de siempre es una señal de velocidad de rueda y no la unidad de control: esos sensores van donde les llega agua del camino, polvo de freno y aceite de engranajes, y en un carro de esta edad el ramal que lleva la señal lleva décadas doblándose. Antes de todo eso, defina cuál luz está viendo, porque el carro tiene dos y no significan lo mismo: la luz del ABS es de la que trata esta entrada, y la luz de advertencia del freno, que es otra, es la que se enciende por nivel bajo de líquido de frenos o por el freno de mano puesto. Hacer esa distinción no cuesta nada y decide si el resto de esta página le aplica a usted. Esta entrada está escrita a partir de reportes de dueños en conjunto y no de un boletín de fábrica, así que tome el orden de las causas como un punto de partida y no como un diagnóstico. El freno antibloqueo es trabajo crítico para la seguridad: si los códigos apuntan más allá de un sensor, llévelo donde un mecánico calificado que tenga el procedimiento de fábrica.",
+      "slug": "luz-de-abs-y-ruedas-trabadas",
+      "symptoms": {
+        "abs-lamp-stays-on": "La luz de advertencia del ABS se queda encendida después de que el carro empieza a rodar",
+        "wheels-lock-and-the-truck-skids": "Las ruedas se traban y el carro patina en una frenada fuerte en vez de mantenerse derecho",
+        "no-pulsing-in-a-hard-stop": "El pedal ya no pulsa en una frenada de emergencia, cuando antes sí lo hacía",
+        "abs-lamp-only-after-a-few-minutes": "La luz aparece solo después de unos minutos de manejo y ahí se queda"
+      },
+      "causes": {
+        "contaminated-or-failed-speed-sensor": "Sensor de velocidad de rueda contaminado por suciedad, aceite o corrosión",
+        "broken-sensor-wiring": "Ramal roto o desgastado entre un sensor y la unidad de control",
+        "low-brake-fluid": "Nivel bajo de líquido de frenos",
+        "worn-out-friction-on-one-axle": "Pastillas de freno o zapatas de freno gastadas en un eje",
+        "failed-abs-control-unit": "Unidad de control del ABS dañada"
+      },
+      "diagnosticSteps": {
+        "identify-which-lamp-is-lit": "Determine cuál luz de advertencia es la que está encendida —la del ABS, o la luz de advertencia del freno que avisa del freno de mano y del nivel bajo de líquido de frenos— y confírmelo contra los símbolos del manual y no de memoria",
+        "check-the-fluid-level-and-the-friction": "Revise el nivel del depósito de líquido de frenos y mida las pastillas de freno y las zapatas de freno de los dos ejes, y no rellene hasta saber a dónde se fue el líquido",
+        "read-the-stored-abs-codes": "Lea con un escáner los códigos guardados del ABS y anote cuál rueda nombra cada uno",
+        "pull-and-clean-each-speed-sensor": "Saque cada sensor de velocidad de rueda, limpie la punta y su alojamiento, y fíjese si hay acumulación de polvo metálico o una película aceitosa",
+        "wiggle-test-the-sensor-harness": "Con los códigos en pantalla, mueva el ramal con la mano a lo largo de su recorrido desde el sensor hasta la carrocería y vea si la lectura se cae"
+      },
+      "fixPaths": {
+        "clean-or-replace-the-sensor": {
+          "title": "Limpiar o cambiar el sensor de velocidad de rueda que nombran los códigos",
+          "detail": "Un sensor contaminado muchas veces vuelve a leer bien apenas se le limpian la punta y el alojamiento. Después borre los códigos y maneje el carro para ver si la falla vuelve, porque un sensor cambiado por corazonada no prueba nada."
+        },
+        "repair-the-sensor-harness": {
+          "title": "Reparar el ramal del sensor",
+          "detail": "Los empalmes se sueldan y se sellan, no se tuercen y se envuelven en cinta: ese recorrido vive debajo del carro entre agua y arena, y un empalme que deja entrar agua vuelve a fallar en una estación."
+        },
+        "restore-the-foundation-brakes": {
+          "title": "Poner en orden el freno común que va por debajo",
+          "detail": "El freno antibloqueo va montado encima del freno común y no puede tapar material de fricción acabado ni un sistema con poco líquido de frenos. Arregle primero esa capa, averigüe a dónde se fue el líquido y solo después juzgue qué sigue haciendo mal el ABS."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "id": "g4-engine-crank-pulley-perished",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["cr", "uk", "au", "jdm", "eu", "me", "global"],
+    "years": {
+      "from": 2006,
+      "to": 2021
+    }
+  },
+  "system": "engine",
+  "safetyCritical": true,
+  "severity": "damaging",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "squeal-on-a-cold-start",
+    "pulley-visibly-wobbles-at-idle",
+    "rubber-crumbs-around-the-front-of-the-engine",
+    "belt-thrown-or-shredded"
+  ],
+  "causes": [
+    {
+      "id": "perished-pulley-rubber"
+    },
+    {
+      "id": "loose-or-broken-centre-bolt"
+    },
+    {
+      "id": "worn-belt-or-tensioner"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "look-at-the-pulley-rubber-with-a-light",
+      "rulesIn": ["perished-pulley-rubber"],
+      "rulesOut": []
+    },
+    {
+      "id": "watch-the-outer-ring-against-the-hub-at-idle",
+      "rulesIn": ["perished-pulley-rubber", "loose-or-broken-centre-bolt"],
+      "rulesOut": []
+    },
+    {
+      "id": "look-for-rubber-crumbs-and-belt-dust",
+      "rulesIn": ["perished-pulley-rubber", "worn-belt-or-tensioner"],
+      "rulesOut": []
+    },
+    {
+      "id": "check-the-centre-bolt-is-seated",
+      "rulesIn": ["loose-or-broken-centre-bolt"],
+      "rulesOut": ["worn-belt-or-tensioner"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-crankshaft-pulley",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": ["perished-pulley-rubber"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-belt-and-tensioner",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["worn-belt-or-tensioner"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-centre-bolt-correctly-torqued",
+      "difficulty": 4,
+      "cost": {
+        "from": "minimal",
+        "to": "significant"
+      },
+      "addresses": ["loose-or-broken-centre-bolt"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero 4x4 Life — \"Pajero 3.2 DI-D common problems\": lists crankshaft pulley (harmonic damper) failure on both the third and fourth generations, with cold-start squeal, visible wobble and rubber crumbs as the symptoms, notes that \"rubber perishes with age rather than mileage, so failures turn up on ten to fifteen year old vehicles\", and warns that ignoring it can escalate to an engine-out repair",
+      "url": "https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "archiveUrl": "https://web.archive.org/web/20260902175907id_/https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "Opinautos — Mitsubishi Montero, reportes de dueños sobre la polea del cigüeñal: seven entries spanning 1994 to 2008 model years describing the pulley working loose, the centre bolt breaking or disappearing, and repeat failures after refitting. The single fourth-generation entry (a 2008 3.2 DI-D) is a request for the tightening torque rather than a failure report, so it evidences the question owners ask, not a fourth-generation failure",
+      "url": "https://www.opinautos.com/mx/mitsubishi/montero/defectos/polea-del-ciguenal",
+      "archiveUrl": "https://web.archive.org/web/20260902175954id_/https://www.opinautos.com/mx/mitsubishi/montero/defectos/polea-del-ciguenal",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "Repuestos USA Motors, Tres Ríos, Cartago, Costa Rica — catalogue category page listing \"polea principal del motor o damper\"; a quote-request listing, not a per-vehicle stock or price check",
+      "url": "https://repuestosusamotorscr.com/producto/poleas-variedad/",
+      "archiveUrl": "https://web.archive.org/web/20260902180046id_/https://repuestosusamotorscr.com/producto/poleas-variedad/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Crankshaft pulley rubber perishes",
+      "slug": "crankshaft-pulley-rubber-perishes",
+      "summary": "The crankshaft pulley on this engine is two metal rings bonded together through a rubber layer that damps torsional vibration. That rubber perishes with age rather than with distance, which is why the one source that documents this for the fourth generation says the failures turn up on trucks of a certain age regardless of how far they have gone. One source is why this entry carries the site's weakest confidence tier: the Spanish-language owner record beside it covers earlier trucks, and its single fourth-generation entry is somebody asking for a torque figure rather than reporting a failure — and every fourth-generation truck is now that age. When the bond lets go, the outer ring walks relative to the hub: the belt runs off line and squeals, then throws, and everything the belt drives stops. Spanish-language owner reports on the same family of trucks describe the related failure of the centre bolt working loose or breaking, which the first-generation entry on this site documents in detail from federal complaint records. Treat a wobbling pulley the same way in both cases: stop. Losing the belt takes the water pump and the steering assist with it, which is why this is filed as safety-critical work for a qualified mechanic rather than a noise to monitor.",
+      "symptoms": {
+        "squeal-on-a-cold-start": "A belt squeal on a cold start that clears as things warm up",
+        "pulley-visibly-wobbles-at-idle": "The pulley visibly wobbles or runs off line at idle",
+        "rubber-crumbs-around-the-front-of-the-engine": "Black rubber crumbs collecting around the front of the engine or on the undertray",
+        "belt-thrown-or-shredded": "The drive belt has been thrown off or has shredded"
+      },
+      "causes": {
+        "perished-pulley-rubber": "The rubber bonding the pulley's outer ring to its hub has perished and is letting go",
+        "loose-or-broken-centre-bolt": "The pulley centre bolt has worked loose or broken",
+        "worn-belt-or-tensioner": "The drive belt or its tensioner is worn, which makes a similar noise from a healthy pulley"
+      },
+      "diagnosticSteps": {
+        "look-at-the-pulley-rubber-with-a-light": "With the engine stopped, shine a light on the rubber ring between the pulley's outer and inner sections and look for cracks, bulging and separation",
+        "watch-the-outer-ring-against-the-hub-at-idle": "At idle, watch the outer ring against the hub — timing marks that appear to move relative to each other mean the bond has gone",
+        "look-for-rubber-crumbs-and-belt-dust": "Look for black rubber crumbs and belt dust in the undertray and around the front of the engine",
+        "check-the-centre-bolt-is-seated": "Check that the pulley centre bolt is still there and pulled down flush"
+      },
+      "fixPaths": {
+        "replace-the-crankshaft-pulley": {
+          "title": "Replace the crankshaft pulley",
+          "detail": "A perished pulley is replaced, not repaired. A Costa Rican counter lists this part category, which is worth knowing before somebody quotes you weeks of import lead time — though the listing is a quote request, not a stock check."
+        },
+        "renew-the-belt-and-tensioner": {
+          "title": "Renew the drive belt and tensioner",
+          "detail": "Do these with the pulley whatever else you find. A belt that has been running on a wobbling pulley has been abraded unevenly and will not last."
+        },
+        "renew-the-centre-bolt-correctly-torqued": {
+          "title": "Renew the centre bolt to the factory torque",
+          "detail": "Owner reports in the cited Spanish-language record describe this bolt loosening again after a repair on other trucks in the model line, so the torque figure and the thread condition both matter. Take the figure from the factory manual and do not accept a number quoted from memory."
+        }
+      }
+    },
+    "es": {
+      "title": "Se cristaliza el hule de la polea del cigüeñal",
+      "slug": "se-cristaliza-el-hule-de-la-polea-del-ciguenal",
+      "summary": "La polea del cigüeñal de este motor son dos anillos metálicos unidos entre sí por una capa de hule que amortigua la vibración torsional. Ese hule se cristaliza por edad y no por kilometraje, y por eso la única fuente que documenta esto para la cuarta generación dice que las fallas aparecen en carros de cierta edad sin importar cuánto hayan rodado. Esa única fuente es la razón por la que esta entrada lleva el nivel de confianza más bajo del sitio: el registro de dueños en español que la acompaña cubre carros anteriores, y su único caso de cuarta generación es alguien preguntando por un valor de apriete, no reportando una falla; y todos los carros de cuarta generación ya tienen esa edad. Cuando la unión se suelta, el anillo exterior camina respecto del cubo: la faja empieza a correr fuera de línea y a chillar, después se bota, y todo lo que la faja mueve se detiene. Los reportes de dueños en español sobre esta misma familia de carros describen la falla emparentada del tornillo central que se afloja o se quiebra, que la entrada de primera generación de este sitio documenta en detalle a partir de registros federales de reclamos. En ambos casos, trate una polea que se bambolea igual: párese. Perder la faja se lleva con ella la bomba de agua y la asistencia de la dirección, y por eso esto se clasifica como trabajo crítico para la seguridad, para un mecánico calificado, y no como un ruido que se pueda ir vigilando.",
+      "symptoms": {
+        "squeal-on-a-cold-start": "Un chillido de faja al arrancar en frío que se quita conforme calienta",
+        "pulley-visibly-wobbles-at-idle": "La polea se bambolea o corre fuera de línea a simple vista en marcha mínima",
+        "rubber-crumbs-around-the-front-of-the-engine": "Migajas de hule negro juntándose al frente del motor o en el protector de cárter",
+        "belt-thrown-or-shredded": "La faja se botó o se deshilachó"
+      },
+      "causes": {
+        "perished-pulley-rubber": "El hule que une el anillo exterior de la polea con su cubo se cristalizó y se está soltando",
+        "loose-or-broken-centre-bolt": "El tornillo central de la polea se aflojó o se quebró",
+        "worn-belt-or-tensioner": "La faja o su tensor están gastados, y hacen un ruido parecido con la polea sana"
+      },
+      "diagnosticSteps": {
+        "look-at-the-pulley-rubber-with-a-light": "Con el motor apagado, alumbre el anillo de hule entre la parte exterior y la interior de la polea buscando rajaduras, abombamiento y separación",
+        "watch-the-outer-ring-against-the-hub-at-idle": "En marcha mínima, observe el anillo exterior contra el cubo: si las marcas parecen moverse una respecto de la otra, la unión ya se fue",
+        "look-for-rubber-crumbs-and-belt-dust": "Busque migajas de hule negro y polvo de faja en el protector de cárter y alrededor del frente del motor",
+        "check-the-centre-bolt-is-seated": "Revise que el tornillo central de la polea siga puesto y asentado a ras"
+      },
+      "fixPaths": {
+        "replace-the-crankshaft-pulley": {
+          "title": "Cambiar la polea del cigüeñal",
+          "detail": "Una polea cristalizada se cambia, no se repara. Hay mostrador en Costa Rica que lista esta categoría de pieza, lo cual conviene saber antes de que alguien le cotice semanas de importación, aunque el listado es para pedir cotización y no una consulta de existencias."
+        },
+        "renew-the-belt-and-tensioner": {
+          "title": "Cambiar la faja y el tensor",
+          "detail": "Hágalos junto con la polea, encuentre lo que encuentre. Una faja que estuvo corriendo sobre una polea bamboleante se desgastó disparejo y no va a durar."
+        },
+        "renew-the-centre-bolt-correctly-torqued": {
+          "title": "Poner tornillo central nuevo con el apriete de fábrica",
+          "detail": "Los reportes de dueños en el registro en español que se cita describen que ese tornillo se vuelve a aflojar después de una reparación en otros carros de la misma línea, así que el valor de apriete y el estado de la rosca importan los dos. Tome el valor del manual de servicio de fábrica y no acepte un número dicho de memoria."
+        }
+      }
+    }
+  }
+}

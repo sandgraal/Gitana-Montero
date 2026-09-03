@@ -1,0 +1,158 @@
+{
+  "id": "gen2-brakes-front-brake-hose-cracking",
+  "fitment": {
+    "gens": ["gen2"],
+    "markets": ["us"],
+    "years": {
+      "from": 1992,
+      "to": 1994
+    }
+  },
+  "system": "brakes",
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "brake-warning-lamp-on",
+    "pedal-sinks-under-steady-pressure",
+    "fluid-level-keeps-dropping",
+    "wet-film-behind-front-wheel"
+  ],
+  "causes": [
+    { "id": "cracked-wheel-side-hose" },
+    { "id": "cracked-lower-hose" },
+    { "id": "leaking-caliper-seal" },
+    { "id": "leaking-master-cylinder" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "look-behind-each-front-wheel",
+      "rulesIn": ["cracked-wheel-side-hose", "cracked-lower-hose"],
+      "rulesOut": ["leaking-master-cylinder"]
+    },
+    {
+      "id": "flex-the-hose-at-full-lock",
+      "rulesIn": ["cracked-wheel-side-hose"],
+      "rulesOut": ["cracked-lower-hose"]
+    },
+    {
+      "id": "check-the-caliper-piston-boot",
+      "rulesIn": ["leaking-caliper-seal"],
+      "rulesOut": ["cracked-wheel-side-hose", "cracked-lower-hose"]
+    },
+    {
+      "id": "check-the-bulkhead-and-reservoir",
+      "rulesIn": ["leaking-master-cylinder"],
+      "rulesOut": ["leaking-caliper-seal"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-both-front-hoses",
+      "difficulty": 3,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["cracked-wheel-side-hose", "cracked-lower-hose"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "rebuild-or-replace-the-caliper",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": ["leaking-caliper-seal"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "tsb",
+  "sources": [
+    {
+      "title": "NHTSA safety recall 96V143001 (Mitsubishi) — front wheel-side brake hose can crack under full-lock steering and full suspension travel",
+      "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=96V143001",
+      "archiveUrl": "https://web.archive.org/web/20260902174723/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=96V143001",
+      "accessed": "2026-09-02",
+      "kind": "manufacturer"
+    },
+    {
+      "title": "NHTSA safety recall 00V226001 (Mitsubishi) — front lower brake hoses can crack",
+      "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=00V226001",
+      "archiveUrl": "https://web.archive.org/web/20260902174734/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=00V226001",
+      "accessed": "2026-09-02",
+      "kind": "manufacturer"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1992 Mitsubishi Montero",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1992",
+      "archiveUrl": "https://web.archive.org/web/20260902205108/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1992",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front brake hose cracks and leaks",
+      "summary": "Mitsubishi ran two separate United States recall campaigns on the front flexible brake hoses of this generation. The first says the wheel-side hose can crack when the steering is at full lock and the suspension at full travel — the two things that happen together every time the truck is manoeuvred hard or driven off pavement. The second, a much smaller campaign, covers cracking of the lower hoses. Either way the result is the same: fluid escapes from one front circuit, the pedal travels further than it should, and the truck stops on less than it was designed to stop on. These are the original rubber hoses on a truck that is now decades old, so age and heat have done their own work on top of whichever defect the campaign described. Both campaigns are United States ones filed with NHTSA; a truck imported from another market was never part of them, and nothing here says what any other market's authority required. Whatever the paperwork says, flexible brake hoses are a wear item with a service life, and on a truck this age they are inspected on their condition, not on their recall history.",
+      "slug": "front-brake-hose-cracks",
+      "symptoms": {
+        "brake-warning-lamp-on": "The brake warning lamp comes on and stays on",
+        "pedal-sinks-under-steady-pressure": "The pedal sinks slowly while you hold steady pressure at a stop",
+        "fluid-level-keeps-dropping": "The fluid reservoir keeps dropping without the pads being worn out",
+        "wet-film-behind-front-wheel": "A wet, oily film on the inside of one front wheel or on the inner fender"
+      },
+      "causes": {
+        "cracked-wheel-side-hose": "Cracked flexible hose on the wheel side of the front axle",
+        "cracked-lower-hose": "Cracked lower front hose",
+        "leaking-caliper-seal": "Leaking caliper piston seal",
+        "leaking-master-cylinder": "Leaking master cylinder or its bulkhead seal"
+      },
+      "diagnosticSteps": {
+        "look-behind-each-front-wheel": "With the truck safely raised and supported, look along both front hoses for cracks, bulges and wet patches, and wipe the area dry so a fresh leak shows",
+        "flex-the-hose-at-full-lock": "Have someone turn the steering to full lock both ways while you watch the wheel-side hose flex, and look into the folds of the bend",
+        "check-the-caliper-piston-boot": "Peel back the caliper piston boot and look for fluid behind it",
+        "check-the-bulkhead-and-reservoir": "Look under the reservoir and at the bulkhead where the master cylinder passes through, and check the carpet below the pedal for damp"
+      },
+      "fixPaths": {
+        "replace-both-front-hoses": {
+          "title": "Replace both front hoses and bleed the system",
+          "detail": "Hoses are replaced in pairs, never one side alone: the two have aged together, and a fresh hose beside a cracked one gives the truck an uneven front end under hard braking. Bleed the whole system afterwards and check the pedal before the truck moves."
+        },
+        "rebuild-or-replace-the-caliper": {
+          "title": "Replace the caliper on the leaking side",
+          "detail": "If the fluid is coming from behind the piston boot rather than from the hose, the hose is not the fault. Fluid that has run over a pad has contaminated it, so pads on that axle are replaced with the caliper."
+        }
+      }
+    },
+    "es": {
+      "title": "La manguera de freno delantera se raja y gotea",
+      "summary": "Mitsubishi hizo dos llamados a revisión distintos en Estados Unidos por las mangueras de freno flexibles delanteras de esta generación. El primero dice que la manguera del lado de la rueda se raja cuando la dirección está topada y la suspensión llega al final de su recorrido, que son justamente las dos cosas que pasan juntas cada vez que uno maniobra fuerte o sale del asfalto. El segundo, una campaña mucho más pequeña, cubre el rajado de las mangueras inferiores. El resultado es el mismo en los dos casos: se escapa líquido de frenos de un circuito delantero, el pedal se va más abajo de lo normal y el carro frena con menos de lo que fue diseñado. Se trata de las mangueras de hule originales de un carro que ya tiene décadas, así que la edad y el calor hicieron lo suyo encima del defecto que describió la campaña. Las dos campañas son estadounidenses y se presentaron ante la NHTSA; un carro importado de otro mercado nunca estuvo dentro de ellas, y aquí no se afirma nada sobre lo que haya exigido la autoridad de otro mercado. Diga lo que diga el papeleo, las mangueras de freno flexibles son una pieza de desgaste con vida útil, y en un carro de esta edad se revisan por su estado y no por su historial de llamados a revisión.",
+      "slug": "manguera-de-freno-delantera-rajada",
+      "symptoms": {
+        "brake-warning-lamp-on": "La luz de advertencia del freno se enciende y se queda encendida",
+        "pedal-sinks-under-steady-pressure": "El pedal se hunde despacio mientras usted lo mantiene pisado en un alto",
+        "fluid-level-keeps-dropping": "El depósito de líquido de frenos baja sin que las pastillas de freno estén gastadas",
+        "wet-film-behind-front-wheel": "Una película húmeda y aceitosa por dentro de una rueda delantera o en el guardabarros interior"
+      },
+      "causes": {
+        "cracked-wheel-side-hose": "Manguera de freno flexible rajada del lado de la rueda del eje delantero",
+        "cracked-lower-hose": "Manguera de freno delantera inferior rajada",
+        "leaking-caliper-seal": "Empaque del pistón del cáliper con fuga",
+        "leaking-master-cylinder": "Bomba principal de freno con fuga, o su empaque contra el mamparo"
+      },
+      "diagnosticSteps": {
+        "look-behind-each-front-wheel": "Con el carro levantado y apoyado sobre soportes de seguridad, recorra con la vista las dos mangueras delanteras buscando rajaduras, abultamientos y zonas húmedas; limpie y seque el área para que una fuga nueva se note",
+        "flex-the-hose-at-full-lock": "Pida que alguien tope la dirección hacia los dos lados mientras usted observa cómo se dobla la manguera del lado de la rueda, y revise por dentro del pliegue de la curva",
+        "check-the-caliper-piston-boot": "Levante el guardapolvo del pistón del cáliper y vea si hay líquido de frenos por detrás",
+        "check-the-bulkhead-and-reservoir": "Revise debajo del depósito y en el mamparo por donde pasa la bomba principal de freno, y toque la alfombra bajo el pedal para ver si está húmeda"
+      },
+      "fixPaths": {
+        "replace-both-front-hoses": {
+          "title": "Cambiar las dos mangueras delanteras y purgar el sistema",
+          "detail": "Las mangueras se cambian en pareja, nunca un solo lado: las dos envejecieron juntas, y una manguera nueva al lado de una rajada le deja al carro un tren delantero disparejo en una frenada fuerte. Después haga la purga de frenos completa y compruebe el pedal antes de que el carro se mueva."
+        },
+        "rebuild-or-replace-the-caliper": {
+          "title": "Cambiar el cáliper del lado que gotea",
+          "detail": "Si el líquido de frenos sale por detrás del guardapolvo del pistón y no de la manguera, la manguera no es la falla. El líquido que corrió sobre una pastilla la dejó contaminada, así que las pastillas de freno de ese eje se cambian junto con el cáliper."
+        }
+      }
+    }
+  }
+}

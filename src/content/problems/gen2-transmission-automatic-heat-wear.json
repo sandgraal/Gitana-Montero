@@ -1,0 +1,184 @@
+{
+  "id": "gen2-transmission-automatic-heat-wear",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "transmissions": ["automatic-4-speed"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "transmission",
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "will-not-shift-properly-when-cold",
+    "shifts-flare-and-slip-under-load",
+    "shudder-at-a-steady-cruise",
+    "fluid-dark-and-smells-burnt",
+    "harsh-bang-into-gear"
+  ],
+  "causes": [
+    { "id": "burnt-or-overdue-fluid" },
+    { "id": "blocked-or-restricted-cooler-circuit" },
+    { "id": "worn-clutch-packs-from-heat" },
+    { "id": "failing-torque-converter" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "check-the-fluid-level-and-condition-warm",
+      "rulesIn": ["burnt-or-overdue-fluid", "worn-clutch-packs-from-heat"],
+      "rulesOut": ["blocked-or-restricted-cooler-circuit"]
+    },
+    {
+      "id": "note-whether-it-misbehaves-cold-or-hot",
+      "rulesIn": ["burnt-or-overdue-fluid"],
+      "rulesOut": ["failing-torque-converter"]
+    },
+    {
+      "id": "measure-the-flow-through-the-cooler-return",
+      "rulesIn": ["blocked-or-restricted-cooler-circuit"],
+      "rulesOut": ["burnt-or-overdue-fluid"]
+    },
+    {
+      "id": "feel-for-shudder-at-a-light-steady-throttle",
+      "rulesIn": ["failing-torque-converter"],
+      "rulesOut": ["worn-clutch-packs-from-heat"]
+    },
+    {
+      "id": "drop-the-pan-and-look-at-what-is-in-it",
+      "rulesIn": ["worn-clutch-packs-from-heat"],
+      "rulesOut": ["blocked-or-restricted-cooler-circuit"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "service-the-fluid-and-filter",
+      "difficulty": 3,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["burnt-or-overdue-fluid"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "clear-or-improve-the-cooling-circuit",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": ["blocked-or-restricted-cooler-circuit"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "rebuild-or-replace-the-transmission",
+      "difficulty": 5,
+      "cost": { "from": "significant", "to": "major" },
+      "addresses": ["worn-clutch-packs-from-heat", "failing-torque-converter"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: automatic transmission overheating and wear from towing, old fluid, a clogged cooler and high temperatures; look for smooth shifts and clean fluid",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1996 Mitsubishi Montero (power train complaints including a transmission that will not shift when cold and a failed torque converter)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "archiveUrl": "https://web.archive.org/web/20260902205122/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1999 Mitsubishi Montero (power train and transmission failures)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "archiveUrl": "https://web.archive.org/web/20260902175310/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Automatic slipping, flaring or refusing to shift",
+      "summary": "A buyer's guide for this generation puts the automatic's problem down to heat: towing, old fluid, a clogged cooler and high temperatures shorten its life, and the guide tells a buyer to look for smooth shifts and clean fluid as the test. Owner reports filed with the United States road safety agency add the specific complaints that show up first — a transmission that will not shift properly when the truck is cold, and torque converters that failed. Heat is the whole story here and it explains why the symptoms arrive in the order they do. Transmission fluid does not wear out gradually and evenly; it survives until it has been cooked, and then it stops doing the two jobs it has, which are carrying pressure and holding friction. Once the fluid has gone, what it destroys is the clutch material inside, and that is the part that turns a fluid service into a rebuild. So the useful judgement is not about the transmission — it is about time. A truck that is slipping today can often be saved with a service; the same truck a thousand kilometres later usually cannot. Drive it gently, keep it off towing and long climbs, and get the fluid looked at this week rather than at the next service.",
+      "slug": "automatic-slipping-or-not-shifting",
+      "symptoms": {
+        "will-not-shift-properly-when-cold": "It will not shift properly until the truck has warmed up",
+        "shifts-flare-and-slip-under-load": "The engine revs rise between gears, and the truck does not gather speed with them",
+        "shudder-at-a-steady-cruise": "A shudder or a fine vibration at a steady cruise that goes away when you touch the throttle",
+        "fluid-dark-and-smells-burnt": "The fluid on the dipstick is dark brown and smells burnt",
+        "harsh-bang-into-gear": "A harsh bang into gear where it used to be smooth"
+      },
+      "causes": {
+        "burnt-or-overdue-fluid": "Burnt or long-overdue transmission fluid",
+        "blocked-or-restricted-cooler-circuit": "Blocked or restricted cooler circuit",
+        "worn-clutch-packs-from-heat": "Clutch packs worn out by heat",
+        "failing-torque-converter": "Failing torque converter, or its lock-up clutch"
+      },
+      "diagnosticSteps": {
+        "check-the-fluid-level-and-condition-warm": "With the engine warm and running, check the fluid level the way the truck expects and wipe the dipstick on white paper to judge its colour and smell",
+        "note-whether-it-misbehaves-cold-or-hot": "Note whether the trouble is worst cold and improves as it warms, or worst hot after a long run",
+        "measure-the-flow-through-the-cooler-return": "Have the cooler return line disconnected into a container and the flow checked while the engine idles, which shows whether the circuit is restricted",
+        "feel-for-shudder-at-a-light-steady-throttle": "At a steady cruise on a level road, hold a light throttle and feel for a fine shudder, then lift slightly and see whether it disappears",
+        "drop-the-pan-and-look-at-what-is-in-it": "Drop the pan and look at the magnet and the bottom: fine grey paste is normal wear, dark friction material and metal flakes are not"
+      },
+      "fixPaths": {
+        "service-the-fluid-and-filter": {
+          "title": "Service the fluid and filter, and keep servicing it",
+          "detail": "The cheapest useful action and the only preventive one. Use the fluid specification the truck calls for rather than a universal product, change the filter with it, and set a shorter interval than the book's if the truck tows or climbs. On a transmission that is already slipping badly this may not save it, and it is still the right first move."
+        },
+        "clear-or-improve-the-cooling-circuit": {
+          "title": "Clear the cooler circuit, or improve it",
+          "detail": "A restricted cooler means the fluid never gets cool no matter how new it is. Flush the lines and the cooler, and if the truck tows or works in heat, an additional cooler is the change that actually addresses the cause the cited guide names."
+        },
+        "rebuild-or-replace-the-transmission": {
+          "title": "Rebuild or replace the transmission",
+          "detail": "Where the clutch material is already in the pan or the converter has failed, fluid will not bring it back. Have the cooler circuit cleaned out as part of the job, whatever else is done — a rebuilt transmission fed by a cooler full of the old one's debris does not last."
+        }
+      }
+    },
+    "es": {
+      "title": "La automática patina, se dispara o no quiere cambiar",
+      "summary": "Una guía de compra de esta generación le achaca el problema de la transmisión automática al calor: remolcar, aceite viejo, un enfriador tapado y temperaturas altas le acortan la vida, y la guía le dice al comprador que la prueba es buscar cambios suaves y aceite limpio. Los reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos agregan las quejas concretas que aparecen primero: una transmisión que no cambia bien mientras el carro está frío, y convertidores de par que fallaron. El calor es toda la historia acá y explica por qué los síntomas llegan en el orden en que llegan. El aceite de transmisión automática no se desgasta poco a poco y parejo; aguanta hasta que se cocina, y ahí deja de hacer los dos trabajos que tiene, que son cargar presión y sostener fricción. Una vez que el aceite se fue, lo que destruye es el material de fricción de adentro, y esa es la parte que convierte un cambio de aceite en una reparación completa. Así que el juicio útil no es sobre la transmisión, es sobre el tiempo. Un carro que patina hoy muchas veces se salva con un servicio; ese mismo carro mil kilómetros después normalmente ya no. Maneje suave, déjelo fuera de remolques y subidas largas, y mande a revisar el aceite esta semana y no en el próximo servicio.",
+      "slug": "automatica-patina-o-no-cambia",
+      "symptoms": {
+        "will-not-shift-properly-when-cold": "No cambia bien hasta que el carro se calienta",
+        "shifts-flare-and-slip-under-load": "Las revoluciones suben entre cambios y el carro no gana velocidad con ellas",
+        "shudder-at-a-steady-cruise": "Un temblor fino a velocidad sostenida que desaparece cuando usted toca el acelerador",
+        "fluid-dark-and-smells-burnt": "El aceite de transmisión automática de la varilla está café oscuro y huele a quemado",
+        "harsh-bang-into-gear": "Un golpe seco al entrar el cambio donde antes entraba suave"
+      },
+      "causes": {
+        "burnt-or-overdue-fluid": "Aceite de transmisión automática quemado o muy vencido",
+        "blocked-or-restricted-cooler-circuit": "Circuito del enfriador tapado o restringido",
+        "worn-clutch-packs-from-heat": "Paquetes de fricción acabados por el calor",
+        "failing-torque-converter": "Convertidor de par fallando, o su embrague de bloqueo"
+      },
+      "diagnosticSteps": {
+        "check-the-fluid-level-and-condition-warm": "Con el motor tibio y encendido, revise el nivel de aceite como lo pide el carro y limpie la varilla sobre papel blanco para juzgar color y olor",
+        "note-whether-it-misbehaves-cold-or-hot": "Anote si el problema es peor en frío y mejora conforme calienta, o peor en caliente después de un recorrido largo",
+        "measure-the-flow-through-the-cooler-return": "Mande a desconectar la cañería de retorno del enfriador hacia un recipiente y a medir el caudal con el motor en marcha mínima, que es lo que muestra si el circuito está restringido",
+        "feel-for-shudder-at-a-light-steady-throttle": "A velocidad sostenida en camino plano, mantenga acelerador suave y sienta si hay un temblor fino; después suelte un poco y vea si desaparece",
+        "drop-the-pan-and-look-at-what-is-in-it": "Baje el cárter de la transmisión y revise el imán y el fondo: una pasta gris fina es desgaste normal, material de fricción oscuro y escamas de metal no lo son"
+      },
+      "fixPaths": {
+        "service-the-fluid-and-filter": {
+          "title": "Hacer el servicio de aceite y filtro, y seguir haciéndolo",
+          "detail": "Es la acción útil más barata y la única preventiva. Use la especificación de aceite que pide el carro y no un producto universal, cambie el filtro con él, y ponga un intervalo más corto que el del manual si el carro remolca o sube. En una transmisión que ya patina feo esto puede no salvarla, y aun así es el primer movimiento correcto."
+        },
+        "clear-or-improve-the-cooling-circuit": {
+          "title": "Destapar el circuito del enfriador, o mejorarlo",
+          "detail": "Un enfriador restringido significa que el aceite nunca se enfría por más nuevo que esté. Lave las cañerías y el enfriador, y si el carro remolca o trabaja en calor, un enfriador adicional es el cambio que de verdad ataca la causa que nombra la guía citada."
+        },
+        "rebuild-or-replace-the-transmission": {
+          "title": "Reparar o cambiar la transmisión",
+          "detail": "Cuando el material de fricción ya está en el cárter o el convertidor falló, el aceite no la trae de vuelta. Mande a limpiar el circuito del enfriador como parte del trabajo, se haga lo que se haga: una transmisión reparada alimentada por un enfriador lleno de los restos de la anterior no dura."
+        }
+      }
+    }
+  }
+}

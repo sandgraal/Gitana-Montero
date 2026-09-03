@@ -1,0 +1,200 @@
+{
+  "id": "g1-electrical-engine-bay-fire",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us"],
+    "years": {
+      "from": 1989,
+      "to": 1991
+    }
+  },
+  "system": "electrical",
+  "safetyCritical": true,
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "smoke-from-under-the-hood",
+    "smell-of-burning-plastic",
+    "fuse-blows-again-as-soon-as-it-is-replaced",
+    "melted-or-discoloured-insulation"
+  ],
+  "causes": [
+    {
+      "id": "chafed-or-brittle-harness-insulation"
+    },
+    {
+      "id": "corroded-high-current-connection"
+    },
+    {
+      "id": "fuel-or-oil-leaking-onto-hot-metal"
+    },
+    {
+      "id": "rodent-damage-to-the-harness"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "stop-and-disconnect-the-battery",
+      "rulesIn": [
+        "chafed-or-brittle-harness-insulation",
+        "corroded-high-current-connection"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "feel-the-main-battery-and-starter-terminals",
+      "rulesIn": ["corroded-high-current-connection"],
+      "rulesOut": []
+    },
+    {
+      "id": "trace-the-harness-where-it-crosses-metal",
+      "rulesIn": [
+        "chafed-or-brittle-harness-insulation",
+        "rodent-damage-to-the-harness"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "look-for-wet-fuel-or-oil-on-the-exhaust",
+      "rulesIn": ["fuel-or-oil-leaking-onto-hot-metal"],
+      "rulesOut": ["corroded-high-current-connection"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "repair-the-harness-section",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": [
+        "chafed-or-brittle-harness-insulation",
+        "rodent-damage-to-the-harness"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "remake-the-high-current-connections",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["corroded-high-current-connection"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "cure-the-fluid-leak-first",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "significant"
+      },
+      "addresses": ["fuel-or-oil-leaking-onto-hot-metal"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (two fire reports: one vehicle \"became engulfed in flames\" while driving, one underhood fire while parked; one further report of fuel found in the exhaust and oil)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
+      "archiveUrl": "https://web.archive.org/web/20260902180641id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1991 Mitsubishi Montero (one electrical-system fire while the vehicle was parked and unattended)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "archiveUrl": "https://web.archive.org/web/20260902175215id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "Expedition Portal forum — \"First Gen Montero Advice\" thread (a member reports rodent damage to engine-bay wiring, and vacuum leaks, on a first-generation truck)",
+      "url": "https://forum.expeditionportal.com/threads/first-gen-montero-advice.152161/",
+      "archiveUrl": "https://web.archive.org/web/20260902175302id_/https://forum.expeditionportal.com/threads/first-gen-montero-advice.152161/",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine-bay fire on an ageing truck",
+      "slug": "engine-bay-fire",
+      "summary": "A handful of owners have reported engine-bay fires on these trucks to the US federal regulator — one while driving, two while parked. That is a small number, and it is why this entry is tiered as weakly as it is: nothing here establishes a design defect, and it should not be read as one. What it does establish is the failure mode worth taking seriously on any truck this old, where insulation has had decades to go hard, high-current connections have had decades to corrode, and something has almost certainly nested in the engine bay at least once. Several of the other problems documented for this generation end in leaked oil or fuel on hot metal. The right response to smoke or a burning smell is to stop, switch off, and disconnect the battery — not to drive on and see. Have a qualified mechanic go through the harness before you put it back on the road.",
+      "symptoms": {
+        "smoke-from-under-the-hood": "Smoke rising from under the hood, with or without a warning light",
+        "smell-of-burning-plastic": "A sharp burning-plastic smell in the cabin or at the vents",
+        "fuse-blows-again-as-soon-as-it-is-replaced": "A fuse blows again immediately every time it is replaced",
+        "melted-or-discoloured-insulation": "Wiring insulation that has gone shiny, brown, sticky or melted where it touches metal"
+      },
+      "causes": {
+        "chafed-or-brittle-harness-insulation": "Decades-old harness insulation has gone brittle or chafed through where it crosses a bracket or edge",
+        "corroded-high-current-connection": "A high-current connection — battery, starter, alternator, main ground — is corroded and heating under load",
+        "fuel-or-oil-leaking-onto-hot-metal": "Fuel or oil is leaking onto the exhaust manifold or another hot surface",
+        "rodent-damage-to-the-harness": "Rodents have chewed the harness insulation in the engine bay"
+      },
+      "diagnosticSteps": {
+        "stop-and-disconnect-the-battery": "At the first smoke or burning smell, stop, switch off and disconnect the battery negative before opening anything up",
+        "feel-the-main-battery-and-starter-terminals": "With the engine cold and the battery reconnected, run the engine briefly and then carefully feel the battery, starter, alternator and main ground connections for one that is hotter than the rest",
+        "trace-the-harness-where-it-crosses-metal": "Follow every harness branch by hand where it passes over brackets, edges and the engine, looking and feeling for hard, cracked or chewed insulation",
+        "look-for-wet-fuel-or-oil-on-the-exhaust": "Look and smell along the exhaust manifold and downpipe for wet fuel or oil, and for the dry scorched patches they leave behind"
+      },
+      "fixPaths": {
+        "repair-the-harness-section": {
+          "title": "Repair or replace the damaged harness section",
+          "detail": "Cut back to good copper, splice with soldered or properly crimped joints, insulate, and re-route the branch away from the edge that cut it. Patching over brittle insulation with tape puts the fault back exactly where it was."
+        },
+        "remake-the-high-current-connections": {
+          "title": "Clean and remake the high-current connections",
+          "detail": "Undo, clean to bright metal, and re-tighten the battery, starter, alternator and main ground connections. This is the cheapest job on the page and it removes the most common source of heat."
+        },
+        "cure-the-fluid-leak-first": {
+          "title": "Cure the fuel or oil leak before anything else",
+          "detail": "If fuel or oil is reaching hot metal, that is the fire, and no amount of electrical work fixes it. Several of the other documented problems on this generation feed straight into this one."
+        }
+      }
+    },
+    "es": {
+      "title": "Incendio en el compartimiento del motor en un carro ya viejo",
+      "slug": "incendio-en-el-compartimiento-del-motor",
+      "summary": "Unos pocos dueños reportaron incendios en el compartimiento del motor de estos carros al regulador federal de Estados Unidos: uno manejando y dos con el carro estacionado. Son pocos casos, y por eso esta entrada lleva el nivel de confianza más bajo: nada de lo que hay aquí demuestra un defecto de diseño, y no se debe leer así. Lo que sí establece es cuál es el modo de falla que hay que tomar en serio en cualquier carro de esta edad, donde el aislamiento tuvo décadas para endurecerse, las conexiones de alta corriente tuvieron décadas para corroerse y casi con seguridad algún animal anidó ahí adentro alguna vez. Varios de los otros problemas documentados de esta generación terminan en aceite o combustible sobre metal caliente. Ante humo u olor a quemado, lo correcto es pararse, apagar y desconectar la batería; no seguir manejando a ver qué pasa. Deje que un mecánico calificado revise todo el ramal antes de volver a sacarlo a la calle.",
+      "symptoms": {
+        "smoke-from-under-the-hood": "Humo saliendo por debajo del capó, con o sin luz de advertencia encendida",
+        "smell-of-burning-plastic": "Olor fuerte a plástico quemado dentro de la cabina o en las salidas de aire",
+        "fuse-blows-again-as-soon-as-it-is-replaced": "El fusible se vuelve a quemar de inmediato cada vez que se cambia",
+        "melted-or-discoloured-insulation": "Aislamiento de cables brillante, café, pegajoso o derretido donde roza con metal"
+      },
+      "causes": {
+        "chafed-or-brittle-harness-insulation": "El aislamiento del ramal, de décadas de edad, se cristalizó o se peló donde cruza un soporte o un filo",
+        "corroded-high-current-connection": "Una conexión de alta corriente —batería, motor de arranque, alternador, tierra principal— está corroída y se calienta bajo carga",
+        "fuel-or-oil-leaking-onto-hot-metal": "Combustible o aceite está goteando sobre el múltiple de escape u otra superficie caliente",
+        "rodent-damage-to-the-harness": "Los roedores mordieron el aislamiento del ramal dentro del compartimiento del motor"
+      },
+      "diagnosticSteps": {
+        "stop-and-disconnect-the-battery": "Al primer humo u olor a quemado, párese, apague y desconecte el negativo de la batería antes de abrir nada",
+        "feel-the-main-battery-and-starter-terminals": "Con el motor frío y la batería conectada, haga andar el motor un momento y luego palpe con cuidado las conexiones de batería, motor de arranque, alternador y tierra principal buscando una que esté más caliente que las demás",
+        "trace-the-harness-where-it-crosses-metal": "Recorra con la mano cada rama del ramal donde pasa sobre soportes, filos y el motor, viendo y sintiendo si el aislamiento está duro, rajado o mordido",
+        "look-for-wet-fuel-or-oil-on-the-exhaust": "Revise y huela a lo largo del múltiple de escape y del tubo de bajada buscando combustible o aceite fresco, y las manchas chamuscadas que dejan"
+      },
+      "fixPaths": {
+        "repair-the-harness-section": {
+          "title": "Reparar o cambiar el tramo dañado del ramal",
+          "detail": "Corte hasta llegar a cobre sano, empalme con uniones soldadas o bien prensadas, aísle y vuelva a acomodar la rama lejos del filo que la cortó. Poner cinta encima de un aislamiento cristalizado deja la falla exactamente donde estaba."
+        },
+        "remake-the-high-current-connections": {
+          "title": "Limpiar y rehacer las conexiones de alta corriente",
+          "detail": "Suelte, limpie hasta metal brillante y vuelva a apretar las conexiones de batería, motor de arranque, alternador y tierra principal. Es el trabajo más barato de esta página y quita la fuente de calor más común."
+        },
+        "cure-the-fluid-leak-first": {
+          "title": "Arreglar primero la fuga de combustible o de aceite",
+          "detail": "Si hay combustible o aceite llegando a metal caliente, eso es el incendio, y ningún trabajo eléctrico lo arregla. Varios de los otros problemas documentados de esta generación desembocan directamente en este."
+        }
+      }
+    }
+  }
+}

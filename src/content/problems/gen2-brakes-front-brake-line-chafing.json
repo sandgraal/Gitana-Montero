@@ -1,0 +1,167 @@
+{
+  "id": "gen2-brakes-front-brake-line-chafing",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "markets": ["us"],
+    "years": {
+      "from": 1997,
+      "to": 1998
+    }
+  },
+  "system": "brakes",
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "brake-indicator-lamp-on",
+    "pedal-goes-further-than-normal",
+    "fluid-loss-with-no-wet-wheel",
+    "damp-patch-on-inner-fender"
+  ],
+  "causes": [
+    {
+      "id": "line-chafed-at-pass-through"
+    },
+    {
+      "id": "line-chafed-against-neighbouring-pipe"
+    },
+    {
+      "id": "corroded-rigid-line"
+    },
+    {
+      "id": "cracked-flexible-hose"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "inspect-the-inner-fender-pass-through",
+      "rulesIn": ["line-chafed-at-pass-through"],
+      "rulesOut": ["cracked-flexible-hose"]
+    },
+    {
+      "id": "trace-the-line-along-its-whole-run",
+      "rulesIn": [
+        "line-chafed-against-neighbouring-pipe",
+        "corroded-rigid-line"
+      ],
+      "rulesOut": ["line-chafed-at-pass-through"]
+    },
+    {
+      "id": "check-the-flexible-hose-at-the-caliper",
+      "rulesIn": ["cracked-flexible-hose"],
+      "rulesOut": ["corroded-rigid-line"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "reposition-and-protect-the-line",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": [
+        "line-chafed-at-pass-through",
+        "line-chafed-against-neighbouring-pipe"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-damaged-line",
+      "difficulty": 4,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": [
+        "line-chafed-at-pass-through",
+        "line-chafed-against-neighbouring-pipe",
+        "corroded-rigid-line"
+      ],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "tsb",
+  "sources": [
+    {
+      "title": "NHTSA safety recall 98V220000 (Mitsubishi) — front brake lines can develop pin holes by chafing against the inner-fender pass-through",
+      "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=98V220000",
+      "archiveUrl": "https://web.archive.org/web/20260902205057/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=98V220000",
+      "accessed": "2026-09-02",
+      "kind": "manufacturer"
+    },
+    {
+      "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero — note the year's dataset also carries Montero Sport records, a different platform, which are excluded from what is relied on here",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
+      "archiveUrl": "https://web.archive.org/web/20260902175240/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1997",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front brake line chafes through at the inner fender",
+      "summary": "The rigid front brake lines pass through a hole in the inner fender. Mitsubishi's United States recall says that when a line is not centred in that hole it rubs on the edge, and the rubbing eventually opens pin holes in the wall of the line. The remedy the campaign describes is telling: a line still centred is simply bent back into place, and only a line already worn is replaced. That means the fault is progressive and silent for a long time — there is nothing to feel until the wall finally opens and pressure escapes. Owner reports filed with the same agency describe the same class of failure elsewhere on the run, with lines routed close enough to a neighbouring pipe to wear against it. On a truck of this age, corrosion works on the same lines from the outside, especially where they run behind a wheel that throws salt or coastal grit at them. A brake line that is leaking is not a defect you drive with, and finding the leak is not the same as knowing the rest of the run is sound.",
+      "slug": "front-brake-line-chafes-through",
+      "symptoms": {
+        "brake-indicator-lamp-on": "The brake indicator lamp lights and does not go out",
+        "pedal-goes-further-than-normal": "The pedal travels further than it used to before the truck slows",
+        "fluid-loss-with-no-wet-wheel": "The fluid level falls with no wet wheel or wet caliper to explain it",
+        "damp-patch-on-inner-fender": "A damp, dust-caked patch on the inner fender or along the frame rail"
+      },
+      "causes": {
+        "line-chafed-at-pass-through": "Rigid line worn through where it passes through the inner fender",
+        "line-chafed-against-neighbouring-pipe": "Rigid line worn through against a neighbouring pipe or bracket",
+        "corroded-rigid-line": "Rigid line perforated by external corrosion",
+        "cracked-flexible-hose": "Cracked flexible hose at the caliper end"
+      },
+      "diagnosticSteps": {
+        "inspect-the-inner-fender-pass-through": "Find where each front line crosses the inner fender and look at the line where it meets the edge of the hole; check whether it sits centred or is pressed against one side",
+        "trace-the-line-along-its-whole-run": "Follow each line from the master cylinder to the flexible hose, feeling for a flat spot, a bright rub mark or a soft, scaly section",
+        "check-the-flexible-hose-at-the-caliper": "Wipe the flexible hose dry, then have someone press the pedal hard while you watch for fluid appearing at the crimp or in a crack"
+      },
+      "fixPaths": {
+        "reposition-and-protect-the-line": {
+          "title": "Re-centre the line and protect it where it passes through",
+          "detail": "Only for a line whose wall is still sound. Bend it back so it sits clear of the edge and fit a grommet or sleeve so it cannot walk back. A line that already has a worn flat is replaced, not repositioned."
+        },
+        "replace-the-damaged-line": {
+          "title": "Replace the damaged section of rigid line",
+          "detail": "New line is formed and flared to match, routed clear of anything that can rub it, and the system is bled afterwards. On a truck old enough to have corroded one line, the neighbouring lines have lived the same life — this is the moment to look at all of them. Brake lines are a safety-critical repair with a flare joint that must not weep; if you are not equipped to flare and bleed properly, this is work for a qualified mechanic."
+        }
+      }
+    },
+    "es": {
+      "title": "La cañería de freno delantera se desgasta contra el guardabarros interior",
+      "summary": "Las cañerías rígidas de freno delanteras pasan por un hueco del guardabarros interior. El llamado a revisión de Mitsubishi en Estados Unidos dice que cuando la cañería no queda centrada en ese hueco roza contra el borde, y ese roce termina abriendo huequitos en la pared de la cañería. El remedio que describe la campaña es revelador: una cañería que todavía va centrada solo se acomoda doblándola, y únicamente se cambia la que ya está desgastada. Eso quiere decir que la falla avanza callada durante mucho tiempo: no hay nada que se sienta hasta que la pared se abre y se escapa la presión. Reportes de dueños presentados ante la misma agencia describen el mismo tipo de falla en otros puntos del recorrido, con cañerías que van tan cerca de otro tubo que se desgastan contra él. En un carro de esta edad la corrosión trabaja sobre esas mismas cañerías desde afuera, sobre todo donde pasan detrás de una rueda que les tira sal o arena de costa. Una cañería de freno que gotea no es algo con lo que uno maneje, y encontrar la fuga no es lo mismo que saber que el resto del recorrido está sano.",
+      "slug": "caneria-de-freno-delantera-desgastada",
+      "symptoms": {
+        "brake-indicator-lamp-on": "La luz de advertencia del freno se enciende y no se apaga",
+        "pedal-goes-further-than-normal": "El pedal baja más de lo que bajaba antes de que el carro empiece a frenar",
+        "fluid-loss-with-no-wet-wheel": "Baja el nivel de líquido de frenos y no hay rueda ni cáliper mojado que lo explique",
+        "damp-patch-on-inner-fender": "Una mancha húmeda con polvo pegado en el guardabarros interior o a lo largo del chasis"
+      },
+      "causes": {
+        "line-chafed-at-pass-through": "Cañería rígida desgastada donde pasa por el guardabarros interior",
+        "line-chafed-against-neighbouring-pipe": "Cañería rígida desgastada contra otro tubo o una abrazadera",
+        "corroded-rigid-line": "Cañería rígida perforada por corrosión externa",
+        "cracked-flexible-hose": "Manguera de freno flexible rajada del lado del cáliper"
+      },
+      "diagnosticSteps": {
+        "inspect-the-inner-fender-pass-through": "Ubique dónde cruza cada cañería delantera el guardabarros interior y observe la cañería justo en el borde del hueco; fíjese si va centrada o si está recostada contra un lado",
+        "trace-the-line-along-its-whole-run": "Siga cada cañería desde la bomba principal de freno hasta la manguera flexible, palpando si hay una parte aplanada, una marca brillante de roce o un tramo blando y escamado",
+        "check-the-flexible-hose-at-the-caliper": "Seque la manguera flexible y pida que alguien pise el pedal con fuerza mientras usted observa si aparece líquido de frenos en el engaste o en una rajadura"
+      },
+      "fixPaths": {
+        "reposition-and-protect-the-line": {
+          "title": "Recentrar la cañería y protegerla donde atraviesa",
+          "detail": "Solo sirve si la pared de la cañería todavía está sana. Se dobla para que quede libre del borde y se le pone un pasacables o un forro para que no se vuelva a recostar. Una cañería que ya tiene una parte aplanada se cambia, no se acomoda."
+        },
+        "replace-the-damaged-line": {
+          "title": "Cambiar el tramo dañado de cañería rígida",
+          "detail": "La cañería nueva se dobla y se abocina igual a la original, se acomoda lejos de cualquier cosa que la roce, y después se purga el sistema. En un carro con edad suficiente para haber corroído una cañería, las cañerías vecinas vivieron lo mismo: este es el momento de verlas todas. Las cañerías de freno son una reparación crítica para la seguridad, con una unión abocinada que no puede sudar; si usted no tiene con qué abocinar y purgar bien, este trabajo es para un mecánico calificado."
+        }
+      }
+    }
+  }
+}

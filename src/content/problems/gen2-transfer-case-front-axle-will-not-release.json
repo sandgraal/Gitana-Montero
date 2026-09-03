@@ -1,0 +1,187 @@
+{
+  "id": "gen2-transfer-case-front-axle-will-not-release",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "transferCases": ["super-select"],
+    "years": {
+      "from": 1991,
+      "to": 1999
+    }
+  },
+  "system": "transfer-case",
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "binding-and-hopping-in-tight-turns-on-pavement",
+    "steering-fights-back-when-parking",
+    "indicator-still-blinks-after-selecting-two-wheel-drive",
+    "shudder-and-groan-from-the-front-on-full-lock",
+    "front-tyres-scrubbing-and-wearing-fast"
+  ],
+  "causes": [
+    { "id": "solenoid-stuck-holding-vacuum" },
+    { "id": "actuator-stuck-in-the-engaged-position" },
+    { "id": "hose-routed-to-the-wrong-port" },
+    { "id": "transfer-case-not-out-of-the-locked-mode" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "confirm-the-lever-is-really-in-two-wheel-drive",
+      "rulesIn": ["transfer-case-not-out-of-the-locked-mode"],
+      "rulesOut": ["hose-routed-to-the-wrong-port"]
+    },
+    {
+      "id": "release-the-wind-up-then-retest",
+      "rulesIn": [
+        "actuator-stuck-in-the-engaged-position",
+        "solenoid-stuck-holding-vacuum"
+      ],
+      "rulesOut": ["transfer-case-not-out-of-the-locked-mode"]
+    },
+    {
+      "id": "disconnect-the-vacuum-at-the-actuator",
+      "rulesIn": [
+        "solenoid-stuck-holding-vacuum",
+        "hose-routed-to-the-wrong-port"
+      ],
+      "rulesOut": ["actuator-stuck-in-the-engaged-position"]
+    },
+    {
+      "id": "compare-the-hose-routing-against-the-old-unit",
+      "rulesIn": ["hose-routed-to-the-wrong-port"],
+      "rulesOut": ["solenoid-stuck-holding-vacuum"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-solenoid-and-route-the-hoses-right",
+      "difficulty": 2,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "time": { "value": 5, "unit": "min" },
+      "addresses": [
+        "solenoid-stuck-holding-vacuum",
+        "hose-routed-to-the-wrong-port"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "free-or-replace-the-stuck-actuator",
+      "difficulty": 3,
+      "cost": { "from": "moderate" },
+      "addresses": ["actuator-stuck-in-the-engaged-position"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "learn-the-mode-selection-properly",
+      "difficulty": 1,
+      "cost": { "from": "minimal" },
+      "addresses": ["transfer-case-not-out-of-the-locked-mode"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — Montero Gen 2 / 2.5 / 3 freewheel clutch control solenoid (Mitsubishi MR430381, MB620532, MR263723): blinking front-wheel indicators mean the front axle is having trouble engaging or disengaging; match the new unit's hose routing to the old one",
+      "url": "https://lusooverland.com/VP-LO-MR430381",
+      "archiveUrl": "https://web.archive.org/web/20260902175735/https://lusooverland.com/VP-LO-MR430381",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Opinautos — fallas de 4x4 reportadas por dueños de Mitsubishi Montero: luces de las ruedas delanteras que parpadean y palanca de 4x4 trabada (reportes de varios años modelo; la página mezcla generaciones y modelos —el hilo destacado es de un Pajero iO, que no es este carro— así que de aquí solo se toman los síntomas que reportan dueños de Montero, y no las causas que propone cada quien)",
+      "url": "https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
+      "archiveUrl": "https://web.archive.org/web/20260902205429/https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: check Super Select across all modes; flashing lights indicate actuator or position switch faults",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front axle will not release and the driveline binds",
+      "summary": "This is the expensive half of the same vacuum-actuated front axle. When the clutch stays engaged after you have asked for two-wheel drive, the front and rear axles are tied together on a surface with grip, and on dry pavement they cannot both be right about how far the truck has travelled through a corner. Something has to give up the difference, and on this truck that something is a tyre chirping, the steering fighting back, and the driveline winding up until it releases with a bang. Do that repeatedly and the wear lands in the transfer case and the front axle, which is why this entry is marked as damaging and its twin — the axle that never engages at all — is not. There is one thing to check before assuming a fault, and it costs nothing. Super Select is designed to be used with the centre differential open on pavement, and if the truck has been left in a locked mode it will bind exactly like this while behaving completely correctly. Get out of the locked mode, drive in a straight line on a loose surface to unwind what is stored in the driveline, and see whether the complaint is still there. If it is, it is the control side or the actuator, and the supplier's own note about matching the hose routing when a solenoid is replaced is worth heeding: crossed hoses turn 'will not engage' into 'will not release'.",
+      "slug": "front-axle-will-not-release",
+      "symptoms": {
+        "binding-and-hopping-in-tight-turns-on-pavement": "The truck binds and hops through tight turns on dry pavement",
+        "steering-fights-back-when-parking": "The steering fights back and the truck resists turning when parking",
+        "indicator-still-blinks-after-selecting-two-wheel-drive": "The front-wheel indicator keeps blinking after two-wheel drive is selected",
+        "shudder-and-groan-from-the-front-on-full-lock": "A shudder and a groan from the front on full lock",
+        "front-tyres-scrubbing-and-wearing-fast": "The front tyres scrub and wear far faster than the rears"
+      },
+      "causes": {
+        "solenoid-stuck-holding-vacuum": "Control solenoid stuck, holding vacuum on the engage side",
+        "actuator-stuck-in-the-engaged-position": "Front axle actuator seized in the engaged position",
+        "hose-routed-to-the-wrong-port": "Vacuum hose fitted to the wrong port on the solenoid pack",
+        "transfer-case-not-out-of-the-locked-mode": "The transfer case is still in a locked mode, not a fault at all"
+      },
+      "diagnosticSteps": {
+        "confirm-the-lever-is-really-in-two-wheel-drive": "Confirm the lever has fully reached the two-wheel-drive position and is not resting between detents, and check what the dash says about the centre differential",
+        "release-the-wind-up-then-retest": "On a loose surface, drive straight and then briefly in reverse to unwind the driveline, then try the tight turn again on pavement",
+        "disconnect-the-vacuum-at-the-actuator": "With the engine running and two-wheel drive selected, pull the vacuum line off the actuator and see whether the axle releases",
+        "compare-the-hose-routing-against-the-old-unit": "If a solenoid pack has been changed recently, compare its hose routing against the pattern on the unit it replaced"
+      },
+      "fixPaths": {
+        "replace-the-solenoid-and-route-the-hoses-right": {
+          "title": "Replace the control solenoid and get the hose routing right",
+          "detail": "The time shown is the supplier's own figure for the swap. Their instruction is the part that matters here: note the routing on the existing unit and match it on the new one. This is a cheap part that produces an expensive symptom when its plumbing is one port out."
+        },
+        "free-or-replace-the-stuck-actuator": {
+          "title": "Free off or replace the seized actuator",
+          "detail": "If the axle stays engaged with the vacuum line off, the control side is innocent and the actuator or the mechanism it drives is stuck. Clean and inspect before buying, then confirm the axle both engages and releases on command before the truck goes back on the road."
+        },
+        "learn-the-mode-selection-properly": {
+          "title": "Confirm which mode the truck is actually in",
+          "detail": "Free, and it is the first thing to eliminate. This transfer case has modes that are meant for pavement and modes that are not, and driving a locked mode on grippy ground produces every symptom on this page while nothing at all is broken."
+        }
+      }
+    },
+    "es": {
+      "title": "El eje delantero no sale y el tren motriz se amarra",
+      "summary": "Esta es la mitad cara del mismo eje delantero accionado por vacío. Cuando el embrague se queda enganchado después de que usted pidió tracción sencilla, el eje delantero y el trasero quedan amarrados sobre un piso con agarre, y en asfalto seco los dos no pueden tener razón a la vez sobre cuánto recorrió el carro en una curva. Alguien tiene que ceder la diferencia, y en este carro eso se traduce en una llanta chillando, la dirección peleando y el tren motriz cargándose de torsión hasta que se suelta de un golpe. Repita eso y el desgaste cae en la caja de transferencia y en el eje delantero, que es la razón por la que esta entrada está marcada como dañina y su gemela —el eje que nunca entra— no lo está. Hay algo que revisar antes de suponer una falla, y no cuesta nada. El Super Select está hecho para usarse con el diferencial central abierto en asfalto, y si el carro quedó en un modo bloqueado se va a amarrar exactamente así mientras se comporta de manera completamente correcta. Salga del modo bloqueado, maneje en línea recta sobre piso suelto para descargar la torsión guardada en el tren motriz, y vea si la queja sigue ahí. Si sigue, es el lado de control o el actuador, y vale la pena hacerle caso a la nota del proveedor sobre respetar por dónde van las mangueras al cambiar un solenoide: mangueras cruzadas convierten un 'no entra' en un 'no sale'.",
+      "slug": "el-eje-delantero-no-sale",
+      "symptoms": {
+        "binding-and-hopping-in-tight-turns-on-pavement": "El carro se amarra y brinca en curvas cerradas sobre asfalto seco",
+        "steering-fights-back-when-parking": "La dirección pelea y el carro se resiste a girar al parquear",
+        "indicator-still-blinks-after-selecting-two-wheel-drive": "El indicador de ruedas delanteras sigue parpadeando después de poner tracción sencilla",
+        "shudder-and-groan-from-the-front-on-full-lock": "Un temblor y un quejido adelante con la dirección topada",
+        "front-tyres-scrubbing-and-wearing-fast": "Las llantas delanteras raspan y se gastan mucho más rápido que las traseras"
+      },
+      "causes": {
+        "solenoid-stuck-holding-vacuum": "Solenoide de control pegado, manteniendo vacío del lado de enganche",
+        "actuator-stuck-in-the-engaged-position": "Actuador del eje delantero pegado en la posición enganchada",
+        "hose-routed-to-the-wrong-port": "Manguera de vacío puesta en el puerto equivocado del bloque de solenoides",
+        "transfer-case-not-out-of-the-locked-mode": "La caja de transferencia sigue en un modo bloqueado, y no hay falla del todo"
+      },
+      "diagnosticSteps": {
+        "confirm-the-lever-is-really-in-two-wheel-drive": "Confirme que la palanca llegó completa a la posición de tracción sencilla y no quedó entre topes, y revise qué dice el tablero sobre el diferencial central",
+        "release-the-wind-up-then-retest": "Sobre piso suelto, maneje en línea recta y luego un poco en reversa para descargar la torsión del tren motriz, y después vuelva a probar la curva cerrada en asfalto",
+        "disconnect-the-vacuum-at-the-actuator": "Con el motor encendido y la tracción sencilla puesta, saque la manguera de vacío del actuador y vea si el eje se suelta",
+        "compare-the-hose-routing-against-the-old-unit": "Si hace poco se cambió un bloque de solenoides, compare por dónde le van las mangueras contra el recorrido de la unidad que reemplazó"
+      },
+      "fixPaths": {
+        "replace-the-solenoid-and-route-the-hoses-right": {
+          "title": "Cambiar el solenoide de control y dejar bien el recorrido de las mangueras",
+          "detail": "El tiempo que aparece es la cifra del propio proveedor para el cambio. Su instrucción es la parte que importa acá: anote el recorrido en la unidad existente y repítalo en la nueva. Es una pieza barata que produce un síntoma caro cuando sus mangueras quedan corridas un puerto."
+        },
+        "free-or-replace-the-stuck-actuator": {
+          "title": "Liberar o cambiar el actuador pegado",
+          "detail": "Si el eje se queda enganchado con la manguera de vacío afuera, el lado de control está limpio de culpa y lo pegado es el actuador o el mecanismo que mueve. Limpie y revise antes de comprar, y después confirme que el eje entra y sale cuando se le ordena antes de que el carro vuelva a la calle."
+        },
+        "learn-the-mode-selection-properly": {
+          "title": "Confirmar en cuál modo está de verdad el carro",
+          "detail": "Es gratis y es lo primero que hay que descartar. Esta caja de transferencia tiene modos hechos para asfalto y modos que no lo son, y manejar un modo bloqueado sobre piso con agarre produce todos los síntomas de esta página sin que haya nada roto."
+        }
+      }
+    }
+  }
+}
