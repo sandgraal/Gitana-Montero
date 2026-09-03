@@ -1,0 +1,771 @@
+---
+/**
+ * The modifications index (T601, MOD-01).
+ *
+ * > **MOD-01** THE `mods` collection SHALL hold, per entry: what it requires
+ * > (by entry ID), what it breaks or affects, cost band, difficulty, fitment,
+ * > honest tradeoffs prose in both locales, sources.
+ *
+ * ## One page, two URLs, one component (I18N-01)
+ *
+ * The seam T205 built for the glossary and T501 reused for parts: the segment
+ * is translated (`/en/mods/` and `/es/modificaciones/`), so this file is
+ * parameterized on it and `getStaticPaths` reads both values from
+ * `src/i18n/routes.ts`' registry. Neither locale is a redirect of the other.
+ *
+ * ## The card leads with the cost of saying yes
+ *
+ * A parts card leads with a number because a reader arrives holding one. A
+ * mods card leads with **what it costs you** — the cost band, the difficulty,
+ * and the worst consequence the entry declares — because a reader arrives
+ * holding a question. The upside is the title; everything else on the card is
+ * the bill, which is the only honest way to render a section whose spec line
+ * asks for "honest tradeoffs".
+ *
+ * The consequence chip is `worstImpact` and never the first row of `affects`:
+ * a mod that `breaks` one thing and merely `degrades` another is a
+ * breaks-something mod, and a card that filed it under its gentlest
+ * consequence would be the listing helping a reader miss the sentence that
+ * mattered (`src/lib/mods/filter.ts`).
+ *
+ * ## Two filters, two shapes — T204's rule, restated
+ *
+ * The pills **hide** what does not match: a reader who picks "suspension"
+ * asked for a shorter list. The vehicle selector does not hide anything — a
+ * mod that does not fit the reader's truck stays on the page at 55% opacity
+ * with a "filtered" tag, exactly as the Selector artboard draws it ("never
+ * hidden silently"). Whether an entry fits is `matchesVehicle` and only
+ * `matchesVehicle` (FIT-01), through `src/lib/vehicle-listing.ts`.
+ *
+ * ## Empty today, and correct empty
+ *
+ * T602 authors the entries. Until then this page renders its heading, its
+ * intro and `modsEmpty` — no toolbar, no dead controls — which is also the
+ * state SCF-06 audits it in.
+ *
+ * refs specs/001-foundation (MOD-01, MOD-02, I18N-01, I18N-04, I18N-08, FIT-03)
+ */
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ConfidenceCaveat from "../../components/ConfidenceCaveat.astro";
+import VehicleFitSummary from "../../components/VehicleFitSummary.astro";
+import {
+  LOCALE_BCP47,
+  isLocale,
+  localeHref,
+  type Locale,
+} from "../../i18n/routing";
+import {
+  collectionRouteParams,
+  collectionRoutePaths,
+  entryRoutePath,
+} from "../../i18n/routes";
+import {
+  costBandLabel,
+  generationLabel,
+  glossarySystemLabel,
+  modImpactLabel,
+  t,
+} from "../../i18n/ui";
+import { formatCount } from "../../lib/glossary-filter";
+import { needsConfidenceCaveat } from "../../lib/confidence";
+import { buildTaxonomy, expandGenerations } from "../../lib/fitment";
+import { buildFitmentTable } from "../../lib/vehicle-listing";
+import { selectorTaxonomyData } from "../../lib/vehicle-taxonomy";
+import { costBandAccessibleName, costBandGlyphs } from "../../lib/problems";
+import { modSafety } from "../../lib/mods/safety";
+import { worstImpact } from "../../lib/mods/filter";
+import { GLOSSARY_SYSTEMS, type GlossarySystem } from "../../schemas/glossary";
+import { DIFFICULTY_MAX } from "../../schemas/problems";
+import { MOD_IMPACTS, type ModImpact } from "../../schemas/mods";
+import { GENERATION_IDS, type GenerationId } from "../../schemas/vehicles";
+
+export function getStaticPaths() {
+  return collectionRouteParams("mods", "modsSegment");
+}
+
+const { locale: param } = Astro.params;
+if (!isLocale(param)) {
+  throw new Error(`Unknown locale segment: ${String(param)}`);
+}
+const locale: Locale = param;
+const strings = t(locale);
+const routes = collectionRoutePaths("mods");
+
+const collator = new Intl.Collator(LOCALE_BCP47[locale], {
+  sensitivity: "base",
+});
+
+/** A `GENERATION_IDS` value if `id` is one, else the raw string unchanged. */
+function isKnownGeneration(id: string): id is GenerationId {
+  return (GENERATION_IDS as readonly string[]).includes(id);
+}
+
+/**
+ * The same taxonomy the selector ships to the browser, built here so the
+ * *server* render answers generation questions the same way the client does —
+ * one engine, one answer, whichever side of the wire asks (FIT-01).
+ */
+const taxonomy = buildTaxonomy(
+  selectorTaxonomyData(
+    (await getCollection("vehicles")).map((entry) => entry.data)
+  ).nodes
+);
+
+const entries = await getCollection("mods");
+
+/**
+ * An unprefixed route path turned into a real `href` — `localeHref` adds the
+ * `/en` or `/es` prefix and the deploy base. See the note on the `href` field
+ * below for why the path arrives without them.
+ *
+ * `null` in, `null` out — a card whose entry has no slug row renders its title
+ * unlinked rather than linking somewhere plausible-but-wrong. (The build
+ * refuses that corpus anyway; this is what the page does if it is ever
+ * rendered outside one.)
+ */
+function routePathHref(routePath: string | null): string | null {
+  return routePath === null ? null : localeHref(locale, routePath);
+}
+
+const mods = entries
+  .map((entry) => {
+    const {
+      id,
+      system,
+      cost,
+      difficulty,
+      affects,
+      confidence,
+      fitment,
+      prose,
+    } = entry.data;
+    const local = prose[locale];
+    const safety = modSafety(entry.data);
+    const worst = worstImpact(affects.map((row) => row.impact));
+
+    return {
+      id,
+      domId: `mod-${id.replace(/\//g, "--")}`,
+      /*
+       * `entryRoutePath` returns a path that is **already this locale's own
+       * and still unprefixed**: in ES it is `/modificaciones/<es slug>/` —
+       * translated segment, translated slug, no `/es` in front and no deploy
+       * base. It is unprefixed on purpose, because `BaseLayout` needs every
+       * locale's path side by side to build the hreflang pairs, so the prefix
+       * goes on last, per link, via `localeHref`. Without that step every card
+       * links to a 404 (the defect T501 shipped twice and this page does not
+       * repeat — graded in `tests/pages/mods-index.render.test.ts`).
+       */
+      href: routePathHref(entryRoutePath("mods", id, locale)),
+      system,
+      systemLabel: glossarySystemLabel(strings, system),
+      safetyCritical: safety.safetyCritical,
+      costGlyphs: costBandGlyphs(cost),
+      costName: costBandAccessibleName(cost, (band) =>
+        costBandLabel(strings, band)
+      ),
+      difficulty,
+      affectsCount: affects.length,
+      worstImpact: worst,
+      worstImpactLabel: worst === null ? null : modImpactLabel(strings, worst),
+      fitment,
+      genLabels: expandGenerations(fitment.gens, taxonomy).map((gen) =>
+        isKnownGeneration(gen) ? generationLabel(strings, gen) : gen
+      ),
+      confidence,
+      showCaveat: needsConfidenceCaveat(confidence),
+      title: local.title,
+      summary: local.summary,
+    };
+  })
+  .sort((a, b) => collator.compare(a.title, b.title));
+
+/** Canonical taxonomy order, not alphabetical — the glossary page's rule. */
+const systemOptions = (GLOSSARY_SYSTEMS as readonly GlossarySystem[])
+  .filter((system) => mods.some((mod) => mod.system === system))
+  .map((system) => ({
+    code: system,
+    label: glossarySystemLabel(strings, system),
+  }));
+
+/** Worst-first, the vocabulary's own order — never alphabetical by label. */
+const impactOptions = (MOD_IMPACTS as readonly ModImpact[])
+  .filter((impact) => mods.some((mod) => mod.worstImpact === impact))
+  .map((impact) => ({ code: impact, label: modImpactLabel(strings, impact) }));
+
+const numbers = new Intl.NumberFormat(LOCALE_BCP47[locale]);
+
+/**
+ * One entry per *distinct* fitment, so a listing whose rows mostly share one
+ * does not repeat it in every card's attribute (T204 review, F3).
+ */
+const fitmentTable = buildFitmentTable(mods.map((mod) => mod.fitment));
+---
+
+<BaseLayout
+  locale={locale}
+  routePathByLocale={routes}
+  title={`${strings.modsHeading} — ${strings.siteTagline}`}
+  description={strings.modsIntro}
+>
+  <section class="mods" data-mods>
+    <div class="mods__intro">
+      <h1>{strings.modsHeading}</h1>
+      <p>{strings.modsIntro}</p>
+    </div>
+
+    {
+      mods.length === 0 ? (
+        <p class="mods__empty">{strings.modsEmpty}</p>
+      ) : (
+        <>
+          <div class="mods__toolbar" data-mods-toolbar>
+            <div class="mods__filter-group">
+              <span class="mods__filter-label">
+                {strings.modsFilterSystemLabel}
+              </span>
+              <div
+                class="mods__pills"
+                role="group"
+                aria-label={strings.modsFilterSystemLabel}
+              >
+                <button
+                  type="button"
+                  data-facet="system"
+                  data-value=""
+                  aria-pressed="true"
+                >
+                  {strings.modsFilterSystemAll}
+                </button>
+                {systemOptions.map((option) => (
+                  <button
+                    type="button"
+                    data-facet="system"
+                    data-value={option.code}
+                    aria-pressed="false"
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div class="mods__filter-group">
+              <span class="mods__filter-label">
+                {strings.modsFilterImpactLabel}
+              </span>
+              <div
+                class="mods__pills"
+                role="group"
+                aria-label={strings.modsFilterImpactLabel}
+              >
+                <button
+                  type="button"
+                  data-facet="impact"
+                  data-value=""
+                  aria-pressed="true"
+                >
+                  {strings.modsFilterImpactAll}
+                </button>
+                {impactOptions.map((option) => (
+                  <button
+                    type="button"
+                    data-facet="impact"
+                    data-value={option.code}
+                    aria-pressed="false"
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <p
+            class="mods__count"
+            data-mods-count
+            data-count-template={strings.modsCountTemplate}
+            data-total={String(mods.length)}
+            aria-live="polite"
+          >
+            {formatCount(strings.modsCountTemplate, mods.length, mods.length)}
+          </p>
+
+          <VehicleFitSummary locale={locale} fitments={fitmentTable.table} />
+
+          <ul class="mods__list" data-mods-list>
+            {mods.map((mod) => (
+              <li
+                class="mod"
+                id={mod.domId}
+                data-system={mod.system}
+                data-impact={mod.worstImpact ?? ""}
+                data-fitment={fitmentTable.indexOf(mod.fitment)}
+              >
+                <div class="mod__head">
+                  <h2 class="mod__title">
+                    {mod.href === null ? (
+                      mod.title
+                    ) : (
+                      <a href={mod.href}>{mod.title}</a>
+                    )}
+                  </h2>
+                  <span class="mod__system">{mod.systemLabel}</span>
+                </div>
+
+                <p class="mod__cost">
+                  <span class="mod__label">{strings.modsCostLabel}</span>
+                  <span
+                    class="datum mod__cost-glyphs"
+                    aria-label={mod.costName}
+                  >
+                    {mod.costGlyphs}
+                  </span>
+                  <span class="datum mod__difficulty">
+                    {strings.modsDifficultyTemplate
+                      .replace("{value}", numbers.format(mod.difficulty))
+                      .replace("{max}", numbers.format(DIFFICULTY_MAX))}
+                  </span>
+                </p>
+
+                <p class="mod__summary">{mod.summary}</p>
+
+                <div class="mod__tags">
+                  {mod.safetyCritical && (
+                    <span class="tag tag--safety">
+                      {strings.safetyCriticalChipLabel}
+                    </span>
+                  )}
+                  {mod.worstImpactLabel !== null && (
+                    <span
+                      class:list={[
+                        "tag",
+                        "tag--impact",
+                        `tag--impact-${mod.worstImpact}`,
+                      ]}
+                    >
+                      {mod.worstImpactLabel}
+                    </span>
+                  )}
+                  {mod.affectsCount > 0 && (
+                    <span class="tag datum">
+                      {strings.modsAffectsCountTemplate.replace(
+                        "{count}",
+                        numbers.format(mod.affectsCount)
+                      )}
+                    </span>
+                  )}
+                  {mod.genLabels.map((label) => (
+                    <span class="tag datum">{label}</span>
+                  ))}
+                </div>
+
+                {mod.showCaveat && (
+                  <ConfidenceCaveat locale={locale} tier={mod.confidence} />
+                )}
+              </li>
+            ))}
+          </ul>
+
+          <p class="mods__none" data-mods-none hidden>
+            {strings.modsNoResults}
+          </p>
+        </>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<script>
+  import {
+    EMPTY_MODS_FILTER,
+    matchesModsFilter,
+    type ModsFilterState,
+  } from "../../lib/mods/filter";
+  import { formatCount } from "../../lib/glossary-filter";
+  import { buildTaxonomy } from "../../lib/fitment";
+  import { readSelectorPayload } from "../../lib/vehicle-taxonomy";
+  import { createVehicleListingView } from "../../lib/vehicle-listing";
+  import {
+    onVehicleSelectionChange,
+    readVehicleSelection,
+    type StoredVehicleSelection,
+  } from "../../lib/vehicle-selection";
+
+  /**
+   * Client-side filtering and the vehicle fit view. Enhancement only — the
+   * toolbar is laid out only when the document is marked script-capable (see
+   * the CSS note below), so a visitor with no JavaScript sees every mod and no
+   * dead control. DOM wiring only: `matchesModsFilter`
+   * (`src/lib/mods/filter.ts`) owns the pill rule,
+   * `src/lib/vehicle-listing.ts` owns the vehicle filter, and
+   * `src/lib/fitment/` owns every fitment answer (FIT-01).
+   */
+  function enhance(root: HTMLElement): void {
+    const toolbar = root.querySelector<HTMLElement>("[data-mods-toolbar]");
+    const count = root.querySelector<HTMLElement>("[data-mods-count]");
+    const none = root.querySelector<HTMLElement>("[data-mods-none]");
+    const cards = [...root.querySelectorAll<HTMLElement>(".mod")];
+    if (!toolbar || !count || !none) return;
+
+    const template = count.dataset.countTemplate ?? "";
+    const total = Number(count.dataset.total ?? cards.length);
+    const state: ModsFilterState = { ...EMPTY_MODS_FILTER };
+
+    const payload = readSelectorPayload(document);
+    // The same nodes the selector shipped, read once. Without a selector on
+    // the page there is no taxonomy and no vehicle filter — the pills still
+    // work, and `buildTaxonomy([])` gives the generation facet its
+    // "no expansion" reading rather than throwing.
+    const taxonomy = buildTaxonomy(payload?.nodes ?? []);
+
+    const vehicle = createVehicleListingView({
+      root,
+      cards,
+      taxonomy,
+      lang: document.documentElement.lang,
+    });
+
+    function apply(): void {
+      let shown = 0;
+      for (const card of cards) {
+        const visible = matchesModsFilter(
+          {
+            system: card.dataset.system ?? "",
+            impact: card.dataset.impact ?? "",
+          },
+          state
+        );
+        card.hidden = !visible;
+        if (visible) shown += 1;
+      }
+      count!.textContent = formatCount(template, shown, total);
+      none!.hidden = shown > 0;
+      applyVehicle(readVehicleSelection(window));
+    }
+
+    function applyVehicle(selection: StoredVehicleSelection | null): void {
+      vehicle?.apply(selection);
+    }
+
+    for (const facet of ["system", "impact"] as const) {
+      const buttons = [
+        ...toolbar.querySelectorAll<HTMLButtonElement>(
+          `[data-facet="${facet}"]`
+        ),
+      ];
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          const value = button.dataset.value ?? "";
+          state[facet] = value;
+          for (const sibling of buttons) {
+            sibling.setAttribute(
+              "aria-pressed",
+              String((sibling.dataset.value ?? "") === value)
+            );
+          }
+          apply();
+        });
+      }
+    }
+
+    // The selector lives in the site chrome and knows nothing about this
+    // page; it announces, and the listing re-filters (FIT-03).
+    onVehicleSelectionChange(window, (selection) => applyVehicle(selection));
+
+    apply();
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-mods]")) {
+    enhance(root);
+  }
+</script>
+
+<style>
+  /*
+   * Tokens from specs/001-foundation/design/HANDOFF-DESIGN.md, scoped to this
+   * page — site-wide chrome tokens belong to the task that restyles the
+   * chrome, not to a collection page (the glossary, community and parts
+   * pages' identical note).
+   */
+  .mods {
+    --paper: #f7f4ee;
+    --panel: #ffffff;
+    --panel-soft: #fbf9f4;
+    --ink: #2b2620;
+    --muted: #6e6559;
+    --muted-strong: #55493c;
+    --faint: #a99c88;
+    --line: #e4ddd1;
+    --chip: #efe9dd;
+    --rust-deep: #93441f;
+    --safety-text: #7a2e2e;
+    --safety-bg: #f6e3d8;
+    --safety-border: #e4c4b0;
+
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 75rem;
+  }
+
+  .mods__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .mods__intro h1 {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  .mods__intro p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+    max-width: 62ch;
+  }
+
+  /*
+   * Laid out only when scripting is available — the pattern T204 settled on
+   * the community page: `[hidden]` loses to an author `display: flex`, and
+   * revealing the toolbar after the module script loads pushed every card
+   * down (CLS past SCF-06's budget). `BaseLayout` marks the document `js`
+   * before first paint, so CSS can answer the question with no shift and no
+   * dead control.
+   */
+  .mods__toolbar {
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  :global(html.js) .mods__toolbar {
+    display: flex;
+  }
+
+  .mods__filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .mods__filter-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    flex: 0 0 auto;
+    min-width: 9rem;
+  }
+
+  .mods__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .mods__pills button {
+    font: inherit;
+    font-size: 0.8125rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    min-height: 2.75rem;
+    background: var(--panel);
+    color: var(--muted-strong);
+    cursor: pointer;
+  }
+
+  .mods__pills button[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+    font-weight: 700;
+  }
+
+  .mods__count,
+  .mods__none,
+  .mods__empty {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .mods__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mod {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem 1.375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .mod[hidden] {
+    display: none;
+  }
+
+  /* The Selector artboard's third state — dimmed, tagged, never removed. */
+  .mod[data-fits="false"] {
+    background: var(--panel-soft);
+    opacity: 0.55;
+  }
+
+  .mod__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .mod__title {
+    margin: 0;
+    font-size: 1.1875rem;
+    font-weight: 700;
+  }
+
+  .mod__title a {
+    color: var(--rust-deep);
+    text-decoration: none;
+  }
+
+  .mod__title a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+
+  .mod__system {
+    flex: 0 0 auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted-strong);
+    background: var(--chip);
+    border-radius: 4px;
+    padding: 0.1875rem 0.5rem;
+  }
+
+  /*
+   * The handoff's rule: every value that came out of shared `data` renders in
+   * IBM Plex Mono. Cost glyphs and a difficulty are both stored figures.
+   */
+  .datum {
+    font-family:
+      "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  .mod__cost {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .mod__label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .mod__cost-glyphs {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .mod__difficulty {
+    font-size: 0.8125rem;
+    color: var(--muted-strong);
+  }
+
+  .mod__summary {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--muted-strong);
+  }
+
+  .mod__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    background: var(--chip);
+    border-radius: 4px;
+    padding: 0.125rem 0.5rem;
+    color: var(--muted-strong);
+  }
+
+  .tag--safety {
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    color: var(--safety-text);
+    background: var(--safety-bg);
+    border: 1px solid var(--safety-border);
+  }
+
+  /*
+   * The consequence chip carries weight, not colour alone: `breaks` is the
+   * strongest claim on the card and a reader who cannot distinguish the
+   * palette still has to be able to see which chip it is.
+   */
+  .tag--impact {
+    font-weight: 700;
+  }
+
+  .tag--impact-breaks {
+    color: var(--safety-text);
+    background: var(--safety-bg);
+    border: 1px solid var(--safety-border);
+  }
+
+  .tag--impact-degrades {
+    color: var(--muted-strong);
+    background: var(--chip);
+    border: 1px solid var(--line);
+  }
+
+  .tag--impact-needs-adjustment {
+    color: var(--muted-strong);
+    background: var(--panel);
+    border: 1.5px dashed var(--faint);
+  }
+
+  @media (max-width: 48rem) {
+    .mods__list {
+      grid-template-columns: 1fr;
+    }
+
+    .mods__intro h1 {
+      font-size: 1.5rem;
+    }
+
+    .mods__filter-label {
+      min-width: 0;
+    }
+  }
+</style>
