@@ -11,10 +11,11 @@
  * A handle is the only part of a garage URL a stranger can guess or type, and
  * three of its properties decide whether a link means what its reader thinks:
  *
- * 1. **Uniqueness has to survive a race.** Two signups checking "is `gitana`
- *    free?" at the same moment both get "yes". The answer is a unique index in
- *    the database, not a lookup in the form; `handles.test.ts` proves it by
- *    inserting twice.
+ * 1. **Uniqueness has to live in the database.** Two signups checking "is
+ *    `gitana` free?" at the same moment both get "yes", so the answer must be a
+ *    unique index and not a lookup in the form. `handles.test.ts` proves the
+ *    constraint exists by writing twice; it does not simulate the race itself,
+ *    and says so.
  * 2. **Case must fold.** `Gitana` and `gitana` are the same string in the same
  *    position of the same URL to every reader on earth, and two accounts that
  *    differ only in case is an impersonation kit.
@@ -30,10 +31,14 @@
  *
  * `RESERVED_HANDLES` in `tests/garage/contract.ts` covers the impersonation
  * words (`admin`, `api`, `support`, …). What it cannot know is the route
- * segment somebody adds next year, so the grader computes the site's own
- * segments from `src/pages/` and `src/i18n/routes.ts` at test time and requires
- * the reserved set to be a superset. A list checked only against itself is a
- * list that stops being complete the first time the site grows.
+ * segment somebody adds next year, so the grader reads the site's own segments
+ * out of `src/i18n/routes.ts` at test time and requires the reserved set to be
+ * a superset of them. A list checked only against itself is a list that stops
+ * being complete the first time the site grows.
+ *
+ * The list itself stays hand-written — reserving a word is a decision, and the
+ * grader's job is to make forgetting one a red build rather than to guess on
+ * the author's behalf.
  *
  * ## Not implemented
  *

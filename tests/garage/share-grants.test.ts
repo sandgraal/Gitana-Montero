@@ -40,9 +40,12 @@ import { describe, expect, it } from "vitest";
 import {
   CONTRACT_SCHEMA,
   SHARE_CAPABILITY_COLUMNS,
+  SHARE_CREATE_ARGUMENTS,
   SHARE_CREATE_FUNCTION,
+  SHARE_CREATE_RESULT_FIELDS,
   SHARE_GRANT_KINDS,
   SHARE_READER_NAMES,
+  SHARE_REVOKE_ARGUMENTS,
   SHARE_REVOKE_FUNCTION,
   testReceiptPath,
   testShareToken,
@@ -50,14 +53,18 @@ import {
 import {
   createOwnedFixture,
   detectLiveStack,
+  insertRow,
   liveTitle,
   provisionScenario,
   rpc,
+  selectRows,
   stackOf,
   teardownScenario,
+  updateRows,
   type ApiResponse,
   type Scenario,
 } from "./harness.ts";
+import { issueGrant, refusalShape, revokeGrant } from "./share-fixtures.ts";
 import {
   anonExecutableFunctions,
   capabilityGateIssues,
@@ -203,6 +210,68 @@ describe("the grant lifecycle RPCs (SHR-05, SHR-08)", () => {
   });
 
   it.fails(
+    "both lifecycle RPCs take the argument names the graders send",
+    () => {
+      // ## T2-401 review, F3 — the argument list is contract, not detail
+      //
+      // PostgREST resolves an RPC overload **by argument name**. A call whose
+      // names match no function resolves to nothing and answers in a way a
+      // grader reading `response.ok` cannot tell from a refusal — so a revoke
+      // with the wrong parameter name revokes nothing, silently, and the SHR-08
+      // proof then compares a *live* grant against two refusals and fails for a
+      // fixture reason. That is the failure shape that gets an assertion
+      // loosened instead of fixed.
+      //
+      // So the names are pinned, and `share-fixtures.ts` builds every payload
+      // from the same lists. If T2-404 wants different names, this line and
+      // `contract.ts` move together and every call site follows.
+      const [create] = requireGrantRoutine(SHARE_CREATE_FUNCTION);
+      const [revoke] = requireGrantRoutine(SHARE_REVOKE_FUNCTION);
+
+      for (const name of SHARE_CREATE_ARGUMENTS) {
+        expect(
+          create.header,
+          `${SHARE_CREATE_FUNCTION} is missing ${name}`
+        ).toContain(name);
+      }
+      for (const name of SHARE_REVOKE_ARGUMENTS) {
+        expect(
+          revoke.header,
+          `${SHARE_REVOKE_FUNCTION} is missing ${name}`
+        ).toContain(name);
+      }
+    }
+  );
+
+  it.fails("revocation is per-GRANT, not per-vehicle (SHR-08)", () => {
+    // > Every grant SHALL be revocable **by its issuer** at any time.
+    //
+    // A grant, not a truck. An owner who issued one link to their mechanic and
+    // another to a buyer must be able to end one without ending the other, and
+    // `revoke_share_grant(p_vehicle_id)` cannot express that. Graded as the
+    // *absence* of a vehicle parameter, because a signature taking both is a
+    // signature where the wrong one gets passed.
+    const [revoke] = requireGrantRoutine(SHARE_REVOKE_FUNCTION);
+
+    expect(revoke.header).toContain("p_share_id");
+    expect(revoke.header).not.toContain("p_vehicle_id");
+  });
+
+  it.fails("the create RPC hands back the grant's id beside its token", () => {
+    // The consequence of pinning revocation to an id: the issuer has to be
+    // given one. A token is a secret the owner copies once and cannot be asked
+    // to keep; an id is how they manage what they issued.
+    const [create] = requireGrantRoutine(SHARE_CREATE_FUNCTION);
+
+    for (const field of SHARE_CREATE_RESULT_FIELDS) {
+      expect(
+        `${create.returns} ${create.body}`,
+        `${SHARE_CREATE_FUNCTION} never returns ${field}`
+      ).toContain(field);
+    }
+  });
+
+  it.fails(
     "the create RPC returns the token ONCE and stores only its hash",
     () => {
       // The token is 256 bits the owner has to be able to copy. It exists in
@@ -283,51 +352,26 @@ describe("SHR-08: the refusal is not an existence oracle (SMELL CHECK)", () => {
 
 /* =========================================================================
  * Tier B — behavioural. The half that can actually prove SHR-08.
+ *
+ * Every grant is issued and revoked through `share-fixtures.ts`, which builds
+ * its payloads from `contract.ts`'s pinned argument lists. That is not tidiness
+ * — see F3 in that file's header: PostgREST resolves RPC overloads by argument
+ * name, so a call with the wrong names revokes nothing and returns something
+ * indistinguishable from a refusal, which would have made the SHR-08 proof
+ * below fail for a fixture reason on the one grader that matters most.
  * ====================================================================== */
 
-/** One grant, as the create RPC returns it. */
-interface IssuedGrant {
-  readonly token: string;
-  readonly response: ApiResponse;
-}
-
-/**
- * Issue a grant on `vehicleId` as its owner.
- *
- * Fails loudly when the RPC is missing, so a marked grader below reports "the
- * RPC does not exist" rather than "expected undefined to be a string".
- */
-async function issueGrant(
+/** One vehicle owned by owner A, created through the API as that owner. */
+async function ownedVehicle(
   scenario: Scenario,
-  vehicleId: string,
-  options: {
-    readonly includesCosts?: boolean;
-    readonly includesReceipts?: boolean;
-    readonly expiresInHours?: number;
-  } = {}
-): Promise<IssuedGrant> {
-  const response = await rpc(scenario, scenario.ownerA, SHARE_CREATE_FUNCTION, {
-    p_vehicle_id: vehicleId,
-    p_kind: SHARE_GRANT_KINDS[0],
-    p_includes_costs: options.includesCosts ?? false,
-    p_includes_receipts: options.includesReceipts ?? false,
-    p_expires_in_hours: options.expiresInHours ?? 24,
-  });
-  if (!response.ok) {
-    throw shareSeam(
-      `${SHARE_CREATE_FUNCTION} answered ${response.status}: ${response.text}`
-    );
-  }
-  const token =
-    typeof response.body === "string"
-      ? response.body
-      : (response.body as { token?: string } | null)?.token;
-  if (typeof token !== "string" || token.length === 0) {
-    throw shareSeam(
-      `${SHARE_CREATE_FUNCTION} returned no token: ${response.text}`
-    );
-  }
-  return { token, response };
+  slot = "1"
+): Promise<{ readonly vehicleId: string }> {
+  const owned = await createOwnedFixture(
+    scenario,
+    scenario.ownerA,
+    testReceiptPath(scenario.ownerA.userId ?? "", slot)
+  );
+  return { vehicleId: owned.vehicleId };
 }
 
 /** Read a vehicle's history as an accountless holder of `token`. */
@@ -339,19 +383,6 @@ function readAsHolder(
   return rpc(scenario, scenario.anon, reader, { p_token: token });
 }
 
-/** The comparable shape of a refusal — everything a caller can observe. */
-function refusalShape(response: ApiResponse): {
-  status: number;
-  body: string;
-  rows: number;
-} {
-  return {
-    status: response.status,
-    body: response.text,
-    rows: Array.isArray(response.body) ? response.body.length : -1,
-  };
-}
-
 describe.skipIf(!live.available)(
   liveTitle("SHR-08: unknown, expired, and revoked are one answer", live),
   () => {
@@ -361,18 +392,24 @@ describe.skipIf(!live.available)(
       //
       // Compared as a triple in one grader rather than three graders comparing
       // against a constant, because the property is *equality between the
-      // three*, not conformance of each to some expected refusal. A
-      // implementation that changed all three together would still be correct.
+      // three*, not conformance of each to some expected refusal. An
+      // implementation that changed all three together is still correct.
       const scenario = await provisionScenario(stackOf(live));
       try {
         const { vehicleId } = await ownedVehicle(scenario);
 
-        const revoked = await issueGrant(scenario, vehicleId);
-        await rpc(scenario, scenario.ownerA, SHARE_REVOKE_FUNCTION, {
-          p_token_hash: null,
-          p_share_id: null,
-        });
-        const expired = await issueGrant(scenario, vehicleId, {
+        const revoked = await issueGrant(scenario, scenario.ownerA, vehicleId);
+        const cut = await revokeGrant(
+          scenario,
+          scenario.ownerA,
+          revoked.shareId
+        );
+        // Asserted, not assumed. A revoke that silently did nothing would make
+        // the "revoked" arm of this comparison a *live* grant, and the grader
+        // would fail for a fixture reason on the one property it exists for.
+        expect(cut.ok).toBe(true);
+
+        const expired = await issueGrant(scenario, scenario.ownerA, vehicleId, {
           expiresInHours: -1,
         });
 
@@ -393,14 +430,14 @@ describe.skipIf(!live.available)(
 
     it.fails("POSITIVE CONTROL: a live grant answers DIFFERENTLY", async () => {
       // Without this, "the three refusals match" is satisfied by a surface that
-      // refuses everything — including the grant that was just issued — which
-      // would be a broken feature reported as a secure one.
+      // refuses everything — including the grant just issued — which would be a
+      // broken feature reported as a secure one.
       const scenario = await provisionScenario(stackOf(live));
       try {
         const { vehicleId } = await ownedVehicle(scenario);
-        const live_ = await issueGrant(scenario, vehicleId);
+        const grant = await issueGrant(scenario, scenario.ownerA, vehicleId);
 
-        const allowed = await readAsHolder(scenario, live_.token);
+        const allowed = await readAsHolder(scenario, grant.token);
         const refused = await readAsHolder(
           scenario,
           testShareToken("x", scenario.runId)
@@ -421,14 +458,13 @@ describe.skipIf(!live.available)(
       const scenario = await provisionScenario(stackOf(live));
       try {
         const { vehicleId } = await ownedVehicle(scenario);
-        const grant = await issueGrant(scenario, vehicleId);
+        const grant = await issueGrant(scenario, scenario.ownerA, vehicleId);
 
         const before = await readAsHolder(scenario, grant.token);
         expect(before.ok).toBe(true);
 
-        await rpc(scenario, scenario.ownerA, SHARE_REVOKE_FUNCTION, {
-          p_vehicle_id: vehicleId,
-        });
+        const cut = await revokeGrant(scenario, scenario.ownerA, grant.shareId);
+        expect(cut.ok).toBe(true);
 
         const after = await readAsHolder(scenario, grant.token);
         expect(after.ok).toBe(false);
@@ -436,6 +472,37 @@ describe.skipIf(!live.available)(
         await teardownScenario(scenario);
       }
     });
+
+    it.fails(
+      "revoking ONE grant leaves the owner's other grant alive",
+      async () => {
+        // SHR-08 is per-grant: "revocable by its issuer at any time" is about a
+        // grant, not about a truck. An owner who gave their mechanic a link in
+        // March and a buyer a link in June must be able to end one without ending
+        // the other — and a `revoke_share_grant(p_vehicle_id)` cannot express
+        // that, which is why `contract.ts` pins the id signature.
+        const scenario = await provisionScenario(stackOf(live));
+        try {
+          const { vehicleId } = await ownedVehicle(scenario);
+          const first = await issueGrant(scenario, scenario.ownerA, vehicleId);
+          const second = await issueGrant(
+            scenario,
+            scenario.ownerA,
+            vehicleId,
+            {
+              kind: SHARE_GRANT_KINDS[1],
+            }
+          );
+
+          await revokeGrant(scenario, scenario.ownerA, first.shareId);
+
+          expect((await readAsHolder(scenario, first.token)).ok).toBe(false);
+          expect((await readAsHolder(scenario, second.token)).ok).toBe(true);
+        } finally {
+          await teardownScenario(scenario);
+        }
+      }
+    );
   }
 );
 
@@ -462,7 +529,7 @@ describe.skipIf(!live.available)(
         const scenario = await provisionScenario(stackOf(live));
         try {
           const { vehicleId } = await ownedVehicle(scenario);
-          const grant = await issueGrant(scenario, vehicleId, {
+          const grant = await issueGrant(scenario, scenario.ownerA, vehicleId, {
             includesCosts,
             includesReceipts,
           });
@@ -498,7 +565,11 @@ describe.skipIf(!live.available)(
         try {
           const first = await ownedVehicle(scenario, "1");
           const second = await ownedVehicle(scenario, "2");
-          const grant = await issueGrant(scenario, first.vehicleId);
+          const grant = await issueGrant(
+            scenario,
+            scenario.ownerA,
+            first.vehicleId
+          );
 
           const history = await readAsHolder(scenario, grant.token);
           const rows = Array.isArray(history.body) ? history.body : [];
@@ -519,31 +590,86 @@ describe.skipIf(!live.available)(
 describe.skipIf(!live.available)(
   liveTitle("SHR-07: the accountless path is read-only", live),
   () => {
-    it.fails(
-      "a holder with no session cannot write through any reader",
-      async () => {
-        // "WHILE a request carries no authenticated session, no grant SHALL admit
-        // any write." Graded over the tables rather than the functions, because
-        // the requirement is about the *path*: whatever a token buys, it does not
-        // buy a row.
-        const scenario = await provisionScenario(stackOf(live));
-        try {
-          const { vehicleId } = await ownedVehicle(scenario);
-          const grant = await issueGrant(scenario, vehicleId, {
-            includesCosts: true,
-            includesReceipts: true,
-          });
+    it.fails("a holder with no session cannot INSERT a record", async () => {
+      // "WHILE a request carries no authenticated session, no grant SHALL admit
+      // any write." Graded over the **table**, because the requirement is about
+      // the path: whatever a token buys, it does not buy a row.
+      //
+      // ## T2-401 review, F4
+      //
+      // The first draft called `rpc(scenario, scenario.anon, "records", …)` —
+      // an RPC to a stored procedure literally named `records`, which does not
+      // exist and never will, so it 404s and `ok === false` forever regardless
+      // of what RLS does. Unfalsifiable: the grader could not have caught the
+      // defect it was written for. It hits `/rest/v1/records` now.
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const { vehicleId } = await ownedVehicle(scenario);
+        const grant = await issueGrant(scenario, scenario.ownerA, vehicleId, {
+          includesCosts: true,
+          includesReceipts: true,
+        });
+        expect(grant.token).toBeTruthy();
 
-          const written = await rpc(scenario, scenario.anon, "records", {
-            p_token: grant.token,
-          });
+        const written = await insertRow(scenario, scenario.anon, "records", {
+          vehicle_id: vehicleId,
+          occurred_on: "2026-08-30",
+          kind: "note",
+        });
 
-          expect(written.ok).toBe(false);
-        } finally {
-          await teardownScenario(scenario);
-        }
+        expect(written.ok).toBe(false);
+        expect(written.status).toBeGreaterThanOrEqual(400);
+      } finally {
+        await teardownScenario(scenario);
       }
-    );
+    });
+
+    it.fails("a holder with no session cannot UPDATE a record", async () => {
+      // The other verb, and the more tempting one: a mechanic "correcting" an
+      // odometer reading is the exact feature 003's propose-and-accept exists
+      // to provide *with* an account and an owner's acceptance (PRO-02, PRO-03).
+      const scenario = await provisionScenario(stackOf(live));
+      try {
+        const owned = await createOwnedFixture(
+          scenario,
+          scenario.ownerA,
+          testReceiptPath(scenario.ownerA.userId ?? "", "1")
+        );
+        const grant = await issueGrant(
+          scenario,
+          scenario.ownerA,
+          owned.vehicleId,
+          { includesCosts: true, includesReceipts: true }
+        );
+        expect(grant.token).toBeTruthy();
+
+        const written = await updateRows(
+          scenario,
+          scenario.anon,
+          "records",
+          `id=eq.${owned.recordId}`,
+          { odometer_km: 999_999 }
+        );
+
+        expect(written.ok).toBe(false);
+
+        // And the row is untouched — a PostgREST update that matches no row
+        // under RLS returns 2xx with an empty body on some configurations, so
+        // "the response was not ok" is not on its own a statement about data.
+        const readBack = await selectRows(
+          scenario,
+          scenario.ownerA,
+          "records",
+          `id=eq.${owned.recordId}`
+        );
+        const rows = Array.isArray(readBack.body) ? readBack.body : [];
+        expect(
+          (rows[0] as { odometer_km?: number } | undefined)?.odometer_km
+        ).not.toBe(999_999);
+      } finally {
+        await teardownScenario(scenario);
+      }
+    });
 
     it.fails("a holder cannot issue a grant of their own", async () => {
       // The escalation. A grant that can mint a grant is a grant with no
@@ -551,13 +677,18 @@ describe.skipIf(!live.available)(
       const scenario = await provisionScenario(stackOf(live));
       try {
         const { vehicleId } = await ownedVehicle(scenario);
-        const grant = await issueGrant(scenario, vehicleId);
+        await issueGrant(scenario, scenario.ownerA, vehicleId);
 
         const minted = await rpc(
           scenario,
           scenario.anon,
           SHARE_CREATE_FUNCTION,
-          { p_vehicle_id: vehicleId, p_token: grant.token }
+          Object.fromEntries(
+            SHARE_CREATE_ARGUMENTS.map((name) => [
+              name,
+              name === "p_vehicle_id" ? vehicleId : null,
+            ])
+          )
         );
 
         expect(minted.ok).toBe(false);
@@ -572,13 +703,12 @@ describe.skipIf(!live.available)(
       const scenario = await provisionScenario(stackOf(live));
       try {
         const { vehicleId } = await ownedVehicle(scenario);
-        const grant = await issueGrant(scenario, vehicleId);
+        const grant = await issueGrant(scenario, scenario.ownerA, vehicleId);
 
-        const stolen = await rpc(
+        const stolen = await revokeGrant(
           scenario,
           scenario.ownerB,
-          SHARE_REVOKE_FUNCTION,
-          { p_vehicle_id: vehicleId }
+          grant.shareId
         );
         const stillWorks = await readAsHolder(scenario, grant.token);
 
@@ -590,23 +720,3 @@ describe.skipIf(!live.available)(
     });
   }
 );
-
-/**
- * One vehicle owned by `ownerA`, created through the API as that owner.
- *
- * Local to this file rather than added to `harness.ts`: `createOwnedFixture`
- * builds the whole vehicle → record → receipt chain and returns one vehicle id,
- * which is exactly what these graders need, and a second helper that did the
- * same thing differently would be a second thing to keep in step.
- */
-async function ownedVehicle(
-  scenario: Scenario,
-  slot = "1"
-): Promise<{ readonly vehicleId: string }> {
-  const owned = await createOwnedFixture(
-    scenario,
-    scenario.ownerA,
-    testReceiptPath(scenario.ownerA.userId ?? "", slot)
-  );
-  return { vehicleId: owned.vehicleId };
-}

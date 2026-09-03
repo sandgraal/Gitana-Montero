@@ -42,11 +42,20 @@
  * The **denial** proofs run against `public.records` itself: they only insert
  * and read, so they are a statement about the shipped policy and nothing else.
  * The **leak** proofs run against a two-table replica created inside the
- * transaction, because `create policy` takes an ACCESS EXCLUSIVE lock and the
- * PostgREST suites are writing to `records` at the same time — the first
- * version queued behind them and died on the query timeout in a full Tier B
- * run. The replica is tied back to reality by an assertion that the shipped
- * policy still has the shape the replica mirrors.
+ * transaction, because `create policy` takes an ACCESS EXCLUSIVE lock on the
+ * table and the PostgREST suites are writing to `records` at the same time.
+ * The replica is tied back to reality by an assertion that the shipped policy
+ * still has the shape it mirrors.
+ *
+ * That contention is real but it was **not** the whole story, and the first
+ * draft of this comment said it was. Under a full parallel Tier B run the
+ * failure was `deadlock detected`, and the server's own report named the cycle:
+ * this file's DDL against `auth.users` on one side, GoTrue inserting an
+ * identity for another suite's `provisionScenario` on the other. Neither party
+ * is wrong — they take the same catalog rows in opposite orders. The fix is in
+ * `db.ts`, where the transaction wrapper retries a deadlocked probe, which is
+ * the response Postgres documents. Measured: 2 red in 5 before, 9 green in 10
+ * after.
  *
  * ## Why the leak is asserted rather than fixed
  *
@@ -236,6 +245,62 @@ describe("subqueryCorrelationIssues — the declaration half", () => {
     `);
 
     expect(subqueryCorrelationIssues(fixture, ["vehicles"])).toEqual([]);
+  });
+
+  it("CONTROL: a row-self comparison BESIDE a subquery is still accepted", () => {
+    // ## T2-401 review, F7 — the control above does not reach the clause it
+    // ## claims to control
+    //
+    // `subqueryCorrelationIssues` has two escapes in sequence: it returns early
+    // when there are no subqueries, and again when the outer expression already
+    // ties the row to the caller. The `vehicles` fixture above trips the
+    // *first* one — `(select auth.uid())` is canonicalised before
+    // `stripSubqueries` runs, so nothing is left that looks like a subquery —
+    // and the second escape is never executed. The reviewer deleted that second
+    // escape and the suite stayed green: a control that cannot fail, in the
+    // over-strict direction, which is the direction that breaks T2-404 rather
+    // than leaking.
+    //
+    // This fixture reaches it. The row itself carries a denormalised
+    // `owner_id` compared to `auth.uid()` — so ownership is settled without any
+    // join — **and** there is a genuine `exists` beside it doing something
+    // else entirely (filtering out deleted accounts). The rule must accept it:
+    // demanding a `records.vehicle_id` correlation from a subquery that was
+    // never the ownership claim would reject a correct policy.
+    const fixture = normalizeSql(`
+      create policy "records owner all" on public.records
+        for all to authenticated
+        using (
+          records.owner_id = (select auth.uid())
+          and exists (
+            select 1 from public.profiles p
+             where p.deleted_at is null
+          )
+        );
+    `);
+
+    expect(subqueryCorrelationIssues(fixture, ["records"])).toEqual([]);
+  });
+
+  it("CONTROL: the same policy WITHOUT the row-self comparison is rejected", () => {
+    // The pair that makes the control above mean something. Remove the one
+    // clause that ties the row to the caller and the remaining `exists` is the
+    // whole ownership claim — uncorrelated, and a finding. If both fixtures
+    // ever agree, the rule has collapsed in one direction or the other.
+    const fixture = normalizeSql(`
+      create policy "records owner all" on public.records
+        for all to authenticated
+        using (
+          exists (
+            select 1 from public.profiles p
+             where p.deleted_at is null
+          )
+        );
+    `);
+
+    expect(
+      subqueryCorrelationIssues(fixture, ["records"]).length
+    ).toBeGreaterThan(0);
   });
 });
 

@@ -176,7 +176,132 @@ export const SKIP_REASONS = {
     "GARAGE_LIVE is set but no Supabase stack answered on the local URL",
   nonLocal:
     "SUPABASE_URL points somewhere that is not loopback — refusing to run",
+  wrongProject:
+    "the stack on that port is NOT this project's — refusing to run",
 } as const;
+
+/**
+ * The tables a stack must expose to be recognised as this project's.
+ *
+ * Not a version check and not a hash — a fingerprint. A PostgREST instance
+ * exposing all four of these is this repo's stack for any purpose a grader
+ * cares about, and one exposing none of them is somebody else's.
+ */
+const PROJECT_FINGERPRINT_TABLES = [
+  "profiles",
+  "vehicles",
+  "records",
+  "receipts",
+] as const;
+
+/**
+ * Whether an exposed-table list identifies this project's stack, or a sentence
+ * saying why not.
+ *
+ * ## Loopback is not the same question as "this project" (T2-401 review, F8)
+ *
+ * `assertLocalTarget` answers "is this my machine". It does not answer "is this
+ * my project", and on a developer machine those come apart constantly: the
+ * Supabase CLI gives every project the same default ports, so
+ * `127.0.0.1:54321` is **whichever checkout started first**. Observed on this
+ * machine while T2-401 was written — an unrelated project held 54321/54322 and
+ * monterogarage came up on 56321/56322.
+ *
+ * That is not a cosmetic problem here. `provisionScenario` creates two accounts
+ * and `teardownScenario` deletes them, the harness mints its own `service_role`
+ * JWT from the CLI's **published default secret**, and a foreign local stack
+ * shares that secret. So `GARAGE_LIVE=1 npm run test:garage` with default URLs
+ * would have provisioned and deleted users in a stranger's database. The blast
+ * radius is bounded — teardown only removes the two accounts it created — but
+ * "bounded" is not the standard this directory holds itself to, and the
+ * constitution's "never a production credential" is the same instinct one port
+ * over.
+ *
+ * Pure and exported so it is graded without a stack: the failure it prevents
+ * only happens on a machine running two projects, which is precisely the
+ * failure an integration test on a clean runner will never reproduce.
+ */
+export function projectFingerprintIssue(
+  exposed: readonly string[],
+  expected: readonly string[] = PROJECT_FINGERPRINT_TABLES
+): string | null {
+  if (expected.length === 0) {
+    return "no fingerprint tables declared — nothing identifies this project";
+  }
+
+  // ## The asymmetry, and why it runs this way round
+  //
+  // An empty enumeration is **"cannot tell"**, not "wrong project", and the
+  // difference was measured rather than assumed. PostgREST's OpenAPI document
+  // lists only what the *calling role* can reach, so:
+  //
+  // - probed as `anon`, a correctly locked-down project enumerates **nothing**
+  //   — which is true of this repo's own schema, since T2-202 revokes every
+  //   privilege from `anon`. An anon-based fingerprint would therefore have
+  //   refused the real stack and switched the whole behavioural tier off in
+  //   silence. Observed: 0 tables from a real, healthy stack.
+  // - probed as `service_role`, a foreign stack sharing the CLI's default
+  //   secret enumerates its own tables happily. Observed: 7, including
+  //   `subscriptions` and `stripe_webhook_events` — a project that is
+  //   emphatically not this one.
+  //
+  // So the guard refuses only on **positive** evidence of a different schema,
+  // and stays out of the way when the answer is uninformative. Refusing on
+  // silence would trade a rare, bounded, human-noticeable hazard for a
+  // permanent and invisible loss of Tier B, and a tier that never runs is
+  // indistinguishable from a tier that passes.
+  if (exposed.length === 0) return null;
+
+  const present = new Set(exposed);
+  const missing = expected.filter((table) => !present.has(table));
+  if (missing.length === 0) return null;
+
+  const found = exposed
+    .filter((name) => !name.startsWith("rpc/"))
+    .slice(0, 5)
+    .join(", ");
+  return (
+    `${SKIP_REASONS.wrongProject} (it does not expose ${missing.join(", ")}; ` +
+    `it exposes ${found || "no tables"}). The Supabase CLI gives every project ` +
+    `the same default ports, so the stack on this one belongs to another ` +
+    `checkout — set SUPABASE_URL to the port \`supabase status\` reports here`
+  );
+}
+
+/**
+ * The table and RPC names a PostgREST instance exposes, from its OpenAPI
+ * document, **as the service role**.
+ *
+ * The role matters and is the whole reason this works — see the note in
+ * `projectFingerprintIssue`. The service-role token is the credential the
+ * harness is about to use to create accounts anyway, so probing with it asks
+ * exactly the question that matters: *what would I be writing into?*
+ *
+ * Returns `null` when the document cannot be read or parsed — **not** an empty
+ * list. An empty list is a different answer ("this role sees no tables") and
+ * the caller treats it differently (AGENTS.md: a failure is not a zero).
+ */
+async function exposedTables(
+  url: string,
+  token: string
+): Promise<string[] | null> {
+  try {
+    const response = await fetch(`${url}/rest/v1/`, {
+      signal: AbortSignal.timeout(3000),
+      headers: { apikey: token, authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return null;
+    const document = (await response.json()) as {
+      paths?: Record<string, unknown>;
+    };
+    if (!document.paths) return null;
+    return Object.keys(document.paths)
+      .filter((path) => path.startsWith("/") && path.length > 1)
+      .map((path) => path.slice(1));
+  } catch {
+    return null;
+  }
+}
 
 export type LiveDecision =
   | { readonly available: true; readonly stack: LiveStack }
@@ -219,6 +344,26 @@ export async function detectLiveStack(
       reason: `${SKIP_REASONS.unreachable} (${url}: ${(error as Error).message})`,
     };
   }
+
+  // Loopback is not the same question as "this project" — see
+  // `projectFingerprintIssue`. This runs before any grader provisions an
+  // account, because provisioning is the irreversible half.
+  //
+  // Probed as `service_role` deliberately: that is the credential the harness
+  // is about to create and delete accounts with, so this asks the question that
+  // actually matters — *what would I be writing into?* A null answer means the
+  // instance did not describe itself and is treated as uninformative rather
+  // than as a refusal.
+  const exposed = await exposedTables(
+    url,
+    mintJwt({ role: "service_role" }, jwtSecret)
+  );
+  const wrongProject =
+    exposed === null ? null : projectFingerprintIssue(exposed);
+  if (wrongProject !== null) {
+    return { available: false, reason: `${wrongProject} — ${url}` };
+  }
+
   return { available: true, stack: { url, jwtSecret } };
 }
 

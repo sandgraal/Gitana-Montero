@@ -808,15 +808,70 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   contract's declared ownership column) and `policy-join-semantics.test.ts`,
   which asserts the leak on a replica of the shipped shape so the property stays
   recorded rather than assumed.
-  <br>*A live-target hazard in the Tier B harness.* The Supabase CLI gives every
-  project the same default ports, so `127.0.0.1:54321/54322` is whichever
-  checkout started first — observed on this machine, where an unrelated project
-  held them and monterogarage came up on 56321/56322. `assertLocalTarget`
-  answers "is this my machine", not "is this my project", and the PostgREST tier
-  creates and **deletes** accounts. `db.ts` checks the migration ledger before
-  it will run; `harness.ts` has no equivalent and is a live foot-gun for anyone
-  running `npm run test:garage` with a second stack up. Left for a follow-up
-  rather than fixed here — it is T2-201 harness surface, not T2-401's.
+  <br>*A live-target hazard in the Tier B harness — **found, then closed**.*
+  The Supabase CLI gives every project the same default ports, so
+  `127.0.0.1:54321/54322` is whichever checkout started first — observed on this
+  machine, where an unrelated project held them. `assertLocalTarget` answers "is
+  this my machine", not "is this my project", and the PostgREST tier creates and
+  **deletes** accounts using a `service_role` JWT minted from the CLI's
+  *published default secret*, which a foreign local stack shares. Confirmed
+  live: that token was accepted by the other project's PostgREST (200) and
+  enumerated its tables. `detectLiveStack` now fingerprints the stack before any
+  grader provisions anything, and refuses with a named reason. Both directions
+  proved against real stacks — refuses the foreign one, runs against the
+  genuine one. The fingerprint is deliberately asymmetric (it refuses only on
+  positive evidence of a different schema, never on silence) because an
+  anon-role probe enumerates nothing against a correctly locked-down project,
+  and a guard that read silence as "wrong project" would have switched the whole
+  behavioural tier off invisibly.
+  <br>**Round-2 review fixes (2026-09-03).** An independent review confirmed
+  blind spot (b) three ways and found seven defects, all now closed:
+  <br>— **F1 (high).** `parseRoles` did not strip identifier quotes, so
+  `grant select on public.records to "anon";` — valid SQL, and the exact
+  vulnerability shape T2-401a exists to catch — was recorded as the role
+  `"anon"`, matched nothing, and produced **zero findings** from every rule
+  built on the grant replay, T2-401's own new ADP rule included. One-line root
+  fix; six probes, one per call site that names a role.
+  <br>— **F2 (high).** `capabilityGateIssues`' third clause — the only detector
+  for SHR-06's "receipts gated behind costs" collapse, the cell these files call
+  the one that matters most — had no probe at all and could not fail. Reject and
+  accept fixtures added, plus its real limit stated and pinned.
+  <br>— **F3.** Three incompatible `revoke_share_grant` signatures across the
+  branch; PostgREST resolves overloads by argument name, so the central SHR-08
+  proof was revoking nothing and would have compared a live grant against two
+  refusals. Argument lists are now contract (`SHARE_CREATE_ARGUMENTS`,
+  `SHARE_REVOKE_ARGUMENTS`) and one module builds every payload. **Revocation is
+  pinned per-grant, not per-vehicle** — SHR-08 says "every grant … by its
+  issuer", and revoke-all is a different operation the spec does not ask for.
+  <br>— **F4.** SHR-07's Tier B write proof called an RPC named `records`, which
+  cannot exist, so it was unfalsifiable. It hits the table now, and asserts the
+  row is unchanged as well as the response refused.
+  <br>— **F5.** Three signer success cells never uploaded the object they asked
+  to sign.
+  <br>— **F6.** Tier B flakiness **was** partly this branch's: the server's own
+  report named the cycle — this tier's DDL against `auth.users` versus GoTrue
+  inserting an identity. Deadlock is transient by definition, so the transaction
+  wrapper retries it. Measured: 2 red in 5 before, **9 green in 10** after.
+  Residual, and explicitly *not* claimed fixed: about 1 run in 10 still fails in
+  pre-existing suites under full parallel load (RLS rejections during
+  provisioning, GoTrue's side of the same contention). That belongs to whoever
+  promotes `tier-b` from informational to required.
+  <br>— **F7.** A positive control did not reach the clause it controlled;
+  `canonicalizeAuthUid` normalised the fixture before the escape ran. Replaced
+  with a row-self comparison beside a genuine subquery, plus its negative pair.
+  <br>— **F9/F10.** Two comments over-claimed: the reserved list is
+  cross-checked against `src/i18n/routes.ts`, not computed from `src/pages/`
+  (which holds only dynamic segments), and handle uniqueness is proved
+  sequentially — enough to show the constraint is in the schema, not a
+  concurrency proof. Both corrected in place rather than quietly dropped.
+  <br>— **F11 (process, for T901/T902).** Every commit on this branch carries
+  the same git author as T2-201 and T2-401a, so separation-by-authorship is not
+  traceable through `git log` alone; the `X-Agent-Role` trailer is the only
+  in-repo signal.
+  <br>*Corrected claim:* the first round said "15 mutants, all killed". True of
+  the 15 written, but the battery did not cover every clause separately as
+  GRADER-PRINCIPLES requires — F2 and F7 are the proof. The battery is now 20
+  mutants across both rounds, per-clause, all killed.
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*

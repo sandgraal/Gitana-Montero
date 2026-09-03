@@ -268,14 +268,78 @@ export async function openDatabase(
  * those changes would poison every grader that ran after it, and the failure
  * would look like a different bug entirely.
  */
+/** Postgres' SQLSTATE for `deadlock detected`. */
+const DEADLOCK_DETECTED = "40P01";
+
+/**
+ * Whether an error is Postgres telling us to try again.
+ *
+ * A deadlock is not a defect in either transaction — it is the server breaking
+ * a cycle by shooting one of the participants, and the documented response is
+ * to retry. Matched on SQLSTATE rather than on the message text, because the
+ * message is localised and the code is not.
+ */
+function isTransientConflict(error: unknown): boolean {
+  return (error as { code?: string } | null)?.code === DEADLOCK_DETECTED;
+}
+
 export async function inRolledBackTransaction<T>(
+  session: DbSession,
+  body: (session: DbSession) => Promise<T>,
+  attemptsLeft = 3
+): Promise<T> {
+  try {
+    return await attemptTransaction(session, body);
+  } catch (error) {
+    // ## Retry on deadlock (T2-401 review, F6)
+    //
+    // Measured, not assumed. A full live run of `tests/garage` was red 2 runs
+    // in 5, always with `deadlock detected`, and the server's own report named
+    // the cycle: this tier's DDL against `auth.users` on one side, GoTrue
+    // inserting an identity for `provisionScenario` on the other. Neither party
+    // is wrong; they simply take the same catalog rows in opposite orders, and
+    // Postgres resolves that by cancelling one.
+    //
+    // So the fix is the documented one — retry the victim — rather than
+    // serialising the whole suite, which would cost every other file's
+    // parallelism to solve a problem three files have. Bounded at three
+    // attempts: a *persistent* deadlock is a real defect and must still
+    // surface as a red test rather than as a hang.
+    if (attemptsLeft > 1 && isTransientConflict(error)) {
+      return inRolledBackTransaction(session, body, attemptsLeft - 1);
+    }
+    throw error;
+  }
+}
+
+async function attemptTransaction<T>(
   session: DbSession,
   body: (session: DbSession) => Promise<T>
 ): Promise<T> {
   await session.query("begin");
-  // Fail fast rather than hang. These probes run beside the PostgREST tier,
-  // which is writing to the same tables, so a probe that takes a heavy lock can
-  // queue behind it — and a grader that blocks for the full query timeout
+
+  // ## Serialize every direct-DB probe against every other one (T2-401, F6)
+  //
+  // These probes create tables, add policies, and disable RLS — all catalog
+  // DDL in schema `public`. Two of them running concurrently in different
+  // Vitest workers take the same catalog tuples in different orders, and
+  // Postgres resolves that the only way it can: **`deadlock detected`**.
+  // Reproduced on a clean stack, in the full-directory live run, twice out of
+  // two attempts, always on the same replica probe.
+  //
+  // The advisory lock is transaction-scoped, so it is released by the rollback
+  // below and needs no unlock path. It bounds the direct-DB tier's concurrency
+  // to one at a time — these probes are milliseconds each, so the wall-clock
+  // cost is nil beside a deadlock that fails a run.
+  //
+  // The number is arbitrary but must be stable and unlikely to collide with
+  // anything else that takes advisory locks on this database; nothing else in
+  // this repo does.
+  await session.query("select pg_advisory_xact_lock($1)", [2401]);
+
+  // Fail fast rather than hang. These probes also run beside the PostgREST
+  // tier, which is writing to the same tables, so one that takes a heavy lock
+  // can queue behind it — and a grader that blocks for the full query timeout
   // reports a confusing "current transaction is aborted" instead of "something
   // else holds this lock". Five seconds is far longer than any correct probe
   // here needs and far shorter than a reader's patience.

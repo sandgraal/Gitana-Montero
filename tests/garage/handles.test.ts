@@ -20,10 +20,18 @@
  * This is that file. The four properties, and why each one is a security
  * property rather than a validation nicety:
  *
- * 1. **Uniqueness survives a race.** Two signups asking "is `gitana` free?" at
- *    the same moment both get "yes". The answer is a unique index, not a
- *    `select` in the form — so it is graded by inserting twice, not by reading
- *    the DDL and hoping.
+ * 1. **Uniqueness lives in the database.** Two signups asking "is `gitana`
+ *    free?" at the same moment both get "yes", so the answer has to be a unique
+ *    index rather than a `select` in the form.
+ *
+ *    **What the Tier B graders actually prove is the weaker, checkable half**:
+ *    a second account cannot take a handle the first already holds, asserted by
+ *    writing twice *sequentially*. That is enough to prove the constraint
+ *    exists in the schema — a form-only check fails it — and it is **not** a
+ *    proof that the constraint holds under genuine concurrency, which would
+ *    need two overlapping transactions and is a different test. Stated here so
+ *    nobody reads "uniqueness under concurrent signup" off the task line and
+ *    assumes it was demonstrated (T2-401 review, F10).
  * 2. **Case folds.** `Gitana` and `gitana` are the same string in the same
  *    position of the same URL to every reader alive. Two accounts differing
  *    only in case is an impersonation kit.
@@ -31,6 +39,20 @@
  *    task brief; the dangerous one is the route segment somebody adds next
  *    year, so the reserved set is graded as a **superset of the segments the
  *    site actually serves**, read out of `src/i18n/routes.ts` at test time.
+ *
+ *    `RESERVED_HANDLES` is still a hand-written literal — the grader
+ *    cross-checks it against the registry rather than deriving it, so adding a
+ *    collection turns this file red until somebody reserves the new segment.
+ *    That is the intended ergonomics (a reserved word is a decision), but it is
+ *    worth stating plainly rather than implying the list computes itself.
+ *
+ *    **`src/pages/` is deliberately not scanned**, and that is not an
+ *    oversight: every route under `src/pages/[locale]/` is a *dynamic* segment
+ *    (`[garageSegment].astro`, `[partsSegment].astro`), so the directory
+ *    contains no literal path words at all. The literal words live in
+ *    `COLLECTION_ROUTE_SEGMENTS` and nowhere else, which is why that is what
+ *    gets read. A filesystem sweep here would be a sweep over an empty set —
+ *    the vacuity this directory exists to refuse.
  * 4. **A released handle does not immediately become somebody else's.** SHR-02
  *    calls the URL *stable*. If a rename frees the old handle for a stranger,
  *    every link already shared quietly starts pointing at a different person's
@@ -299,7 +321,10 @@ describe("the database is what enforces uniqueness (SHR-02)", () => {
 describe.skipIf(!live.available)(
   liveTitle("handles are unique, folded, and not recyclable", live),
   () => {
-    it.fails("two accounts cannot hold the same handle", async () => {
+    // Sequential, not concurrent — see the file header. This proves the
+    // constraint is in the schema (a form-only check fails it); it does not
+    // prove behaviour under two overlapping transactions.
+    it.fails("a second account cannot take a handle already held", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
         const handle = testHandle("a", scenario.runId);

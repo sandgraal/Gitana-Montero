@@ -50,6 +50,7 @@ import {
   detectLiveStack,
   liveTitle,
   mintJwt,
+  projectFingerprintIssue,
 } from "./harness.ts";
 import {
   columnDefinition,
@@ -152,6 +153,84 @@ describe("detectLiveStack — skips are named, and can be made fatal", () => {
 
     expect(title).toContain("RLS deny-by-default");
     expect(title).toContain(SKIP_REASONS.notEnabled);
+  });
+
+  it("an EMPTY enumeration is 'cannot tell', not 'wrong project'", () => {
+    // Measured, not assumed, and it is the whole shape of this guard.
+    // PostgREST's OpenAPI document lists only what the calling role can reach,
+    // and a correctly locked-down project enumerates **nothing** to `anon` —
+    // which is true of this repo, since T2-202 revokes every privilege from it.
+    // A guard that read silence as "wrong project" would have refused the real
+    // stack and switched the whole behavioural tier off without saying so, and
+    // a tier that never runs is indistinguishable from a tier that passes.
+    expect(projectFingerprintIssue([])).toBeNull();
+  });
+
+  it("refuses a loopback stack that is NOT this project's", () => {
+    // ## T2-401 review, F8 — loopback is not the same question as "this project"
+    //
+    // The Supabase CLI gives every project the same default ports, so
+    // `127.0.0.1:54321` is whichever checkout started first. Observed on the
+    // author's machine: an unrelated project held it and monterogarage came up
+    // on 56321. `provisionScenario` creates accounts and `teardownScenario`
+    // deletes them, and the harness mints its own `service_role` JWT from the
+    // CLI's *published default secret* — which a foreign local stack shares. So
+    // the default URL was a live path to writing in a stranger's database.
+    //
+    // These are real table names, read off the foreign stack that was actually
+    // squatting on 54321 while this was written — probed with a `service_role`
+    // token minted from the CLI's *published default secret*, which that stack
+    // shares. It answered 200 and enumerated them. The hazard is not
+    // theoretical: that credential works.
+    const issue = projectFingerprintIssue([
+      "subscriptions",
+      "stripe_webhook_events",
+      "rpc/claim_stripe_webhook_batch",
+    ]);
+
+    expect(issue).toContain("NOT this project's");
+    expect(issue).toContain("profiles");
+    // Names what it DID find, so a reader can tell at a glance whose stack it is.
+    expect(issue).toContain("subscriptions");
+    // The refusal names the fix, so nobody works around it by deleting it.
+    expect(issue).toContain("SUPABASE_URL");
+  });
+
+  it("does not count RPCs as tables when reporting what it found", () => {
+    // Cosmetic but load-bearing for the message: a refusal listing eight
+    // `rpc/...` entries and no table names reads like a parser bug rather than
+    // a different project.
+    expect(
+      projectFingerprintIssue(["rpc/a", "rpc/b", "subscriptions"])
+    ).toContain("it exposes subscriptions");
+  });
+
+  it("accepts a stack exposing every fingerprint table", () => {
+    // The control. A guard that refuses everything would turn Tier B off
+    // permanently and look like caution.
+    expect(
+      projectFingerprintIssue([
+        "profiles",
+        "vehicles",
+        "records",
+        "receipts",
+        "shares",
+      ])
+    ).toBeNull();
+  });
+
+  it("refuses a PARTIAL match — three of four is a different schema", () => {
+    expect(
+      projectFingerprintIssue(["profiles", "vehicles", "records"])
+    ).toContain("receipts");
+  });
+
+  it("refuses to identify anything when the fingerprint is empty", () => {
+    // The vacuity guard. With nothing expected, every stack matches — including
+    // the stranger's one this exists to refuse.
+    expect(projectFingerprintIssue(["anything"], [])).toContain(
+      "nothing identifies this project"
+    );
   });
 
   it("FAIL-CLOSED: GARAGE_LIVE_REQUIRED=1 forbids skipping the live tier", async () => {

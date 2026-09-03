@@ -1128,6 +1128,63 @@ export const SHARE_CREATE_FUNCTION = "create_share_grant";
 export const SHARE_REVOKE_FUNCTION = "revoke_share_grant";
 
 /**
+ * The **parameter names**, not just the function names.
+ *
+ * ## Why the arguments are pinned here too (T2-401 review, F3)
+ *
+ * PostgREST resolves an RPC overload **by argument name**. A call whose named
+ * arguments match no function resolves to nothing and quietly does nothing —
+ * it does not error in a way a grader reading `response.ok` can distinguish
+ * from a refusal. The first draft of these graders had three different revoke
+ * signatures across the branch, and the one used by the central SHR-08 proof
+ * revoked nothing at all: the "all three refusals are identical" comparison
+ * would have compared a **live grant's successful response** against two
+ * refusals, and failed for a fixture reason on the one grader whose whole job
+ * is proving the requirement. That is the failure shape that gets an assertion
+ * loosened by whoever hits it at 5pm.
+ *
+ * So the argument list is contract, graded like the names are, and every call
+ * site reads it from here — `share-fixtures.ts` is the only place that builds
+ * these payloads.
+ */
+export const SHARE_CREATE_ARGUMENTS = [
+  "p_vehicle_id",
+  "p_kind",
+  "p_includes_costs",
+  "p_includes_receipts",
+  "p_expires_in_hours",
+] as const;
+
+/**
+ * Revocation takes **one grant**, by id.
+ *
+ * > **SHR-08** Every grant SHALL be revocable **by its issuer** at any time.
+ *
+ * Read literally, that is a per-grant operation: an owner who issued a link to
+ * their mechanic in March and another to a buyer in June must be able to end
+ * one without ending the other. A `revoke_share_grant(p_vehicle_id)` — which an
+ * earlier draft of these graders assumed — is a *different* operation, "revoke
+ * everything on this truck", and the spec does not ask for it. Flagged to the
+ * conductor rather than designed here: if the owner wants a revoke-all, it is a
+ * second RPC with a second name, not a wider parameter on this one.
+ *
+ * The consequence for the create RPC is that it must return the grant's id
+ * beside its token — see {@link SHARE_CREATE_RESULT_FIELDS}. A token is a
+ * secret the owner copies once; an id is how they manage what they issued.
+ */
+export const SHARE_REVOKE_ARGUMENTS = ["p_share_id"] as const;
+
+/**
+ * What the create RPC hands back: the id to manage the grant with, and the
+ * bearer token, **once**.
+ *
+ * The token exists in plaintext for exactly one response and never again
+ * (`SHARE_TOKEN_HASH_COLUMN`), so this is the only shape in the system allowed
+ * to carry it.
+ */
+export const SHARE_CREATE_RESULT_FIELDS = ["share_id", "token"] as const;
+
+/**
  * The Edge Function that signs a receipt for a grant holder (T2-404).
  *
  * A Postgres function cannot mint a Supabase signed URL, so authorization

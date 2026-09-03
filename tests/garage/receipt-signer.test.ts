@@ -55,10 +55,7 @@ import { describe, expect, it } from "vitest";
 import {
   RECEIPTS_BUCKET,
   RECEIPT_SIGNER_DIR,
-  SHARE_CREATE_FUNCTION,
-  SHARE_GRANT_KINDS,
   SHARE_READER_NAMES,
-  SHARE_REVOKE_FUNCTION,
   SIGNED_URL_TTL_SECONDS,
   testReceiptPath,
 } from "./contract.ts";
@@ -68,13 +65,13 @@ import {
   detectLiveStack,
   liveTitle,
   provisionScenario,
-  rpc,
   signObject,
   stackOf,
   teardownScenario,
   uploadObject,
   type Scenario,
 } from "./harness.ts";
+import { issueGrant, revokeGrant, type IssuedGrant } from "./share-fixtures.ts";
 import { readSupabaseConfig, SEAM_SHARE_GRANTS, shareSeam } from "./sql.ts";
 
 const live = await detectLiveStack();
@@ -331,49 +328,54 @@ describe.skipIf(!live.available)(
       };
     }
 
-    /** Issue a grant on `vehicleId` as owner A, and hand back its token. */
-    async function grantOn(
+    /**
+     * Issue a grant on `vehicleId` as owner A.
+     *
+     * Delegates to `share-fixtures.ts` rather than building the payload here.
+     * The first draft had its own copy and the two drifted into incompatible
+     * argument names — which PostgREST resolves to *no function at all*, so the
+     * revocation cell below revoked nothing (T2-401 review, F3).
+     */
+    function grantOn(
       scenario: Scenario,
       vehicleId: string,
       includesCosts: boolean,
       includesReceipts: boolean
-    ): Promise<string> {
-      const response = await rpc(
-        scenario,
-        scenario.ownerA,
-        SHARE_CREATE_FUNCTION,
-        {
-          p_vehicle_id: vehicleId,
-          p_kind: SHARE_GRANT_KINDS[0],
-          p_includes_costs: includesCosts,
-          p_includes_receipts: includesReceipts,
-          p_expires_in_hours: 24,
-        }
-      );
-      const token =
-        typeof response.body === "string"
-          ? response.body
-          : (response.body as { token?: string } | null)?.token;
-      if (!response.ok || typeof token !== "string") {
-        throw shareSeam(
-          `${SHARE_CREATE_FUNCTION} answered ${response.status}: ${response.text}`
-        );
-      }
-      return token;
+    ): Promise<IssuedGrant> {
+      return issueGrant(scenario, scenario.ownerA, vehicleId, {
+        includesCosts,
+        includesReceipts,
+      });
+    }
+
+    /**
+     * A vehicle -> record -> receipt chain **with the bytes uploaded**.
+     *
+     * The upload is the point (T2-401 review, F5). `createOwnedFixture` writes
+     * the database rows only, and the storage API refuses to sign a path with
+     * no object behind it — so three success cells here would have failed for a
+     * fixture reason the day T2-404 activated them, on exactly the assertions
+     * meant to prove the signer works. The unmarked control in the previous
+     * block documents that behaviour; these fixtures now honour it.
+     */
+    async function uploadedFixture(
+      scenario: Scenario,
+      owner: Scenario["ownerA"],
+      slot: string
+    ) {
+      const path = testReceiptPath(owner.userId ?? "", slot);
+      await uploadObject(scenario, owner, path);
+      return createOwnedFixture(scenario, owner, path);
     }
 
     it.fails("signs a receipt on the granted vehicle", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
-        const owned = await createOwnedFixture(
-          scenario,
-          scenario.ownerA,
-          testReceiptPath(scenario.ownerA.userId ?? "", "1")
-        );
-        const token = await grantOn(scenario, owned.vehicleId, false, true);
+        const owned = await uploadedFixture(scenario, scenario.ownerA, "1");
+        const grant = await grantOn(scenario, owned.vehicleId, false, true);
 
         const signed = await askSigner(scenario, {
-          token,
+          token: grant.token,
           receipt_id: owned.receiptId,
         });
 
@@ -392,20 +394,12 @@ describe.skipIf(!live.available)(
         // truck's invoices the day the owner buys one.
         const scenario = await provisionScenario(stackOf(live));
         try {
-          const granted = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
-          const other = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "2")
-          );
-          const token = await grantOn(scenario, granted.vehicleId, false, true);
+          const granted = await uploadedFixture(scenario, scenario.ownerA, "1");
+          const other = await uploadedFixture(scenario, scenario.ownerA, "2");
+          const grant = await grantOn(scenario, granted.vehicleId, false, true);
 
           const signed = await askSigner(scenario, {
-            token,
+            token: grant.token,
             receipt_id: other.receiptId,
           });
 
@@ -419,20 +413,12 @@ describe.skipIf(!live.available)(
     it.fails("REFUSES a receipt on another owner's vehicle", async () => {
       const scenario = await provisionScenario(stackOf(live));
       try {
-        const mine = await createOwnedFixture(
-          scenario,
-          scenario.ownerA,
-          testReceiptPath(scenario.ownerA.userId ?? "", "1")
-        );
-        const theirs = await createOwnedFixture(
-          scenario,
-          scenario.ownerB,
-          testReceiptPath(scenario.ownerB.userId ?? "", "1")
-        );
-        const token = await grantOn(scenario, mine.vehicleId, false, true);
+        const mine = await uploadedFixture(scenario, scenario.ownerA, "1");
+        const theirs = await uploadedFixture(scenario, scenario.ownerB, "1");
+        const grant = await grantOn(scenario, mine.vehicleId, false, true);
 
         const signed = await askSigner(scenario, {
-          token,
+          token: grant.token,
           receipt_id: theirs.receiptId,
         });
 
@@ -450,25 +436,24 @@ describe.skipIf(!live.available)(
         // ceiling is for — but no *new* one may be issued after revocation.
         const scenario = await provisionScenario(stackOf(live));
         try {
-          const owned = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
-          const token = await grantOn(scenario, owned.vehicleId, false, true);
+          const owned = await uploadedFixture(scenario, scenario.ownerA, "1");
+          const grant = await grantOn(scenario, owned.vehicleId, false, true);
 
           const before = await askSigner(scenario, {
-            token,
+            token: grant.token,
             receipt_id: owned.receiptId,
           });
           expect(before.ok).toBe(true);
 
-          await rpc(scenario, scenario.ownerA, SHARE_REVOKE_FUNCTION, {
-            p_vehicle_id: owned.vehicleId,
-          });
+          const cut = await revokeGrant(
+            scenario,
+            scenario.ownerA,
+            grant.shareId
+          );
+          expect(cut.ok).toBe(true);
 
           const after = await askSigner(scenario, {
-            token,
+            token: grant.token,
             receipt_id: owned.receiptId,
           });
           expect(after.ok).toBe(false);
@@ -486,15 +471,11 @@ describe.skipIf(!live.available)(
         // financial stuff" hands over the scans as well.
         const scenario = await provisionScenario(stackOf(live));
         try {
-          const owned = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
-          const token = await grantOn(scenario, owned.vehicleId, true, false);
+          const owned = await uploadedFixture(scenario, scenario.ownerA, "1");
+          const grant = await grantOn(scenario, owned.vehicleId, true, false);
 
           const signed = await askSigner(scenario, {
-            token,
+            token: grant.token,
             receipt_id: owned.receiptId,
           });
 
@@ -513,15 +494,11 @@ describe.skipIf(!live.available)(
         // everything.
         const scenario = await provisionScenario(stackOf(live));
         try {
-          const owned = await createOwnedFixture(
-            scenario,
-            scenario.ownerA,
-            testReceiptPath(scenario.ownerA.userId ?? "", "1")
-          );
-          const token = await grantOn(scenario, owned.vehicleId, false, true);
+          const owned = await uploadedFixture(scenario, scenario.ownerA, "1");
+          const grant = await grantOn(scenario, owned.vehicleId, false, true);
 
           const signed = await askSigner(scenario, {
-            token,
+            token: grant.token,
             receipt_id: owned.receiptId,
           });
 
@@ -538,20 +515,12 @@ describe.skipIf(!live.available)(
       // Postgres resolved for `receipt_id`, or it refuses.
       const scenario = await provisionScenario(stackOf(live));
       try {
-        const mine = await createOwnedFixture(
-          scenario,
-          scenario.ownerA,
-          testReceiptPath(scenario.ownerA.userId ?? "", "1")
-        );
-        const theirs = await createOwnedFixture(
-          scenario,
-          scenario.ownerB,
-          testReceiptPath(scenario.ownerB.userId ?? "", "1")
-        );
-        const token = await grantOn(scenario, mine.vehicleId, false, true);
+        const mine = await uploadedFixture(scenario, scenario.ownerA, "1");
+        const theirs = await uploadedFixture(scenario, scenario.ownerB, "1");
+        const grant = await grantOn(scenario, mine.vehicleId, false, true);
 
         const signed = await askSigner(scenario, {
-          token,
+          token: grant.token,
           receipt_id: mine.receiptId,
           path: theirs.storagePath,
           storage_path: theirs.storagePath,
