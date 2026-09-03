@@ -264,6 +264,186 @@ export const USER_TABLES: readonly TableContract[] = [
 /** Convenience: the table names, in the order the cascade walks them. */
 export const USER_TABLE_NAMES = USER_TABLES.map((table) => table.name);
 
+/* -------------------------------------------------------------------------
+ * GAR-06′ — record media attachments (declared by T2-305a [TEST])
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The three attachment kinds GAR-06′ names, and nothing else.
+ *
+ * > **GAR-06′** A record SHALL support general documentation attachments —
+ * > photo, video, or audio, in addition to GAR-05′'s image/PDF receipts —
+ * > uploaded into user-private storage, independent of a receipt's
+ * > vendor/date/amount fields.
+ *
+ * Each kind carries the MIME *prefix* that defines it, because the bucket's
+ * `allowed_mime_types` is graded against the category rather than against a
+ * list of spellings: `video/mp4` and `video/quicktime` are both video, and a
+ * grader that enumerated one spelling would reject the other for no reason a
+ * requirement can name. `sample` is one concrete member of the category, for
+ * the live upload probes — a fixture has to pick something.
+ *
+ * `extension` exists so a synthetic object path is obviously what it claims to
+ * be; Supabase's bucket filter reads the declared content type rather than the
+ * name, so nothing depends on it, but a listing full of `.bin` would make a
+ * live failure harder to read than it needs to be.
+ */
+export const RECORD_MEDIA_KINDS = [
+  {
+    kind: "photo",
+    mimePrefix: "image/",
+    sample: "image/jpeg",
+    extension: "jpg",
+  },
+  {
+    kind: "video",
+    mimePrefix: "video/",
+    sample: "video/mp4",
+    extension: "mp4",
+  },
+  {
+    kind: "audio",
+    mimePrefix: "audio/",
+    sample: "audio/mp4",
+    extension: "m4a",
+  },
+] as const;
+
+/** Convenience: just the kind names, for a `check` constraint or an enum. */
+export const RECORD_MEDIA_KIND_NAMES = RECORD_MEDIA_KINDS.map(
+  (entry) => entry.kind
+);
+
+/**
+ * A MIME type in **none** of the three declared categories.
+ *
+ * `application/pdf` on purpose, and not an invented type: it is the one the
+ * receipts bucket really allows, so "the media bucket refuses it" is a claim
+ * about the boundary between GAR-05′ and GAR-06′ rather than a claim about a
+ * string nobody would ever upload. If the media bucket accepted it, the two
+ * surfaces would have collapsed into one general-purpose file host and the
+ * independence GAR-06′ asks for would be a naming convention.
+ */
+export const NON_MEDIA_MIME_TYPE = "application/pdf";
+
+/**
+ * The columns that make a receipt a *receipt* (GAR-05′), named in one place.
+ *
+ * GAR-06′ is explicit that an attachment is "independent of a receipt's
+ * vendor/date/amount fields". The grader that enforces it is a negative — no
+ * column in this list may be required on a media row — so the list has to be
+ * enumerated rather than inferred, in the same style as
+ * `KNOWN_EXTERNAL_PROVIDERS` and `PLAINTEXT_TOKEN_COLUMNS`.
+ */
+export const RECEIPT_FINANCIAL_COLUMNS = [
+  "vendor",
+  "issued_on",
+  "amount",
+  "currency",
+] as const;
+
+/**
+ * The media-attachment table — **declared here, not yet in `USER_TABLES`**.
+ *
+ * ## Naming: `record_media`, not `record_attachments`
+ *
+ * A bucket id is global to the project and permanent in every stored path
+ * (the `vehicle-photos` argument above), and the same is true of a table name
+ * in every query that will ever read it. `record_attachments` is the *generic*
+ * name for "a thing attached to a record" — and a receipt is already a thing
+ * attached to a record, living in a different bucket under a different table
+ * with different columns. A name that describes both while governing one is a
+ * name that will be wrong the first time somebody reads it quickly.
+ *
+ * `record_media` describes the contents, and the contents are exactly what the
+ * bucket's `allowed_mime_types` says they are: image, video, audio. It also
+ * leaves `record_attachments` free for the general surface if one is ever
+ * wanted. As with every other name in this file, this is T2-305a's design
+ * decision on the spec's behalf and is a one-line conversation with the
+ * conductor to change — what is not negotiable is the behaviour graded around
+ * it.
+ *
+ * ## Why it is a table and not `records.media_paths text[]`
+ *
+ * `vehicles.photo_paths` is the array precedent, and T2-304's seeding found
+ * the defect it carries: two uploads landing back-to-back read-modify-write the
+ * same array and one clobbers the other, leaving a real storage object that no
+ * row names (recorded on T2-302/T2-305 in `tasks.md`). A row per object has no
+ * such race — an insert is an insert — and it is also the only shape that can
+ * carry `media_kind`, which GAR-06′ needs and an array of paths cannot hold.
+ *
+ * ## Why it is NOT in `USER_TABLES` yet, and what promotion costs
+ *
+ * `USER_TABLES` drives unmarked `it.each` sweeps in `schema-shape.test.ts`,
+ * `rls-deny-by-default.test.ts` and `deletion-cascade.test.ts`. Adding a table
+ * that no migration creates would turn those sweeps red *without a marker*,
+ * which is the one thing a `[TEST]` branch must never do — an expected failure
+ * and an error look identical in a report and mean opposite things.
+ *
+ * So the contract is declared here and graded by T2-305a's own marked graders,
+ * and **promotion is T2-305's job**, in the same commit that creates the table.
+ * Promotion is three edits and the marked grader
+ * `"record_media is enumerated in USER_TABLES"` fails until all three land:
+ *
+ * 1. move this entry into the `USER_TABLES` array (delete `PENDING_USER_TABLES`);
+ * 2. add `["record_media", "record_id", "records"]` to `CASCADE_HOPS` in
+ *    `tests/garage/deletion-cascade.test.ts`;
+ * 3. extend the five-name list in `harness-contract.test.ts`'s
+ *    `"names the four user-data tables T2-202 must ship"`.
+ *
+ * Until then `ungradedTableIssues` is silent because the table does not exist;
+ * the moment it does and promotion has not happened, that sweep goes red and
+ * says so by name. That is the ordering `EXEMPT_PUBLIC_TABLES` already
+ * describes for `shares`, applied a second time.
+ *
+ * **Verified, not assumed** (T2-305a ran a scratch migration to check): with
+ * the table created and promotion skipped, the two ungraded-table sweeps in
+ * `rls-deny-by-default.test.ts` and `share-instrument.test.ts` fail by name,
+ * and so do the anonymous-privilege sweeps — Supabase's default privileges
+ * grant ALL on a new table in `public` to `anon` and `authenticated`, and an
+ * explicit `grant` *adds to* that ACL rather than replacing it. T2-202's F2
+ * found that the hard way and the fix is in `20260830120000_garage_schema.sql`:
+ * revoke first, by name, then grant the four verbs to `authenticated` only.
+ */
+export const RECORD_MEDIA_TABLE: TableContract = {
+  name: "record_media",
+  requirement: "GAR-06′",
+  ownershipPath: ["record_id", "vehicle_id", "owner_id"],
+  columns: [
+    { name: "id", requirement: "GAR-06′", type: /uuid/, notNull: true },
+    {
+      name: "record_id",
+      requirement: "GAR-06′ (an attachment is documentation *of a record*)",
+      type: /uuid/,
+      notNull: true,
+    },
+    {
+      name: "storage_path",
+      requirement: "GAR-06′ (the object in the private bucket)",
+      notNull: true,
+    },
+    {
+      // The closed set. Without it the "photo, video, or audio" of GAR-06′ is
+      // a sentence in a spec rather than a property of the data, and a UI that
+      // renders an `<audio>` for a video is one typo away.
+      name: "media_kind",
+      requirement: "GAR-06′ (“photo, video, or audio” — three, and only three)",
+      notNull: true,
+    },
+  ],
+};
+
+/**
+ * Tables this file has declared that no migration creates yet.
+ *
+ * Named rather than commented out, so the promotion grader has something to
+ * read and so a reader can tell "declared, pending" from "forgotten". T2-305
+ * empties this array.
+ */
+export const PENDING_USER_TABLES: readonly TableContract[] = [
+  RECORD_MEDIA_TABLE,
+];
+
 /**
  * Every column whose *default* is the privacy guarantee. SHR-01 says
  * "everything a user stores SHALL default to private"; a boolean that is
@@ -333,6 +513,48 @@ export const RECEIPTS_BUCKET = "receipts";
 export const VEHICLE_PHOTOS_BUCKET = "vehicle-photos";
 
 /**
+ * The private bucket a record's media attachments live in — declared by
+ * T2-305a [TEST], created by T2-305 [PLATFORM].
+ *
+ * > **GAR-06′** A record SHALL support general documentation attachments —
+ * > photo, video, or audio … uploaded into user-private storage … Never
+ * > publicly accessible unless the record's visibility is opened.
+ *
+ * ## Why a third bucket rather than widening one of the two that exist
+ *
+ * Widening `receipts` would mean one `allowed_mime_types` list governing both
+ * a financial document and a voice note, and one bucket where "is this a
+ * receipt" is answered by which table happens to name the path — the exact
+ * coupling GAR-06′ says must not exist ("independent of a receipt's
+ * vendor/date/amount fields"). Widening `vehicle-photos` is worse: its objects
+ * are `<owner>/<vehicle>/<file>` and its delete trigger sweeps that prefix, so
+ * a record's media dropped in there would either be missed by the record-delete
+ * path or swept away by the vehicle one, depending on where it was filed.
+ *
+ * A bucket is also the only place a MIME restriction can be enforced by the
+ * platform rather than by page code, and SHR-01 is explicit that a check living
+ * in client or page code is not one of the three permitted enforcement modes.
+ *
+ * ## Named for its contents
+ *
+ * `record-media`, matching `RECORD_MEDIA_TABLE` — see that entry for why the
+ * generic `record-attachments` was rejected. The bucket id must be a valid
+ * Supabase bucket id, which is why it is hyphenated where the table is
+ * underscored; `vehicle-photos` / `vehicles.photo_paths` set that precedent.
+ *
+ * ## Private, and the open question is *still* open
+ *
+ * SHR-01 again: everything a user stores defaults to private, and a bucket that
+ * has ever been public cannot be un-published for objects already in it. How a
+ * *public* work-log page (SHR-02) renders an object out of a private bucket is
+ * the same unanswered sharing question `VEHICLE_PHOTOS_BUCKET` records above,
+ * and this entry does not answer it either. Video makes it slightly worse and
+ * not differently shaped: a signed URL for a fifty-megabyte video expires
+ * mid-playback exactly as one for a photo expires mid-render.
+ */
+export const RECORD_MEDIA_BUCKET = "record-media";
+
+/**
  * Every bucket that must never serve an object without a session.
  *
  * `vehicle-photos.test.ts` runs a `describe.each` sweep over this list —
@@ -348,6 +570,7 @@ export const VEHICLE_PHOTOS_BUCKET = "vehicle-photos";
 export const PRIVATE_BUCKETS = [
   RECEIPTS_BUCKET,
   VEHICLE_PHOTOS_BUCKET,
+  RECORD_MEDIA_BUCKET,
 ] as const;
 
 /* -------------------------------------------------------------------------
@@ -697,6 +920,52 @@ export function testVehiclePhotoPath(
   slot: string
 ): string {
   return `${ownerId}/${vehicleId}/${TEST_NAMESPACE}-PHOTO-${slot}.jpg`;
+}
+
+/**
+ * A record-media object path — **`<owner uuid>/<vehicle id>/<record id>/<file>`**.
+ *
+ * ## Why three id segments (T2-305a decision)
+ *
+ * The first segment is the owner, for the third time and for the same reason:
+ * `(storage.foldername(name))[1]` is what every storage policy in this project
+ * compares to `auth.uid()`, so keeping that position identical makes the
+ * `record-media` policies the receipts policies with one bucket id changed —
+ * a shape already proved against the whole cross-user matrix.
+ *
+ * The **third** segment is the load-bearing one, and it is here because of a
+ * gap this project already has and has already paid for. T2-302 recorded it in
+ * its own task notes:
+ *
+ * > **Found, not fixed — receipts have no delete-trigger belt.**
+ * > `on_vehicle_deleted` sweeps `vehicle-photos` by `<owner>/<vehicle>/`
+ * > prefix; receipt objects are `<owner>/<file>` (the contract's shape), so no
+ * > prefix identifies one vehicle's receipts and no trigger can find them
+ * > without reading the rows it is cascading away.
+ *
+ * That is a *path* defect, not a trigger defect: `<owner>/<file>` carries no
+ * information about which record or which vehicle an object belongs to, so the
+ * belt is unwritable however much anyone wants it. Putting the record id in
+ * the path makes "delete this record's media" a prefix match — which is what
+ * lets T2-305a grade the trigger's existence instead of recording the gap a
+ * third time and moving on. The vehicle segment is kept between them so the
+ * existing `<owner>/<vehicle>/` prefix sweep also reaches these objects, and
+ * so a per-vehicle operation never has to enumerate records.
+ *
+ * `extension` is the caller's, because a `.m4a` and a `.mp4` are different
+ * things to a human reading a bucket listing and identical to every policy.
+ */
+export function testRecordMediaPath(
+  ownerId: string,
+  vehicleId: string,
+  recordId: string,
+  slot: string,
+  extension: string
+): string {
+  return (
+    `${ownerId}/${vehicleId}/${recordId}/` +
+    `${TEST_NAMESPACE}-MEDIA-${slot}.${extension}`
+  );
 }
 
 /**
