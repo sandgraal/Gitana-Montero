@@ -426,14 +426,26 @@ function policyTable(statement: string): string {
   );
 }
 
+/**
+ * The roles a `create policy … to …` names.
+ *
+ * Accepts quoted identifiers and strips the quotes, for the reason
+ * `parseRoles` gives at length (T2-401, F1). The old character class excluded
+ * `"` outright, so `to "anon"` matched nothing and the policy was recorded with
+ * **no** roles — which `userTablePolicyIssues` then reports as "granted to
+ * public (no `to` clause)". That failed closed, so it was not a hole; but it
+ * was a finding whose message named the wrong defect, and a reviewer chasing a
+ * missing `to` clause that is right there in the file is a reviewer who
+ * concludes the grader is broken.
+ */
 function policyRoles(statement: string): string[] {
-  const clause = /\bto ([a-z0-9_, ]+?)(?= using| with check|$)/.exec(
+  const clause = /\bto ([a-z0-9_,"\s]+?)(?= using| with check|$)/.exec(
     statement
   )?.[1];
   return clause
     ? clause
         .split(",")
-        .map((role) => role.trim())
+        .map((role) => role.replace(/"/g, "").trim())
         .filter(Boolean)
     : [];
 }
@@ -1114,6 +1126,30 @@ function parsePrivileges(clause: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * The roles named in a `to …` / `from …` clause.
+ *
+ * ## Identifier quotes are stripped, and that is the whole point (T2-401, F1)
+ *
+ * `grant select on public.records to "anon";` is valid SQL and means exactly
+ * what the unquoted form means. Before this, the quotes survived into the
+ * parsed role name, so the recorded role was the literal string `"anon"`,
+ * which matches nothing in `ANONYMOUS_ROLES` — and **every rule built on the
+ * grant replay returned zero findings for it**. Verified by direct execution:
+ * the unquoted spelling flagged the leak, the quoted one reported clean.
+ *
+ * That is precisely the vulnerability shape T2-401a exists to catch, reachable
+ * by adding two characters. It silently defeated `tableGrantIssues`,
+ * `anonExecutableFunctions`, the closed allow-list, and T2-401's own
+ * `defaultPrivilegeGrantIssues`.
+ *
+ * Quotes are removed rather than honoured because the safe failure direction
+ * is **over-matching**: Postgres treats `"ANON"` and `anon` as different roles,
+ * so folding them together can only produce a spurious finding — five minutes
+ * of a reviewer's time — whereas keeping them apart produced a missed one,
+ * which is a live hole. Same reasoning, and the same `.replace(/"/g, "")`, as
+ * `qualify` already applies to object names.
+ */
 function parseRoles(clause: string): string[] {
   return splitTopLevelCommas(
     clause
@@ -1121,7 +1157,12 @@ function parseRoles(clause: string): string[] {
       .replace(/\s+with grant option$/, "")
       .replace(/\s+(?:cascade|restrict)$/, "")
   )
-    .map((role) => role.replace(/^(?:group|role)\s+/, "").trim())
+    .map((role) =>
+      role
+        .replace(/^(?:group|role)\s+/, "")
+        .replace(/"/g, "")
+        .trim()
+    )
     .filter(Boolean);
 }
 
@@ -1254,7 +1295,11 @@ export function grants(normalized: string): GrantState {
     const roles = parseRoles(grant[4]);
 
     const bulk =
-      /^all\s+(tables|sequences|functions|routines|procedures)\s+in\s+schema\s+([a-z0-9_, ]+)$/.exec(
+      // Quoted schema names accepted for the same reason quoted roles are
+      // (T2-401, F1): `grant … on all tables in schema "public" to anon` is
+      // valid SQL, and a character class that excluded `"` would have made the
+      // whole bulk grant invisible to the replay.
+      /^all\s+(tables|sequences|functions|routines|procedures)\s+in\s+schema\s+([a-z0-9_,"\s]+)$/.exec(
         target
       );
     if (bulk) {

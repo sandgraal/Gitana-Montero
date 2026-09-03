@@ -704,7 +704,7 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   body, not by any grader in this file — **T2-404's reviewer must verify it by
   reading.**
 
-- [ ] **T2-401 [TEST]** Sharing graders: private-by-default proofs at the URL
+- [x] **T2-401 [TEST]** Sharing graders: private-by-default proofs at the URL
   level, per-record cost masking on public work-logs, showcase toggle
   round-trip, **and the typed grants of SHR-05..09**. Depends: T2-401a, T2-302.
   *(SHR-01..09)*
@@ -789,6 +789,122 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   *accepted*. The rule could become over-strict and reject a legitimate return
   shape with no test noticing, which is the direction that gets a security rule
   deleted rather than fixed. One fixture closes it.
+  <br>**Landed 2026-09-02.** Six new grader files (`share-grants`,
+  `share-delivery`, `receipt-signer`, `handles`, `public-pages`, plus the two
+  behavioural ones below), six new rules in `rules.ts`, three seam modules under
+  `src/lib/garage/` (`visibility`, `handles`, `share-link`), and `shares` +
+  `profiles.handle` declared in `USER_TABLES` behind a new `pending` marker so
+  every existing `it.each` sweep partitions instead of going red without a
+  marker. 15 mutants over the new rules, all killed. **Two findings the task
+  did not anticipate:**
+  <br>*(b) is worse than recorded — the inherited defence does not exist.* The
+  review's note assumed RLS on `vehicles` would save a mis-joined policy.
+  Verified against the running database: it does **not**. A policy reading
+  `exists (select 1 from public.vehicles v where records.vehicle_id is not null
+  and v.owner_id = auth.uid())` passes `isOwnerScoped` intact **and lets owner B
+  read owner A's records** — because RLS filters the subquery to B's own
+  vehicles, so `exists` degenerates into "does B own anything". Closed at both
+  tiers: `subqueryCorrelationIssues` (Tier A, requires the join to use the
+  contract's declared ownership column) and `policy-join-semantics.test.ts`,
+  which asserts the leak on a replica of the shipped shape so the property stays
+  recorded rather than assumed.
+  <br>*A live-target hazard in the Tier B harness — **found, then closed**.*
+  The Supabase CLI gives every project the same default ports, so
+  `127.0.0.1:54321/54322` is whichever checkout started first — observed on this
+  machine, where an unrelated project held them. `assertLocalTarget` answers "is
+  this my machine", not "is this my project", and the PostgREST tier creates and
+  **deletes** accounts using a `service_role` JWT minted from the CLI's
+  *published default secret*, which a foreign local stack shares. Confirmed
+  live: that token was accepted by the other project's PostgREST (200) and
+  enumerated its tables. `detectLiveStack` now fingerprints the stack before any
+  grader provisions anything, and refuses with a named reason. Both directions
+  proved against real stacks — refuses the foreign one, runs against the
+  genuine one. The fingerprint is deliberately asymmetric (it refuses only on
+  positive evidence of a different schema, never on silence) because an
+  anon-role probe enumerates nothing against a correctly locked-down project,
+  and a guard that read silence as "wrong project" would have switched the whole
+  behavioural tier off invisibly.
+  <br>**Round-2 review fixes (2026-09-03).** An independent review confirmed
+  blind spot (b) three ways and found seven defects, all now closed:
+  <br>— **F1 (high).** `parseRoles` did not strip identifier quotes, so
+  `grant select on public.records to "anon";` — valid SQL, and the exact
+  vulnerability shape T2-401a exists to catch — was recorded as the role
+  `"anon"`, matched nothing, and produced **zero findings** from every rule
+  built on the grant replay, T2-401's own new ADP rule included. One-line root
+  fix; six probes, one per call site that names a role.
+  <br>— **F2 (high).** `capabilityGateIssues`' third clause — the only detector
+  for SHR-06's "receipts gated behind costs" collapse, the cell these files call
+  the one that matters most — had no probe at all and could not fail. Reject and
+  accept fixtures added, plus its real limit stated and pinned.
+  <br>— **F3.** Three incompatible `revoke_share_grant` signatures across the
+  branch; PostgREST resolves overloads by argument name, so the central SHR-08
+  proof was revoking nothing and would have compared a live grant against two
+  refusals. Argument lists are now contract (`SHARE_CREATE_ARGUMENTS`,
+  `SHARE_REVOKE_ARGUMENTS`) and one module builds every payload. **Revocation is
+  pinned per-grant, not per-vehicle** — SHR-08 says "every grant … by its
+  issuer", and revoke-all is a different operation the spec does not ask for.
+  <br>— **F4.** SHR-07's Tier B write proof called an RPC named `records`, which
+  cannot exist, so it was unfalsifiable. It hits the table now, and asserts the
+  row is unchanged as well as the response refused.
+  <br>— **F5.** Three signer success cells never uploaded the object they asked
+  to sign.
+  <br>— **F6.** Tier B flakiness **was** partly this branch's: the server's own
+  report named the cycle — this tier's DDL against `auth.users` versus GoTrue
+  inserting an identity. Deadlock is transient by definition, so the transaction
+  wrapper retries it. Measured: 2 red in 5 before, **9 green in 10** after.
+  Residual, and explicitly *not* claimed fixed: about 1 run in 10 still fails in
+  pre-existing suites under full parallel load (RLS rejections during
+  provisioning, GoTrue's side of the same contention). That belongs to whoever
+  promotes `tier-b` from informational to required.
+  <br>— **F7.** A positive control did not reach the clause it controlled;
+  `canonicalizeAuthUid` normalised the fixture before the escape ran. Replaced
+  with a row-self comparison beside a genuine subquery, plus its negative pair.
+  <br>— **F9/F10.** Two comments over-claimed: the reserved list is
+  cross-checked against `src/i18n/routes.ts`, not computed from `src/pages/`
+  (which holds only dynamic segments), and handle uniqueness is proved
+  sequentially — enough to show the constraint is in the schema, not a
+  concurrency proof. Both corrected in place rather than quietly dropped.
+  <br>— **F11 (process, for T901/T902).** Every commit on this branch carries
+  the same git author as T2-201 and T2-401a, so separation-by-authorship is not
+  traceable through `git log` alone; the `X-Agent-Role` trailer is the only
+  in-repo signal.
+  <br>*Corrected claim:* the first round said "15 mutants, all killed". True of
+  the 15 written, but the battery did not cover every clause separately as
+  GRADER-PRINCIPLES requires — F2 and F7 are the proof.
+  <br>**Round-3 review fixes (2026-09-03).** A second independent review
+  reproduced every round-2 fix, including running the F8 guard live against the
+  foreign stack in both directions, and found three more — all of the same
+  shape: *the guard can be deleted and the tests stay green*.
+  <br>— **M1. F8's detection logic was graded; its WIRING was not.** Two mutants
+  survived: deleting the refusal branch, and probing as `anon` instead of
+  `service_role`. The second is the nastier one — an anon probe enumerates
+  nothing against a correctly locked-down project, so one word silently
+  disables the entire wrong-project guard. `detectLiveStack` is now split into
+  a pure `liveDecisionFrom` plus an injectable observer, so the refusal path and
+  the probe role are both assertable without a stack. Five wiring mutants,
+  including the reviewer's two verbatim, all killed.
+  <br>— **M2. SHR-06's "cell that matters most" could pass while broken, and my
+  documented limit was wrong.** Round 2 guarded the collapse clause with
+  `!mentionsCosts` and called a both-kinds reader "off-architecture, therefore
+  somebody else's problem". The reviewer disproved it with a reader using the
+  contract's own approved name and one extra column: zero findings from all
+  seven Tier A rules, because the closed allow-list checks the function *name*.
+  It is a rule now, and a total one: one query has one predicate for one result
+  set, so no gating of that shape can serve a `costs=false receipts=true` grant.
+  Tier B was equally weak — a broken reader returning `200 []` satisfied
+  `ok === true` — so the open cells assert rows came back.
+  <br>— **M3. A "row unchanged" assertion was vacuously passable.** A failed
+  read-back left `rows[0]` undefined and `undefined).not.toBe(999_999)` passes.
+  The identical unknown-coalesced-to-zero mistake AGENTS.md names, in a file
+  whose own `refusalShape` uses a `-1` sentinel to avoid it.
+  <br>— **F-D/F-E (recorded, and fixed anyway).** A probe row reached its clause
+  only through a neighbouring pattern, and the revocation deny-list had one
+  probe for seven entries. F-F..F-K were documentation-only.
+  <br>*Final battery:* **45 mutants, one per clause plus the wiring, all
+  killed.* Tier B could not be re-soaked in round 3 (Docker down on the
+  machine); the changed Tier B lines sit inside `it.fails` markers that cannot
+  execute until T2-404 activates them, and the Tier A/pure paths are covered by
+  the battery.
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*

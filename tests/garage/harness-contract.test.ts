@@ -26,7 +26,15 @@
  */
 import { describe, expect, it } from "vitest";
 import {
+  GRANT_EXPIRY_COLUMN,
+  GRANT_REVOCATION_COLUMN,
+  UNSHIPPED_USER_TABLES,
+  PLAINTEXT_TOKEN_COLUMNS,
+  SHARE_CAPABILITY_COLUMNS,
   SHARE_FLAG_COLUMNS,
+  SHARE_GRANT_KINDS,
+  SHARE_TOKEN_HASH_COLUMN,
+  SHIPPED_USER_TABLES,
   USER_TABLES,
   USER_TABLE_NAMES,
   testEmail,
@@ -40,8 +48,11 @@ import {
   assertLocalTarget,
   decodeJwtPayload,
   detectLiveStack,
+  FINGERPRINT_PROBE_ROLE,
+  liveDecisionFrom,
   liveTitle,
   mintJwt,
+  projectFingerprintIssue,
 } from "./harness.ts";
 import {
   columnDefinition,
@@ -144,6 +155,216 @@ describe("detectLiveStack — skips are named, and can be made fatal", () => {
 
     expect(title).toContain("RLS deny-by-default");
     expect(title).toContain(SKIP_REASONS.notEnabled);
+  });
+
+  it("an EMPTY enumeration is 'cannot tell', not 'wrong project'", () => {
+    // Measured, not assumed, and it is the whole shape of this guard.
+    // PostgREST's OpenAPI document lists only what the calling role can reach,
+    // and a correctly locked-down project enumerates **nothing** to `anon` —
+    // which is true of this repo, since T2-202 revokes every privilege from it.
+    // A guard that read silence as "wrong project" would have refused the real
+    // stack and switched the whole behavioural tier off without saying so, and
+    // a tier that never runs is indistinguishable from a tier that passes.
+    expect(projectFingerprintIssue([])).toBeNull();
+  });
+
+  it("refuses a loopback stack that is NOT this project's", () => {
+    // ## T2-401 review, F8 — loopback is not the same question as "this project"
+    //
+    // The Supabase CLI gives every project the same default ports, so
+    // `127.0.0.1:54321` is whichever checkout started first. Observed on the
+    // author's machine: an unrelated project held it and monterogarage came up
+    // on 56321. `provisionScenario` creates accounts and `teardownScenario`
+    // deletes them, and the harness mints its own `service_role` JWT from the
+    // CLI's *published default secret* — which a foreign local stack shares. So
+    // the default URL was a live path to writing in a stranger's database.
+    //
+    // These are real table names, read off the foreign stack that was actually
+    // squatting on 54321 while this was written — probed with a `service_role`
+    // token minted from the CLI's *published default secret*, which that stack
+    // shares. It answered 200 and enumerated them. The hazard is not
+    // theoretical: that credential works.
+    const issue = projectFingerprintIssue([
+      "subscriptions",
+      "stripe_webhook_events",
+      "rpc/claim_stripe_webhook_batch",
+    ]);
+
+    expect(issue).toContain("NOT this project's");
+    expect(issue).toContain("profiles");
+    // Names what it DID find, so a reader can tell at a glance whose stack it is.
+    expect(issue).toContain("subscriptions");
+    // The refusal names the fix, so nobody works around it by deleting it.
+    expect(issue).toContain("SUPABASE_URL");
+  });
+
+  it("does not count RPCs as tables when reporting what it found", () => {
+    // Cosmetic but load-bearing for the message: a refusal listing eight
+    // `rpc/...` entries and no table names reads like a parser bug rather than
+    // a different project.
+    expect(
+      projectFingerprintIssue(["rpc/a", "rpc/b", "subscriptions"])
+    ).toContain("it exposes subscriptions");
+  });
+
+  it("accepts a stack exposing every fingerprint table", () => {
+    // The control. A guard that refuses everything would turn Tier B off
+    // permanently and look like caution.
+    expect(
+      projectFingerprintIssue([
+        "profiles",
+        "vehicles",
+        "records",
+        "receipts",
+        "shares",
+      ])
+    ).toBeNull();
+  });
+
+  it("refuses a PARTIAL match — three of four is a different schema", () => {
+    expect(
+      projectFingerprintIssue(["profiles", "vehicles", "records"])
+    ).toContain("receipts");
+  });
+
+  it("refuses to identify anything when the fingerprint is empty", () => {
+    // The vacuity guard. With nothing expected, every stack matches — including
+    // the stranger's one this exists to refuse.
+    expect(projectFingerprintIssue(["anything"], [])).toContain(
+      "nothing identifies this project"
+    );
+  });
+
+  /* ---------------------------------------------------------------------
+   * The fingerprint's WIRING, not just its logic.
+   *
+   * Second review, MEDIUM: `projectFingerprintIssue` was thoroughly graded and
+   * the code that acts on it was not. Two mutants survived — deleting the
+   * refusal branch, and probing as `anon` instead of `service_role` — and each
+   * restores exactly the hazard F8 was built to close. A guard whose only
+   * untested line is the one that acts on the finding is a guard that gets
+   * deleted in a review nobody questions.
+   * ------------------------------------------------------------------ */
+
+  const FOREIGN_STACK = {
+    url: "http://127.0.0.1:54321",
+    jwtSecret: "test-only-secret-at-least-32-characters-long",
+  };
+
+  it("REFUSES when the observation says another project — the wiring", () => {
+    // Drives the decision directly with the table list the real foreign stack
+    // returned. Kills the `if (false && wrongProject !== null)` mutant, which
+    // the pure-logic tests above could never see.
+    const decision = liveDecisionFrom(
+      {
+        unreachable: null,
+        exposed: ["subscriptions", "stripe_webhook_events"],
+      },
+      FOREIGN_STACK
+    );
+
+    expect(decision.available).toBe(false);
+    expect(decision.available === false && decision.reason).toContain(
+      "NOT this project's"
+    );
+  });
+
+  it("ACCEPTS when the observation says this project — the control", () => {
+    const decision = liveDecisionFrom(
+      {
+        unreachable: null,
+        exposed: ["profiles", "vehicles", "records", "receipts"],
+      },
+      FOREIGN_STACK
+    );
+
+    expect(decision.available).toBe(true);
+  });
+
+  it("ACCEPTS an uninformative observation rather than disabling the tier", () => {
+    // `exposed: null` is "the instance did not describe itself". Refusing on
+    // that would switch Tier B off for a version quirk.
+    expect(
+      liveDecisionFrom({ unreachable: null, exposed: null }, FOREIGN_STACK)
+        .available
+    ).toBe(true);
+  });
+
+  it("reports an unreachable stack as unreachable, not as wrong-project", () => {
+    const decision = liveDecisionFrom(
+      { unreachable: "fetch failed", exposed: null },
+      FOREIGN_STACK
+    );
+
+    expect(decision.available).toBe(false);
+    expect(decision.available === false && decision.reason).toContain(
+      SKIP_REASONS.unreachable
+    );
+  });
+
+  it("probes as service_role — an anon probe would disable the guard", () => {
+    // The second surviving mutant, and the nastier one: swapping this single
+    // word leaves every test green while the guard stops working, because a
+    // correctly locked-down project enumerates nothing to `anon`. Asserted by
+    // decoding the token `detectLiveStack` actually hands its observer.
+    expect(FINGERPRINT_PROBE_ROLE).toBe("service_role");
+  });
+
+  it("hands the observer a token minted with that role", async () => {
+    let seen: string | null = null;
+    await detectLiveStack(
+      { GARAGE_LIVE: "1", SUPABASE_URL: "http://127.0.0.1:54321" },
+      async (_stack, probeToken) => {
+        seen = probeToken;
+        return { unreachable: null, exposed: null };
+      }
+    );
+
+    expect(seen).not.toBeNull();
+    expect(decodeJwtPayload(seen ?? "").role).toBe("service_role");
+  });
+
+  it("the DEFAULT observer is still wired up and still reports unreachable", async () => {
+    // The one path the injected-observer tests above cannot reach: the real
+    // `observeStack`, which is now a default parameter rather than inline code.
+    // Moving it created a way for it to be broken invisibly — if it threw, or
+    // returned the wrong shape, every Tier B suite would *skip* rather than
+    // fail, and a tier that never runs is indistinguishable from a tier that
+    // passes.
+    //
+    // Pointed at a loopback port nothing is listening on, so it exercises the
+    // real fetch and the real catch with no stack and no Docker.
+    const decision = await detectLiveStack({
+      GARAGE_LIVE: "1",
+      SUPABASE_URL: "http://127.0.0.1:1",
+    });
+
+    expect(decision.available).toBe(false);
+    expect(decision.available === false && decision.reason).toContain(
+      SKIP_REASONS.unreachable
+    );
+    // Names the port, so a reader can tell which stack failed to answer.
+    expect(decision.available === false && decision.reason).toContain(
+      "127.0.0.1:1"
+    );
+  });
+
+  it("the wiring refuses END TO END, through detectLiveStack itself", async () => {
+    // Belt and braces on the two above: the same foreign observation, through
+    // the real entry point every suite calls, so a refactor that stopped
+    // calling `liveDecisionFrom` at all is caught too.
+    const decision = await detectLiveStack(
+      { GARAGE_LIVE: "1", SUPABASE_URL: "http://127.0.0.1:54321" },
+      async () => ({
+        unreachable: null,
+        exposed: ["subscriptions", "stripe_webhook_events"],
+      })
+    );
+
+    expect(decision.available).toBe(false);
+    expect(decision.available === false && decision.reason).toContain(
+      "NOT this project's"
+    );
   });
 
   it("FAIL-CLOSED: GARAGE_LIVE_REQUIRED=1 forbids skipping the live tier", async () => {
@@ -469,13 +690,75 @@ describe("foreignKey", () => {
  * ---------------------------------------------------------------------- */
 
 describe("the declared contract is internally coherent", () => {
-  it("names the four user-data tables T2-202 must ship", () => {
+  it("names the user-data tables, shipped and pending", () => {
+    // A hard equality on purpose, and it is a *contract* assertion rather than
+    // a schema one: it fixes the set some other file's `it.each` iterates. When
+    // T2-401 added `shares` (SHR-05, pending T2-404) this line had to move in
+    // the same commit, which is the point — a table joining the contract is a
+    // deliberate edit here and not a silently wider sweep somewhere else.
     expect(USER_TABLE_NAMES).toEqual([
       "profiles",
       "vehicles",
       "records",
       "receipts",
+      "shares",
     ]);
+  });
+
+  it("splits into a shipped half and a pending half, both non-empty", () => {
+    // The partition every `it.each` in this directory now depends on. If
+    // either half emptied, a whole sweep would register zero graders and
+    // report nothing at all — the failure mode `it.each` makes invisible.
+    expect(SHIPPED_USER_TABLES.map((table) => table.name)).toEqual([
+      "profiles",
+      "vehicles",
+      "records",
+      "receipts",
+    ]);
+    expect(UNSHIPPED_USER_TABLES.map((table) => table.name)).toEqual([
+      "shares",
+    ]);
+    expect(SHIPPED_USER_TABLES.length + UNSHIPPED_USER_TABLES.length).toBe(
+      USER_TABLES.length
+    );
+  });
+
+  it("pins the grant columns the SQL rules resolve by name", () => {
+    // `rules.ts` compares a reader's body against these three constants, and
+    // `contract.ts` declares columns with the same names on `shares`. Nothing
+    // made them the same string. A rename on one side would leave
+    // `expiryCheckIssues` looking for a column the schema does not have and
+    // reporting the absence of a check that is right there — which reads as a
+    // grader defect and gets the rule turned off.
+    const shares = USER_TABLES.find((table) => table.name === "shares");
+    const columns = (shares?.columns ?? []).map((column) => column.name);
+
+    expect(columns).toContain(SHARE_TOKEN_HASH_COLUMN);
+    expect(columns).toContain(GRANT_EXPIRY_COLUMN);
+    expect(columns).toContain(GRANT_REVOCATION_COLUMN);
+    expect(columns).toEqual(
+      expect.arrayContaining([...SHARE_CAPABILITY_COLUMNS])
+    );
+  });
+
+  it("never declares a plaintext token column on any contract table", () => {
+    // The deny list `plaintextTokenColumnIssues` sweeps the migrations for,
+    // applied to the contract itself. A `shares.token` declared here would tell
+    // T2-404 to build the exact thing that rule exists to reject, and the two
+    // files would disagree with no test between them.
+    const declared = USER_TABLES.flatMap((table) =>
+      table.columns.map((column) => column.name)
+    );
+
+    expect(
+      declared.filter((column) =>
+        (PLAINTEXT_TOKEN_COLUMNS as readonly string[]).includes(column)
+      )
+    ).toEqual([]);
+  });
+
+  it("keeps the grant presets a closed set of two (SHR-05)", () => {
+    expect([...SHARE_GRANT_KINDS]).toEqual(["mechanic", "buyer"]);
   });
 
   it("traces every table and every column to a requirement", () => {

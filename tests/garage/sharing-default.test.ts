@@ -32,11 +32,13 @@
  */
 import { describe, expect, it } from "vitest";
 import {
+  OPTIMISTIC_BOOLEAN_DEFAULTS,
   SHARE_FLAG_COLUMNS,
   TEST_TAXONOMY_IDENTITY,
   testReceiptPath,
   testVehicleName,
 } from "./contract.ts";
+import { optimisticBooleanDefaultIssues } from "./rules.ts";
 import {
   createOwnedFixture,
   detectLiveStack,
@@ -56,9 +58,19 @@ import {
 
 const live = await detectLiveStack();
 
-const FLAGS = SHARE_FLAG_COLUMNS.map(
-  (flag) => [flag.table, flag.column, flag.requirement] as const
-);
+const flagsOf = (pending: boolean) =>
+  SHARE_FLAG_COLUMNS.filter(
+    (flag) => (flag.pending !== undefined) === pending
+  ).map((flag) => [flag.table, flag.column, flag.requirement] as const);
+
+/** The flags on tables that exist. */
+const FLAGS = flagsOf(false);
+
+/**
+ * The flags a named task still has to ship — SHR-06's two capability columns
+ * on `shares` (T2-404). Marked, not dropped: see `ColumnContract.pending`.
+ */
+const PENDING_FLAGS = flagsOf(true);
 
 /* =========================================================================
  * Tier A — declaration
@@ -95,18 +107,77 @@ describe("every visibility flag is declared private-by-default", () => {
     }
   );
 
-  it("declares no visibility flag defaulting to true, anywhere", () => {
-    // The negative sweep: catches a *fifth* flag added later that this file's
-    // table does not know about. A grader that only iterates a known list can
-    // never see the column nobody told it about.
-    const sql = migrationSql();
-    const optimistic = [
-      ...sql.matchAll(
-        /(is_[a-z_]*(public|shared|visible)[a-z_]*)[^,)]*default true/g
-      ),
-    ].map((match) => match[1]);
+  it.fails.each(PENDING_FLAGS)("%s.%s exists (%s)", (table, column) => {
+    const body = createTableBody(migrationSql(), table);
 
-    expect(optimistic).toEqual([]);
+    expect(columnDefinition(body ?? "", column)).not.toBeNull();
+  });
+
+  it.fails.each(PENDING_FLAGS)("%s.%s is boolean (%s)", (table, column) => {
+    const body = createTableBody(migrationSql(), table);
+
+    expect(columnDefinition(body ?? "", column)?.definition ?? "").toMatch(
+      /\bbool/
+    );
+  });
+
+  it.fails.each(PENDING_FLAGS)("%s.%s is not null (%s)", (table, column) => {
+    expect(isNotNullFor(migrationSql(), table, column)).toBe(true);
+  });
+
+  it.fails.each(PENDING_FLAGS)(
+    "%s.%s DEFAULTS TO FALSE — the whole of SHR-01 (%s)",
+    (table, column) => {
+      const body = createTableBody(migrationSql(), table);
+      const definition = columnDefinition(body ?? "", column);
+
+      expect(defaultExpression(definition?.definition ?? "")).toBe("false");
+    }
+  );
+
+  it("BOTH flag partitions are non-empty — neither sweep is vacuous", () => {
+    // `it.each([])` registers nothing and reports nothing. Without this, a bug
+    // that put every flag on one side would delete half the file in silence.
+    expect(FLAGS.length).toBeGreaterThanOrEqual(4);
+    expect(PENDING_FLAGS.length).toBeGreaterThan(0);
+  });
+
+  it("declares NO boolean defaulting to true, anywhere, whatever it is called", () => {
+    // ## Rewritten by T2-401. The previous version was name-shaped.
+    //
+    // It swept for
+    //   /(is_[a-z_]*(public|shared|visible)[a-z_]*)[^,)]*default true/
+    // which needs an `is_` prefix AND one of three words AND the default, all
+    // three. That is not a sweep for optimistic defaults; it is a sweep for one
+    // *naming convention* of optimistic default — and it existed to catch "a
+    // fifth flag this file does not know about", which is by construction the
+    // flag that does not follow the convention. Verified: both
+    //
+    //   includes_costs boolean not null default true
+    //   is_active      boolean not null default true
+    //
+    // walked straight past it. The first is not a hypothetical — it is a
+    // capability column on `shares`, and defaulting it true opens every
+    // grant's costs to every holder, which is SHR-06's exact prohibition.
+    //
+    // Inverted: every boolean that defaults to true is a finding unless it is
+    // named in `OPTIMISTIC_BOOLEAN_DEFAULTS` with a reason. A rule that does
+    // not read the column name cannot be dodged by choosing one.
+    expect(
+      optimisticBooleanDefaultIssues(
+        migrationSql(),
+        OPTIMISTIC_BOOLEAN_DEFAULTS
+      )
+    ).toEqual([]);
+  });
+
+  it("the exemption map is EMPTY — a default-open column is a deliberate diff", () => {
+    // Same reasoning as `EXEMPT_PUBLIC_TABLES`' size assertion in
+    // `share-instrument.test.ts` (round-2 F4): iterating an empty map asserting
+    // each entry has a reason is a test that cannot fail. Asserting the size
+    // can, and it puts the exemption and this file's blessing of it in one
+    // diff.
+    expect(OPTIMISTIC_BOOLEAN_DEFAULTS.size).toBe(0);
   });
 });
 
