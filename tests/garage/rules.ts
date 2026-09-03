@@ -70,6 +70,7 @@ import {
   EXEMPT_PUBLIC_TABLES,
   GRANT_EXPIRY_COLUMN,
   GRANT_REVOCATION_COLUMN,
+  PENDING_USER_TABLES,
   PLAINTEXT_TOKEN_COLUMNS,
   SHARE_TOKEN_HASH_COLUMN,
   USER_TABLES,
@@ -473,12 +474,24 @@ function policyIssues(
   return issues;
 }
 
-/** The declared columns of a contract table, for correlation checking. */
+/**
+ * The declared columns of a contract table, for correlation checking.
+ *
+ * `PENDING_USER_TABLES` is searched alongside `USER_TABLES` (T2-305a). A table
+ * that is declared but not yet created is exactly the case where a grader is
+ * asked to judge a policy that does not exist yet, and `isCorrelated` fails
+ * **closed** when it has no columns to test the unqualified back-reference
+ * against — so leaving a pending table out would reject the correct,
+ * idiomatic `… where record_id = id` spelling with no route to green but
+ * renaming. Adding pending tables cannot change any existing verdict: no name
+ * in `PENDING_USER_TABLES` is in `USER_TABLES`, and the only effect is more
+ * candidate names for a table nothing currently references.
+ */
 function columnsOf(table: string): readonly string[] {
   return (
-    USER_TABLES.find((entry) => entry.name === table)?.columns.map(
-      (column) => column.name
-    ) ?? []
+    [...USER_TABLES, ...PENDING_USER_TABLES]
+      .find((entry) => entry.name === table)
+      ?.columns.map((column) => column.name) ?? []
   );
 }
 

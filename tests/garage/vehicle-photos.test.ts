@@ -801,12 +801,33 @@ describe("the photo fixtures are coherent", () => {
     expect(deletionReachesBucket(shipped, VEHICLE_PHOTOS_BUCKET)).toBe(false);
   });
 
-  it("reads a two-bucket deletion as reaching both", () => {
-    const both =
-      "delete from storage.objects o where o.bucket_id in ('receipts', 'vehicle-photos')";
+  it("reads a multi-bucket deletion as reaching every bucket it names", () => {
+    // The bucket list is **built from the manifest** rather than spelled out.
+    // It used to be the literal `in ('receipts', 'vehicle-photos')`, which
+    // meant adding a third bucket to `PRIVATE_BUCKETS` turned this control red
+    // for a reason that had nothing to do with the rule it grades — the
+    // fixture had simply gone stale (found while adding `record-media`,
+    // T2-305a). Generated, it cannot go stale again.
+    const named = PRIVATE_BUCKETS.map((bucket) => `'${bucket}'`).join(", ");
+    const every = `delete from storage.objects o where o.bucket_id in (${named})`;
 
     for (const bucket of PRIVATE_BUCKETS) {
-      expect(deletionReachesBucket(both, bucket), bucket).toBe(true);
+      expect(deletionReachesBucket(every, bucket), bucket).toBe(true);
+    }
+  });
+
+  it("still reads a deletion that names only SOME buckets as missing the rest", () => {
+    // The other half, so the generated fixture above cannot decay into a rule
+    // that says yes to everything. Two buckets named, the third not.
+    const partial =
+      "delete from storage.objects o where o.bucket_id in ('receipts', 'vehicle-photos')";
+    const unnamed = PRIVATE_BUCKETS.filter(
+      (bucket) => !partial.includes(`'${bucket}'`)
+    );
+
+    expect(unnamed.length, "the manifest has grown past this fixture").toBe(1);
+    for (const bucket of unnamed) {
+      expect(deletionReachesBucket(partial, bucket), bucket).toBe(false);
     }
   });
 });
