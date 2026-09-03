@@ -103,6 +103,10 @@ const UNCONDITIONAL_PAGES = [
   { locale: "es", path: "/es/problemas/" },
   { locale: "en", path: "/en/parts/" },
   { locale: "es", path: "/es/repuestos/" },
+  // T601 — the mods index carries a `[hidden]` element (`data-mods-none`) and
+  // lays its toolbar out with `display: flex`, exactly like the parts index.
+  { locale: "en", path: "/en/mods/" },
+  { locale: "es", path: "/es/modificaciones/" },
 ] as const;
 
 /**

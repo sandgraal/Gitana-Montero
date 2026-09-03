@@ -119,6 +119,33 @@ export const COLLECTION_ROUTE_SEGMENTS = {
    * a list.
    */
   parts: { en: "parts", es: "repuestos" },
+  /**
+   * T601 — modifications and their tradeoffs (MOD-01, MOD-02).
+   *
+   * **EN is `mods`, ES is `modificaciones`,** and the asymmetry in length is
+   * the point rather than a compromise: I18N-01 asks that each locale get the
+   * word its own readers use, not that the two words be the same shape.
+   * English-speaking Montero owners say "mods"; nobody writes `/es/mods/`.
+   *
+   * The ES word was chosen over the two near neighbours the glossary already
+   * rules on, and neither is a GLO-02 alias question — `modificación` appears
+   * in no entry's `aliases`, so nothing is being pulled out of the search
+   * index and into a URL:
+   *
+   * 1. **`preparación`** (`all-general-preparacion`) is the canonical Costa
+   *    Rican term for a *build* — the whole project, "preparación de vehículos
+   *    4x4", as the shops advertise it. It names the programme; this
+   *    collection holds its individual items. `/es/preparacion/` would be a
+   *    section named after the sum of its contents.
+   * 2. **`levante`** (`all-suspension-levante-de-suspension`) is one mod, not
+   *    the category.
+   *
+   * `modificaciones` is also the word the jurisdictional surface uses — a
+   * Costa Rican owner meets it at the RTV, where "modificaciones al vehículo"
+   * is what gets inspected — so it is the word a reader arrives already
+   * holding.
+   */
+  mods: { en: "mods", es: "modificaciones" },
 } as const satisfies Readonly<Record<string, Readonly<Record<Locale, string>>>>;
 
 export type CollectionRouteId = keyof typeof COLLECTION_ROUTE_SEGMENTS;
@@ -145,7 +172,23 @@ if (registryIssues.length > 0) {
   );
 }
 
-/** The locale-independent route for a collection's page in `locale`. */
+/**
+ * A collection page's route **in `locale`, without the locale prefix**:
+ * `/glossary/` for `en`, `/glosario/` for `es`.
+ *
+ * The word to avoid here is "locale-independent" — the returned path is very
+ * much locale-*specific* (that is the point of a translated segment, I18N-01).
+ * What it omits is the `/en` / `/es` prefix and the deploy base, which
+ * `localeHref` adds at the moment a link is rendered. Everything in this
+ * module returns paths in that shape, because `BaseLayout` needs all of a
+ * page's locale paths side by side to emit the hreflang pairs, and prefixing
+ * them earlier would leave nothing to compare (T601 review, PR #94).
+ *
+ * `splitLocalePath` in `src/i18n/routing.ts` does call its second return value
+ * the "locale-independent route", and that is a different, correct use of the
+ * phrase: there it means "what is left after the locale prefix is stripped".
+ * The value is the same shape; only the emphasis differs.
+ */
 export function collectionRoutePath(
   collection: CollectionRouteId,
   locale: Locale
