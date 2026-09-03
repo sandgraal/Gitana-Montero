@@ -1,16 +1,36 @@
 ---
 /**
- * The problems index (PRB-01…PRB-05) — the way into the problem finder.
+ * The problems index (PRB-01…PRB-06) — the way into the problem finder.
  *
- * ## Scope: this is the listing, not the navigation
+ * ## Scope: the listing, plus T402's symptom-first navigation
  *
- * T402 owns symptom-first navigation (PRB-02) — the searchable bilingual
- * symptom index. This page is what that search lands on and what a reader
- * browsing the section sees: every problem, worst triage first, filtered
- * through the vehicle selector. It ships with T401 rather than with T402
- * because the selector obligation the task carries — dim-not-hide plus a
- * prominent provisional indicator — is a *listing* behaviour, and because a
- * detail page whose breadcrumb pointed at a 404 would be a broken template.
+ * This page is every problem, worst triage first, filtered through the
+ * vehicle selector — that part shipped with T401 because the selector
+ * obligation it carries (dim-not-hide plus a prominent provisional
+ * indicator) is a *listing* behaviour, and because a detail page whose
+ * breadcrumb pointed at a 404 would be a broken template.
+ *
+ * T402 adds the two ways PRB-02 promises a reader can arrive at "matching
+ * problems" — pick or search a symptom phrase — as a client-side layer on
+ * top of that same listing, the same relationship the glossary's search box
+ * and system pills have to its term list (`[glossarySegment].astro`):
+ *
+ * - **Search** (`data-problems-search`): free text matched, substring and
+ *   accent/case-insensitive, against each card's title, summary, symptom
+ *   bullets and chip text — `src/lib/problems-filter.ts`'s `buildHaystack`.
+ * - **Symptom index** (`data-symptom` pills): one pill per *distinct*
+ *   symptom phrase across every listed problem, built server-side by
+ *   `buildSymptomIndex` from the same `problems` array below (deduped by
+ *   normalized text — see that function's docs for why there is no shared
+ *   symptom taxonomy to dedupe by id instead). Picking a pill is an exact
+ *   match against a card's own symptom set, not a substring search.
+ *
+ * The two facets AND together and both default to permissive, so the
+ * enhancement reproduces the server-rendered listing on load — same
+ * contract as every other filtered listing on this site. Progressive
+ * enhancement follows the community/glossary pattern exactly: the toolbar
+ * is laid out only once `BaseLayout` marks the document `html.js`, so a
+ * visitor with no JavaScript sees the full listing and no dead control.
  *
  * ## Ordering is triage, not the alphabet
  *
@@ -32,8 +52,8 @@
  * Nothing here interprets a fitment: `matchesVehicle` and
  * `provisionalMatchFacets` do, through `src/lib/vehicle-listing.ts` (FIT-01).
  *
- * refs specs/001-foundation (PRB-01, PRB-05, FIT-03, I18N-01, I18N-04, I18N-08),
- * specs/001-foundation/design/HANDOFF-DESIGN.md
+ * refs specs/001-foundation (PRB-01, PRB-02, PRB-05, FIT-03, I18N-01, I18N-04,
+ * I18N-08), specs/001-foundation/design/HANDOFF-DESIGN.md
  */
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -56,6 +76,7 @@ import {
   t,
 } from "../../i18n/ui";
 import { formatCount } from "../../lib/glossary-filter";
+import { buildSymptomIndex } from "../../lib/problems-filter";
 import { isSafetyCritical } from "../../lib/safety";
 import { buildFitmentTable } from "../../lib/vehicle-listing";
 import { compareProblems, problemRoutePath } from "../../lib/problems";
@@ -102,6 +123,17 @@ const problems = entries
 const fitmentTable = buildFitmentTable(
   problems.map((problem) => problem.fitment)
 );
+
+/**
+ * PRB-02's "picks" half — one pill per distinct symptom phrase across
+ * `problems`, page locale, deduped and sorted by the reader's own collation.
+ * See `buildSymptomIndex`'s docs for why this is a best-effort merge of
+ * independently-authored text, not a canonical vocabulary.
+ */
+const symptomIndex = buildSymptomIndex(
+  problems.map((problem) => ({ symptoms: problem.symptoms })),
+  collator
+);
 ---
 
 <BaseLayout
@@ -121,7 +153,63 @@ const fitmentTable = buildFitmentTable(
         <p class="problems__empty">{strings.problemsEmpty}</p>
       ) : (
         <>
-          <p class="problems__count" aria-live="polite">
+          <div class="problems__toolbar" data-problems-toolbar>
+            <div class="problems__search">
+              <label class="visually-hidden" for="problems-search">
+                {strings.problemsSearchLabel}
+              </label>
+              <svg
+                class="problems__search-icon"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <input
+                id="problems-search"
+                type="search"
+                autocomplete="off"
+                data-problems-search
+                placeholder={strings.problemsSearchPlaceholder}
+              />
+            </div>
+            {symptomIndex.length > 0 && (
+              <div
+                class="problems__symptoms"
+                role="group"
+                aria-label={strings.problemsSymptomIndexLabel}
+              >
+                <button type="button" data-symptom="" aria-pressed="true">
+                  {strings.problemsSymptomIndexAll}
+                </button>
+                {symptomIndex.map((entry) => (
+                  <button
+                    type="button"
+                    data-symptom={entry.normalized}
+                    aria-pressed="false"
+                  >
+                    {entry.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <p
+            class="problems__count"
+            data-problems-count
+            data-count-template={strings.problemsCountTemplate}
+            data-total={String(problems.length)}
+            aria-live="polite"
+          >
             {formatCount(
               strings.problemsCountTemplate,
               problems.length,
@@ -181,6 +269,10 @@ const fitmentTable = buildFitmentTable(
               </li>
             ))}
           </ul>
+
+          <p class="problems__none" data-problems-none hidden>
+            {strings.problemsNoResults}
+          </p>
         </>
       )
     }
@@ -188,33 +280,145 @@ const fitmentTable = buildFitmentTable(
 </BaseLayout>
 
 <script>
+  import { formatCount } from "../../lib/glossary-filter";
+  import {
+    buildHaystack,
+    matchesFilter,
+    normalizedSymptoms,
+    type ProblemFilterState,
+  } from "../../lib/problems-filter";
   import { buildTaxonomy } from "../../lib/fitment";
   import { readSelectorPayload } from "../../lib/vehicle-taxonomy";
   import { createVehicleListingView } from "../../lib/vehicle-listing";
   import {
     onVehicleSelectionChange,
     readVehicleSelection,
+    type StoredVehicleSelection,
   } from "../../lib/vehicle-selection";
 
   /**
-   * The vehicle filter, and only that (FIT-03). Search and symptom facets are
-   * T402's. DOM wiring only: what fits, and whether the fit leaned on silence,
-   * is `src/lib/vehicle-listing.ts` over `src/lib/fitment/`.
+   * Symptom-first navigation (T402, PRB-02) and the vehicle filter (T204,
+   * FIT-03), layered on the same card list. Only DOM wiring lives here —
+   * which elements to read, what to toggle. Every decision (does this card
+   * match the picked symptom or the typed text? what does the counter say?
+   * does this problem apply to the reader's truck?) is a pure function in
+   * `src/lib/problems-filter.ts` or `src/lib/vehicle-listing.ts`.
+   *
+   * The per-card haystack is read from each card's own already-rendered
+   * text — title, summary, symptom bullets, chip and triage labels — never
+   * a second server-serialized copy (same discipline `[glossarySegment].astro`
+   * documents for the same reason).
    */
   function enhance(root: HTMLElement): void {
     const cards = [...root.querySelectorAll<HTMLElement>(".problem-card")];
     if (cards.length === 0) return;
 
-    const view = createVehicleListingView({
+    const toolbar = root.querySelector<HTMLElement>("[data-problems-toolbar]");
+    const search = root.querySelector<HTMLInputElement>(
+      "[data-problems-search]"
+    );
+    const count = root.querySelector<HTMLElement>("[data-problems-count]");
+    const none = root.querySelector<HTMLElement>("[data-problems-none]");
+
+    const filterCards = cards.map((element) => {
+      const symptomTexts = [
+        ...element.querySelectorAll<HTMLElement>(".problem-card__symptoms li"),
+      ].map((li) => li.textContent ?? "");
+
+      return {
+        element,
+        filter: {
+          symptoms: normalizedSymptoms(symptomTexts),
+          haystack: buildHaystack({
+            title:
+              element.querySelector<HTMLElement>(".problem-card__title")
+                ?.textContent ?? "",
+            summary:
+              element.querySelector<HTMLElement>(".problem-card__summary")
+                ?.textContent ?? "",
+            symptoms: symptomTexts,
+            chips: [
+              element.querySelector<HTMLElement>(".problem-card__triage")
+                ?.textContent ?? "",
+              ...[
+                ...element.querySelectorAll<HTMLElement>(
+                  ".problem-card__chips .chip"
+                ),
+              ].map((chip) => chip.textContent ?? ""),
+            ],
+          }),
+        },
+      };
+    });
+
+    const template = count?.dataset.countTemplate ?? "";
+    const total = Number(count?.dataset.total ?? filterCards.length);
+    const symptomButtons = toolbar
+      ? [...toolbar.querySelectorAll<HTMLButtonElement>("[data-symptom]")]
+      : [];
+
+    let state: ProblemFilterState = { symptom: "", query: "" };
+
+    /*
+     * The vehicle filter (FIT-03: "any collection listing"). Same module and
+     * therefore the same semantics as the glossary and community pages —
+     * dim, tag, never hide — reading the taxonomy the selector already
+     * inlined. `buildTaxonomy([])` keeps this harmless on a page with no
+     * selector.
+     */
+    const vehicle = createVehicleListingView({
       root,
       cards,
       taxonomy: buildTaxonomy(readSelectorPayload(document)?.nodes ?? []),
       lang: document.documentElement.lang,
     });
-    if (view === null) return;
 
-    view.apply(readVehicleSelection(window));
-    onVehicleSelectionChange(window, (selection) => view.apply(selection));
+    function applyVehicle(selection: StoredVehicleSelection | null): void {
+      vehicle?.apply(selection);
+    }
+
+    function apply(): void {
+      let shown = 0;
+
+      for (const card of filterCards) {
+        const visible = matchesFilter(card.filter, state);
+        card.element.hidden = !visible;
+        if (visible) shown += 1;
+      }
+
+      if (count) count.textContent = formatCount(template, shown, total);
+      if (none) none.hidden = shown > 0;
+      // The vehicle filter dims within whatever the symptom/search facets
+      // left visible; re-marking after every apply keeps the two layers
+      // consistent without either one interpreting the other's state.
+      applyVehicle(readVehicleSelection(window));
+    }
+
+    if (search) {
+      search.addEventListener("input", () => {
+        state = { ...state, query: search.value };
+        apply();
+      });
+    }
+
+    for (const button of symptomButtons) {
+      button.addEventListener("click", () => {
+        const symptom = button.dataset.symptom ?? "";
+        state = { ...state, symptom };
+        for (const other of symptomButtons) {
+          other.setAttribute(
+            "aria-pressed",
+            String((other.dataset.symptom ?? "") === symptom)
+          );
+        }
+        apply();
+      });
+    }
+
+    // The selector lives in the site chrome and knows nothing about this
+    // page; it announces, and the listing re-marks itself (FIT-03).
+    onVehicleSelectionChange(window, (selection) => applyVehicle(selection));
+    apply();
   }
 
   for (const root of document.querySelectorAll<HTMLElement>(
@@ -276,6 +480,88 @@ const fitmentTable = buildFitmentTable(
     max-width: 72ch;
   }
 
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /*
+   * T402's search box and symptom pills, laid out only once `BaseLayout`
+   * marks the document `html.js` — same reasoning `[glossarySegment].astro`
+   * and `[communitySegment].astro` record at length: a visitor with no
+   * JavaScript must see the full listing and no dead control, and asking
+   * the question before first paint (rather than via a later `hidden`
+   * toggle) avoids the layout shift a delayed reveal would cause.
+   */
+  .problems__toolbar {
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  :global(html.js) .problems__toolbar {
+    display: flex;
+  }
+
+  .problems__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    background: #fff;
+    border: 1px solid #e4ddd1;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: #6e6559;
+  }
+
+  .problems__search input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 0.875rem;
+    color: #2b2620;
+    min-height: 1.75rem;
+  }
+
+  .problems__search input::placeholder {
+    color: #6e6559;
+    opacity: 1;
+  }
+
+  .problems__symptoms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .problems__symptoms button {
+    font: inherit;
+    font-size: 0.8125rem;
+    border: 1px solid #e4ddd1;
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    min-height: 2.75rem;
+    background: #fff;
+    color: #55493c;
+    cursor: pointer;
+  }
+
+  .problems__symptoms button[aria-pressed="true"] {
+    background: #2b2620;
+    border-color: #2b2620;
+    color: #f7f4ee;
+    font-weight: 700;
+  }
+
   .problems__count {
     margin: 0;
     font-size: 0.8125rem;
@@ -283,7 +569,8 @@ const fitmentTable = buildFitmentTable(
     color: #6e6559;
   }
 
-  .problems__empty {
+  .problems__empty,
+  .problems__none {
     margin: 0;
     font-size: 0.9375rem;
     color: #6e6559;
@@ -306,6 +593,18 @@ const fitmentTable = buildFitmentTable(
     border: 1px solid #e4ddd1;
     border-radius: 8px;
     padding: 1.125rem 1.25rem;
+  }
+
+  /*
+   * `display: flex` above beats the user-agent stylesheet's
+   * `[hidden] { display: none }` (author rules win), so T402's search/symptom
+   * filter — which hides a non-matching card by setting the `hidden`
+   * property — needs this restated explicitly, same fix `[glossarySegment].astro`
+   * and `[communitySegment].astro` record for their own cards. This is
+   * unrelated to FIT-03's dim-and-tag below: the vehicle filter never hides.
+   */
+  .problem-card[hidden] {
+    display: none;
   }
 
   /*
