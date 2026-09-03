@@ -534,8 +534,8 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   Depends: T2-302. *(MIG-04)*
 
 - [ ] **T2-306a [TEST]** Graders for the cover-photo designation (GAR-01′):
-  a nullable `vehicles` column (or equivalent) naming one entry already
-  present in `photo_paths` as the cover; the value SHALL be validated as
+  a nullable `vehicles.cover_photo_path` column (or equivalent) naming one entry already
+  present in `vehicles.photo_paths` as the cover; the value SHALL be validated as
   membership in that same array (a cover path naming a photo the vehicle
   does not have is a defect, not a user error to accept silently); removing
   a photo that is the current cover SHALL clear the cover designation rather
