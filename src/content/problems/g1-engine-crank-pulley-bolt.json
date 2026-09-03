@@ -5,7 +5,7 @@
     "markets": ["us"],
     "engines": ["6g72-sohc"],
     "years": {
-      "from": 1989,
+      "from": 1990,
       "to": 1991
     }
   },
@@ -79,7 +79,7 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (four of the twenty-four filed complaints name the crankshaft pulley bolt, the crankshaft bolt or the vibration-damper bolt breaking, two of them reporting loss of power steering and one a loss of vehicle control)",
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (three of the twenty-four filed complaints name a bolt breaking — the crankshaft pulley bolt, the vibration-damper bolt and the bolt on the front of the crankshaft — two of them reporting loss of power steering and one a loss of vehicle control)",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
       "archiveUrl": "https://web.archive.org/web/20260902180641id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
       "accessed": "2026-09-02",
@@ -91,13 +91,20 @@
       "archiveUrl": "https://web.archive.org/web/20260902175215id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
       "accessed": "2026-09-02",
       "kind": "reference"
+    },
+    {
+      "title": "RepairPal — \"Loose or Broken Crankshaft Pulley Bolt on Mitsubishi Montero\": \"The crankshaft pulley bolt may become loose or break causing loss of power steering operation and other related engine accessories\", with \"an updated bolt may be available\". The page names the engines affected as the 3.0L V6 and 3.5L V6 — the 3.0 is this generation's 6G72 — lists model years from 1990 onward, and records 46 owner reports at an average of 172,426 miles. Read from the Wayback capture; the live page refuses automated readers",
+      "url": "https://repairpal.com/loose-or-broken-crankshaft-pulley-bolt-305",
+      "archiveUrl": "https://web.archive.org/web/20161019215711id_/http://repairpal.com/loose-or-broken-crankshaft-pulley-bolt-305",
+      "accessed": "2026-09-03",
+      "kind": "forum"
     }
   ],
   "prose": {
     "en": {
       "title": "Crankshaft pulley bolt works loose or breaks (V6)",
       "slug": "crankshaft-pulley-bolt-works-loose",
-      "summary": "The single bolt through the middle of the crankshaft pulley backs out, then snaps. It is the most-repeated complaint owners of the V6 first-generation Montero filed with the US federal safety regulator, and the reason it is filed here as a safety problem rather than an engine problem is what happens next: the pulley and every belt it drives leave the engine at once, so the power steering pump, the alternator and the water pump all stop together, without warning, at whatever speed the truck happens to be doing. Owners in the complaint records describe exactly that sequence, one of them ending in a loss of control. The repair is cheap while it is only a loose bolt and expensive once the crankshaft nose is chewed. Treat a knock from the front of the engine on this truck as this problem until you have proved it is not. This is safety-critical work: have it done by a qualified mechanic.",
+      "summary": "The single bolt through the middle of the crankshaft pulley backs out, then snaps. It is among the most-repeated complaints owners of the V6 first-generation Montero filed with the US federal safety regulator, and a repair database that names the engines affected puts the 3.0 V6 at the head of the list, and the reason it is filed here as a safety problem rather than an engine problem is what happens next: the pulley and every belt it drives leave the engine at once, so the power steering pump, the alternator and the water pump all stop together, without warning, at whatever speed the truck happens to be doing. Owners in the complaint records describe exactly that sequence, one of them ending in a loss of control. The repair is cheap while it is only a loose bolt and expensive once the crankshaft nose is chewed. Treat a knock from the front of the engine on this truck as this problem until you have proved it is not. This is safety-critical work: have it done by a qualified mechanic.",
       "symptoms": {
         "knock-from-front-of-engine": "A knock or heavy rattle from the very front of the engine, loudest at low speed",
         "pulley-wobble": "The crankshaft pulley visibly wobbles or rocks as the engine idles",
@@ -129,7 +136,7 @@
     "es": {
       "title": "El tornillo de la polea del cigüeñal se afloja o se quiebra (V6)",
       "slug": "tornillo-de-la-polea-del-ciguenal-se-afloja",
-      "summary": "El tornillo central de la polea del cigüeñal se va aflojando y después se quiebra. Es el reclamo que más se repite entre los dueños del Montero de primera generación con V6 ante el regulador federal de seguridad de Estados Unidos, y si aquí se clasifica como problema de seguridad y no como una simple falla de motor es por lo que pasa después: la polea y todas las fajas que mueve se van de un solo golpe, así que la bomba de la dirección hidráulica, el alternador y la bomba de agua se detienen al mismo tiempo, sin aviso, a la velocidad que sea que lleve el carro. Los reportes describen esa misma secuencia; en uno de ellos el conductor perdió el control. La reparación es barata mientras sea solo un tornillo flojo y cara cuando ya se comió la punta del cigüeñal. En este carro, trate cualquier golpeteo en la parte delantera del motor como si fuera esto hasta demostrar lo contrario. Este trabajo es crítico para la seguridad: déjelo en manos de un mecánico calificado.",
+      "summary": "El tornillo central de la polea del cigüeñal se va aflojando y después se quiebra. Es uno de los reclamos que más se repiten entre los dueños del Montero de primera generación con V6 ante el regulador federal de seguridad de Estados Unidos, y una base de datos de reparaciones que sí nombra los motores afectados pone el V6 de 3.0 a la cabeza de la lista, y si aquí se clasifica como problema de seguridad y no como una simple falla de motor es por lo que pasa después: la polea y todas las fajas que mueve se van de un solo golpe, así que la bomba de la dirección hidráulica, el alternador y la bomba de agua se detienen al mismo tiempo, sin aviso, a la velocidad que sea que lleve el carro. Los reportes describen esa misma secuencia; en uno de ellos el conductor perdió el control. La reparación es barata mientras sea solo un tornillo flojo y cara cuando ya se comió la punta del cigüeñal. En este carro, trate cualquier golpeteo en la parte delantera del motor como si fuera esto hasta demostrar lo contrario. Este trabajo es crítico para la seguridad: déjelo en manos de un mecánico calificado.",
       "symptoms": {
         "knock-from-front-of-engine": "Un golpeteo o traqueteo fuerte al frente del motor, más audible a baja velocidad",
         "pulley-wobble": "La polea del cigüeñal se bambolea o cabecea a simple vista con el motor en marcha mínima",
