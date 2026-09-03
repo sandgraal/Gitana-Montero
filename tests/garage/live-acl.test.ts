@@ -61,7 +61,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-  PENDING_USER_TABLES,
+  UNSHIPPED_USER_TABLES,
   SHIPPED_USER_TABLES,
   USER_TABLE_NAMES,
 } from "./contract.ts";
@@ -91,7 +91,7 @@ const EXPECTED_AUTHENTICATED = ["delete", "insert", "select", "update"];
 const MUST_HOLD_NOTHING = ["anon", "public"] as const;
 
 const SHIPPED = SHIPPED_USER_TABLES.map((table) => [table.name] as const);
-const PENDING = PENDING_USER_TABLES.map(
+const PENDING = UNSHIPPED_USER_TABLES.map(
   (table) => [table.name, table.pending ?? ""] as const
 );
 

@@ -599,18 +599,45 @@ export const PENDING_USER_TABLES: readonly TableContract[] = [
   RECORD_MEDIA_TABLE,
 ];
 
+/* -------------------------------------------------------------------------
+ * Two kinds of "not yet", and they are NOT the same list
+ *
+ * `PENDING_USER_TABLES` above (T2-305a) means **declared here but absent from
+ * `USER_TABLES`** — a table the contract describes and the enumerated set does
+ * not yet admit. Its promotion step is to *move* the entry into `USER_TABLES`
+ * and empty that array.
+ *
+ * The pair below (T2-401) means **inside `USER_TABLES`, carrying a `pending`
+ * marker** — enumerated, swept by every table-level grader, but under
+ * `it.fails` until the migration catches up. Its promotion step is to delete
+ * one `pending:` line.
+ *
+ * They arrived in the same file from two branches and briefly shared a name,
+ * which did not compile. Keeping both, distinctly named, is deliberate: they
+ * solve the same problem for tables at different stages, and collapsing them
+ * would mean rewriting whichever task's promotion path lost. The distinction a
+ * reader needs is *is the table in `USER_TABLES` yet* — if yes, it is
+ * shipped-or-unshipped below; if no, it is pending above.
+ * ---------------------------------------------------------------------- */
+
 /**
- * The tables whose graders run unmarked, because the tables exist.
+ * The enumerated tables whose graders run unmarked, because they exist.
  *
  * Every `it.each` sweep over the contract partitions on this — see
- * `ColumnContract.pending` for why the pending half is not simply left out.
+ * `ColumnContract.pending` for why the unshipped half is not simply left out.
  */
 export const SHIPPED_USER_TABLES = USER_TABLES.filter(
   (table) => table.pending === undefined
 );
 
-/** The tables a later task ships. Swept under `it.fails`, never dropped. */
-export const PENDING_USER_TABLES = USER_TABLES.filter(
+/**
+ * The enumerated tables a named task still has to create. Swept under
+ * `it.fails`, never dropped.
+ *
+ * `UNSHIPPED`, not `PENDING`, precisely because `PENDING_USER_TABLES` above
+ * already means something else in this file.
+ */
+export const UNSHIPPED_USER_TABLES = USER_TABLES.filter(
   (table) => table.pending !== undefined
 );
 
@@ -1297,6 +1324,12 @@ export const RESERVED_HANDLES = [
   "problemas",
   "parts",
   "repuestos",
+  // T601's mods collection, added when it merged to main. The grader caught
+  // this on the first CI run after the sync and named both locales — which is
+  // the whole point of cross-checking the list against
+  // `COLLECTION_ROUTE_SEGMENTS` rather than trusting it to stay complete.
+  "mods",
+  "modificaciones",
 ] as const;
 
 /* -------------------------------------------------------------------------

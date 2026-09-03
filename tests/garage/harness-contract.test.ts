@@ -28,7 +28,7 @@ import { describe, expect, it } from "vitest";
 import {
   GRANT_EXPIRY_COLUMN,
   GRANT_REVOCATION_COLUMN,
-  PENDING_USER_TABLES,
+  UNSHIPPED_USER_TABLES,
   PLAINTEXT_TOKEN_COLUMNS,
   SHARE_CAPABILITY_COLUMNS,
   SHARE_FLAG_COLUMNS,
@@ -715,8 +715,10 @@ describe("the declared contract is internally coherent", () => {
       "records",
       "receipts",
     ]);
-    expect(PENDING_USER_TABLES.map((table) => table.name)).toEqual(["shares"]);
-    expect(SHIPPED_USER_TABLES.length + PENDING_USER_TABLES.length).toBe(
+    expect(UNSHIPPED_USER_TABLES.map((table) => table.name)).toEqual([
+      "shares",
+    ]);
+    expect(SHIPPED_USER_TABLES.length + UNSHIPPED_USER_TABLES.length).toBe(
       USER_TABLES.length
     );
   });

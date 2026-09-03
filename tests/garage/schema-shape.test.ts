@@ -36,7 +36,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-  PENDING_USER_TABLES,
+  UNSHIPPED_USER_TABLES,
   SHIPPED_USER_TABLES,
   TEST_TAXONOMY_IDENTITY,
   USER_TABLES,
@@ -95,7 +95,7 @@ describe("every user-data table exists", () => {
   );
 
   it.fails.each(
-    PENDING_USER_TABLES.map((table) => [
+    UNSHIPPED_USER_TABLES.map((table) => [
       table.name,
       table.requirement,
       table.pending ?? "",

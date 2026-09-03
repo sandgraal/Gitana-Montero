@@ -49,7 +49,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-  PENDING_USER_TABLES,
+  UNSHIPPED_USER_TABLES,
   SHIPPED_USER_TABLES,
   USER_TABLE_NAMES,
   testReceiptPath,
@@ -95,7 +95,7 @@ const live = await detectLiveStack();
  * because nothing enumerated it. It is enumerated now, before it exists.
  */
 const SHIPPED = SHIPPED_USER_TABLES.map((table) => [table.name] as const);
-const PENDING = PENDING_USER_TABLES.map(
+const PENDING = UNSHIPPED_USER_TABLES.map(
   (table) => [table.name, table.pending ?? ""] as const
 );
 const SHIPPED_NAMES = SHIPPED_USER_TABLES.map((table) => table.name);
