@@ -1,0 +1,204 @@
+{
+  "id": "g1-brakes-front-discs-wear-fast",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us"],
+    "years": {
+      "from": 1990,
+      "to": 1991
+    }
+  },
+  "system": "brakes",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "grinding-metal-on-metal-when-braking",
+    "pedal-goes-further-than-it-used-to",
+    "front-discs-worn-thin-again-soon-after-replacement",
+    "one-front-wheel-hotter-than-the-other-after-a-drive"
+  ],
+  "causes": [
+    {
+      "id": "seized-caliper-slides"
+    },
+    {
+      "id": "stuck-caliper-piston"
+    },
+    {
+      "id": "collapsed-flexible-brake-hose"
+    },
+    {
+      "id": "poor-quality-friction-material"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "feel-each-wheel-after-a-drive",
+      "rulesIn": [
+        "seized-caliper-slides",
+        "stuck-caliper-piston",
+        "collapsed-flexible-brake-hose"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "compare-pad-thickness-inner-and-outer",
+      "rulesIn": ["seized-caliper-slides"],
+      "rulesOut": []
+    },
+    {
+      "id": "crack-the-bleed-nipple-on-a-dragging-caliper",
+      "rulesIn": ["collapsed-flexible-brake-hose"],
+      "rulesOut": ["stuck-caliper-piston"]
+    },
+    {
+      "id": "push-the-piston-back-with-the-caliper-off",
+      "rulesIn": ["stuck-caliper-piston"],
+      "rulesOut": ["seized-caliper-slides"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "service-the-caliper-slides",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["seized-caliper-slides"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "rebuild-or-replace-the-calipers",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["stuck-caliper-piston"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-flexible-hoses",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["collapsed-flexible-brake-hose"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "fit-known-good-pads-and-discs",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["poor-quality-friction-material"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1991 Mitsubishi Montero (a service-brake complaint reporting front brake rotors replaced five times in four years, wearing thin, metal-to-metal grinding and excessive stopping effort)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "archiveUrl": "https://web.archive.org/web/20260902175215id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (two hydraulic service-brake complaints, one reporting a front brake hose that broke down and one reporting a rear brake hose put under tension when the vehicle is lifted)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
+      "archiveUrl": "https://web.archive.org/web/20260902180641id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front brake discs wear out fast",
+      "slug": "front-brake-discs-wear-out-fast",
+      "summary": "One owner told the federal regulator they had replaced the front discs five times in four years, ending each time in metal-to-metal grinding and a pedal that needed far more effort than it should. That is a single report and this entry is tiered at the bottom of the site's scale to say so. It is published because the pattern it describes — new front brakes that do not last — almost never means the parts were bad, and almost always means something is holding the pads against the disc after you take your foot off. The four causes below are the usual suspects, in the order that costs least to eliminate. One extra warning from a second complaint in the same records: check the length and run of the flexible hoses whenever the truck goes up on a hoist, because a hose pulled tight as the suspension hangs is a hose being damaged. Brakes are safety-critical. Grinding brakes still stop the truck, but with less margin than you think and no margin at all when they are hot: keep speeds down, leave more room, and get this to a qualified mechanic rather than putting it off.",
+      "symptoms": {
+        "grinding-metal-on-metal-when-braking": "A harsh metallic grinding from the front when you brake",
+        "pedal-goes-further-than-it-used-to": "The brake pedal travels further before the truck slows",
+        "front-discs-worn-thin-again-soon-after-replacement": "The front discs are worn thin again far too soon after the last set",
+        "one-front-wheel-hotter-than-the-other-after-a-drive": "One front wheel is much hotter than the other after a normal drive"
+      },
+      "causes": {
+        "seized-caliper-slides": "The caliper slide pins have seized, so the caliper cannot release squarely",
+        "stuck-caliper-piston": "A caliper piston is sticking in its bore and holding the pads on the disc",
+        "collapsed-flexible-brake-hose": "A flexible brake hose has collapsed internally and traps pressure at the caliper",
+        "poor-quality-friction-material": "The pads or discs fitted last time were poor-quality parts"
+      },
+      "diagnosticSteps": {
+        "feel-each-wheel-after-a-drive": "After a normal drive with light braking, carefully feel the heat coming off each front wheel and compare the two sides",
+        "compare-pad-thickness-inner-and-outer": "Take a wheel off and compare the inner and outer pad thickness on the same caliper — a big difference points at the slides",
+        "crack-the-bleed-nipple-on-a-dragging-caliper": "With a caliper found dragging, crack its bleed nipple: if pressure spits out and the brake frees off, the hose is holding it on",
+        "push-the-piston-back-with-the-caliper-off": "With the caliper off the truck and the hose disconnected, push the piston back into its bore and feel whether it moves smoothly"
+      },
+      "fixPaths": {
+        "service-the-caliper-slides": {
+          "title": "Strip, clean and re-grease the caliper slides",
+          "detail": "The cheapest fix and the most common cause. New boots and the correct high-temperature grease, not general-purpose grease, or it will seize again."
+        },
+        "rebuild-or-replace-the-calipers": {
+          "title": "Rebuild or replace the calipers",
+          "detail": "A pitted bore will destroy a new seal, so a seal kit is only worth fitting to a clean bore. Do both sides so the truck brakes evenly."
+        },
+        "renew-the-flexible-hoses": {
+          "title": "Renew the flexible brake hoses",
+          "detail": "Hoses on a truck this old are due on age alone. Check the routing and length as you fit them, and make sure nothing goes tight when the suspension hangs at full droop on a hoist."
+        },
+        "fit-known-good-pads-and-discs": {
+          "title": "Fit good-quality pads and discs",
+          "detail": "Worth doing, but only after the dragging is cured. Fitting better parts to a caliper that will not release just buys a slightly slower version of the same failure."
+        }
+      }
+    },
+    "es": {
+      "title": "Los discos de freno delanteros se gastan rapidísimo",
+      "slug": "los-discos-de-freno-delanteros-se-gastan-rapido",
+      "summary": "Un dueño le contó al regulador federal que había cambiado los discos de freno delanteros cinco veces en cuatro años, terminando cada vez con roce de metal contra metal y un pedal que pedía mucho más esfuerzo del normal. Es un solo reporte y esta entrada lleva el nivel más bajo de la escala del sitio justamente para decirlo. Se publica porque el patrón que describe —frenos delanteros nuevos que no duran— casi nunca significa que las piezas eran malas, y casi siempre significa que algo mantiene las pastillas de freno pegadas al disco después de que usted suelta el pedal. Las cuatro causas de abajo son los sospechosos de siempre, en el orden que sale más barato descartar. Una advertencia extra que sale de otro reclamo en esos mismos registros: revise el largo y la trayectoria de las mangueras de freno cada vez que suba el carro al elevador, porque una manguera que queda tensa mientras la suspensión cuelga es una manguera que se está dañando. Los frenos son críticos para la seguridad. Un freno que roza todavía detiene el carro, pero con menos margen del que usted cree y sin ningún margen cuando está caliente: baje la velocidad, deje más distancia y llévelo donde un mecánico calificado en vez de dejarlo para después.",
+      "symptoms": {
+        "grinding-metal-on-metal-when-braking": "Un roce metálico áspero al frente cuando usted frena",
+        "pedal-goes-further-than-it-used-to": "El pedal del freno se hunde más que antes para que el carro baje la velocidad",
+        "front-discs-worn-thin-again-soon-after-replacement": "Los discos de freno delanteros están otra vez delgados demasiado pronto después del último juego",
+        "one-front-wheel-hotter-than-the-other-after-a-drive": "Una rueda delantera queda mucho más caliente que la otra después de un recorrido normal"
+      },
+      "causes": {
+        "seized-caliper-slides": "Los pernos deslizantes del cáliper se agarrotaron y el cáliper no puede soltar a escuadra",
+        "stuck-caliper-piston": "Un pistón del cáliper se está pegando en su cilindro y mantiene las pastillas de freno contra el disco",
+        "collapsed-flexible-brake-hose": "Una manguera de freno se colapsó por dentro y deja presión atrapada en el cáliper",
+        "poor-quality-friction-material": "Las pastillas de freno o los discos que se pusieron la vez pasada eran de mala calidad"
+      },
+      "diagnosticSteps": {
+        "feel-each-wheel-after-a-drive": "Después de un recorrido normal frenando suave, palpe con cuidado el calor que sale de cada rueda delantera y compare los dos lados",
+        "compare-pad-thickness-inner-and-outer": "Quite una rueda y compare el grosor de la pastilla de freno interna contra la externa del mismo cáliper: una diferencia grande apunta a los deslizantes",
+        "crack-the-bleed-nipple-on-a-dragging-caliper": "En el cáliper que encontró rozando, afloje su tornillo de purga: si sale presión de golpe y el freno se libera, la manguera es la que lo estaba manteniendo pegado",
+        "push-the-piston-back-with-the-caliper-off": "Con el cáliper fuera del carro y la manguera desconectada, empuje el pistón de vuelta a su cilindro y sienta si se mueve parejo"
+      },
+      "fixPaths": {
+        "service-the-caliper-slides": {
+          "title": "Desarmar, limpiar y reengrasar los deslizantes del cáliper",
+          "detail": "La reparación más barata y la causa más común. Botas nuevas y grasa de alta temperatura, no grasa de uso general, o se vuelve a agarrotar."
+        },
+        "rebuild-or-replace-the-calipers": {
+          "title": "Reparar o cambiar los cálipers",
+          "detail": "Un cilindro picado se come un empaque nuevo, así que el kit solo vale la pena en un cilindro sano. Hágalo de los dos lados para que el carro frene parejo."
+        },
+        "renew-the-flexible-hoses": {
+          "title": "Cambiar las mangueras de freno",
+          "detail": "En un carro de esta edad las mangueras ya tocan solo por antigüedad. Revise la trayectoria y el largo al ponerlas, y asegúrese de que nada quede tenso cuando la suspensión cuelga al máximo en el elevador."
+        },
+        "fit-known-good-pads-and-discs": {
+          "title": "Poner pastillas de freno y discos de buena calidad",
+          "detail": "Vale la pena, pero solo después de curar el roce. Ponerle piezas mejores a un cáliper que no suelta solo compra una versión un poco más lenta de la misma falla."
+        }
+      }
+    }
+  }
+}

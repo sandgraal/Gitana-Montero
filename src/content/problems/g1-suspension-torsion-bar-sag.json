@@ -1,0 +1,203 @@
+{
+  "id": "g1-suspension-torsion-bar-sag",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us", "cr", "uk", "au", "jdm", "eu", "global"],
+    "years": {
+      "from": 1983,
+      "to": 1991
+    }
+  },
+  "system": "suspension",
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "front-of-the-truck-sits-low",
+    "one-front-corner-lower-than-the-other",
+    "front-tyres-wearing-on-the-inner-edge",
+    "front-suspension-bottoms-out-easily"
+  ],
+  "causes": [
+    {
+      "id": "torsion-bars-settled-with-age"
+    },
+    {
+      "id": "adjuster-never-reset-after-added-weight"
+    },
+    {
+      "id": "seized-adjuster-thread"
+    },
+    {
+      "id": "collapsed-rear-springs-tipping-the-truck"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "measure-both-front-corners-on-level-ground",
+      "rulesIn": [
+        "torsion-bars-settled-with-age",
+        "adjuster-never-reset-after-added-weight"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "measure-the-rear-corners-too",
+      "rulesIn": ["collapsed-rear-springs-tipping-the-truck"],
+      "rulesOut": []
+    },
+    {
+      "id": "find-the-adjuster-under-its-rubber-cover",
+      "rulesIn": ["seized-adjuster-thread"],
+      "rulesOut": []
+    },
+    {
+      "id": "note-what-has-been-bolted-to-the-front",
+      "rulesIn": ["adjuster-never-reset-after-added-weight"],
+      "rulesOut": ["torsion-bars-settled-with-age"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "reindex-and-reset-the-adjusters",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": [
+        "torsion-bars-settled-with-age",
+        "adjuster-never-reset-after-added-weight"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "free-or-renew-the-adjuster-hardware",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["seized-adjuster-thread"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "fit-heavier-torsion-bars",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": [
+        "torsion-bars-settled-with-age",
+        "adjuster-never-reset-after-added-weight"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-rear-springs",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["collapsed-rear-springs-tipping-the-truck"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"Adjusting torsion bars (front suspension)\": the thread concerns a 1997 long-wheelbase Pajero, a second-generation truck rather than a first-generation one, and members describe the anchor arm and anchor bolt layout, that slackening the locknut and tightening the adjusting nut raises the suspension, that the adjuster hides under a domed rubber cover, and that added front weight settles the ride height unevenly between sides",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=1911",
+      "archiveUrl": "https://web.archive.org/web/20260902174806id_/https://www.pocuk.com/forums/viewtopic.php?t=1911",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Front end sits low — settled torsion bars",
+      "slug": "front-end-sits-low",
+      "summary": "The front suspension on this generation is sprung by torsion bars, and a torsion bar is a coil spring that has been straightened out: it settles with age exactly as a coil spring does, and it settles further and unevenly once a winch bumper or a bull bar goes on the front. The one cited club thread is about a later, second-generation truck, not this one — the torsion-bar front end carried over, but nobody in the sources has confirmed the detail on a first-generation truck, which is why this entry carries the site's weakest confidence tier. Owners in that thread describe the layout — an anchor arm at the chassis end of each bar with an adjusting nut and a locknut, the adjuster hidden under a domed rubber cover that is the reason most people cannot find it — and the fact that slackening the locknut and tightening the adjusting nut raises that corner. Two cautions the thread does not spell out and this page will. Raising the front changes the front geometry, so a wheel alignment belongs in the same visit. And ride height is not free travel: the higher you wind it, the less suspension is left and the harder it rides. Suspension is safety-critical; if you are not confident setting both sides equally, have a qualified mechanic do it with the alignment.",
+      "symptoms": {
+        "front-of-the-truck-sits-low": "The truck noses down — the front wheel arch gap is visibly smaller than the rear",
+        "one-front-corner-lower-than-the-other": "One front corner sits lower than the other on level ground",
+        "front-tyres-wearing-on-the-inner-edge": "The front tyres are wearing faster on their inner edges",
+        "front-suspension-bottoms-out-easily": "The front suspension bottoms out over bumps it used to take"
+      },
+      "causes": {
+        "torsion-bars-settled-with-age": "The torsion bars have simply settled over decades, as springs do",
+        "adjuster-never-reset-after-added-weight": "Weight was added to the front — a bumper, a winch, a bull bar — and the adjusters were never reset for it",
+        "seized-adjuster-thread": "The adjusting nut and its thread have seized with rust and will no longer turn",
+        "collapsed-rear-springs-tipping-the-truck": "The rear springs have collapsed, so the truck's stance only looks like a front problem"
+      },
+      "diagnosticSteps": {
+        "measure-both-front-corners-on-level-ground": "On level ground, with the tyres at equal pressure, measure from the ground to the same point on each front wheel arch and compare the two figures",
+        "measure-the-rear-corners-too": "Measure the rear corners the same way before touching anything at the front, so you know which end has actually moved",
+        "find-the-adjuster-under-its-rubber-cover": "Find each adjusting nut — it hides under a domed rubber cover on the anchor arm — and try the locknut with a spanner to see whether the thread will move at all",
+        "note-what-has-been-bolted-to-the-front": "Write down everything hanging off the front of the truck that did not leave the factory on it"
+      },
+      "fixPaths": {
+        "reindex-and-reset-the-adjusters": {
+          "title": "Reset the torsion bar adjusters",
+          "detail": "Slacken the locknut, wind the adjusting nut in, and set both sides to the same measured height rather than by eye. Do it in small equal steps, front and side, and finish with a wheel alignment."
+        },
+        "free-or-renew-the-adjuster-hardware": {
+          "title": "Free or renew the seized adjuster hardware",
+          "detail": "Penetrating oil, patience and heat before force. Winding a seized adjuster with a rattle gun is how the anchor arm and the thread both get destroyed, and that turns a free adjustment into a parts hunt."
+        },
+        "fit-heavier-torsion-bars": {
+          "title": "Fit heavier-rate torsion bars",
+          "detail": "If the bars are genuinely tired, or the truck permanently carries winch and bumper weight, heavier bars restore the height without winding the standard bars to the end of their adjustment."
+        },
+        "renew-the-rear-springs": {
+          "title": "Renew the rear springs",
+          "detail": "If the measurements say the rear has dropped, fixing the rear is the repair and winding the front up to match is cosmetics on top of a fault."
+        }
+      }
+    },
+    "es": {
+      "title": "El frente queda bajo — barras de torsión asentadas",
+      "slug": "el-frente-queda-bajo",
+      "summary": "La suspensión delantera de esta generación va sobre barras de torsión, y una barra de torsión es un resorte estirado: se asienta con los años igual que un resorte, y se asienta más y disparejo apenas se le monta al frente un bumper con winch o una parrilla de defensa. El único hilo de club que se cita trata de un carro posterior, de segunda generación, no de este: el tren delantero de barras de torsión se mantuvo, pero nadie en las fuentes confirmó el detalle en un carro de primera generación, y por eso esta entrada lleva el nivel de confianza más bajo del sitio. En ese hilo los miembros describen el armado —un brazo de anclaje en el extremo del chasis de cada barra, con una tuerca de ajuste y una contratuerca, y el ajustador escondido bajo una tapa de hule abombada, que es la razón por la que casi nadie lo encuentra— y explican que aflojar la contratuerca y apretar la tuerca de ajuste levanta esa esquina. Dos advertencias que el hilo no dice y esta página sí. Levantar el frente cambia la geometría delantera, así que el alineamiento va en la misma visita. Y la altura no sale gratis: entre más alto lo suba, menos recorrido de suspensión le queda y más duro va a rodar. La suspensión es crítica para la seguridad; si no se siente seguro dejando ambos lados iguales, que se lo haga un mecánico calificado junto con el alineamiento.",
+      "symptoms": {
+        "front-of-the-truck-sits-low": "El carro va de nariz abajo: la separación entre el guardabarros delantero y la llanta se ve claramente menor que la de atrás",
+        "one-front-corner-lower-than-the-other": "Una esquina delantera queda más baja que la otra en piso parejo",
+        "front-tyres-wearing-on-the-inner-edge": "Las llantas delanteras se están gastando más por el borde interno",
+        "front-suspension-bottoms-out-easily": "La suspensión delantera hace tope en huecos que antes se pasaban sin problema"
+      },
+      "causes": {
+        "torsion-bars-settled-with-age": "Las barras de torsión simplemente se asentaron con las décadas, como se asienta cualquier resorte",
+        "adjuster-never-reset-after-added-weight": "Se le agregó peso al frente —un bumper, un winch, una defensa— y nunca se reajustaron los ajustadores para ese peso",
+        "seized-adjuster-thread": "La tuerca de ajuste y su rosca se agarrotaron por herrumbre y ya no giran",
+        "collapsed-rear-springs-tipping-the-truck": "Los resortes traseros se vencieron, así que la postura del carro solo parece un problema delantero"
+      },
+      "diagnosticSteps": {
+        "measure-both-front-corners-on-level-ground": "En piso parejo y con las llantas a la misma presión, mida del suelo al mismo punto de cada guardabarros delantero y compare las dos medidas",
+        "measure-the-rear-corners-too": "Mida las esquinas traseras de la misma forma antes de tocar nada adelante, para saber cuál extremo fue el que de verdad bajó",
+        "find-the-adjuster-under-its-rubber-cover": "Ubique cada tuerca de ajuste —va escondida bajo una tapa de hule abombada en el brazo de anclaje— y pruebe la contratuerca con una llave para ver si la rosca se mueve del todo",
+        "note-what-has-been-bolted-to-the-front": "Anote todo lo que cuelga del frente del carro y que no venía de fábrica"
+      },
+      "fixPaths": {
+        "reindex-and-reset-the-adjusters": {
+          "title": "Reajustar los ajustadores de las barras de torsión",
+          "detail": "Afloje la contratuerca, entre la tuerca de ajuste y deje ambos lados a la misma altura medida, no a ojo. Hágalo en pasos cortos e iguales de lado y lado, y termine con un alineamiento."
+        },
+        "free-or-renew-the-adjuster-hardware": {
+          "title": "Liberar o cambiar los ajustadores agarrotados",
+          "detail": "Penetrante, paciencia y calor antes que fuerza. Darle con pistola de impacto a un ajustador agarrotado es como se destruyen el brazo de anclaje y la rosca, y ahí un ajuste gratis se convierte en una cacería de repuestos."
+        },
+        "fit-heavier-torsion-bars": {
+          "title": "Poner barras de torsión de mayor capacidad",
+          "detail": "Si las barras de verdad están cansadas, o el carro anda siempre con el peso del winch y el bumper, unas barras más duras recuperan la altura sin dejar las originales al final de su ajuste."
+        },
+        "renew-the-rear-springs": {
+          "title": "Cambiar los resortes traseros",
+          "detail": "Si las medidas dicen que lo que bajó fue atrás, la reparación es atrás; subir el frente para emparejar es maquillaje encima de una falla."
+        }
+      }
+    }
+  }
+}

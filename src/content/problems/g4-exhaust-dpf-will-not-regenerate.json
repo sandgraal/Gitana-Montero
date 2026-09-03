@@ -1,0 +1,220 @@
+{
+  "id": "g4-exhaust-dpf-will-not-regenerate",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["uk", "eu"],
+    "engines": ["4m41"],
+    "years": {
+      "from": 2007,
+      "to": 2009
+    },
+    "transmissions": ["automatic-5-speed", "automatic-4-speed"]
+  },
+  "system": "exhaust",
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "particulate-filter-warning-lamp-on-or-flashing",
+    "engine-management-lamp-comes-on-as-well",
+    "power-drops-away-under-load",
+    "fuel-consumption-collapses-during-a-regeneration"
+  ],
+  "causes": [
+    {
+      "id": "filter-loaded-with-soot"
+    },
+    {
+      "id": "short-trip-use-never-completes-a-regeneration"
+    },
+    {
+      "id": "differential-pressure-sensing-fault"
+    },
+    {
+      "id": "filter-loaded-with-ash-rather-than-soot"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "read-the-stored-fault-codes",
+      "rulesIn": [
+        "filter-loaded-with-soot",
+        "differential-pressure-sensing-fault"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "describe-how-the-truck-is-actually-used",
+      "rulesIn": ["short-trip-use-never-completes-a-regeneration"],
+      "rulesOut": []
+    },
+    {
+      "id": "drive-it-at-a-steady-speed-on-an-open-road",
+      "rulesIn": ["short-trip-use-never-completes-a-regeneration"],
+      "rulesOut": ["differential-pressure-sensing-fault"]
+    },
+    {
+      "id": "check-the-differential-pressure-sensor-and-its-pipes",
+      "rulesIn": ["differential-pressure-sensing-fault"],
+      "rulesOut": []
+    },
+    {
+      "id": "try-a-workshop-forced-regeneration",
+      "rulesIn": ["filter-loaded-with-ash-rather-than-soot"],
+      "rulesOut": ["filter-loaded-with-soot"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "change-the-driving-pattern",
+      "difficulty": 1,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["short-trip-use-never-completes-a-regeneration"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "repair-the-pressure-sensing-circuit",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["differential-pressure-sensing-fault"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "forced-regeneration-and-oil-change",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["filter-loaded-with-soot"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "specialist-clean-or-replace-the-filter",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
+      "addresses": ["filter-loaded-with-ash-rather-than-soot"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"DPF filter trouble on 2007 Shogun Diamond\": owner reports the filter warning lamp, then the lamp flashing with the engine management lamp on, fault code P1498 read as \"DPF overloaded\", and repeated dealer forced regenerations that failed; members point at the differential pressure sensing circuit and report a successful outcome from a correct-specification oil change, filter cleaning and a diagnostic reset rather than replacement",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=144623",
+      "archiveUrl": "https://web.archive.org/web/20260902175419id_/https://www.pocuk.com/forums/viewtopic.php?t=144623",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"Mk 4\" thread: members advise steering clear of the 2007 to 2009 automatics for low power and a troublesome particulate filter system, report 9 to 13 miles per gallon at a steady 50 miles per hour during a regeneration, and note that the 2010 and 2011 trucks used an open-flow filter that does not run regenerations",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=171496",
+      "archiveUrl": "https://web.archive.org/web/20260902175526id_/https://www.pocuk.com/forums/viewtopic.php?t=171496",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "Recambiofácil — \"Filtro de partículas diésel: diagnóstico, limpieza y cambio\": describes passive regeneration above 550 °C on long runs, active regeneration where the engine control unit injects extra fuel to raise temperature, and workshop forced regeneration when the first two have failed",
+      "url": "https://articulos.recambiofacil.com/articulos/filtro-particulas-diesel-kta/",
+      "archiveUrl": "https://web.archive.org/web/20260902181204id_/https://articulos.recambiofacil.com/articulos/filtro-particulas-diesel-kta/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Diesel particulate filter will not regenerate",
+      "slug": "diesel-particulate-filter-will-not-regenerate",
+      "summary": "The filter fills with soot, the warning lamp comes on, the engine tries to burn the soot off and cannot, and eventually the engine management lamp joins in and the power goes. Owners in the cited club threads single out the earliest automatic fourth-generation diesels as the ones that give the most trouble, and report that dealer forced regenerations on those trucks can fail repeatedly. Two of their findings are worth carrying into any diagnosis. First, a blocked filter is detected by a pressure difference across it, so a fault in that sensing circuit produces the same warning as a genuinely blocked filter — one member found the filter almost clean after all the warnings said otherwise. Second, soot burns and ash does not: a filter full of ash will not respond to any amount of regeneration, forced or otherwise, and needs cleaning or replacing. The reason the triage is not simply drive-normally is what happens next when regeneration keeps failing — see the engine-oil level entry for this generation.",
+      "symptoms": {
+        "particulate-filter-warning-lamp-on-or-flashing": "The particulate filter warning lamp is lit, or flashing",
+        "engine-management-lamp-comes-on-as-well": "The engine management lamp joins the filter lamp",
+        "power-drops-away-under-load": "The truck loses power, especially pulling a hill or loaded",
+        "fuel-consumption-collapses-during-a-regeneration": "Fuel consumption gets far worse for a stretch of driving and then recovers"
+      },
+      "causes": {
+        "filter-loaded-with-soot": "The filter is loaded with soot that has not been burnt off",
+        "short-trip-use-never-completes-a-regeneration": "The truck only does short, cold trips, so a regeneration is started and never completed",
+        "differential-pressure-sensing-fault": "The differential pressure sensor or its pipework is faulty, so a clear filter is reported as blocked",
+        "filter-loaded-with-ash-rather-than-soot": "The filter is loaded with ash, which no regeneration can burn away"
+      },
+      "diagnosticSteps": {
+        "read-the-stored-fault-codes": "Have the stored fault codes read and written down before anything is cleared, so you know whether the system is reporting an overloaded filter or a sensing fault",
+        "describe-how-the-truck-is-actually-used": "Be honest about the trips the truck actually does — short, cold, urban journeys are the single biggest cause of this problem",
+        "drive-it-at-a-steady-speed-on-an-open-road": "Take it for a long, steady run on an open road at a constant speed and see whether the lamp goes out on its own",
+        "check-the-differential-pressure-sensor-and-its-pipes": "Inspect the differential pressure sensor and both of its small pipes for splits, soot blockage and corrosion before condemning the filter",
+        "try-a-workshop-forced-regeneration": "Have a workshop run a forced regeneration with diagnostic equipment and see whether the load actually falls"
+      },
+      "fixPaths": {
+        "change-the-driving-pattern": {
+          "title": "Give the truck a long run regularly",
+          "detail": "The cheapest fix on this page, and the one that prevents the rest. A sustained run at a steady speed on an open road lets the filter burn its soot off the way it was designed to."
+        },
+        "repair-the-pressure-sensing-circuit": {
+          "title": "Repair the differential pressure sensing circuit",
+          "detail": "A split pipe or a soot-blocked take-off is cheap, and it makes a healthy filter look dead. Rule it out before spending anything on the filter itself."
+        },
+        "forced-regeneration-and-oil-change": {
+          "title": "Forced regeneration with a correct-specification oil change",
+          "detail": "One member of the cited thread got out of this with a correct-specification oil change, a clean and a diagnostic reset rather than new parts. Change the oil as part of the job: repeated failed regenerations put fuel into it."
+        },
+        "specialist-clean-or-replace-the-filter": {
+          "title": "Specialist clean, or replace the filter",
+          "detail": "For an ash-loaded filter, which no regeneration will clear. Removing the filter instead is illegal for road use in many jurisdictions and will fail inspection where filters are checked — the rules vary by market, so check yours before anybody offers you that as a repair."
+        }
+      }
+    },
+    "es": {
+      "title": "El filtro de partículas diésel no regenera",
+      "slug": "el-filtro-de-particulas-no-regenera",
+      "summary": "El filtro se llena de hollín, se enciende la luz de advertencia, el motor trata de quemar ese hollín y no puede, y al final se suma la luz de falla del motor y se va la potencia. Los dueños en los hilos del club que se citan señalan a los diésel automáticos más tempranos de la cuarta generación como los que más problema dan, y cuentan que en esos carros las regeneraciones forzadas de agencia pueden fallar una y otra vez. Dos de sus hallazgos vale la pena llevárselos a cualquier diagnóstico. Primero: el filtro tapado se detecta por diferencia de presión entre sus dos extremos, así que una falla en ese circuito de medición produce exactamente el mismo aviso que un filtro realmente tapado; a un miembro le apareció el filtro casi limpio después de que todos los avisos decían lo contrario. Segundo: el hollín se quema y la ceniza no; un filtro lleno de ceniza no responde a ninguna regeneración, forzada o no, y hay que limpiarlo o cambiarlo. Si el triaje no es simplemente manejar normal es por lo que viene después cuando la regeneración sigue fallando: vea la entrada del nivel de aceite de motor de esta generación.",
+      "symptoms": {
+        "particulate-filter-warning-lamp-on-or-flashing": "La luz de advertencia del filtro de partículas está encendida, o parpadeando",
+        "engine-management-lamp-comes-on-as-well": "A la luz del filtro se le suma la luz de falla del motor",
+        "power-drops-away-under-load": "El carro pierde potencia, sobre todo en cuesta o cargado",
+        "fuel-consumption-collapses-during-a-regeneration": "El rendimiento de combustible se desploma durante un tramo de manejo y después se recupera"
+      },
+      "causes": {
+        "filter-loaded-with-soot": "El filtro está cargado de hollín que no se ha logrado quemar",
+        "short-trip-use-never-completes-a-regeneration": "El carro solo hace recorridos cortos y en frío, así que la regeneración empieza y nunca termina",
+        "differential-pressure-sensing-fault": "El sensor de presión diferencial o sus tuberías están fallando, y un filtro limpio se reporta como tapado",
+        "filter-loaded-with-ash-rather-than-soot": "El filtro está cargado de ceniza, que ninguna regeneración puede quemar"
+      },
+      "diagnosticSteps": {
+        "read-the-stored-fault-codes": "Haga leer y anotar los códigos guardados antes de que alguien los borre, para saber si el sistema reporta filtro sobrecargado o falla de medición",
+        "describe-how-the-truck-is-actually-used": "Sea honesto sobre los recorridos que el carro realmente hace: los viajes cortos, urbanos y en frío son la causa número uno de este problema",
+        "drive-it-at-a-steady-speed-on-an-open-road": "Llévelo a un recorrido largo y parejo en carretera abierta a velocidad constante y vea si la luz se apaga sola",
+        "check-the-differential-pressure-sensor-and-its-pipes": "Revise el sensor de presión diferencial y sus dos tuberías finas buscando rajaduras, hollín tapando y corrosión antes de condenar el filtro",
+        "try-a-workshop-forced-regeneration": "Pida en un taller una regeneración forzada con equipo de diagnóstico y observe si la carga del filtro de verdad baja"
+      },
+      "fixPaths": {
+        "change-the-driving-pattern": {
+          "title": "Darle al carro un recorrido largo con regularidad",
+          "detail": "La reparación más barata de esta página y la que evita todas las demás. Un recorrido sostenido a velocidad pareja en carretera abierta deja que el filtro queme su hollín como fue diseñado para hacerlo."
+        },
+        "repair-the-pressure-sensing-circuit": {
+          "title": "Reparar el circuito de presión diferencial",
+          "detail": "Una tubería rajada o una toma tapada de hollín es barata, y hace ver muerto a un filtro sano. Descártelo antes de gastar un cinco en el filtro."
+        },
+        "forced-regeneration-and-oil-change": {
+          "title": "Regeneración forzada junto con cambio de aceite de la especificación correcta",
+          "detail": "A un miembro del hilo citado le bastó un cambio de aceite de la especificación correcta, una limpieza y un reinicio con equipo de diagnóstico, sin piezas nuevas. Cambie el aceite como parte del trabajo: las regeneraciones fallidas repetidas le meten combustible."
+        },
+        "specialist-clean-or-replace-the-filter": {
+          "title": "Limpieza especializada, o cambio del filtro",
+          "detail": "Para un filtro cargado de ceniza, que ninguna regeneración va a resolver. Eliminarlo en vez de repararlo es ilegal para circular en muchas jurisdicciones y reprueba la revisión donde se controlan los filtros; las reglas cambian según el mercado, así que revise las suyas antes de que alguien le ofrezca eso como reparación."
+        }
+      }
+    }
+  }
+}
