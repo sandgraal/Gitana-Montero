@@ -20,9 +20,15 @@
     "charge-and-temperature-warnings-together"
   ],
   "causes": [
-    { "id": "centre-bolt-worked-loose" },
-    { "id": "centre-bolt-snapped" },
-    { "id": "damaged-crank-snout" }
+    {
+      "id": "centre-bolt-worked-loose"
+    },
+    {
+      "id": "centre-bolt-snapped"
+    },
+    {
+      "id": "damaged-crank-snout"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -50,7 +56,10 @@
     {
       "id": "renew-bolt-and-torque-correctly",
       "difficulty": 3,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["centre-bolt-worked-loose"],
       "parts": [],
       "procedures": []
@@ -58,7 +67,10 @@
     {
       "id": "repair-or-replace-the-crankshaft",
       "difficulty": 5,
-      "cost": { "from": "significant", "to": "major" },
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
       "addresses": ["centre-bolt-snapped", "damaged-crank-snout"],
       "parts": [],
       "procedures": []
@@ -67,25 +79,18 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (six of the twenty-four filed complaints name the crankshaft pulley bolt or vibration-damper bolt breaking, with loss of power steering)",
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (four of the twenty-four filed complaints name the crankshaft pulley bolt, the crankshaft bolt or the vibration-damper bolt breaking, two of them reporting loss of power steering and one a loss of vehicle control)",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
       "archiveUrl": "https://web.archive.org/web/20260902180641id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
       "accessed": "2026-09-02",
       "kind": "reference"
     },
     {
-      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1991 Mitsubishi Montero (five complaints name the crankshaft pulley bolt coming out or snapping; one reports the pulley found lying on the skid plate with the battery and transmission warnings lit)",
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1991 Mitsubishi Montero (five of the eighteen filed complaints name the crankshaft pulley bolt coming out, loosening over time or snapping; one reports the harmonic balancer found lying on the skid plate with the transmission and battery warnings lit)",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
       "archiveUrl": "https://web.archive.org/web/20260902175215id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
       "accessed": "2026-09-02",
       "kind": "reference"
-    },
-    {
-      "title": "Opinautos — Mitsubishi Montero, fallas reportadas de la polea del cigüeñal (siete reportes de dueños; el tornillo se afloja, se parte o desaparece y la polea se suelta)",
-      "url": "https://www.opinautos.com/mx/mitsubishi/montero/defectos/polea-del-ciguenal",
-      "archiveUrl": "https://web.archive.org/web/20260902175954id_/https://www.opinautos.com/mx/mitsubishi/montero/defectos/polea-del-ciguenal",
-      "accessed": "2026-09-02",
-      "kind": "forum"
     }
   ],
   "prose": {

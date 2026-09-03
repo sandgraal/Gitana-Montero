@@ -19,10 +19,18 @@
     "hub-will-not-turn-to-lock"
   ],
   "causes": [
-    { "id": "broken-driving-dog-in-an-automatic-hub" },
-    { "id": "hub-internals-full-of-water-and-rust" },
-    { "id": "transfer-case-not-actually-engaged" },
-    { "id": "broken-front-axle-shaft-or-joint" }
+    {
+      "id": "broken-driving-dog-in-an-automatic-hub"
+    },
+    {
+      "id": "hub-internals-full-of-water-and-rust"
+    },
+    {
+      "id": "transfer-case-not-actually-engaged"
+    },
+    {
+      "id": "broken-front-axle-shaft-or-joint"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -56,7 +64,9 @@
     {
       "id": "service-and-repack-the-hubs",
       "difficulty": 3,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["hub-internals-full-of-water-and-rust"],
       "parts": [],
       "procedures": []
@@ -64,7 +74,9 @@
     {
       "id": "fit-manual-free-wheeling-hubs",
       "difficulty": 3,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": [
         "broken-driving-dog-in-an-automatic-hub",
         "hub-internals-full-of-water-and-rust"
@@ -75,13 +87,16 @@
     {
       "id": "replace-the-axle-shaft-or-joint",
       "difficulty": 4,
-      "cost": { "from": "moderate", "to": "significant" },
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
       "addresses": ["broken-front-axle-shaft-or-joint"],
       "parts": [],
       "procedures": []
     }
   ],
-  "confidence": "community-consensus",
+  "confidence": "anecdotal",
   "sources": [
     {
       "title": "Mitsubishi Pajero Owners Club (UK) forum — \"Free Wheeling Hubs\" thread: members report that automatic hubs break the small driving dog that mates with the rear hub, typically under shock loading when rocking a stuck vehicle forward and back, that a ratcheting sound from the hub is the early warning, and that the factory manual hubs are stronger than the automatics and bolt straight on",
@@ -95,7 +110,7 @@
     "en": {
       "title": "Free-wheeling hub will not drive the front wheel",
       "slug": "free-wheeling-hub-will-not-drive",
-      "summary": "You select four-wheel drive, the transfer case goes in, and one front wheel still does nothing. On the automatic hubs, the usual answer in the cited club thread is a small driving dog inside the hub that has snapped off — and the loading that snaps it is exactly the loading you apply when you are already stuck and rocking the truck forward and back. Members describe a ratcheting sound from the hub as the warning that comes first, which makes it worth acting on rather than driving through. The same thread is unanimous that the factory manual hubs are the stronger part and bolt straight up in place of the automatics, which is why that is listed here as a fix and not as a modification. The truck drives perfectly well in two-wheel drive with a dead hub, so this is not an emergency on tarmac — it is an emergency the first time you need the front axle and do not have it.",
+      "summary": "You select four-wheel drive, the transfer case goes in, and one front wheel still does nothing. This rests on a single club thread rather than the several independent ones a stronger tier would need, so treat it as a well-argued starting point. On the automatic hubs, the answer in that thread is a small driving dog inside the hub that has snapped off — and the loading that snaps it is exactly the loading you apply when you are already stuck and rocking the truck forward and back. Members describe a ratcheting sound from the hub as the warning that comes first, which makes it worth acting on rather than driving through. The same thread is unanimous that the factory manual hubs are the stronger part and bolt straight up in place of the automatics, which is why that is listed here as a fix and not as a modification. The truck drives perfectly well in two-wheel drive with a dead hub, so this is not an emergency on tarmac — it is an emergency the first time you need the front axle and do not have it.",
       "symptoms": {
         "ratcheting-noise-from-one-front-wheel": "A ratcheting or clicking noise from one front wheel, often only when turning",
         "no-drive-to-the-front-in-four-wheel-drive": "Four-wheel drive is selected and engaged but the front wheels are not pulling",
@@ -132,7 +147,7 @@
     "es": {
       "title": "El cubo de rueda libre no le da tracción a la rueda delantera",
       "slug": "el-cubo-de-rueda-libre-no-da-traccion",
-      "summary": "Usted mete doble tracción, la caja de transferencia entra, y una rueda delantera sigue sin hacer nada. En los cubos automáticos, la respuesta más común en el hilo del club que se cita es un dientecillo de arrastre adentro del cubo que se quebró, y la carga que lo quiebra es justamente la que usted aplica cuando ya está atascado y mece el carro hacia adelante y hacia atrás. Los miembros describen un chasquido repetitivo en el cubo como el aviso que aparece primero, y por eso vale la pena atenderlo en vez de seguir manejando encima. Ese mismo hilo es unánime en que los cubos manuales de fábrica son la pieza más fuerte y se empernan directo en lugar de los automáticos, y por eso aquí aparecen como reparación y no como modificación. El carro anda perfectamente en tracción sencilla con un cubo muerto, así que en asfalto esto no es una emergencia: la emergencia llega la primera vez que usted necesite el eje delantero y no lo tenga.",
+      "summary": "Usted mete doble tracción, la caja de transferencia entra, y una rueda delantera sigue sin hacer nada. Esto se apoya en un solo hilo de club y no en los varios hilos independientes que pediría un nivel de confianza más alto, así que tómelo como un punto de partida bien argumentado. En los cubos automáticos, la respuesta en ese hilo es un dientecillo de arrastre adentro del cubo que se quebró, y la carga que lo quiebra es justamente la que usted aplica cuando ya está atascado y mece el carro hacia adelante y hacia atrás. Los miembros describen un chasquido repetitivo en el cubo como el aviso que aparece primero, y por eso vale la pena atenderlo en vez de seguir manejando encima. Ese mismo hilo es unánime en que los cubos manuales de fábrica son la pieza más fuerte y se empernan directo en lugar de los automáticos, y por eso aquí aparecen como reparación y no como modificación. El carro anda perfectamente en tracción sencilla con un cubo muerto, así que en asfalto esto no es una emergencia: la emergencia llega la primera vez que usted necesite el eje delantero y no lo tenga.",
       "symptoms": {
         "ratcheting-noise-from-one-front-wheel": "Un chasquido repetitivo o traqueteo en una rueda delantera, muchas veces solo al girar",
         "no-drive-to-the-front-in-four-wheel-drive": "La doble tracción está puesta y engranada pero las ruedas delanteras no jalan",

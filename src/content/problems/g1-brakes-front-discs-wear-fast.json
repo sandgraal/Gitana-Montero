@@ -4,7 +4,7 @@
     "gens": ["gen1"],
     "markets": ["us"],
     "years": {
-      "from": 1983,
+      "from": 1990,
       "to": 1991
     }
   },
@@ -18,10 +18,18 @@
     "one-front-wheel-hotter-than-the-other-after-a-drive"
   ],
   "causes": [
-    { "id": "seized-caliper-slides" },
-    { "id": "stuck-caliper-piston" },
-    { "id": "collapsed-flexible-brake-hose" },
-    { "id": "poor-quality-friction-material" }
+    {
+      "id": "seized-caliper-slides"
+    },
+    {
+      "id": "stuck-caliper-piston"
+    },
+    {
+      "id": "collapsed-flexible-brake-hose"
+    },
+    {
+      "id": "poor-quality-friction-material"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -53,7 +61,9 @@
     {
       "id": "service-the-caliper-slides",
       "difficulty": 3,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["seized-caliper-slides"],
       "parts": [],
       "procedures": []
@@ -61,7 +71,9 @@
     {
       "id": "rebuild-or-replace-the-calipers",
       "difficulty": 4,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["stuck-caliper-piston"],
       "parts": [],
       "procedures": []
@@ -69,7 +81,10 @@
     {
       "id": "renew-the-flexible-hoses",
       "difficulty": 3,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["collapsed-flexible-brake-hose"],
       "parts": [],
       "procedures": []
@@ -77,7 +92,9 @@
     {
       "id": "fit-known-good-pads-and-discs",
       "difficulty": 3,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["poor-quality-friction-material"],
       "parts": [],
       "procedures": []
@@ -104,7 +121,7 @@
     "en": {
       "title": "Front brake discs wear out fast",
       "slug": "front-brake-discs-wear-out-fast",
-      "summary": "One owner told the federal regulator they had replaced the front discs five times in four years, ending each time in metal-to-metal grinding and a pedal that needed far more effort than it should. That is a single report and this entry is tiered at the bottom of the site's scale to say so. It is published because the pattern it describes — new front brakes that do not last — almost never means the parts were bad, and almost always means something is holding the pads against the disc after you take your foot off. The four causes below are the usual suspects, in the order that costs least to eliminate. One extra warning from a second complaint in the same records: check the length and routing of the flexible hoses whenever the truck is lifted, because a hose pulled tight on a hoist is a hose being damaged. Brakes are safety-critical. Grinding brakes still stop the truck, but with less margin than you think and no margin at all when they are hot: keep speeds down, leave more room, and get this to a qualified mechanic rather than putting it off.",
+      "summary": "One owner told the federal regulator they had replaced the front discs five times in four years, ending each time in metal-to-metal grinding and a pedal that needed far more effort than it should. That is a single report and this entry is tiered at the bottom of the site's scale to say so. It is published because the pattern it describes — new front brakes that do not last — almost never means the parts were bad, and almost always means something is holding the pads against the disc after you take your foot off. The four causes below are the usual suspects, in the order that costs least to eliminate. One extra warning from a second complaint in the same records: check the length and run of the flexible hoses whenever the truck goes up on a hoist, because a hose pulled tight as the suspension hangs is a hose being damaged. Brakes are safety-critical. Grinding brakes still stop the truck, but with less margin than you think and no margin at all when they are hot: keep speeds down, leave more room, and get this to a qualified mechanic rather than putting it off.",
       "symptoms": {
         "grinding-metal-on-metal-when-braking": "A harsh metallic grinding from the front when you brake",
         "pedal-goes-further-than-it-used-to": "The brake pedal travels further before the truck slows",
@@ -145,7 +162,7 @@
     "es": {
       "title": "Los discos de freno delanteros se gastan rapidísimo",
       "slug": "los-discos-de-freno-delanteros-se-gastan-rapido",
-      "summary": "Un dueño le contó al regulador federal que había cambiado los discos de freno delanteros cinco veces en cuatro años, terminando cada vez con roce de metal contra metal y un pedal que pedía mucho más esfuerzo del normal. Es un solo reporte y esta entrada lleva el nivel más bajo de la escala del sitio justamente para decirlo. Se publica porque el patrón que describe —frenos delanteros nuevos que no duran— casi nunca significa que las piezas eran malas, y casi siempre significa que algo mantiene las pastillas de freno pegadas al disco después de que usted suelta el pedal. Las cuatro causas de abajo son los sospechosos de siempre, en el orden que sale más barato descartar. Una advertencia extra que sale de otro reclamo en esos mismos registros: revise el largo y el ruteo de las mangueras de freno cada vez que levante el carro, porque una manguera que queda tensa en el elevador es una manguera que se está dañando. Los frenos son críticos para la seguridad. Un freno que roza todavía detiene el carro, pero con menos margen del que usted cree y sin ningún margen cuando está caliente: baje la velocidad, deje más distancia y llévelo donde un mecánico calificado en vez de dejarlo para después.",
+      "summary": "Un dueño le contó al regulador federal que había cambiado los discos de freno delanteros cinco veces en cuatro años, terminando cada vez con roce de metal contra metal y un pedal que pedía mucho más esfuerzo del normal. Es un solo reporte y esta entrada lleva el nivel más bajo de la escala del sitio justamente para decirlo. Se publica porque el patrón que describe —frenos delanteros nuevos que no duran— casi nunca significa que las piezas eran malas, y casi siempre significa que algo mantiene las pastillas de freno pegadas al disco después de que usted suelta el pedal. Las cuatro causas de abajo son los sospechosos de siempre, en el orden que sale más barato descartar. Una advertencia extra que sale de otro reclamo en esos mismos registros: revise el largo y la trayectoria de las mangueras de freno cada vez que suba el carro al elevador, porque una manguera que queda tensa mientras la suspensión cuelga es una manguera que se está dañando. Los frenos son críticos para la seguridad. Un freno que roza todavía detiene el carro, pero con menos margen del que usted cree y sin ningún margen cuando está caliente: baje la velocidad, deje más distancia y llévelo donde un mecánico calificado en vez de dejarlo para después.",
       "symptoms": {
         "grinding-metal-on-metal-when-braking": "Un roce metálico áspero al frente cuando usted frena",
         "pedal-goes-further-than-it-used-to": "El pedal del freno se hunde más que antes para que el carro baje la velocidad",
@@ -175,7 +192,7 @@
         },
         "renew-the-flexible-hoses": {
           "title": "Cambiar las mangueras de freno",
-          "detail": "En un carro de esta edad las mangueras ya tocan solo por antigüedad. Revise el ruteo y el largo al ponerlas, y asegúrese de que nada quede tenso cuando la suspensión cuelga al máximo en el elevador."
+          "detail": "En un carro de esta edad las mangueras ya tocan solo por antigüedad. Revise la trayectoria y el largo al ponerlas, y asegúrese de que nada quede tenso cuando la suspensión cuelga al máximo en el elevador."
         },
         "fit-known-good-pads-and-discs": {
           "title": "Poner pastillas de freno y discos de buena calidad",

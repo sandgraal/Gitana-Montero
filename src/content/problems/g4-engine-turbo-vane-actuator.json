@@ -19,10 +19,18 @@
     "boost-comes-and-goes"
   ],
   "causes": [
-    { "id": "variable-vane-mechanism-stuck-with-soot" },
-    { "id": "turbocharger-bearing-failure" },
-    { "id": "oil-servicing-neglect" },
-    { "id": "boost-leak-in-the-pipework" }
+    {
+      "id": "variable-vane-mechanism-stuck-with-soot"
+    },
+    {
+      "id": "turbocharger-bearing-failure"
+    },
+    {
+      "id": "oil-servicing-neglect"
+    },
+    {
+      "id": "boost-leak-in-the-pipework"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -50,7 +58,9 @@
     {
       "id": "clean-and-free-the-vane-actuator",
       "difficulty": 4,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["variable-vane-mechanism-stuck-with-soot"],
       "parts": [],
       "procedures": []
@@ -58,7 +68,10 @@
     {
       "id": "replace-the-turbocharger",
       "difficulty": 5,
-      "cost": { "from": "significant", "to": "major" },
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
       "addresses": ["turbocharger-bearing-failure"],
       "parts": [],
       "procedures": []
@@ -66,7 +79,10 @@
     {
       "id": "restore-correct-oil-servicing",
       "difficulty": 2,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["oil-servicing-neglect"],
       "parts": [],
       "procedures": []
@@ -74,7 +90,9 @@
     {
       "id": "seal-the-boost-pipework",
       "difficulty": 2,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["boost-leak-in-the-pipework"],
       "parts": [],
       "procedures": []
@@ -135,7 +153,7 @@
     "es": {
       "title": "Se pegan los álabes del turbo, o el turbo falla",
       "slug": "se-pegan-los-alabes-del-turbo",
-      "summary": "El diésel de cuarta generación usa un turbo de álabes variables, y esos mismos álabes que lo hacen flexible son a lo que se le pega el hollín. La fuente citada nombra causas ligadas al aceite —intervalos de cambio muy largos, especificación de aceite equivocada y no dejar que el motor caliente ni enfríe— y separa dos desenlaces: un mecanismo de álabes engomado, que a veces se puede limpiar si se agarra temprano, y un turbo con los rodamientos ya dañados, que no. Es una sola fuente, así que el nivel de confianza es el más bajo del sitio, pero el orden que propone es sensato y barato de seguir. Antes de cualquiera de las dos cosas, descarte una fuga de presión: una manguera del enfriador de aire rajada o una abrazadera floja da exactamente esa sensación de carro plano, humeante e irregular, por el precio de una abrazadera. Si el turbo está pasando aceite, se lo está metiendo a la admisión, y seguir exigiéndolo arriesga que el motor termine andando con su propio aceite; por eso esto no se clasifica como manejar normal.",
+      "summary": "El diésel de cuarta generación usa un turbo de álabes variables, y esos mismos álabes que lo hacen flexible son a lo que se le pega el hollín. La fuente citada nombra causas ligadas al aceite —intervalos de cambio muy largos, especificación de aceite equivocada y no dejar que el motor caliente ni enfríe— y separa dos desenlaces: un mecanismo de álabes engomado, que a veces se puede limpiar si se agarra temprano, y un turbo con los cojinetes ya dañados, que no. Es una sola fuente, así que el nivel de confianza es el más bajo del sitio, pero el orden que propone es sensato y barato de seguir. Antes de cualquiera de las dos cosas, descarte una fuga de presión: una manguera del enfriador de aire rajada o una abrazadera floja da exactamente esa sensación de carro plano, humeante e irregular, por el precio de una abrazadera. Si el turbo está pasando aceite, se lo está metiendo a la admisión, y seguir exigiéndolo arriesga que el motor termine andando con su propio aceite; por eso esto no se clasifica como manejar normal.",
       "symptoms": {
         "black-smoke-under-load": "Humo negro abundante bajo carga",
         "blue-or-white-smoke-at-idle": "Humo azul o blanco en marcha mínima o al arrancar",
@@ -144,24 +162,24 @@
       },
       "causes": {
         "variable-vane-mechanism-stuck-with-soot": "El mecanismo de álabes variables está engomado de hollín y ya no se mueve libre",
-        "turbocharger-bearing-failure": "Los rodamientos del turbo fallaron y el eje tiene juego",
+        "turbocharger-bearing-failure": "Los cojinetes del turbo fallaron y el eje tiene juego",
         "oil-servicing-neglect": "Intervalos de aceite largos, especificación de aceite equivocada, o cero tiempo de calentamiento y enfriamiento",
         "boost-leak-in-the-pipework": "Una manguera rajada o una abrazadera floja en la tubería del enfriador de aire está perdiendo presión"
       },
       "diagnosticSteps": {
         "ask-for-the-oil-service-history": "Pida el historial de cambios de aceite y revise tanto el intervalo como la especificación del aceite usado, porque esa es la causa que la fuente nombra de primero",
         "check-the-intercooler-pipework-and-clamps": "Recorra todas las mangueras, uniones y abrazaderas del enfriador de aire buscando rajaduras, aceite y flojedad antes de tocar el turbo",
-        "check-the-shaft-for-play-through-the-inlet": "Con la tubería de admisión quitada y el motor apagado, revise si la turbina del compresor tiene juego lateral y si hay marcas de roce en la carcasa",
+        "check-the-shaft-for-play-through-the-inlet": "Con la tubería de admisión quitada y el motor apagado, revise si el rodete del compresor tiene juego lateral y si hay marcas de roce en la carcasa",
         "watch-the-vane-actuator-move": "Haga observar o comandar el actuador de álabes en todo su recorrido con equipo de diagnóstico, para ver si se mueve parejo y completo"
       },
       "fixPaths": {
         "clean-and-free-the-vane-actuator": {
           "title": "Limpiar y liberar el mecanismo de álabes variables",
-          "detail": "Vale la pena intentarlo si el eje está sano y el problema se agarró temprano. No es solución para un turbo que ya está pasando aceite o que tiene juego en los rodamientos."
+          "detail": "Vale la pena intentarlo si el eje está sano y el problema se agarró temprano. No es solución para un turbo que ya está pasando aceite o que tiene juego en los cojinetes."
         },
         "replace-the-turbocharger": {
           "title": "Cambiar el turbo",
-          "detail": "Una vez que los rodamientos se fueron, la respuesta es el cambio. Limpie de aceite el enfriador de aire y la tubería en el mismo trabajo, o los residuos que quedan ahí se van derechito por la unidad nueva."
+          "detail": "Una vez que los cojinetes se fueron, la respuesta es el cambio. Limpie de aceite el enfriador de aire y la tubería en el mismo trabajo, o los residuos que quedan ahí se van derechito por la unidad nueva."
         },
         "restore-correct-oil-servicing": {
           "title": "Volver al mantenimiento de aceite correcto",

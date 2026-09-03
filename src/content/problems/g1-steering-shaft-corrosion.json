@@ -4,7 +4,7 @@
     "gens": ["gen1"],
     "markets": ["us"],
     "years": {
-      "from": 1983,
+      "from": 1990,
       "to": 1991
     }
   },
@@ -18,10 +18,18 @@
     "gritty-feel-through-the-steering-wheel"
   ],
   "causes": [
-    { "id": "pitted-steering-box-input-shaft" },
-    { "id": "torn-input-shaft-seal" },
-    { "id": "low-or-old-power-steering-fluid" },
-    { "id": "seized-steering-shaft-joint" }
+    {
+      "id": "pitted-steering-box-input-shaft"
+    },
+    {
+      "id": "torn-input-shaft-seal"
+    },
+    {
+      "id": "low-or-old-power-steering-fluid"
+    },
+    {
+      "id": "seized-steering-shaft-joint"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -49,7 +57,9 @@
     {
       "id": "flush-and-refill-the-system",
       "difficulty": 2,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["low-or-old-power-steering-fluid"],
       "parts": [],
       "procedures": []
@@ -57,7 +67,10 @@
     {
       "id": "rebuild-or-replace-the-steering-box",
       "difficulty": 4,
-      "cost": { "from": "moderate", "to": "significant" },
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
       "addresses": ["pitted-steering-box-input-shaft", "torn-input-shaft-seal"],
       "parts": [],
       "procedures": []
@@ -65,7 +78,9 @@
     {
       "id": "replace-the-intermediate-shaft",
       "difficulty": 3,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["seized-steering-shaft-joint"],
       "parts": [],
       "procedures": []

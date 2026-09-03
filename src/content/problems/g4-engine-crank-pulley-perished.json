@@ -19,9 +19,15 @@
     "belt-thrown-or-shredded"
   ],
   "causes": [
-    { "id": "perished-pulley-rubber" },
-    { "id": "loose-or-broken-centre-bolt" },
-    { "id": "worn-belt-or-tensioner" }
+    {
+      "id": "perished-pulley-rubber"
+    },
+    {
+      "id": "loose-or-broken-centre-bolt"
+    },
+    {
+      "id": "worn-belt-or-tensioner"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -49,7 +55,10 @@
     {
       "id": "replace-the-crankshaft-pulley",
       "difficulty": 4,
-      "cost": { "from": "moderate", "to": "significant" },
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
       "addresses": ["perished-pulley-rubber"],
       "parts": [],
       "procedures": []
@@ -57,7 +66,10 @@
     {
       "id": "renew-the-belt-and-tensioner",
       "difficulty": 3,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["worn-belt-or-tensioner"],
       "parts": [],
       "procedures": []
@@ -65,7 +77,10 @@
     {
       "id": "renew-the-centre-bolt-correctly-torqued",
       "difficulty": 4,
-      "cost": { "from": "minimal", "to": "significant" },
+      "cost": {
+        "from": "minimal",
+        "to": "significant"
+      },
       "addresses": ["loose-or-broken-centre-bolt"],
       "parts": [],
       "procedures": []
@@ -81,14 +96,14 @@
       "kind": "forum"
     },
     {
-      "title": "Opinautos — Mitsubishi Montero, fallas reportadas de la polea del cigüeñal: seven owner reports spanning 1994 to 2008 model years, including a 2008 3.2 DI-D, describing the pulley working loose, the centre bolt breaking or disappearing, and repeat failures after refitting",
+      "title": "Opinautos — Mitsubishi Montero, reportes de dueños sobre la polea del cigüeñal: seven entries spanning 1994 to 2008 model years describing the pulley working loose, the centre bolt breaking or disappearing, and repeat failures after refitting. The single fourth-generation entry (a 2008 3.2 DI-D) is a request for the tightening torque rather than a failure report, so it evidences the question owners ask, not a fourth-generation failure",
       "url": "https://www.opinautos.com/mx/mitsubishi/montero/defectos/polea-del-ciguenal",
       "archiveUrl": "https://web.archive.org/web/20260902175954id_/https://www.opinautos.com/mx/mitsubishi/montero/defectos/polea-del-ciguenal",
       "accessed": "2026-09-02",
       "kind": "forum"
     },
     {
-      "title": "Repuestos USA Motors, Tres Ríos, Cartago, Costa Rica — parts listing for \"polea principal del motor o damper\", evidence that the crankshaft pulley is a stocked counter item in Costa Rica",
+      "title": "Repuestos USA Motors, Tres Ríos, Cartago, Costa Rica — catalogue category page listing \"polea principal del motor o damper\"; a quote-request listing, not a per-vehicle stock or price check",
       "url": "https://repuestosusamotorscr.com/producto/poleas-variedad/",
       "archiveUrl": "https://web.archive.org/web/20260902180046id_/https://repuestosusamotorscr.com/producto/poleas-variedad/",
       "accessed": "2026-09-02",
@@ -120,7 +135,7 @@
       "fixPaths": {
         "replace-the-crankshaft-pulley": {
           "title": "Replace the crankshaft pulley",
-          "detail": "A perished pulley is replaced, not repaired. The part is a stocked counter item in Costa Rica, which is worth knowing before somebody quotes you weeks of import lead time."
+          "detail": "A perished pulley is replaced, not repaired. A Costa Rican counter lists this part category, which is worth knowing before somebody quotes you weeks of import lead time — though the listing is a quote request, not a stock check."
         },
         "renew-the-belt-and-tensioner": {
           "title": "Renew the drive belt and tensioner",
@@ -128,7 +143,7 @@
         },
         "renew-the-centre-bolt-correctly-torqued": {
           "title": "Renew the centre bolt to the factory torque",
-          "detail": "Owner reports in the cited Spanish-language record describe this bolt loosening again after a repair, so the torque figure and the thread condition both matter. Take the figure from the factory manual and do not accept a number quoted from memory."
+          "detail": "Owner reports in the cited Spanish-language record describe this bolt loosening again after a repair on other trucks in the model line, so the torque figure and the thread condition both matter. Take the figure from the factory manual and do not accept a number quoted from memory."
         }
       }
     },
@@ -156,7 +171,7 @@
       "fixPaths": {
         "replace-the-crankshaft-pulley": {
           "title": "Cambiar la polea del cigüeñal",
-          "detail": "Una polea cristalizada se cambia, no se repara. La pieza es de mostrador en Costa Rica, lo cual conviene saber antes de que alguien le cotice semanas de importación."
+          "detail": "Una polea cristalizada se cambia, no se repara. Hay mostrador en Costa Rica que lista esta categoría de pieza, lo cual conviene saber antes de que alguien le cotice semanas de importación, aunque el listado es para pedir cotización y no una consulta de existencias."
         },
         "renew-the-belt-and-tensioner": {
           "title": "Cambiar la faja y el tensor",
@@ -164,7 +179,7 @@
         },
         "renew-the-centre-bolt-correctly-torqued": {
           "title": "Poner tornillo central nuevo con el apriete de fábrica",
-          "detail": "Los reportes de dueños en el registro en español que se cita describen que ese tornillo se vuelve a aflojar después de una reparación, así que el valor de apriete y el estado de la rosca importan los dos. Tome el valor del manual de servicio de fábrica y no acepte un número dicho de memoria."
+          "detail": "Los reportes de dueños en el registro en español que se cita describen que ese tornillo se vuelve a aflojar después de una reparación en otros carros de la misma línea, así que el valor de apriete y el estado de la rosca importan los dos. Tome el valor del manual de servicio de fábrica y no acepte un número dicho de memoria."
         }
       }
     }

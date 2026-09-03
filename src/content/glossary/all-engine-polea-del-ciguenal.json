@@ -6,6 +6,12 @@
   "system": "engine",
   "aliases": [
     {
+      "term": "damper",
+      "locale": "es",
+      "countries": ["CR"],
+      "falseFriend": true
+    },
+    {
       "term": "polea principal del motor",
       "locale": "es",
       "countries": ["CR"]
@@ -56,7 +62,7 @@
     },
     "es": {
       "title": "polea del cigüeñal",
-      "summary": "La polea empernada a la punta del cigüeñal que mueve las fajas de accesorios. En casi todos estos motores no es una polea simple sino un amortiguador de vibración: dos anillos metálicos unidos por una capa de hule que absorbe la vibración torsional del cigüeñal. En las repuesteras ticas se pide como polea principal del motor, y en el mostrador también la reconocen por su nombre en inglés. Le pasan dos cosas, y este sitio documenta las dos: el hule se cristaliza y deja que el anillo exterior camine, o el único tornillo que lleva en el centro se afloja."
+      "summary": "La polea empernada a la punta del cigüeñal que mueve las fajas de accesorios. En casi todos estos motores no es una polea simple sino un amortiguador de vibración: dos anillos metálicos unidos por una capa de hule que absorbe la vibración torsional del cigüeñal. En las repuesteras ticas se pide como polea principal del motor, y de boca casi todo el mundo le dice damper — ojo, que esa misma palabra en inglés nombra el amortiguador de la suspensión, que no tiene nada que ver. Le pasan dos cosas, y este sitio documenta las dos: el hule se cristaliza y deja que el anillo exterior camine, o el único tornillo que lleva en el centro se afloja."
     }
   }
 }

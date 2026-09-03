@@ -1,7 +1,7 @@
 {
   "id": "all-engine-cadena-de-distribucion",
   "fitment": {
-    "gens": ["gen2", "gen2-5", "gen3", "gen4"]
+    "gens": ["gen3", "gen4"]
   },
   "system": "engine",
   "aliases": [
@@ -39,7 +39,7 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "On2Wheels Costa Rica — parts catalogue category \"CADENA DISTRIBUCION\" under engine parts, a Costa Rican shop listing the part under that name",
+      "title": "On2Wheels Costa Rica — a Costa Rican motorcycle parts catalogue whose engine-parts section carries the category \"CADENA DISTRIBUCION\"; cited for the Costa Rican wording only, not as an automotive fitment source",
       "url": "https://www.on2wheelscr.com/index.php?category_id=53&dispatch=categories.view",
       "archiveUrl": "https://web.archive.org/web/20260902180350id_/https://www.on2wheelscr.com/index.php?category_id=53&dispatch=categories.view",
       "accessed": "2026-09-02",

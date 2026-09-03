@@ -19,10 +19,18 @@
     "happens-in-cold-damp-weather"
   ],
   "causes": [
-    { "id": "ice-on-the-throttle-plate" },
-    { "id": "recall-remedy-never-fitted" },
-    { "id": "binding-throttle-linkage" },
-    { "id": "tired-return-spring" }
+    {
+      "id": "ice-on-the-throttle-plate"
+    },
+    {
+      "id": "recall-remedy-never-fitted"
+    },
+    {
+      "id": "binding-throttle-linkage"
+    },
+    {
+      "id": "tired-return-spring"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -50,7 +58,10 @@
     {
       "id": "have-the-recall-remedy-fitted",
       "difficulty": 3,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["ice-on-the-throttle-plate", "recall-remedy-never-fitted"],
       "parts": [],
       "procedures": []
@@ -58,7 +69,9 @@
     {
       "id": "free-and-service-the-linkage",
       "difficulty": 2,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["binding-throttle-linkage", "tired-return-spring"],
       "parts": [],
       "procedures": []
@@ -67,14 +80,14 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "US NHTSA vehicle-safety API — Mitsubishi Montero 1989 recall records, campaign 89V030000: throttle valve icing on V6 engines, remedy \"install a heated adapter plate\"",
+      "title": "US NHTSA vehicle-safety API — Mitsubishi Montero recall records for the 1989 model year, campaign 89V030000: throttle valve icing on V6 engines, remedy \"install a heated adapter plate\". The campaign is listed against this model year only",
       "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1989",
       "archiveUrl": "https://web.archive.org/web/20260902174734id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1989",
       "accessed": "2026-09-02",
       "kind": "reference"
     },
     {
-      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (two vehicle-speed-control complaints describe the throttle sticking open, one ending in a rollover)",
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (one vehicle-speed-control complaint describes the throttle sticking while driving, the vehicle increasing speed and the driver rolling it over)",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
       "archiveUrl": "https://web.archive.org/web/20260902180641id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
       "accessed": "2026-09-02",
@@ -92,7 +105,7 @@
     "en": {
       "title": "Throttle does not close — the V6 icing recall",
       "slug": "throttle-does-not-close",
-      "summary": "Mitsubishi ran a safety recall on the V6 first-generation Montero because the throttle valve could ice up and stick, leaving the engine unable to drop back to idle. The remedy was a heated adapter plate under the throttle body. Owner complaints filed with the same regulator over the following years describe the outcome the recall was meant to prevent — a throttle that stayed open, a truck that surged from a stop, and in one case a rollover. Because the recall is decades old and these trucks have changed hands many times, a truck in front of you today may never have had the remedy fitted, and nobody can tell by looking. Anything that keeps the throttle from closing on its own is a safety-critical fault: do not drive the truck until it is fixed, and have the work done by a qualified mechanic.",
+      "summary": "Mitsubishi ran a safety recall on the V6 first-generation Montero because the throttle valve could ice up and stick, leaving the engine unable to drop back to idle. The remedy was a heated adapter plate under the throttle body. Owner complaints filed with the same regulator over the following years describe the outcome the recall was meant to prevent — a throttle that stayed open, a truck that surged from a stop, and in one case a rollover. The campaign record is listed against the first V6 model year only, while the owner complaints cited here come from the two later ones, so treat the model-year boundary as the paperwork's, not the fault's. Because the recall is decades old and these trucks have changed hands many times, a truck in front of you today may never have had the remedy fitted, and nobody can tell by looking. Anything that keeps the throttle from closing on its own is a safety-critical fault: do not drive the truck until it is fixed, and have the work done by a qualified mechanic.",
       "symptoms": {
         "engine-will-not-return-to-idle": "You lift off the accelerator and the engine keeps revving instead of dropping to idle",
         "throttle-pedal-feels-stuck": "The accelerator pedal feels held down or gritty, and does not spring back cleanly",
@@ -125,7 +138,7 @@
     "es": {
       "title": "La mariposa no cierra — la campaña de hielo en el V6",
       "slug": "la-mariposa-no-cierra",
-      "summary": "Mitsubishi hizo una campaña de seguridad en el Montero de primera generación con V6 porque a la mariposa de aceleración se le podía formar hielo y quedarse pegada, dejando al motor sin poder bajar a marcha mínima. La solución de fábrica fue una placa adaptadora calentada debajo del cuerpo de aceleración. Los reclamos que los dueños presentaron después ante ese mismo regulador describen justo lo que la campaña quería evitar: una mariposa que se quedó abierta, un carro que se fue hacia adelante desde el alto y, en un caso, una volcadura. Como la campaña es de hace décadas y estos carros han cambiado de dueño muchas veces, es perfectamente posible que al que usted tiene enfrente nunca le pusieran la pieza, y de vista nadie lo puede saber. Cualquier cosa que impida que la mariposa cierre sola es una falla crítica para la seguridad: no maneje el carro hasta arreglarlo, y deje el trabajo en manos de un mecánico calificado.",
+      "summary": "Mitsubishi hizo una campaña de seguridad en el Montero de primera generación con V6 porque a la mariposa de aceleración se le podía formar hielo y quedarse pegada, dejando al motor sin poder bajar a marcha mínima. La solución de fábrica fue una placa adaptadora calentada debajo del cuerpo de aceleración. Los reclamos que los dueños presentaron después ante ese mismo regulador describen justo lo que la campaña quería evitar: una mariposa que se quedó abierta, un carro que se fue hacia adelante desde el alto y, en un caso, una volcadura. El registro de la campaña aparece solo contra el primer año modelo con V6, mientras que los reclamos de dueños que se citan aquí vienen de los dos años siguientes, así que el corte por año modelo es el del papeleo, no el de la falla. Como la campaña es de hace décadas y estos carros han cambiado de dueño muchas veces, es perfectamente posible que al que usted tiene enfrente nunca le pusieran la pieza, y de vista nadie lo puede saber. Cualquier cosa que impida que la mariposa cierre sola es una falla crítica para la seguridad: no maneje el carro hasta arreglarlo, y deje el trabajo en manos de un mecánico calificado.",
       "symptoms": {
         "engine-will-not-return-to-idle": "Usted suelta el acelerador y el motor se queda revolucionado en vez de bajar a marcha mínima",
         "throttle-pedal-feels-stuck": "El pedal del acelerador se siente trabado o áspero y no regresa de un solo",
@@ -151,7 +164,7 @@
         },
         "free-and-service-the-linkage": {
           "title": "Limpiar, liberar y volver a resortear el varillaje del acelerador",
-          "detail": "Limpie el ducto y el eje de la mariposa, libere el cable y el varillaje, y cambie el resorte de retorno que ya no cierra de golpe. Esta es la mitad del problema que no tiene nada que ver con la campaña y todo que ver con la edad del carro."
+          "detail": "Limpie el alojamiento y el eje de la mariposa, libere el cable y el varillaje, y cambie el resorte de retorno que ya no cierra de golpe. Esta es la mitad del problema que no tiene nada que ver con la campaña y todo que ver con la edad del carro."
         }
       }
     }

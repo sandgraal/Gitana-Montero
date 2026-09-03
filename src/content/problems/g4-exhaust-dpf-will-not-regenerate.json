@@ -2,12 +2,13 @@
   "id": "g4-exhaust-dpf-will-not-regenerate",
   "fitment": {
     "gens": ["gen4"],
-    "markets": ["uk", "eu", "au", "global"],
+    "markets": ["uk", "eu"],
     "engines": ["4m41"],
     "years": {
       "from": 2007,
       "to": 2009
-    }
+    },
+    "transmissions": ["automatic-5-speed", "automatic-4-speed"]
   },
   "system": "exhaust",
   "severity": "damaging",
@@ -19,10 +20,18 @@
     "fuel-consumption-collapses-during-a-regeneration"
   ],
   "causes": [
-    { "id": "filter-loaded-with-soot" },
-    { "id": "short-trip-use-never-completes-a-regeneration" },
-    { "id": "differential-pressure-sensing-fault" },
-    { "id": "filter-loaded-with-ash-rather-than-soot" }
+    {
+      "id": "filter-loaded-with-soot"
+    },
+    {
+      "id": "short-trip-use-never-completes-a-regeneration"
+    },
+    {
+      "id": "differential-pressure-sensing-fault"
+    },
+    {
+      "id": "filter-loaded-with-ash-rather-than-soot"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -58,7 +67,9 @@
     {
       "id": "change-the-driving-pattern",
       "difficulty": 1,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["short-trip-use-never-completes-a-regeneration"],
       "parts": [],
       "procedures": []
@@ -66,7 +77,10 @@
     {
       "id": "repair-the-pressure-sensing-circuit",
       "difficulty": 3,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["differential-pressure-sensing-fault"],
       "parts": [],
       "procedures": []
@@ -74,7 +88,9 @@
     {
       "id": "forced-regeneration-and-oil-change",
       "difficulty": 3,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["filter-loaded-with-soot"],
       "parts": [],
       "procedures": []
@@ -82,7 +98,10 @@
     {
       "id": "specialist-clean-or-replace-the-filter",
       "difficulty": 4,
-      "cost": { "from": "significant", "to": "major" },
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
       "addresses": ["filter-loaded-with-ash-rather-than-soot"],
       "parts": [],
       "procedures": []
@@ -121,7 +140,7 @@
         "particulate-filter-warning-lamp-on-or-flashing": "The particulate filter warning lamp is lit, or flashing",
         "engine-management-lamp-comes-on-as-well": "The engine management lamp joins the filter lamp",
         "power-drops-away-under-load": "The truck loses power, especially pulling a hill or loaded",
-        "fuel-consumption-collapses-during-a-regeneration": "Fuel consumption collapses for a stretch of driving and then recovers"
+        "fuel-consumption-collapses-during-a-regeneration": "Fuel consumption gets far worse for a stretch of driving and then recovers"
       },
       "causes": {
         "filter-loaded-with-soot": "The filter is loaded with soot that has not been burnt off",

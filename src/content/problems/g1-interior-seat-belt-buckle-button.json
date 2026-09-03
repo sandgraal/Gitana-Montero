@@ -19,9 +19,15 @@
     "loose-plastic-rattling-inside-the-buckle"
   ],
   "causes": [
-    { "id": "cracked-release-button" },
-    { "id": "broken-plastic-inside-the-buckle" },
-    { "id": "worn-latch-plate" }
+    {
+      "id": "cracked-release-button"
+    },
+    {
+      "id": "broken-plastic-inside-the-buckle"
+    },
+    {
+      "id": "worn-latch-plate"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -49,7 +55,10 @@
     {
       "id": "replace-the-buckle-assembly",
       "difficulty": 2,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": [
         "cracked-release-button",
         "broken-plastic-inside-the-buckle",
@@ -61,6 +70,13 @@
   ],
   "confidence": "community-consensus",
   "sources": [
+    {
+      "title": "US NHTSA vehicle-safety API — Mitsubishi Montero 1986 recall records, the earliest model year the buckle campaign 95V103004 is listed against",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1986",
+      "archiveUrl": "https://web.archive.org/web/20260903015459id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1986",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
     {
       "title": "US NHTSA vehicle-safety API — Mitsubishi Montero 1991 recall records, campaign 95V103004: front safety belt buckle release buttons can break, pieces fall into the buckle, \"the safety belts would not provide adequate protection to an occupant in a vehicle crash\" (Takata-made belts)",
       "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
@@ -74,13 +90,20 @@
       "archiveUrl": "https://web.archive.org/web/20260902180641id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
       "accessed": "2026-09-02",
       "kind": "reference"
+    },
+    {
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1991 Mitsubishi Montero (one complaint reports \"FRONT/REAR SEAT BELT BUCKLES FAILED\", the only cited evidence that rear buckles failed the same way)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "archiveUrl": "https://web.archive.org/web/20260902175215id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "accessed": "2026-09-02",
+      "kind": "reference"
     }
   ],
   "prose": {
     "en": {
       "title": "Seat belt buckle release button breaks up",
       "slug": "seat-belt-buckle-release-button-breaks",
-      "summary": "The red release button on the front seat belt buckles goes brittle, cracks, and drops pieces of itself into the buckle mechanism. Mitsubishi recalled it: the notice says in plain words that the belts would not protect an occupant in a crash. Owner complaints filed separately describe the same thing happening on rear belts too. This is the one entry on this site where the fault does nothing at all until the moment it matters most, which is why the triage here is deliberately the strictest one: a seat whose belt will not latch and hold is a seat nobody should sit in, and a driver's belt that will not latch is a truck nobody should drive. A brittle button is also a good reason to look hard at the rest of a restraint that is decades old — webbing, anchor bolts, retractor. Restraints are safety-critical: have this work done by a qualified mechanic.",
+      "summary": "The red release button on the front seat belt buckles goes brittle, cracks, and drops pieces of itself into the buckle mechanism. Mitsubishi recalled it: the notice says in plain words that the belts would not protect an occupant in a crash. One owner complaint filed separately reports front and rear buckles failing together, which is the only cited evidence that the rear belts go the same way. This is a fault that does nothing at all until the moment it matters most, which is why the triage here is deliberately the strictest one: a seat whose belt will not latch and hold is a seat nobody should sit in, and a driver's belt that will not latch is a truck nobody should drive. A brittle button is also a good reason to look hard at the rest of a restraint that is decades old — webbing, anchor bolts, retractor. Restraints are safety-critical: have this work done by a qualified mechanic.",
       "symptoms": {
         "red-release-button-cracked-or-crumbling": "The red button marked for release is cracked, chalky or missing a corner",
         "latch-plate-will-not-stay-locked": "The metal tongue clicks in but pulls back out when you tug the belt",
@@ -108,7 +131,7 @@
     "es": {
       "title": "Se desbarata el botón de liberación de la hebilla del cinturón",
       "slug": "boton-de-la-hebilla-del-cinturon-se-desbarata",
-      "summary": "El botón rojo de liberación de las hebillas de los cinturones de seguridad delanteros se cristaliza, se raja y le van cayendo pedazos al mecanismo. Mitsubishi hizo campaña por eso: el aviso dice con todas sus letras que los cinturones no protegerían al ocupante en un choque. Aparte, hay reclamos de dueños que describen lo mismo en los cinturones de atrás. Esta es la única entrada del sitio donde la falla no hace absolutamente nada hasta el momento en que más importa, y por eso el triaje aquí es a propósito el más estricto: un asiento cuyo cinturón de seguridad no traba es un asiento donde nadie debe ir, y un cinturón del conductor que no traba es un carro que nadie debe manejar. Un botón cristalizado también es buena razón para revisar de cerca el resto de un sistema de retención que ya tiene décadas: la cinta, los pernos de anclaje y el retractor. Los sistemas de retención son críticos para la seguridad: deje este trabajo en manos de un mecánico calificado.",
+      "summary": "El botón rojo de liberación de las hebillas de los cinturones de seguridad delanteros se cristaliza, se raja y le van cayendo pedazos al mecanismo. Mitsubishi hizo campaña por eso: el aviso dice con todas sus letras que los cinturones no protegerían al ocupante en un choque. Aparte, hay un reclamo de un dueño que reporta que fallaron juntas las hebillas delanteras y traseras, y esa es la única evidencia citada de que las de atrás se van por el mismo camino. Es una falla que no hace absolutamente nada hasta el momento en que más importa, y por eso el triaje aquí es a propósito el más estricto: un asiento cuyo cinturón de seguridad no traba es un asiento donde nadie debe ir, y un cinturón del conductor que no traba es un carro que nadie debe manejar. Un botón cristalizado también es buena razón para revisar de cerca el resto de un sistema de retención que ya tiene décadas: la cinta, los pernos de anclaje y el retractor. Los sistemas de retención son críticos para la seguridad: deje este trabajo en manos de un mecánico calificado.",
       "symptoms": {
         "red-release-button-cracked-or-crumbling": "El botón rojo de liberación está rajado, blanquecino o le falta una esquina",
         "latch-plate-will-not-stay-locked": "La lengüeta metálica entra y hace clic pero se sale al jalar la cinta",

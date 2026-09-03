@@ -2,12 +2,13 @@
   "id": "g4-engine-oil-level-rising",
   "fitment": {
     "gens": ["gen4"],
-    "markets": ["uk", "eu", "au", "global"],
+    "markets": ["uk", "eu"],
     "engines": ["4m41"],
     "years": {
       "from": 2007,
       "to": 2009
-    }
+    },
+    "transmissions": ["automatic-5-speed", "automatic-4-speed"]
   },
   "system": "engine",
   "safetyCritical": true,
@@ -20,10 +21,18 @@
     "particulate-filter-warnings-in-the-weeks-before"
   ],
   "causes": [
-    { "id": "repeated-failed-regenerations-diluting-the-oil" },
-    { "id": "leaking-injector-passing-fuel-into-the-sump" },
-    { "id": "coolant-entering-the-oil" },
-    { "id": "simply-overfilled-at-the-last-service" }
+    {
+      "id": "repeated-failed-regenerations-diluting-the-oil"
+    },
+    {
+      "id": "leaking-injector-passing-fuel-into-the-sump"
+    },
+    {
+      "id": "coolant-entering-the-oil"
+    },
+    {
+      "id": "simply-overfilled-at-the-last-service"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -59,7 +68,9 @@
     {
       "id": "change-the-oil-and-cure-the-regeneration-problem",
       "difficulty": 3,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["repeated-failed-regenerations-diluting-the-oil"],
       "parts": [],
       "procedures": []
@@ -67,7 +78,9 @@
     {
       "id": "repair-the-leaking-injector",
       "difficulty": 4,
-      "cost": { "from": "significant" },
+      "cost": {
+        "from": "significant"
+      },
       "addresses": ["leaking-injector-passing-fuel-into-the-sump"],
       "parts": [],
       "procedures": []
@@ -75,7 +88,9 @@
     {
       "id": "drain-to-the-correct-level",
       "difficulty": 1,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["simply-overfilled-at-the-last-service"],
       "parts": [],
       "procedures": []
@@ -140,7 +155,7 @@
     "es": {
       "title": "El nivel de aceite de motor sube solo — combustible en el cárter",
       "slug": "el-nivel-de-aceite-sube-solo",
-      "summary": "Un dueño de un diésel de cuarta generación temprana reportó, después de una larga pelea con la regeneración del filtro de partículas, que el cárter se le había llenado con una cantidad grande de diésel. Es un solo testimonio, así que esta entrada lleva el nivel de confianza más bajo del sitio; pero el mecanismo detrás no está en discusión y conviene conocerlo antes de que le pase a usted. Para quemar y limpiar el filtro, el motor inyecta combustible extra tarde en el ciclo; si la regeneración nunca se completa, parte de ese combustible baja por las paredes de los cilindros al aceite en vez de quemarse. Aceite diluido es aceite más delgado, y el aceite delgado no protege los rodamientos, así que un problema de filtro se vuelve calladamente un problema de motor. Por eso el triaje aquí es más estricto que el de la entrada del filtro de la que se desprende: un nivel de aceite que sube solo significa que ese aceite ya no es aceite. Deje de manejar, revíselo en frío y busque la causa. Deje el diagnóstico en manos de un mecánico calificado, y nunca siga manejando un diésel al que le está subiendo el nivel de aceite.",
+      "summary": "Un dueño de un diésel de cuarta generación temprana reportó, después de una larga pelea con la regeneración del filtro de partículas, que el cárter se le había llenado con una cantidad grande de diésel. Es un solo testimonio, así que esta entrada lleva el nivel de confianza más bajo del sitio; pero el mecanismo detrás no está en discusión y conviene conocerlo antes de que le pase a usted. Para quemar y limpiar el filtro, el motor inyecta combustible extra tarde en el ciclo; si la regeneración nunca se completa, parte de ese combustible baja por las paredes de los cilindros al aceite en vez de quemarse. Aceite diluido es aceite más delgado, y el aceite delgado no protege los cojinetes, así que un problema de filtro se vuelve calladamente un problema de motor. Por eso el triaje aquí es más estricto que el de la entrada del filtro de la que se desprende: un nivel de aceite que sube solo significa que ese aceite ya no es aceite. Deje de manejar, revíselo en frío y busque la causa. Deje el diagnóstico en manos de un mecánico calificado, y nunca siga manejando un diésel al que le está subiendo el nivel de aceite.",
       "symptoms": {
         "oil-level-above-the-full-mark-without-a-top-up": "La varilla marca por encima del máximo y nadie le ha agregado aceite",
         "oil-smells-of-diesel": "El aceite de la varilla huele fuerte a diésel",

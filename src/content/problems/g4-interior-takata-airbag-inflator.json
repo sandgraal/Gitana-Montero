@@ -2,9 +2,9 @@
   "id": "g4-interior-takata-airbag-inflator",
   "fitment": {
     "gens": ["gen4"],
-    "markets": ["au", "eu", "uk", "me", "global"],
+    "markets": ["au", "eu"],
     "years": {
-      "from": 2006,
+      "from": 2007,
       "to": 2017
     }
   },
@@ -18,9 +18,15 @@
     "airbag-warning-lamp-on"
   ],
   "causes": [
-    { "id": "degraded-inflator-propellant" },
-    { "id": "recall-remedy-never-carried-out" },
-    { "id": "unrelated-restraint-system-fault" }
+    {
+      "id": "degraded-inflator-propellant"
+    },
+    {
+      "id": "recall-remedy-never-carried-out"
+    },
+    {
+      "id": "unrelated-restraint-system-fault"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -46,7 +52,9 @@
     {
       "id": "have-the-inflator-replaced-under-recall",
       "difficulty": 3,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": [
         "degraded-inflator-propellant",
         "recall-remedy-never-carried-out"
@@ -90,7 +98,7 @@
     "en": {
       "title": "Takata airbag inflator recall",
       "slug": "takata-airbag-inflator-recall",
-      "summary": "Fourth-generation trucks across several markets were recalled because the airbag inflator's propellant degrades with heat and humidity, and a degraded inflator can burst its metal housing instead of inflating the bag, firing fragments at the people it is meant to protect. The Australian and European regulator records cited below say so in those words. This is the entry on this site with no symptom: nothing about the truck changes, nothing lights up, and the fault only exists at the one moment you would want the airbag to work. The only diagnosis is to check the vehicle identification number with the manufacturer and to get the completion record if somebody tells you it has been done. Costa Rica is a hot, humid market, which is the exact combination the recalls name as the accelerator. The replacement is free under the recall in the markets that issued it, and a free repair with no expiry is not a repair to defer. Restraints are safety-critical: this is dealer work, not driveway work — never attempt to remove or handle an undeployed inflator yourself.",
+      "summary": "Fourth-generation trucks across several markets were recalled because the airbag inflator's propellant degrades with heat and humidity, and a degraded inflator can burst its metal housing instead of inflating the bag, firing fragments at the people it is meant to protect. The Australian and European regulator records cited below say so in those words. This is a fault with no symptom: nothing about the truck changes, nothing lights up, and the fault only exists at the one moment you would want the airbag to work. Only one of the cited records classifies the inflator by type — the Beta passenger inflator, on the 2013 to 2017 trucks — so do not read a type off this page for the earlier ones. The only diagnosis is to check the vehicle identification number with the manufacturer and to get the completion record if somebody tells you it has been done. Costa Rica is a hot, humid market, which is the exact combination the recalls name as the accelerator. The replacement is free under the recall in the markets that issued it, and a free repair with no expiry is not a repair to defer. Restraints are safety-critical: this is dealer work, not driveway work — never attempt to remove or handle an undeployed inflator yourself.",
       "symptoms": {
         "vehicle-identification-number-appears-on-a-recall-list": "The vehicle identification number comes back as affected on the manufacturer's recall look-up",
         "no-symptom-at-all-until-a-crash": "Nothing at all — the truck gives no sign that the inflator has degraded",
@@ -116,7 +124,7 @@
     "es": {
       "title": "Campaña de las bolsas de aire Takata",
       "slug": "campana-de-las-bolsas-de-aire-takata",
-      "summary": "Los carros de cuarta generación de varios mercados fueron llamados a revisión porque el propelente del inflador de la bolsa de aire se degrada con el calor y la humedad, y un inflador degradado puede reventar su carcasa metálica en vez de inflar la bolsa, disparando fragmentos contra las personas que debía proteger. Los registros del regulador australiano y del europeo que se citan abajo lo dicen con esas palabras. Esta es la entrada del sitio que no tiene síntoma: nada cambia en el carro, nada se enciende, y la falla solo existe en el único momento en que usted querría que la bolsa de aire funcionara. El único diagnóstico es consultar el número de chasis con el fabricante y pedir el comprobante si alguien le dice que ya se hizo. Costa Rica es un mercado caliente y húmedo, que es exactamente la combinación que las campañas nombran como acelerador del problema. El cambio es gratuito bajo la campaña en los mercados que la emitieron, y una reparación gratuita y sin vencimiento no es una reparación para dejar para después. Los sistemas de retención son críticos para la seguridad: esto es trabajo de agencia, no algo para hacer en la casa; nunca intente sacar ni manipular usted mismo un inflador sin detonar.",
+      "summary": "Los carros de cuarta generación de varios mercados fueron llamados a revisión porque el propelente del inflador de la bolsa de aire se degrada con el calor y la humedad, y un inflador degradado puede reventar su carcasa metálica en vez de inflar la bolsa, disparando fragmentos contra las personas que debía proteger. Los registros del regulador australiano y del europeo que se citan abajo lo dicen con esas palabras. Es una falla que no tiene síntoma: nada cambia en el carro, nada se enciende, y la falla solo existe en el único momento en que usted querría que la bolsa de aire funcionara. Solo uno de los registros citados clasifica el inflador por tipo —el inflador Beta del pasajero, en los carros de 2013 a 2017—, así que no dé por sentado un tipo para los años anteriores a partir de esta página. El único diagnóstico es consultar el número de chasis con el fabricante y pedir el comprobante si alguien le dice que ya se hizo. Costa Rica es un mercado caliente y húmedo, que es exactamente la combinación que las campañas nombran como acelerador del problema. El cambio es gratuito bajo la campaña en los mercados que la emitieron, y una reparación gratuita y sin vencimiento no es una reparación para dejar para después. Los sistemas de retención son críticos para la seguridad: esto es trabajo de agencia, no algo para hacer en la casa; nunca intente sacar ni manipular usted mismo un inflador sin detonar.",
       "symptoms": {
         "vehicle-identification-number-appears-on-a-recall-list": "El número de chasis aparece como afectado en la consulta de campañas del fabricante",
         "no-symptom-at-all-until-a-crash": "Ninguno: el carro no da ninguna señal de que el inflador se haya degradado",

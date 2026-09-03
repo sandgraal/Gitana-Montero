@@ -15,14 +15,21 @@
   "symptoms": [
     "hesitates-when-you-ask-for-throttle",
     "rough-idle",
-    "reduced-throttle-response",
-    "black-smoke-under-acceleration"
+    "reduced-throttle-response"
   ],
   "causes": [
-    { "id": "carbon-packed-inlet-manifold" },
-    { "id": "recirculation-valve-stuck-open" },
-    { "id": "short-trip-urban-use" },
-    { "id": "another-air-path-restriction" }
+    {
+      "id": "carbon-packed-inlet-manifold"
+    },
+    {
+      "id": "recirculation-valve-stuck-open"
+    },
+    {
+      "id": "short-trip-urban-use"
+    },
+    {
+      "id": "another-air-path-restriction"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -53,7 +60,10 @@
     {
       "id": "professional-inlet-clean",
       "difficulty": 4,
-      "cost": { "from": "moderate", "to": "significant" },
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
       "addresses": [
         "carbon-packed-inlet-manifold",
         "recirculation-valve-stuck-open"
@@ -64,7 +74,9 @@
     {
       "id": "replace-the-recirculation-valve",
       "difficulty": 3,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["recirculation-valve-stuck-open"],
       "parts": [],
       "procedures": []
@@ -72,7 +84,9 @@
     {
       "id": "change-the-driving-pattern",
       "difficulty": 1,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["short-trip-urban-use"],
       "parts": [],
       "procedures": []
@@ -80,7 +94,9 @@
     {
       "id": "restore-the-air-path",
       "difficulty": 2,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["another-air-path-restriction"],
       "parts": [],
       "procedures": []
@@ -96,7 +112,7 @@
       "kind": "forum"
     },
     {
-      "title": "Repuestos USA Motors, Tres Ríos, Cartago, Costa Rica — parts listing showing the exhaust gas recirculation valve among the valves the shop stocks, evidence that the part is a routine Costa Rican counter item",
+      "title": "Repuestos USA Motors, Tres Ríos, Cartago, Costa Rica — catalogue category page listing \"VALVULA EGR\" among the valves the shop catalogues; a quote-request listing, not a per-vehicle stock or price check",
       "url": "https://repuestosusamotorscr.com/producto/valvulas-variedad/",
       "archiveUrl": "https://web.archive.org/web/20260902180204id_/https://repuestosusamotorscr.com/producto/valvulas-variedad/",
       "accessed": "2026-09-02",
@@ -111,8 +127,7 @@
       "symptoms": {
         "hesitates-when-you-ask-for-throttle": "It hesitates for a beat when you ask for throttle",
         "rough-idle": "The idle is rough or uneven, especially cold",
-        "reduced-throttle-response": "The truck feels flat and slow to respond compared with how it used to",
-        "black-smoke-under-acceleration": "Black smoke under hard acceleration"
+        "reduced-throttle-response": "The truck feels flat and slow to respond compared with how it used to"
       },
       "causes": {
         "carbon-packed-inlet-manifold": "The inlet manifold is packed with hard carbon that has narrowed the passages",
@@ -133,7 +148,7 @@
         },
         "replace-the-recirculation-valve": {
           "title": "Replace the EGR valve",
-          "detail": "If the valve will not seat after cleaning, it is a replacement. The part is a routine counter item in Costa Rica, which is worth knowing before anybody quotes you an import."
+          "detail": "If the valve will not seat after cleaning, it is a replacement. A Costa Rican counter catalogues this part category, which is worth knowing before anybody quotes you an import — though the listing is a quote request, not a stock check."
         },
         "change-the-driving-pattern": {
           "title": "Give the truck regular long runs",
@@ -152,8 +167,7 @@
       "symptoms": {
         "hesitates-when-you-ask-for-throttle": "Titubea un instante cuando usted pide acelerador",
         "rough-idle": "La marcha mínima está áspera o dispareja, sobre todo en frío",
-        "reduced-throttle-response": "El carro se siente plano y lento para responder comparado con cómo era antes",
-        "black-smoke-under-acceleration": "Humo negro al acelerar fuerte"
+        "reduced-throttle-response": "El carro se siente plano y lento para responder comparado con cómo era antes"
       },
       "causes": {
         "carbon-packed-inlet-manifold": "El múltiple de admisión está lleno de carbón duro que le angostó los conductos",
@@ -174,7 +188,7 @@
         },
         "replace-the-recirculation-valve": {
           "title": "Cambiar la válvula EGR",
-          "detail": "Si después de limpiarla la válvula no asienta, toca cambiarla. La pieza es de mostrador común en Costa Rica, lo cual conviene saber antes de que alguien le cotice una importación."
+          "detail": "Si después de limpiarla la válvula no asienta, toca cambiarla. Hay mostrador en Costa Rica que cataloga esta categoría de pieza, lo cual conviene saber antes de que alguien le cotice una importación, aunque el listado es para pedir cotización y no una consulta de existencias."
         },
         "change-the-driving-pattern": {
           "title": "Darle al carro recorridos largos con regularidad",

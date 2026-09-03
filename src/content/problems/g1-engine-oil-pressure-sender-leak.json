@@ -19,9 +19,15 @@
     "oil-pressure-gauge-reading-oddly"
   ],
   "causes": [
-    { "id": "leaking-oil-pressure-sender" },
-    { "id": "original-sender-never-replaced" },
-    { "id": "leak-from-higher-up-running-down" }
+    {
+      "id": "leaking-oil-pressure-sender"
+    },
+    {
+      "id": "original-sender-never-replaced"
+    },
+    {
+      "id": "leak-from-higher-up-running-down"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -44,7 +50,9 @@
     {
       "id": "fit-the-modified-sending-unit",
       "difficulty": 2,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": [
         "leaking-oil-pressure-sender",
         "original-sender-never-replaced"
@@ -55,7 +63,10 @@
     {
       "id": "find-and-cure-the-leak-above",
       "difficulty": 3,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["leak-from-higher-up-running-down"],
       "parts": [],
       "procedures": []
@@ -106,7 +117,7 @@
     "es": {
       "title": "El bulbo de presión de aceite gotea sobre el motor caliente",
       "slug": "bulbo-de-presion-de-aceite-gotea",
-      "summary": "Mitsubishi hizo una campaña sobre los carros del primer año modelo que traían medidor analógico, porque el bulbo del medidor de presión de aceite, en el costado derecho del motor, se podía picar y gotear. El aviso de la campaña nombra las dos consecuencias: daño al motor por el aceite que ya no está adentro, e incendio del motor si ese aceite llega a metal caliente. La solución de fábrica fue un bulbo modificado. Cuatro décadas después esto sigue valiendo la pena por dos razones. La primera es que una fuga de aceite en el costado derecho de este motor tiene una causa conocida y barata que conviene descartar antes que nada. La segunda es que un incendio en el compartimiento del motor alimentado por aceite es justamente el tipo de falla sobre la que este sitio existe para advertir: si usted huele aceite quemándose, párese y revise, y no siga manejando. Deje la revisión en manos de un mecánico calificado.",
+      "summary": "Mitsubishi hizo una campaña sobre los carros del primer año modelo que traían medidor analógico, porque el bulbo del medidor de presión de aceite, en el costado derecho del motor, podía gotear. El aviso de la campaña nombra las dos consecuencias: daño al motor por el aceite que ya no está adentro, e incendio del motor si ese aceite llega a metal caliente. La solución de fábrica fue un bulbo modificado. Cuatro décadas después esto sigue valiendo la pena por dos razones. La primera es que una fuga de aceite en el costado derecho de este motor tiene una causa conocida y barata que conviene descartar antes que nada. La segunda es que un incendio en el compartimiento del motor alimentado por aceite es justamente el tipo de falla sobre la que este sitio existe para advertir: si usted huele aceite quemándose, párese y revise, y no siga manejando. Deje la revisión en manos de un mecánico calificado.",
       "symptoms": {
         "oil-on-the-right-side-of-the-engine": "Aceite fresco, o una costra aceitosa, en el costado derecho del bloque del motor",
         "smell-of-burning-oil": "Olor fuerte a aceite quemado después de manejar, más notorio con el capó abierto",

@@ -19,10 +19,18 @@
     "melted-or-discoloured-insulation"
   ],
   "causes": [
-    { "id": "chafed-or-brittle-harness-insulation" },
-    { "id": "corroded-high-current-connection" },
-    { "id": "fuel-or-oil-leaking-onto-hot-metal" },
-    { "id": "rodent-damage-to-the-harness" }
+    {
+      "id": "chafed-or-brittle-harness-insulation"
+    },
+    {
+      "id": "corroded-high-current-connection"
+    },
+    {
+      "id": "fuel-or-oil-leaking-onto-hot-metal"
+    },
+    {
+      "id": "rodent-damage-to-the-harness"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -56,7 +64,10 @@
     {
       "id": "repair-the-harness-section",
       "difficulty": 3,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": [
         "chafed-or-brittle-harness-insulation",
         "rodent-damage-to-the-harness"
@@ -67,7 +78,9 @@
     {
       "id": "remake-the-high-current-connections",
       "difficulty": 2,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": ["corroded-high-current-connection"],
       "parts": [],
       "procedures": []
@@ -75,7 +88,10 @@
     {
       "id": "cure-the-fluid-leak-first",
       "difficulty": 3,
-      "cost": { "from": "minimal", "to": "significant" },
+      "cost": {
+        "from": "minimal",
+        "to": "significant"
+      },
       "addresses": ["fuel-or-oil-leaking-onto-hot-metal"],
       "parts": [],
       "procedures": []
@@ -98,7 +114,7 @@
       "kind": "reference"
     },
     {
-      "title": "Expedition Portal forum — \"First Gen Montero Advice\" thread (members report rodent damage to engine-bay wiring and vacuum leaks on first-generation trucks)",
+      "title": "Expedition Portal forum — \"First Gen Montero Advice\" thread (a member reports rodent damage to engine-bay wiring, and vacuum leaks, on a first-generation truck)",
       "url": "https://forum.expeditionportal.com/threads/first-gen-montero-advice.152161/",
       "archiveUrl": "https://web.archive.org/web/20260902175302id_/https://forum.expeditionportal.com/threads/first-gen-montero-advice.152161/",
       "accessed": "2026-09-02",
@@ -109,7 +125,7 @@
     "en": {
       "title": "Engine-bay fire on an ageing truck",
       "slug": "engine-bay-fire",
-      "summary": "A handful of owners have reported engine-bay fires on these trucks to the US federal regulator — one while driving, two while parked. That is a small number, and it is why this entry is tiered as weakly as it is: nothing here establishes a design defect, and it should not be read as one. What it does establish is the failure mode worth taking seriously on any truck this old, where insulation has had decades to go hard, high-current connections have had decades to corrode, and something has almost certainly nested in the engine bay at least once. Three of the other problems documented for this generation end in leaked oil or fuel on hot metal. The right response to smoke or a burning smell is to stop, switch off, and disconnect the battery — not to drive on and see. Have a qualified mechanic go through the harness before you put it back on the road.",
+      "summary": "A handful of owners have reported engine-bay fires on these trucks to the US federal regulator — one while driving, two while parked. That is a small number, and it is why this entry is tiered as weakly as it is: nothing here establishes a design defect, and it should not be read as one. What it does establish is the failure mode worth taking seriously on any truck this old, where insulation has had decades to go hard, high-current connections have had decades to corrode, and something has almost certainly nested in the engine bay at least once. Several of the other problems documented for this generation end in leaked oil or fuel on hot metal. The right response to smoke or a burning smell is to stop, switch off, and disconnect the battery — not to drive on and see. Have a qualified mechanic go through the harness before you put it back on the road.",
       "symptoms": {
         "smoke-from-under-the-hood": "Smoke rising from under the hood, with or without a warning light",
         "smell-of-burning-plastic": "A sharp burning-plastic smell in the cabin or at the vents",
@@ -139,14 +155,14 @@
         },
         "cure-the-fluid-leak-first": {
           "title": "Cure the fuel or oil leak before anything else",
-          "detail": "If fuel or oil is reaching hot metal, that is the fire, and no amount of electrical work fixes it. Two of the other documented problems on this generation feed straight into this one."
+          "detail": "If fuel or oil is reaching hot metal, that is the fire, and no amount of electrical work fixes it. Several of the other documented problems on this generation feed straight into this one."
         }
       }
     },
     "es": {
       "title": "Incendio en el compartimiento del motor en un carro ya viejo",
       "slug": "incendio-en-el-compartimiento-del-motor",
-      "summary": "Unos pocos dueños reportaron incendios en el compartimiento del motor de estos carros al regulador federal de Estados Unidos: uno manejando y dos con el carro estacionado. Son pocos casos, y por eso esta entrada lleva el nivel de confianza más bajo: nada de lo que hay aquí demuestra un defecto de diseño, y no se debe leer así. Lo que sí establece es cuál es el modo de falla que hay que tomar en serio en cualquier carro de esta edad, donde el aislamiento tuvo décadas para endurecerse, las conexiones de alta corriente tuvieron décadas para corroerse y casi con seguridad algún animal anidó ahí adentro alguna vez. Tres de los otros problemas documentados de esta generación terminan en aceite o combustible sobre metal caliente. Ante humo u olor a quemado, lo correcto es pararse, apagar y desconectar la batería; no seguir manejando a ver qué pasa. Deje que un mecánico calificado revise todo el ramal antes de volver a sacarlo a la calle.",
+      "summary": "Unos pocos dueños reportaron incendios en el compartimiento del motor de estos carros al regulador federal de Estados Unidos: uno manejando y dos con el carro estacionado. Son pocos casos, y por eso esta entrada lleva el nivel de confianza más bajo: nada de lo que hay aquí demuestra un defecto de diseño, y no se debe leer así. Lo que sí establece es cuál es el modo de falla que hay que tomar en serio en cualquier carro de esta edad, donde el aislamiento tuvo décadas para endurecerse, las conexiones de alta corriente tuvieron décadas para corroerse y casi con seguridad algún animal anidó ahí adentro alguna vez. Varios de los otros problemas documentados de esta generación terminan en aceite o combustible sobre metal caliente. Ante humo u olor a quemado, lo correcto es pararse, apagar y desconectar la batería; no seguir manejando a ver qué pasa. Deje que un mecánico calificado revise todo el ramal antes de volver a sacarlo a la calle.",
       "symptoms": {
         "smoke-from-under-the-hood": "Humo saliendo por debajo del capó, con o sin luz de advertencia encendida",
         "smell-of-burning-plastic": "Olor fuerte a plástico quemado dentro de la cabina o en las salidas de aire",
@@ -176,7 +192,7 @@
         },
         "cure-the-fluid-leak-first": {
           "title": "Arreglar primero la fuga de combustible o de aceite",
-          "detail": "Si hay combustible o aceite llegando a metal caliente, eso es el incendio, y ningún trabajo eléctrico lo arregla. Dos de los otros problemas documentados de esta generación desembocan directamente en este."
+          "detail": "Si hay combustible o aceite llegando a metal caliente, eso es el incendio, y ningún trabajo eléctrico lo arregla. Varios de los otros problemas documentados de esta generación desembocan directamente en este."
         }
       }
     }

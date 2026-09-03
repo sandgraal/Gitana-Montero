@@ -18,10 +18,18 @@
     "front-suspension-bottoms-out-easily"
   ],
   "causes": [
-    { "id": "torsion-bars-settled-with-age" },
-    { "id": "adjuster-never-reset-after-added-weight" },
-    { "id": "seized-adjuster-thread" },
-    { "id": "collapsed-rear-springs-tipping-the-truck" }
+    {
+      "id": "torsion-bars-settled-with-age"
+    },
+    {
+      "id": "adjuster-never-reset-after-added-weight"
+    },
+    {
+      "id": "seized-adjuster-thread"
+    },
+    {
+      "id": "collapsed-rear-springs-tipping-the-truck"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -52,7 +60,9 @@
     {
       "id": "reindex-and-reset-the-adjusters",
       "difficulty": 3,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": [
         "torsion-bars-settled-with-age",
         "adjuster-never-reset-after-added-weight"
@@ -63,7 +73,10 @@
     {
       "id": "free-or-renew-the-adjuster-hardware",
       "difficulty": 3,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["seized-adjuster-thread"],
       "parts": [],
       "procedures": []
@@ -71,7 +84,10 @@
     {
       "id": "fit-heavier-torsion-bars",
       "difficulty": 4,
-      "cost": { "from": "moderate", "to": "significant" },
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
       "addresses": [
         "torsion-bars-settled-with-age",
         "adjuster-never-reset-after-added-weight"
@@ -82,16 +98,18 @@
     {
       "id": "renew-the-rear-springs",
       "difficulty": 3,
-      "cost": { "from": "moderate" },
+      "cost": {
+        "from": "moderate"
+      },
       "addresses": ["collapsed-rear-springs-tipping-the-truck"],
       "parts": [],
       "procedures": []
     }
   ],
-  "confidence": "community-consensus",
+  "confidence": "anecdotal",
   "sources": [
     {
-      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"Adjusting torsion bars (front suspension)\" thread: members describe the anchor arm and anchor bolt layout, that slackening the locknut and tightening the adjusting nut raises the suspension, that the adjuster hides under a domed rubber cover, and that added front weight settles the ride height unevenly between sides",
+      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"Adjusting torsion bars (front suspension)\": the thread concerns a 1997 long-wheelbase Pajero, a second-generation truck rather than a first-generation one, and members describe the anchor arm and anchor bolt layout, that slackening the locknut and tightening the adjusting nut raises the suspension, that the adjuster hides under a domed rubber cover, and that added front weight settles the ride height unevenly between sides",
       "url": "https://www.pocuk.com/forums/viewtopic.php?t=1911",
       "archiveUrl": "https://web.archive.org/web/20260902174806id_/https://www.pocuk.com/forums/viewtopic.php?t=1911",
       "accessed": "2026-09-02",
@@ -102,7 +120,7 @@
     "en": {
       "title": "Front end sits low — settled torsion bars",
       "slug": "front-end-sits-low",
-      "summary": "The front suspension on this generation is sprung by torsion bars, and a torsion bar is a coil spring that has been straightened out: it settles with age exactly as a coil spring does, and it settles further and unevenly once a winch bumper or a bull bar goes on the front. Owners in the cited club thread describe the layout — an anchor arm at the chassis end of each bar with an adjusting nut and a locknut, the adjuster hidden under a domed rubber cover that is the reason most people cannot find it — and the fact that slackening the locknut and tightening the adjusting nut raises that corner. Two cautions the thread does not spell out and this page will. Raising the front changes the front geometry, so a wheel alignment belongs in the same visit. And ride height is not free travel: the higher you wind it, the less suspension is left and the harder it rides. Suspension is safety-critical; if you are not confident setting both sides equally, have a qualified mechanic do it with the alignment.",
+      "summary": "The front suspension on this generation is sprung by torsion bars, and a torsion bar is a coil spring that has been straightened out: it settles with age exactly as a coil spring does, and it settles further and unevenly once a winch bumper or a bull bar goes on the front. The one cited club thread is about a later, second-generation truck, not this one — the torsion-bar front end carried over, but nobody in the sources has confirmed the detail on a first-generation truck, which is why this entry carries the site's weakest confidence tier. Owners in that thread describe the layout — an anchor arm at the chassis end of each bar with an adjusting nut and a locknut, the adjuster hidden under a domed rubber cover that is the reason most people cannot find it — and the fact that slackening the locknut and tightening the adjusting nut raises that corner. Two cautions the thread does not spell out and this page will. Raising the front changes the front geometry, so a wheel alignment belongs in the same visit. And ride height is not free travel: the higher you wind it, the less suspension is left and the harder it rides. Suspension is safety-critical; if you are not confident setting both sides equally, have a qualified mechanic do it with the alignment.",
       "symptoms": {
         "front-of-the-truck-sits-low": "The truck noses down — the front wheel arch gap is visibly smaller than the rear",
         "one-front-corner-lower-than-the-other": "One front corner sits lower than the other on level ground",
@@ -143,9 +161,9 @@
     "es": {
       "title": "El frente queda bajo — barras de torsión asentadas",
       "slug": "el-frente-queda-bajo",
-      "summary": "La suspensión delantera de esta generación va sobre barras de torsión, y una barra de torsión es un resorte estirado: se asienta con los años igual que un resorte, y se asienta más y disparejo apenas se le monta al frente un bumper con winch o una parrilla de defensa. En el hilo del club que se cita, los miembros describen el armado —un brazo de anclaje en el extremo del chasis de cada barra, con una tuerca de ajuste y una contratuerca, y el ajustador escondido bajo una tapa de hule abombada, que es la razón por la que casi nadie lo encuentra— y explican que aflojar la contratuerca y apretar la tuerca de ajuste levanta esa esquina. Dos advertencias que el hilo no dice y esta página sí. Levantar el frente cambia la geometría delantera, así que el alineamiento va en la misma visita. Y la altura no sale gratis: entre más alto lo suba, menos recorrido de suspensión le queda y más duro va a rodar. La suspensión es crítica para la seguridad; si no se siente seguro dejando ambos lados iguales, que se lo haga un mecánico calificado junto con el alineamiento.",
+      "summary": "La suspensión delantera de esta generación va sobre barras de torsión, y una barra de torsión es un resorte estirado: se asienta con los años igual que un resorte, y se asienta más y disparejo apenas se le monta al frente un bumper con winch o una parrilla de defensa. El único hilo de club que se cita trata de un carro posterior, de segunda generación, no de este: el tren delantero de barras de torsión se mantuvo, pero nadie en las fuentes confirmó el detalle en un carro de primera generación, y por eso esta entrada lleva el nivel de confianza más bajo del sitio. En ese hilo los miembros describen el armado —un brazo de anclaje en el extremo del chasis de cada barra, con una tuerca de ajuste y una contratuerca, y el ajustador escondido bajo una tapa de hule abombada, que es la razón por la que casi nadie lo encuentra— y explican que aflojar la contratuerca y apretar la tuerca de ajuste levanta esa esquina. Dos advertencias que el hilo no dice y esta página sí. Levantar el frente cambia la geometría delantera, así que el alineamiento va en la misma visita. Y la altura no sale gratis: entre más alto lo suba, menos recorrido de suspensión le queda y más duro va a rodar. La suspensión es crítica para la seguridad; si no se siente seguro dejando ambos lados iguales, que se lo haga un mecánico calificado junto con el alineamiento.",
       "symptoms": {
-        "front-of-the-truck-sits-low": "El carro va de nariz abajo: la luz del guardabarros delantero se ve claramente menor que la de atrás",
+        "front-of-the-truck-sits-low": "El carro va de nariz abajo: la separación entre el guardabarros delantero y la llanta se ve claramente menor que la de atrás",
         "one-front-corner-lower-than-the-other": "Una esquina delantera queda más baja que la otra en piso parejo",
         "front-tyres-wearing-on-the-inner-edge": "Las llantas delanteras se están gastando más por el borde interno",
         "front-suspension-bottoms-out-easily": "La suspensión delantera hace tope en huecos que antes se pasaban sin problema"

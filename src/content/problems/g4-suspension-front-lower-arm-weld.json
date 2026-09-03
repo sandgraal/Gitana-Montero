@@ -2,10 +2,10 @@
   "id": "g4-suspension-front-lower-arm-weld",
   "fitment": {
     "gens": ["gen4"],
-    "markets": ["au", "eu", "global"],
+    "markets": ["eu"],
     "years": {
-      "from": 2016,
-      "to": 2019
+      "from": 2017,
+      "to": 2018
     }
   },
   "system": "suspension",
@@ -18,9 +18,15 @@
     "visible-crack-at-a-lower-arm-weld"
   ],
   "causes": [
-    { "id": "improper-weld-on-the-right-front-lower-arm" },
-    { "id": "recall-remedy-never-carried-out" },
-    { "id": "ordinary-worn-bushings-or-ball-joint" }
+    {
+      "id": "improper-weld-on-the-right-front-lower-arm"
+    },
+    {
+      "id": "recall-remedy-never-carried-out"
+    },
+    {
+      "id": "ordinary-worn-bushings-or-ball-joint"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -46,7 +52,9 @@
     {
       "id": "have-the-arm-replaced-under-recall",
       "difficulty": 4,
-      "cost": { "from": "minimal" },
+      "cost": {
+        "from": "minimal"
+      },
       "addresses": [
         "improper-weld-on-the-right-front-lower-arm",
         "recall-remedy-never-carried-out"
@@ -57,7 +65,10 @@
     {
       "id": "replace-worn-bushings-or-ball-joint",
       "difficulty": 4,
-      "cost": { "from": "moderate", "to": "significant" },
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
       "addresses": ["ordinary-worn-bushings-or-ball-joint"],
       "parts": [],
       "procedures": []
@@ -77,7 +88,7 @@
     "en": {
       "title": "Front lower control arm weld may break",
       "slug": "front-lower-control-arm-weld-may-break",
-      "summary": "Mitsubishi recalled late fourth-generation trucks because the right-hand front lower control arm could break at a weld joint made by a faulty welding process. The European alert cited below classes the risk as serious and states the failure mode plainly: the arm might break in normal use. A lower control arm is what holds the bottom of the front wheel in place, so losing one is losing control of that corner — this is not a noise you drive to the shop with. The complication is that a worn bush or ball joint in the same arm makes almost exactly the same clunk, and the two demand very different urgency, so the first step here is the vehicle identification number and not the stethoscope. If the truck is in the affected build range and the recall has not been done, it should be recovered rather than driven. Suspension is safety-critical: have this inspected and repaired by a qualified mechanic.",
+      "summary": "Mitsubishi recalled late fourth-generation trucks because the right-hand front lower control arm could break at a weld joint made by a faulty welding process. The European alert cited below classes the risk as serious and states the failure mode plainly: the arm might break in normal use. It records the affected trucks as two model years; a separate Australian campaign covers the same defect, but no Australian record was reachable to cite, so this entry is scoped to the European record and owners elsewhere should run their own market's look-up. A lower control arm is what holds the bottom of the front wheel in place, so losing one is losing control of that corner — this is not a noise you drive to the shop with. The complication is that a worn bush or ball joint in the same arm makes almost exactly the same clunk, and the two demand very different urgency, so the first step here is the vehicle identification number and not the stethoscope. If the truck is in the affected build range and the recall has not been done, it should be recovered rather than driven. Suspension is safety-critical: have this inspected and repaired by a qualified mechanic.",
       "symptoms": {
         "vehicle-identification-number-appears-on-a-recall-list": "The vehicle identification number comes back as affected on the manufacturer's recall look-up",
         "clunk-from-the-right-front-over-bumps": "A clunk or knock from the right front over bumps and on turn-in",
@@ -108,7 +119,7 @@
     "es": {
       "title": "La soldadura de la tijereta inferior delantera se puede quebrar",
       "slug": "soldadura-de-la-tijereta-inferior-se-puede-quebrar",
-      "summary": "Mitsubishi llamó a revisión los carros de cuarta generación de los últimos años porque la tijereta inferior delantera del lado derecho se podía quebrar en una unión soldada hecha con un proceso defectuoso. La alerta europea que se cita abajo clasifica el riesgo como grave y describe el modo de falla sin rodeos: la tijereta se puede quebrar en uso normal. Una tijereta inferior es lo que sostiene la parte de abajo de la rueda delantera en su lugar, así que perder una es perder el control de esa esquina; esto no es un ruido con el que uno se va manejando hasta el taller. Lo complicado es que un buje o una rótula gastada en esa misma tijereta suena casi igual, y las dos cosas piden urgencias muy distintas, así que aquí el primer paso es el número de chasis y no el estetoscopio. Si el carro cae en el rango afectado y no le han aplicado la campaña, hay que llevarlo en plataforma, no manejándolo. La suspensión es crítica para la seguridad: deje la revisión y la reparación en manos de un mecánico calificado.",
+      "summary": "Mitsubishi llamó a revisión los carros de cuarta generación de los últimos años porque la tijereta inferior delantera del lado derecho se podía quebrar en una unión soldada hecha con un proceso defectuoso. La alerta europea que se cita abajo clasifica el riesgo como grave y describe el modo de falla sin rodeos: la tijereta se puede quebrar en uso normal. Registra los carros afectados como dos años modelo; hay además una campaña australiana por el mismo defecto, pero no se logró abrir ningún registro australiano para citarlo, así que esta entrada se limita al registro europeo y los dueños de otros mercados deben hacer la consulta de su propio mercado. Una tijereta inferior es lo que sostiene la parte de abajo de la rueda delantera en su lugar, así que perder una es perder el control de esa esquina; esto no es un ruido con el que uno se va manejando hasta el taller. Lo complicado es que un buje o una rótula gastada en esa misma tijereta suena casi igual, y las dos cosas piden urgencias muy distintas, así que aquí el primer paso es el número de chasis y no el estetoscopio. Si el carro cae en el rango afectado y no le han aplicado la campaña, hay que llevarlo en plataforma, no manejándolo. La suspensión es crítica para la seguridad: deje la revisión y la reparación en manos de un mecánico calificado.",
       "symptoms": {
         "vehicle-identification-number-appears-on-a-recall-list": "El número de chasis aparece como afectado en la consulta de campañas del fabricante",
         "clunk-from-the-right-front-over-bumps": "Un golpe seco al frente derecho en los huecos y al entrar en curva",

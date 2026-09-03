@@ -1,10 +1,11 @@
 {
-  "id": "g1-engine-head-gasket-2-6",
+  "id": "g1-engine-head-gasket-v6",
   "fitment": {
     "gens": ["gen1"],
-    "engines": ["4g54"],
+    "markets": ["us"],
+    "engines": ["6g72-sohc"],
     "years": {
-      "from": 1983,
+      "from": 1989,
       "to": 1991
     }
   },
@@ -18,10 +19,18 @@
     "creamy-deposit-under-the-oil-filler-cap"
   ],
   "causes": [
-    { "id": "failed-head-gasket" },
-    { "id": "cracked-cylinder-head" },
-    { "id": "warped-head-from-a-previous-overheat" },
-    { "id": "cooling-system-fault-that-caused-it" }
+    {
+      "id": "failed-head-gasket"
+    },
+    {
+      "id": "cracked-cylinder-head"
+    },
+    {
+      "id": "warped-head-from-a-previous-overheat"
+    },
+    {
+      "id": "cooling-system-fault-that-caused-it"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -57,7 +66,9 @@
     {
       "id": "head-gasket-with-the-head-skimmed",
       "difficulty": 5,
-      "cost": { "from": "significant" },
+      "cost": {
+        "from": "significant"
+      },
       "addresses": [
         "failed-head-gasket",
         "warped-head-from-a-previous-overheat"
@@ -68,7 +79,10 @@
     {
       "id": "replace-the-cylinder-head",
       "difficulty": 5,
-      "cost": { "from": "significant", "to": "major" },
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
       "addresses": ["cracked-cylinder-head"],
       "parts": [],
       "procedures": []
@@ -76,7 +90,10 @@
     {
       "id": "fix-the-cooling-system-first",
       "difficulty": 2,
-      "cost": { "from": "minimal", "to": "moderate" },
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
       "addresses": ["cooling-system-fault-that-caused-it"],
       "parts": [],
       "procedures": []
@@ -85,7 +102,7 @@
   "confidence": "anecdotal",
   "sources": [
     {
-      "title": "Expedition Portal forum — \"First Gen Montero Advice\" thread: members name blown head gaskets as a common failure point on first-generation trucks, note that cracked heads turn up alongside them, and describe a degraded radiator on the example under discussion",
+      "title": "Expedition Portal forum — \"First Gen Montero Advice\" thread: the truck under discussion is a 1991 first-generation Montero with the 3.0 V6, whose owner is advised on a blown head gasket and a possible cracked head, alongside a degraded radiator and other 6G72 service items",
       "url": "https://forum.expeditionportal.com/threads/first-gen-montero-advice.152161/",
       "archiveUrl": "https://web.archive.org/web/20260902175302id_/https://forum.expeditionportal.com/threads/first-gen-montero-advice.152161/",
       "accessed": "2026-09-02",
@@ -101,9 +118,9 @@
   ],
   "prose": {
     "en": {
-      "title": "Head gasket failure on the 2.6",
-      "slug": "head-gasket-failure-on-the-2-6",
-      "summary": "Members of the cited overland forum name a blown head gasket as the notable engine failure on these trucks, and note that a cracked head sometimes turns up with it. That is one thread, so this entry sits at the site's weakest confidence tier and should be read as a well-informed starting point rather than a settled statistic. The reason to publish it anyway is the ordering below. A head gasket is expensive and a cooling system fault is cheap, and on a truck of this age the cooling system is very often what killed the gasket — the same thread mentions a radiator in poor condition on the truck under discussion. So the diagnostic steps here deliberately test both, and the cheap fix path exists on its own: if you replace a gasket without curing the reason it overheated, you will replace it again. Once coolant and combustion are mixing, keep driving and you turn a gasket job into a head job, or a block. That is why the triage is do-not-drive even though the engine will usually still start and move.",
+      "title": "Head gasket failure on the V6",
+      "slug": "head-gasket-failure-on-the-v6",
+      "summary": "The cited overland thread follows one first-generation truck with the 3.0 V6 whose owner is working through a blown head gasket, with a cracked head raised as the thing that sometimes turns up beside it. That is a single truck in a single thread, so this entry sits at the site's weakest confidence tier: read it as a well-informed starting point, not as a statement about how often this engine does it. The reason to publish it anyway is the ordering below. A head gasket is expensive and a cooling system fault is cheap, and on a truck of this age the cooling system is very often what killed the gasket — the same thread mentions a radiator in poor condition on the truck under discussion. So the diagnostic steps here deliberately test both, and the cheap fix path exists on its own: if you replace a gasket without curing the reason it overheated, you will replace it again. Once coolant and combustion are mixing, keep driving and you turn a gasket job into a head job, or a block. That is why the triage is do-not-drive even though the engine will usually still start and move.",
       "symptoms": {
         "engine-overheats-under-load": "The temperature climbs on a hill or towing and settles again when you back off",
         "coolant-disappears-with-no-external-leak": "The coolant level keeps dropping and nothing drips on the ground",
@@ -139,9 +156,9 @@
       }
     },
     "es": {
-      "title": "Falla del empaque de cabezote en el 2.6",
-      "slug": "falla-del-empaque-de-cabezote-2-6",
-      "summary": "Los miembros del foro de expedición que se cita señalan el empaque de cabezote quemado como la falla de motor destacada de estos carros, y anotan que a veces aparece junto con un cabezote rajado. Es un solo hilo, así que esta entrada lleva el nivel de confianza más bajo del sitio y hay que leerla como un punto de partida bien informado, no como una estadística cerrada. Si aun así se publica es por el orden que se propone abajo. Un empaque de cabezote es caro y una falla de refrigeración es barata, y en un carro de esta edad muy seguido es el sistema de refrigeración el que mató el empaque: ese mismo hilo menciona un radiador en mal estado en el carro del que hablaban. Por eso los pasos de diagnóstico revisan las dos cosas a propósito, y la reparación barata aparece como camino aparte: si usted cambia el empaque sin curar la razón por la que se recalentó, lo va a volver a cambiar. Una vez que el refrigerante y la combustión se están mezclando, seguir manejando convierte un trabajo de empaque en un trabajo de cabezote, o de bloque. Por eso el triaje es no manejar, aunque el motor por lo general todavía encienda y ande.",
+      "title": "Falla del empaque de cabezote en el V6",
+      "slug": "falla-del-empaque-de-cabezote-v6",
+      "summary": "El hilo de expedición que se cita sigue a un solo carro de primera generación con el V6 de 3.0 cuyo dueño va lidiando con un empaque de cabezote quemado, y donde se menciona el cabezote rajado como lo que a veces aparece al lado. Es un solo carro en un solo hilo, así que esta entrada lleva el nivel de confianza más bajo del sitio: léala como un punto de partida bien informado, no como una afirmación sobre qué tan seguido le pasa a este motor. Si aun así se publica es por el orden que se propone abajo. Un empaque de cabezote es caro y una falla de refrigeración es barata, y en un carro de esta edad muy seguido es el sistema de refrigeración el que mató el empaque: ese mismo hilo menciona un radiador en mal estado en el carro del que hablaban. Por eso los pasos de diagnóstico revisan las dos cosas a propósito, y la reparación barata aparece como camino aparte: si usted cambia el empaque sin curar la razón por la que se recalentó, lo va a volver a cambiar. Una vez que el refrigerante y la combustión se están mezclando, seguir manejando convierte un trabajo de empaque en un trabajo de cabezote, o de bloque. Por eso el triaje es no manejar, aunque el motor por lo general todavía encienda y ande.",
       "symptoms": {
         "engine-overheats-under-load": "La temperatura sube en una cuesta o halando, y se normaliza al bajarle",
         "coolant-disappears-with-no-external-leak": "El nivel de refrigerante sigue bajando y no gotea nada en el piso",
