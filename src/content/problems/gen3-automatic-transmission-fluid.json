@@ -1,0 +1,155 @@
+{
+  "id": "gen3-automatic-transmission-fluid",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "transmission",
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "shifts-that-thump-or-hesitate",
+    "shudder-under-load-or-on-a-climb",
+    "burnt-smelling-or-dark-fluid",
+    "no-record-of-a-transmission-service"
+  ],
+  "causes": [
+    {
+      "id": "wrong-fluid-specification-used"
+    },
+    {
+      "id": "fluid-and-filter-long-overdue"
+    },
+    {
+      "id": "internal-wear-already-done"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "ask-the-last-shop-which-fluid-they-put-in",
+      "rulesIn": ["wrong-fluid-specification-used"]
+    },
+    {
+      "id": "look-at-the-fluid-on-a-white-rag-and-smell-it",
+      "rulesIn": ["fluid-and-filter-long-overdue", "internal-wear-already-done"]
+    },
+    {
+      "id": "inspect-the-pan-and-the-filter-when-the-fluid-is-dropped",
+      "rulesIn": ["internal-wear-already-done"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "service-the-fluid-and-filter-to-specification",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "wrong-fluid-specification-used",
+        "fluid-and-filter-long-overdue"
+      ],
+      "parts": [
+        "gen3-automatic-transmission-fluid-spiii",
+        "gen3-transmission-pan-filter",
+        "gen3-transmission-pan-drain-crush-washer",
+        "gen3-transmission-crossmember-bushing"
+      ],
+      "procedures": []
+    },
+    {
+      "id": "have-the-transmission-assessed-by-a-specialist",
+      "difficulty": 5,
+      "cost": {
+        "from": "major"
+      },
+      "addresses": ["internal-wear-already-done"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 Automatic Transmission Service Kit (service interval, the SP-III fluid requirement, and kit contents)",
+      "url": "https://lusooverland.com/VP-LO-K-AT003",
+      "archiveUrl": "https://web.archive.org/web/20260902205404id_/https://lusooverland.com/VP-LO-K-AT003",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filing (ODI 10268701: grinding from the automatic transmission on a well-maintained truck)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Harsh or hesitant shifts, and the fluid nobody can name",
+      "summary": "The most avoidable transmission failure on this truck is a fluid decision. The specialist supplier who assembles the service kit says it in one sentence: they have seen several of these transmissions ruined by shops using the wrong fluid, which is why their kit ships with the manufacturer's own fluid and a printed copy of the factory procedure. An owner complaint filed against this generation describes grinding from the transmission on a truck whose owner had every required service done, with a quote in the thousands, so the downside is real. The practical consequence is an order of operations: the first question is which fluid went in last, by name, not what the symptom is. The specification is on the parts list below rather than in this paragraph, so there is one place to read it and one place to get it wrong.",
+      "slug": "harsh-shifts-and-transmission-fluid",
+      "symptoms": {
+        "shifts-that-thump-or-hesitate": "Shifts that thump, flare or hesitate where they used to be smooth",
+        "shudder-under-load-or-on-a-climb": "A shudder under load or on a long climb",
+        "burnt-smelling-or-dark-fluid": "Fluid that is dark on a rag or smells burnt",
+        "no-record-of-a-transmission-service": "No record of the transmission ever having been serviced"
+      },
+      "causes": {
+        "wrong-fluid-specification-used": "A fluid other than the specified one was put in at the last service",
+        "fluid-and-filter-long-overdue": "The fluid and filter are long past the service interval",
+        "internal-wear-already-done": "Internal wear has already happened and no service will reverse it"
+      },
+      "diagnosticSteps": {
+        "ask-the-last-shop-which-fluid-they-put-in": "Ask whoever serviced it last exactly which fluid they used, by name",
+        "look-at-the-fluid-on-a-white-rag-and-smell-it": "Put some fluid on a white rag, look at the colour and smell it",
+        "inspect-the-pan-and-the-filter-when-the-fluid-is-dropped": "When the pan comes down, look at what is in it and at the state of the filter"
+      },
+      "fixPaths": {
+        "service-the-fluid-and-filter-to-specification": {
+          "title": "Service it with the specified fluid",
+          "detail": "Fluid, pan filter and gasket, the drain bolt crush washer, and the crossmember bushings that come in the same kit. Insist on the specification by name — it is on the parts list for this fix — and keep the receipt that says which fluid went in. The next owner will want it, and so will you."
+        },
+        "have-the-transmission-assessed-by-a-specialist": {
+          "title": "Have it assessed before you spend anything else",
+          "detail": "If the pan holds debris, a service is not a repair. A specialist's opinion on whether this gearbox is worth rebuilding is money better spent than another fluid change."
+        }
+      }
+    },
+    "es": {
+      "title": "Cambios bruscos o perezosos, y el aceite que nadie sabe nombrar",
+      "summary": "La falla de transmisión más evitable de este vehículo es una decisión de aceite. La casa especializada que arma el juego de servicio lo dice en una frase: han visto varias de estas transmisiones arruinadas por talleres que usaron el aceite equivocado, y por eso su juego incluye el aceite del propio fabricante y una copia impresa del procedimiento de fábrica. Una queja de dueño presentada contra esta generación describe ruido de molienda en la transmisión de un vehículo al que le habían hecho todos los servicios, con una cotización de miles, así que el riesgo es real. La consecuencia práctica es un orden de trabajo: la primera pregunta es cuál aceite entró la última vez, por nombre, y no cuál es el síntoma. La especificación está en la lista de repuestos de abajo y no en este párrafo, para que haya un solo lugar donde leerla y un solo lugar donde equivocarse.",
+      "slug": "cambios-bruscos-y-aceite-de-transmision",
+      "symptoms": {
+        "shifts-that-thump-or-hesitate": "Cambios que golpean, se van de vueltas o titubean donde antes entraban suaves",
+        "shudder-under-load-or-on-a-climb": "Vibración con carga o en una subida larga",
+        "burnt-smelling-or-dark-fluid": "Aceite oscuro sobre un trapo o con olor a quemado",
+        "no-record-of-a-transmission-service": "Ningún registro de que a la transmisión le hayan hecho servicio alguna vez"
+      },
+      "causes": {
+        "wrong-fluid-specification-used": "En el último servicio le pusieron un aceite distinto al especificado",
+        "fluid-and-filter-long-overdue": "El aceite y el filtro están muy pasados del intervalo de servicio",
+        "internal-wear-already-done": "El desgaste interno ya ocurrió y ningún servicio lo devuelve"
+      },
+      "diagnosticSteps": {
+        "ask-the-last-shop-which-fluid-they-put-in": "Pregúntele a quien le hizo el último servicio exactamente cuál aceite usó, por nombre",
+        "look-at-the-fluid-on-a-white-rag-and-smell-it": "Ponga un poco de aceite en un trapo blanco, vea el color y huélalo",
+        "inspect-the-pan-and-the-filter-when-the-fluid-is-dropped": "Cuando baje el cárter de la transmisión, vea qué trae adentro y en qué estado está el filtro"
+      },
+      "fixPaths": {
+        "service-the-fluid-and-filter-to-specification": {
+          "title": "Hacer el servicio con el aceite especificado",
+          "detail": "Aceite, filtro y empaque del cárter de la transmisión, la arandela de sello del tapón de drenaje, y los bujes del travesaño que vienen en el mismo juego. Exija la especificación por nombre —está en la lista de repuestos de esta reparación— y guarde la factura que diga cuál aceite entró: la va a querer el próximo dueño, y usted también."
+        },
+        "have-the-transmission-assessed-by-a-specialist": {
+          "title": "Que la valore un especialista antes de gastar más",
+          "detail": "Si el cárter trae limalla, un servicio no es una reparación. La opinión de un especialista sobre si vale reconstruir esta caja es mejor plata que otro cambio de aceite."
+        }
+      }
+    }
+  }
+}

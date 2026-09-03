@@ -1,0 +1,179 @@
+{
+  "id": "gen3-strut-top-hat-corrosion",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "suspension",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "knock-from-the-top-of-the-strut-over-bumps",
+    "creak-or-groan-when-the-steering-is-turned",
+    "rust-visible-at-the-strut-top-under-the-hood",
+    "steering-feels-notchy-at-low-speed"
+  ],
+  "causes": [
+    {
+      "id": "top-hat-corroded-or-broken"
+    },
+    {
+      "id": "upper-strut-bushing-perished"
+    },
+    {
+      "id": "damper-dust-boot-split-and-damper-worn"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "open-the-hood-and-look-at-both-strut-tops",
+      "rulesIn": ["top-hat-corroded-or-broken"]
+    },
+    {
+      "id": "have-somebody-turn-the-steering-while-you-listen-at-the-strut-top",
+      "rulesIn": ["top-hat-corroded-or-broken", "upper-strut-bushing-perished"]
+    },
+    {
+      "id": "check-the-dust-boot-and-the-damper-rod",
+      "rulesIn": ["damper-dust-boot-split-and-damper-worn"],
+      "rulesOut": ["top-hat-corroded-or-broken"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "reuse-the-top-hats-and-replace-the-bushings",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["upper-strut-bushing-perished"],
+      "parts": ["gen3-front-strut-bushing-kit"],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-top-hats-and-bushings-together",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": [
+        "top-hat-corroded-or-broken",
+        "upper-strut-bushing-perished"
+      ],
+      "parts": ["gen3-strut-top-hat", "gen3-front-strut-bushing-kit"],
+      "procedures": []
+    },
+    {
+      "id": "rebuild-the-whole-front-strut",
+      "difficulty": 5,
+      "cost": {
+        "from": "significant"
+      },
+      "addresses": [
+        "top-hat-corroded-or-broken",
+        "upper-strut-bushing-perished",
+        "damper-dust-boot-split-and-damper-worn"
+      ],
+      "parts": [
+        "gen3-strut-top-hat",
+        "gen3-front-strut-bushing-kit",
+        "gen3-front-shock-dust-boot",
+        "gen3-front-shock-absorber"
+      ],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 Strut Top Hat / Shock Mount: «The metal OEM top hats can usually be reused when changing out strut components but if your top hats are rusty or broken…», with the quantity per vehicle",
+      "url": "https://lusooverland.com/VP-LO-MR448170",
+      "archiveUrl": "https://web.archive.org/web/20260902205639id_/https://lusooverland.com/VP-LO-MR448170",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 Front Shock Damper / Dust Boot (MR448172): «Rubber components play a critical part in your front struts and suspension by absorbing impact, maintaining height, and dampening vibration and noise… These dampers take a lot of abuse, particularly off-road and on heavier HD coil equipped vehicles»",
+      "url": "https://lusooverland.com/VP-MMC-MR448172",
+      "archiveUrl": "https://web.archive.org/web/20260903020011id_/https://lusooverland.com/VP-MMC-MR448172",
+      "accessed": "2026-09-03",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Knock and creak from the top of the front strut",
+      "summary": "The mount at the top of each front strut carries the whole corner and lets the strut rotate with the steering, and it is the noise nobody attributes correctly. Because it lives under the hood rather than under the truck, a knock from here reads to most people as a suspension problem down at the wheel, and the parts that get replaced first are usually the wrong ones. The supplier who stocks the replacement is realistic about it: the factory metal top hats can usually be reused when other strut components are changed, and it is the rusty or broken ones that need replacing. That is the whole diagnosis in one sentence, and it takes opening the hood to make. In a wet climate with salt-free but constantly damp air, corrosion at the strut top is worth a look every time the hood is up for anything else.",
+      "slug": "knock-and-creak-at-the-front-strut-top",
+      "symptoms": {
+        "knock-from-the-top-of-the-strut-over-bumps": "A knock that seems to come from up under the hood rather than down at the wheel",
+        "creak-or-groan-when-the-steering-is-turned": "A creak or groan when the steering is turned at a standstill",
+        "rust-visible-at-the-strut-top-under-the-hood": "Visible rust or a cracked mount at the strut top with the hood open",
+        "steering-feels-notchy-at-low-speed": "The steering feels notchy or sticky at parking speed"
+      },
+      "causes": {
+        "top-hat-corroded-or-broken": "The strut top mount is corroded or broken",
+        "upper-strut-bushing-perished": "The upper strut bushing has perished",
+        "damper-dust-boot-split-and-damper-worn": "The dust boot has split and the damper has worn as a result"
+      },
+      "diagnosticSteps": {
+        "open-the-hood-and-look-at-both-strut-tops": "Open the hood and look directly at both strut top mounts for rust, cracks and lifted metal",
+        "have-somebody-turn-the-steering-while-you-listen-at-the-strut-top": "Have somebody turn the steering lock to lock while you listen with a hand on each strut top",
+        "check-the-dust-boot-and-the-damper-rod": "Check the dust boot for splits and the damper rod for pitting and oil"
+      },
+      "fixPaths": {
+        "reuse-the-top-hats-and-replace-the-bushings": {
+          "title": "Reuse sound top hats, replace the bushings",
+          "detail": "The supplier's own default. If the metal is sound there is no reason to buy it twice, and the bushings are the part that actually wears."
+        },
+        "replace-the-top-hats-and-bushings-together": {
+          "title": "Replace the top hats and the bushings together",
+          "detail": "The answer once the metal is rusty or broken. The spring has to come off either way, so doing both at once is one visit rather than two."
+        },
+        "rebuild-the-whole-front-strut": {
+          "title": "Rebuild the whole strut",
+          "detail": "Worth costing out on a high-mileage truck, because the labour is identical and a tired damper is already in there. Compressing a coil spring is genuinely dangerous work; this is the point at which a shop earns its money."
+        }
+      }
+    },
+    "es": {
+      "title": "Golpe y rechinido en la parte alta del amortiguador delantero",
+      "summary": "El soporte que va en la parte alta de cada amortiguador delantero carga toda la esquina del vehículo y deja que el conjunto gire con la dirección, y es el ruido que casi nadie ubica bien. Como vive debajo del capó y no debajo del vehículo, un golpe de aquí se lee como problema de suspensión allá abajo, en la rueda, y las piezas que se cambian de primero suelen ser las equivocadas. La casa que vende el repuesto es realista: los soportes metálicos de fábrica normalmente se pueden reutilizar cuando se cambian otras piezas del conjunto, y los que hay que cambiar son los oxidados o quebrados. Ese es el diagnóstico entero en una frase, y hace falta abrir el capó para hacerlo. En un clima húmedo, con aire sin sal pero mojado todo el año, la oxidación en la parte alta del amortiguador merece una mirada cada vez que el capó esté abierto por cualquier otra cosa.",
+      "slug": "golpe-en-la-parte-alta-del-amortiguador",
+      "symptoms": {
+        "knock-from-the-top-of-the-strut-over-bumps": "Un golpe que parece venir de arriba, bajo el capó, y no abajo en la rueda",
+        "creak-or-groan-when-the-steering-is-turned": "Un rechinido o quejido al mover el volante con el vehículo detenido",
+        "rust-visible-at-the-strut-top-under-the-hood": "Óxido visible o soporte quebrado en la parte alta del amortiguador con el capó abierto",
+        "steering-feels-notchy-at-low-speed": "La dirección se siente con topes o pegajosa a velocidad de parqueo"
+      },
+      "causes": {
+        "top-hat-corroded-or-broken": "El soporte superior del amortiguador está oxidado o quebrado",
+        "upper-strut-bushing-perished": "El buje superior del amortiguador está reseco",
+        "damper-dust-boot-split-and-damper-worn": "El fuelle guardapolvo se rompió y por eso el amortiguador se gastó"
+      },
+      "diagnosticSteps": {
+        "open-the-hood-and-look-at-both-strut-tops": "Abra el capó y revise directamente los dos soportes superiores buscando óxido, rajaduras y lámina levantada",
+        "have-somebody-turn-the-steering-while-you-listen-at-the-strut-top": "Pida que alguien mueva el volante de tope a tope mientras usted escucha con la mano sobre cada soporte superior",
+        "check-the-dust-boot-and-the-damper-rod": "Revise el fuelle guardapolvo por roturas y el vástago del amortiguador por picaduras y aceite"
+      },
+      "fixPaths": {
+        "reuse-the-top-hats-and-replace-the-bushings": {
+          "title": "Reutilizar los soportes sanos y cambiar los bujes",
+          "detail": "Es lo que la propia casa toma por defecto. Si la lámina está sana no hay razón para comprarla dos veces, y el buje es la pieza que de verdad se gasta."
+        },
+        "replace-the-top-hats-and-bushings-together": {
+          "title": "Cambiar soportes y bujes de una vez",
+          "detail": "Es la respuesta cuando la lámina ya está oxidada o quebrada. El resorte hay que sacarlo de todos modos, así que hacer los dos juntos es una visita y no dos."
+        },
+        "rebuild-the-whole-front-strut": {
+          "title": "Reconstruir el conjunto completo",
+          "detail": "Vale cotizarlo en un vehículo de kilometraje alto, porque la mano de obra es la misma y el amortiguador cansado ya está ahí adentro. Comprimir un resorte es trabajo verdaderamente peligroso; este es el punto donde un taller se gana la plata."
+        }
+      }
+    }
+  }
+}

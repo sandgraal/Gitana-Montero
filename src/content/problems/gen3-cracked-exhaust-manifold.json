@@ -1,0 +1,168 @@
+{
+  "id": "gen3-cracked-exhaust-manifold",
+  "fitment": {
+    "gens": ["gen3"],
+    "engines": ["6g74-sohc"],
+    "years": {
+      "from": 2001,
+      "to": 2002
+    }
+  },
+  "system": "exhaust",
+  "severity": "degrading",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "ticking-from-the-engine-bay-on-a-cold-start",
+    "the-tick-fades-as-the-engine-warms-up",
+    "smell-of-exhaust-around-the-engine-bay",
+    "check-engine-light-for-an-oxygen-sensor-reading"
+  ],
+  "causes": [
+    {
+      "id": "manifold-casting-cracked"
+    },
+    {
+      "id": "manifold-to-head-gasket-blown"
+    },
+    {
+      "id": "pipe-flange-gasket-blown"
+    },
+    {
+      "id": "broken-manifold-stud"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "listen-cold-then-listen-again-warm",
+      "rulesIn": ["manifold-casting-cracked", "manifold-to-head-gasket-blown"]
+    },
+    {
+      "id": "look-for-soot-tracks-around-the-manifold-and-its-joints",
+      "rulesIn": [
+        "manifold-to-head-gasket-blown",
+        "pipe-flange-gasket-blown",
+        "broken-manifold-stud"
+      ]
+    },
+    {
+      "id": "clean-the-casting-and-inspect-it-along-the-runners",
+      "rulesIn": ["manifold-casting-cracked"],
+      "rulesOut": ["pipe-flange-gasket-blown"]
+    },
+    {
+      "id": "check-every-manifold-nut-and-stud",
+      "rulesIn": ["broken-manifold-stud"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-gaskets-and-studs-only",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "manifold-to-head-gasket-blown",
+        "pipe-flange-gasket-blown",
+        "broken-manifold-stud"
+      ],
+      "parts": [
+        "gen3-exhaust-manifold-gasket",
+        "gen3-exhaust-manifold-pipe-flange-gasket"
+      ],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-cracked-manifold",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant"
+      },
+      "addresses": ["manifold-casting-cracked"],
+      "parts": [
+        "gen3-exhaust-manifold-left",
+        "gen3-exhaust-manifold-right",
+        "gen3-exhaust-manifold-gasket"
+      ],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 NM 3.5L Exhaust Manifold, Left / Driver: «if your Montero has a cracked manifold (as is very common on the original OEM ones)», with the three gaskets the job needs",
+      "url": "https://lusooverland.com/VP-LO-MR497481",
+      "archiveUrl": "https://web.archive.org/web/20260902205706id_/https://lusooverland.com/VP-LO-MR497481",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Cracked exhaust manifold",
+      "summary": "The specialist supplier who imports replacements for the 3.5-litre V6 describes cracked original manifolds as very common, and the shape of their catalogue tells the same story: they stock left and right castings, they warn that a junkyard unit has a high probability of being cracked too, and they list all three gaskets the job consumes. The symptom this entry leads with — a tick from the engine bay on a cold start that fades as the metal expands and the crack closes up — is not in that source; it is the ordinary mechanical reading of a cracked casting, and it is set down here as inference so a reader can weigh it as such. It is worth knowing because it is exactly why the noise is so often mistaken for a valvetrain problem and chased in the wrong place. This entry is scoped to the years the cited source covers; the later 3.8-litre trucks take different castings and are not claimed here. Two things to be careful about. An exhaust leak upstream of the oxygen sensor changes what the engine management sees, so a fuel-trim or sensor code here may be a symptom rather than a fault of its own. And any exhaust leak is a reason to keep the cabin ventilated until it is fixed; if you smell exhaust inside the vehicle, that is a different and more urgent problem than this one. Everything here comes from one specialist supplier's product documentation, which is why the entry is filed at the weakest tier: it is a trade opinion, not an aggregate of owners agreeing.",
+      "slug": "cracked-exhaust-manifold",
+      "symptoms": {
+        "ticking-from-the-engine-bay-on-a-cold-start": "A sharp tick from the engine bay on a cold start",
+        "the-tick-fades-as-the-engine-warms-up": "The tick fades or disappears once the engine is warm",
+        "smell-of-exhaust-around-the-engine-bay": "The smell of exhaust around the engine bay with the hood up",
+        "check-engine-light-for-an-oxygen-sensor-reading": "A check engine light for an oxygen sensor or fuel trim reading"
+      },
+      "causes": {
+        "manifold-casting-cracked": "The manifold casting itself is cracked",
+        "manifold-to-head-gasket-blown": "The gasket between the manifold and the cylinder head has blown",
+        "pipe-flange-gasket-blown": "The gasket at the pipe flange below the manifold has blown",
+        "broken-manifold-stud": "A manifold stud has broken and the joint is no longer clamped"
+      },
+      "diagnosticSteps": {
+        "listen-cold-then-listen-again-warm": "Listen at the engine bay on a cold start, then again once it is at temperature",
+        "look-for-soot-tracks-around-the-manifold-and-its-joints": "Look for black soot tracks around the manifold, its head joint and the pipe flange",
+        "clean-the-casting-and-inspect-it-along-the-runners": "Clean the casting and inspect it along each runner and around the collector",
+        "check-every-manifold-nut-and-stud": "Check every manifold nut and stud is present and tight"
+      },
+      "fixPaths": {
+        "replace-the-gaskets-and-studs-only": {
+          "title": "Replace the gaskets and any broken stud",
+          "detail": "The cheap outcome, and worth confirming first before buying a casting. The head gasket, the pipe flange gasket and the third gasket the source lists are three separate parts and all three are disturbed by this job."
+        },
+        "replace-the-cracked-manifold": {
+          "title": "Replace the cracked manifold",
+          "detail": "Factory castings, aftermarket ones and used units are all on the table, and the supplier is candid that a used one is likely cracked as well. Whichever you choose, fit new gaskets — reusing them is how this job gets done twice."
+        }
+      }
+    },
+    "es": {
+      "title": "Múltiple de escape rajado",
+      "summary": "La casa especializada que importa repuestos para el V6 de 3.5 litros describe los múltiples de escape originales rajados como algo muy común, y la forma de su catálogo cuenta lo mismo: tienen la pieza izquierda y la derecha, advierten que una unidad de deshuesadero tiene alta probabilidad de venir rajada también, y enumeran los tres empaques que consume el trabajo. El síntoma con que abre esta entrada —un tictac en el compartimiento del motor al arrancar en frío que se va apagando conforme el metal se dilata y la rajadura se cierra— no aparece en esa fuente; es la lectura mecánica corriente de una pieza fundida rajada, y aquí queda anotado como inferencia para que usted lo pese así. Vale conocerlo porque es justamente por eso que tantas veces se confunde con un ruido del tren de válvulas y se busca donde no es. Esta entrada está acotada a los años que cubre la fuente citada; los vehículos posteriores de 3.8 litros llevan piezas distintas y aquí no se afirma nada sobre ellos. Dos cuidados. Una fuga de escape antes del sensor de oxígeno cambia lo que ve la computadora, así que un código de mezcla o de sensor aquí puede ser un síntoma y no una falla propia. Y cualquier fuga de escape es razón para mantener la cabina ventilada hasta repararla; si usted huele escape dentro del vehículo, ese es otro problema, más urgente que este. Todo esto sale de la documentación de producto de una sola casa especializada, y por eso la entrada queda en el nivel de confianza más bajo: es la opinión de un proveedor, no el acuerdo de muchos dueños.",
+      "slug": "multiple-de-escape-rajado",
+      "symptoms": {
+        "ticking-from-the-engine-bay-on-a-cold-start": "Un tictac seco en el compartimiento del motor al arrancar en frío",
+        "the-tick-fades-as-the-engine-warms-up": "El tictac se apaga o desaparece cuando el motor agarra temperatura",
+        "smell-of-exhaust-around-the-engine-bay": "Olor a escape en el compartimiento del motor con el capó abierto",
+        "check-engine-light-for-an-oxygen-sensor-reading": "Luz de check por lectura del sensor de oxígeno o de mezcla"
+      },
+      "causes": {
+        "manifold-casting-cracked": "La pieza fundida del múltiple de escape está rajada",
+        "manifold-to-head-gasket-blown": "El empaque entre el múltiple de escape y el cabezote está soplado",
+        "pipe-flange-gasket-blown": "El empaque de la brida del tubo, debajo del múltiple de escape, está soplado",
+        "broken-manifold-stud": "Se quebró un espárrago del múltiple de escape y la unión ya no aprieta"
+      },
+      "diagnosticSteps": {
+        "listen-cold-then-listen-again-warm": "Escuche en el compartimiento del motor al arrancar en frío y otra vez cuando esté a temperatura",
+        "look-for-soot-tracks-around-the-manifold-and-its-joints": "Busque rastros negros de hollín alrededor del múltiple de escape, de su unión al cabezote y de la brida del tubo",
+        "clean-the-casting-and-inspect-it-along-the-runners": "Limpie la pieza fundida y revísela a lo largo de cada conducto y alrededor de la unión donde los conductos se juntan en uno solo",
+        "check-every-manifold-nut-and-stud": "Confirme que estén todas las tuercas y espárragos del múltiple de escape y que estén apretados"
+      },
+      "fixPaths": {
+        "replace-the-gaskets-and-studs-only": {
+          "title": "Cambiar los empaques y el espárrago quebrado",
+          "detail": "Es el desenlace barato, y vale confirmarlo primero antes de comprar una pieza fundida. El empaque contra el cabezote, el de la brida del tubo y el del tercer tubo que enumera la fuente son tres piezas distintas y las tres se mueven en este trabajo."
+        },
+        "replace-the-cracked-manifold": {
+          "title": "Cambiar el múltiple de escape rajado",
+          "detail": "Están sobre la mesa la pieza de fábrica, la no original y la usada, y la casa especializada es franca en que una usada probablemente venga rajada también. Escoja la que escoja, monte empaques nuevos: reutilizarlos es como este trabajo termina haciéndose dos veces."
+        }
+      }
+    }
+  }
+}

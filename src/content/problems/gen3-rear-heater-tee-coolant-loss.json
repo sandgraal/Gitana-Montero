@@ -1,0 +1,158 @@
+{
+  "id": "gen3-rear-heater-tee-coolant-loss",
+  "fitment": {
+    "gens": ["gen3"],
+    "trims": ["limited"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "cooling",
+  "severity": "damaging",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "coolant-dumped-under-the-middle-of-the-vehicle",
+    "temperature-gauge-climbing-with-no-warning",
+    "coolant-level-falls-with-no-visible-leak-up-front",
+    "sweet-smell-and-steam-from-underneath"
+  ],
+  "causes": [
+    {
+      "id": "plastic-tee-joint-pipe-broken"
+    },
+    {
+      "id": "rear-heater-line-or-hose-perished"
+    },
+    {
+      "id": "radiator-or-front-hose-leak"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "find-where-the-puddle-actually-forms",
+      "rulesIn": [
+        "plastic-tee-joint-pipe-broken",
+        "rear-heater-line-or-hose-perished"
+      ],
+      "rulesOut": ["radiator-or-front-hose-leak"]
+    },
+    {
+      "id": "follow-the-rear-heater-lines-along-the-underside",
+      "rulesIn": ["rear-heater-line-or-hose-perished"]
+    },
+    {
+      "id": "inspect-the-plastic-tee-joints-in-the-rear-heater-circuit",
+      "rulesIn": ["plastic-tee-joint-pipe-broken"]
+    },
+    {
+      "id": "pressure-test-the-cooling-system-cold",
+      "rulesIn": [
+        "plastic-tee-joint-pipe-broken",
+        "rear-heater-line-or-hose-perished",
+        "radiator-or-front-hose-leak"
+      ]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-tee-joint-pipes",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["plastic-tee-joint-pipe-broken"],
+      "parts": ["gen3-rear-heater-tee-joint-pipe"],
+      "procedures": []
+    },
+    {
+      "id": "replace-them-during-the-timing-belt-service",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "plastic-tee-joint-pipe-broken",
+        "rear-heater-line-or-hose-perished"
+      ],
+      "parts": ["gen3-rear-heater-tee-joint-pipe"],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 OEM Timing Belt Kit (recommended additional items: «Rear Heater Tee Joint Pipe, Limited Trim Only»)",
+      "url": "https://lusooverland.com/VP-LO-K-TB005",
+      "archiveUrl": "https://web.archive.org/web/20260902205852id_/https://lusooverland.com/VP-LO-K-TB005",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Rear heater tee pipes dump the coolant",
+      "summary": "The trucks fitted with the rear heater carry the coolant a long way back and return it through plastic tee joints in the middle of the vehicle. The specialist supplier's standing advice is to replace those tees preventively whenever the cooling system is already drained, and their reasoning is the whole entry: if one of the old plastic pipes breaks, all of the vehicle's coolant drains out, which can overheat the engine and turn a cheap plastic fitting into cylinder head work. That is why this sits at do-not-drive. Nobody is hurt by it, but the distance between the puddle and a warped head is measured in minutes of running, and the temperature gauge on a system that has already emptied itself does not necessarily rise in time to be useful. If your Montero has rear heating and you are already draining the system for something else, this is the cheapest insurance on the truck. This entry rests on one specialist supplier's standing recommendation, so it is filed at the weakest tier — the consequence it describes is severe, and it is still one source.",
+      "slug": "rear-heater-tee-pipes-coolant-loss",
+      "symptoms": {
+        "coolant-dumped-under-the-middle-of-the-vehicle": "A large puddle of coolant under the middle of the vehicle rather than under the nose",
+        "temperature-gauge-climbing-with-no-warning": "The temperature gauge climbing with no other warning",
+        "coolant-level-falls-with-no-visible-leak-up-front": "The level in the reservoir keeps falling and nothing is wet at the front",
+        "sweet-smell-and-steam-from-underneath": "A sweet smell and steam from underneath after a run"
+      },
+      "causes": {
+        "plastic-tee-joint-pipe-broken": "One of the plastic tee joint pipes in the rear heater circuit has broken",
+        "rear-heater-line-or-hose-perished": "A rear heater line or hose has perished along its run",
+        "radiator-or-front-hose-leak": "The leak is at the radiator or a front hose and not at the rear circuit"
+      },
+      "diagnosticSteps": {
+        "find-where-the-puddle-actually-forms": "Park on clean, dry ground, run the engine to temperature and note where the puddle starts",
+        "follow-the-rear-heater-lines-along-the-underside": "Follow the rear heater lines along the underside from front to back looking for wet or crusted sections",
+        "inspect-the-plastic-tee-joints-in-the-rear-heater-circuit": "Find the plastic tee joints in the rear heater circuit and check them for cracks and brittleness",
+        "pressure-test-the-cooling-system-cold": "Pressure test the cooling system cold and watch where it lets go"
+      },
+      "fixPaths": {
+        "replace-the-tee-joint-pipes": {
+          "title": "Replace the tee joint pipes",
+          "detail": "A small part with a large downside. Replace them as a set rather than the one that broke — they are the same age and they live in the same place."
+        },
+        "replace-them-during-the-timing-belt-service": {
+          "title": "Do them while the system is already drained",
+          "detail": "The supplier's own recommendation, and the reason it is on their timing belt kit page. Almost all of this cost is access you have already paid for."
+        }
+      }
+    },
+    "es": {
+      "title": "Los tubos plásticos en T del calefactor trasero botan el refrigerante",
+      "summary": "Los vehículos que traen calefactor trasero llevan el refrigerante muy atrás y lo devuelven por unas uniones plásticas en T que van a media carrocería. La recomendación permanente de la casa especializada es cambiar esas uniones de forma preventiva cada vez que el sistema de refrigeración ya esté drenado, y su razonamiento es la entrada entera: si uno de esos tubos plásticos viejos se quiebra, se sale todo el refrigerante del vehículo, lo que puede sobrecalentar el motor y convertir una unión plástica barata en trabajo de cabezote. Por eso queda en no manejar. No lastima a nadie, pero la distancia entre el charco y un cabezote torcido se mide en minutos de motor andando, y el indicador de temperatura de un sistema que ya se vació no necesariamente sube a tiempo para servir de algo. Si su Montero tiene calefacción trasera y usted ya va a drenar el sistema por otra cosa, este es el seguro más barato del vehículo. Esta entrada se apoya en la recomendación permanente de una sola casa especializada, así que queda en el nivel de confianza más bajo: la consecuencia que describe es grave, y aun así es una sola fuente.",
+      "slug": "tubos-en-t-del-calefactor-trasero",
+      "symptoms": {
+        "coolant-dumped-under-the-middle-of-the-vehicle": "Un charco grande de refrigerante a media carrocería y no debajo de la trompa",
+        "temperature-gauge-climbing-with-no-warning": "El indicador de temperatura subiendo sin ninguna otra advertencia",
+        "coolant-level-falls-with-no-visible-leak-up-front": "El nivel del depósito sigue bajando y adelante no hay nada mojado",
+        "sweet-smell-and-steam-from-underneath": "Olor dulce y vapor saliendo por debajo después de andar"
+      },
+      "causes": {
+        "plastic-tee-joint-pipe-broken": "Se quebró uno de los tubos plásticos en T del circuito del calefactor trasero",
+        "rear-heater-line-or-hose-perished": "Una tubería o manguera del calefactor trasero está reseca en algún tramo",
+        "radiator-or-front-hose-leak": "La fuga está en el radiador o en una manguera delantera y no en el circuito trasero"
+      },
+      "diagnosticSteps": {
+        "find-where-the-puddle-actually-forms": "Parquee en piso limpio y seco, ponga el motor a temperatura y anote dónde empieza el charco",
+        "follow-the-rear-heater-lines-along-the-underside": "Siga por debajo las tuberías del calefactor trasero de adelante hacia atrás buscando tramos mojados o costrosos",
+        "inspect-the-plastic-tee-joints-in-the-rear-heater-circuit": "Ubique las uniones plásticas en T del circuito del calefactor trasero y revíselas por rajaduras y resequedad",
+        "pressure-test-the-cooling-system-cold": "Pruebe el sistema de refrigeración con presión y en frío, y observe por dónde cede"
+      },
+      "fixPaths": {
+        "replace-the-tee-joint-pipes": {
+          "title": "Cambiar los tubos en T",
+          "detail": "Pieza pequeña con consecuencia grande. Cámbielos como juego y no solo el que se quebró: tienen la misma edad y viven en el mismo lugar."
+        },
+        "replace-them-during-the-timing-belt-service": {
+          "title": "Hacerlos con el sistema ya drenado",
+          "detail": "Es la recomendación de la propia casa especializada, y por eso aparece en su página del juego de faja de distribución. Casi todo este costo es acceso que usted ya pagó."
+        }
+      }
+    }
+  }
+}

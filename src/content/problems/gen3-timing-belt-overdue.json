@@ -1,0 +1,168 @@
+{
+  "id": "gen3-timing-belt-overdue",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "engine",
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "no-record-of-when-the-belt-was-last-changed",
+    "rattle-or-squeal-from-behind-the-front-cover",
+    "coolant-weeping-from-the-timing-cover-area",
+    "engine-turns-over-but-will-not-start-after-a-bang"
+  ],
+  "causes": [
+    {
+      "id": "timing-belt-past-its-service-life"
+    },
+    {
+      "id": "tensioner-or-idler-pulley-failing"
+    },
+    {
+      "id": "water-pump-leaking-onto-the-belt"
+    },
+    {
+      "id": "cheap-aftermarket-kit-parts-failing-early"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "find-the-last-timing-belt-record-for-this-truck",
+      "rulesIn": ["timing-belt-past-its-service-life"]
+    },
+    {
+      "id": "listen-at-the-front-cover-with-the-engine-idling",
+      "rulesIn": ["tensioner-or-idler-pulley-failing"]
+    },
+    {
+      "id": "look-for-coolant-tracks-below-the-timing-cover",
+      "rulesIn": ["water-pump-leaking-onto-the-belt"]
+    },
+    {
+      "id": "ask-what-brand-of-kit-went-in-last-time",
+      "rulesIn": ["cheap-aftermarket-kit-parts-failing-early"],
+      "rulesOut": ["timing-belt-past-its-service-life"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "do-the-full-timing-belt-service",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant"
+      },
+      "addresses": [
+        "timing-belt-past-its-service-life",
+        "tensioner-or-idler-pulley-failing",
+        "water-pump-leaking-onto-the-belt",
+        "cheap-aftermarket-kit-parts-failing-early"
+      ],
+      "parts": [
+        "gen3-timing-belt",
+        "gen3-timing-belt-tensioner",
+        "gen3-timing-belt-idler-pulley",
+        "gen3-water-pump"
+      ],
+      "procedures": []
+    },
+    {
+      "id": "add-the-seals-and-belts-that-are-already-exposed",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
+      "addresses": ["water-pump-leaking-onto-the-belt"],
+      "parts": [
+        "gen3-front-camshaft-seal",
+        "gen3-front-crankshaft-seal",
+        "gen3-accessory-drive-belt",
+        "gen3-thermostat"
+      ],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 OEM Timing Belt Kit (kit contents, service interval and the recommended additional items)",
+      "url": "https://lusooverland.com/VP-LO-K-TB005",
+      "archiveUrl": "https://web.archive.org/web/20260902205852id_/https://lusooverland.com/VP-LO-K-TB005",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Timing belt service overdue or unknown",
+      "summary": "The Montero specialist who assembles the OEM kit for this generation states it plainly: these are timing-belt-driven interference engines on a fixed service interval, and after collision damage the most common reason they see a Montero reach a scrapyard is a blown engine from a timing failure. That makes an unknown belt history a real problem rather than a paperwork gap — on an interference engine the belt does not strand you, it ends the engine. The same source warns that cheap aftermarket kit parts fail early, and lists what should always be replaced together: the belt, the tensioner and its pulley, the idler pulley, and the water pump with its gaskets. If you have just bought a Gen 3 and there is no receipt for this job, treat it as due. On a truck that lives at the end of a bad road, the arithmetic is not close. The interval and the interference-engine claim both come from one specialist supplier's kit documentation, so this entry is filed at the weakest tier. Treat the recommendation as sound trade practice rather than as a factory specification, and confirm the interval for your own market's service schedule.",
+      "slug": "timing-belt-service-overdue",
+      "symptoms": {
+        "no-record-of-when-the-belt-was-last-changed": "Nobody can say when the timing belt was last replaced",
+        "rattle-or-squeal-from-behind-the-front-cover": "A rattle or squeal from behind the front cover at idle",
+        "coolant-weeping-from-the-timing-cover-area": "Coolant weeping from the area of the timing cover",
+        "engine-turns-over-but-will-not-start-after-a-bang": "The engine spins freely and will not start after a bang or a sudden stop"
+      },
+      "causes": {
+        "timing-belt-past-its-service-life": "The belt is past the service interval the kit supplier states for this engine",
+        "tensioner-or-idler-pulley-failing": "The tensioner or an idler pulley is failing and letting the belt move",
+        "water-pump-leaking-onto-the-belt": "The water pump is leaking coolant onto the belt",
+        "cheap-aftermarket-kit-parts-failing-early": "Cheap aftermarket kit parts fitted at the last service have failed early"
+      },
+      "diagnosticSteps": {
+        "find-the-last-timing-belt-record-for-this-truck": "Go through the truck's records and find the last timing belt invoice, or establish that there is none",
+        "listen-at-the-front-cover-with-the-engine-idling": "Listen at the front cover with the engine idling, then again with the accessory belt off",
+        "look-for-coolant-tracks-below-the-timing-cover": "Look for dried coolant tracks below the timing cover and around the pump area",
+        "ask-what-brand-of-kit-went-in-last-time": "Find out what brand of kit went in at the last service and how long ago"
+      },
+      "fixPaths": {
+        "do-the-full-timing-belt-service": {
+          "title": "Do the full service, not the belt alone",
+          "detail": "The belt, both pulleys, the tensioner and the water pump come out together and go back together. Fitting a belt onto a tired tensioner buys nothing and costs the same access twice."
+        },
+        "add-the-seals-and-belts-that-are-already-exposed": {
+          "title": "Add the parts that are already exposed",
+          "detail": "The camshaft seals are a known leak point and they are behind the same covers; the accessory drive belt and the thermostat are off or drained anyway. Doing them now is labour you have already paid for."
+        }
+      }
+    },
+    "es": {
+      "title": "Servicio de faja de distribución vencido o sin historial",
+      "summary": "La casa especializada en Montero que arma el juego original para esta generación lo dice sin rodeos: estos motores mueven la distribución por faja, son de interferencia y llevan un intervalo de servicio fijo, y después de los choques la razón más común por la que ven llegar una Montero a un deshuesadero es un motor fundido por una falla de distribución. Eso convierte un historial desconocido en un problema real y no en un vacío de papeles: en un motor de interferencia la faja no lo deja botado, le termina el motor. La misma fuente advierte que las piezas baratas no originales del juego fallan temprano, y enumera lo que siempre debe cambiarse junto: la faja, el tensor y su polea, la polea loca y la bomba de agua con sus empaques. Si usted acaba de comprar una tercera generación y no aparece la factura de este trabajo, tómelo por vencido. En un vehículo que vive al final de un camino malo, la cuenta ni siquiera es reñida. El intervalo y la afirmación de que el motor es de interferencia salen los dos de la documentación del juego de una sola casa especializada, así que esta entrada queda en el nivel de confianza más bajo. Tómelo como buena práctica del gremio y no como una especificación de fábrica, y confirme el intervalo contra el plan de servicio de su propio mercado.",
+      "slug": "faja-de-distribucion-vencida",
+      "symptoms": {
+        "no-record-of-when-the-belt-was-last-changed": "Nadie sabe decir cuándo se cambió la faja de distribución por última vez",
+        "rattle-or-squeal-from-behind-the-front-cover": "Un traqueteo o chillido detrás de la tapa delantera en marcha mínima",
+        "coolant-weeping-from-the-timing-cover-area": "Refrigerante rezumando por la zona de la tapa de distribución",
+        "engine-turns-over-but-will-not-start-after-a-bang": "El motor gira libre y no arranca después de un golpe seco o de apagarse de repente"
+      },
+      "causes": {
+        "timing-belt-past-its-service-life": "La faja pasó el intervalo de servicio que indica el proveedor del juego para este motor",
+        "tensioner-or-idler-pulley-failing": "El tensor o una polea loca está fallando y deja que la faja se mueva",
+        "water-pump-leaking-onto-the-belt": "La bomba de agua tiene fuga y moja la faja con refrigerante",
+        "cheap-aftermarket-kit-parts-failing-early": "Piezas baratas no originales del juego montado en el servicio anterior fallaron temprano"
+      },
+      "diagnosticSteps": {
+        "find-the-last-timing-belt-record-for-this-truck": "Revise el historial del vehículo y ubique la última factura de faja de distribución, o confirme que no existe",
+        "listen-at-the-front-cover-with-the-engine-idling": "Escuche en la tapa delantera con el motor en marcha mínima, y otra vez con la faja de accesorios quitada",
+        "look-for-coolant-tracks-below-the-timing-cover": "Busque rastros secos de refrigerante debajo de la tapa de distribución y alrededor de la bomba",
+        "ask-what-brand-of-kit-went-in-last-time": "Averigüe qué marca de juego se montó en el servicio anterior y hace cuánto"
+      },
+      "fixPaths": {
+        "do-the-full-timing-belt-service": {
+          "title": "Hacer el servicio completo, no solo la faja",
+          "detail": "La faja, las dos poleas, el tensor y la bomba de agua salen juntos y entran juntos. Montar faja nueva sobre un tensor cansado no compra nada y hace pagar dos veces el mismo acceso."
+        },
+        "add-the-seals-and-belts-that-are-already-exposed": {
+          "title": "Aprovechar lo que ya quedó destapado",
+          "detail": "Los retenedores del árbol de levas son un punto de fuga conocido y están detrás de las mismas tapas; la faja de accesorios y el termostato ya están afuera o el sistema ya está drenado. Hacerlos ahora es mano de obra que usted ya pagó."
+        }
+      }
+    }
+  }
+}

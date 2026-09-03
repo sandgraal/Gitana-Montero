@@ -1,0 +1,186 @@
+{
+  "id": "gen3-surge-tank-butterfly-valves",
+  "fitment": {
+    "gens": ["gen3"],
+    "engines": ["6g75"],
+    "years": {
+      "from": 2003,
+      "to": 2006
+    }
+  },
+  "system": "engine",
+  "severity": "damaging",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "rattle-from-the-top-of-the-engine-at-idle",
+    "vacuum-leak-and-an-unsteady-idle",
+    "rough-running-with-no-obvious-cause"
+  ],
+  "causes": [
+    {
+      "id": "butterfly-rod-bushings-worn-and-leaking"
+    },
+    {
+      "id": "butterfly-valve-or-screw-loose-in-the-runner"
+    },
+    {
+      "id": "surge-tank-gaskets-leaking"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "listen-at-the-intake-plenum-with-the-engine-idling",
+      "rulesIn": [
+        "butterfly-rod-bushings-worn-and-leaking",
+        "butterfly-valve-or-screw-loose-in-the-runner"
+      ]
+    },
+    {
+      "id": "smoke-test-the-intake-for-leaks",
+      "rulesIn": [
+        "butterfly-rod-bushings-worn-and-leaking",
+        "surge-tank-gaskets-leaking"
+      ]
+    },
+    {
+      "id": "look-into-the-runners-and-check-every-screw-and-bushing",
+      "rulesIn": ["butterfly-valve-or-screw-loose-in-the-runner"],
+      "rulesOut": ["surge-tank-gaskets-leaking"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "rebuild-the-variable-intake-assembly",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": [
+        "butterfly-rod-bushings-worn-and-leaking",
+        "butterfly-valve-or-screw-loose-in-the-runner",
+        "surge-tank-gaskets-leaking"
+      ],
+      "parts": ["gen3-surge-tank-gasket-set"],
+      "procedures": []
+    },
+    {
+      "id": "delete-the-butterfly-assembly",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "butterfly-rod-bushings-worn-and-leaking",
+        "butterfly-valve-or-screw-loose-in-the-runner"
+      ],
+      "parts": [
+        "gen3-surge-tank-butterfly-delete-disc",
+        "gen3-surge-tank-gasket-set"
+      ],
+      "procedures": []
+    },
+    {
+      "id": "fit-a-replacement-surge-tank",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
+      "addresses": [
+        "butterfly-rod-bushings-worn-and-leaking",
+        "butterfly-valve-or-screw-loose-in-the-runner",
+        "surge-tank-gaskets-leaking"
+      ],
+      "parts": ["gen3-surge-tank-gasket-set"],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 Surgetank Butterfly Delete Discs (2-pack): «The 3.8L V6 suffers from a variable intake runner that after around 100,000 miles can create some very serious problems», and the bushings, screws and butterfly valves that can fall into the combustion chambers",
+      "url": "https://lusooverland.com/VP-LO-M3-BDD",
+      "archiveUrl": "https://web.archive.org/web/20260902205507id_/https://lusooverland.com/VP-LO-M3-BDD",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 NP 3.8L Surge Tank Gaskets (MR561581, MR561582, MR561584)",
+      "url": "https://lusooverland.com/VP-MMC-MR56158X",
+      "archiveUrl": "https://web.archive.org/web/20260902210135id_/https://lusooverland.com/VP-MMC-MR56158X",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Variable intake butterfly valves rattling on the 3.8",
+      "summary": "This one belongs to the larger petrol V6 fitted to the later trucks, and the specialist supplier states the mileage at which it starts — the figure is in the citation below rather than in this paragraph, so it is written down once. The failure is mechanical: the butterfly rod bushings wear, the rod leaks air, and the screws, bushings and butterfly valves in the surge tank can end up in the combustion chambers. Enthusiasts have a nickname for it that tells you the stakes better than any severity rating. This entry is deliberately scoped to a truck that is already telling you something — a rattle, an unsteady idle, rough running — rather than to mileage alone; high mileage on its own is a reason to inspect, not a reason to stop driving. Once it does rattle, the hardware is loose upstream of open valves, and that is the point at which the truck should stay parked. The choices are to rebuild the assembly, to remove it entirely and blank the rod port, or to buy a replacement surge tank, and the supplier is honest that deleting it costs a noticeable amount of torque.",
+      "slug": "variable-intake-butterfly-valves-3-8",
+      "symptoms": {
+        "rattle-from-the-top-of-the-engine-at-idle": "A rattle from the top of the engine at idle that changes with throttle",
+        "vacuum-leak-and-an-unsteady-idle": "An unsteady idle that behaves like a vacuum leak",
+        "rough-running-with-no-obvious-cause": "Rough running that survives plugs, coils and a fuel service"
+      },
+      "causes": {
+        "butterfly-rod-bushings-worn-and-leaking": "The butterfly rod bushings are worn and letting air past the rod",
+        "butterfly-valve-or-screw-loose-in-the-runner": "A butterfly valve or one of its screws is loose inside a runner",
+        "surge-tank-gaskets-leaking": "The surge tank gaskets are leaking at the plenum or at the lower manifold"
+      },
+      "diagnosticSteps": {
+        "listen-at-the-intake-plenum-with-the-engine-idling": "Listen along the intake plenum at idle and note whether the rattle tracks the throttle",
+        "smoke-test-the-intake-for-leaks": "Smoke test the intake and watch specifically at the butterfly rod ends",
+        "look-into-the-runners-and-check-every-screw-and-bushing": "With the surge tank off, look into each runner and check every butterfly screw and bushing is where it should be"
+      },
+      "fixPaths": {
+        "rebuild-the-variable-intake-assembly": {
+          "title": "Rebuild the assembly",
+          "detail": "Keeps the variable intake and its torque. New gaskets are not optional once the surge tank has been off — the plenum gaskets and the surge-tank-to-lower-manifold gasket are separate parts."
+        },
+        "delete-the-butterfly-assembly": {
+          "title": "Delete the butterfly assembly and blank the port",
+          "detail": "Removes every screw, bushing and valve that could fall into a cylinder, at a stated cost in torque. The blanking disc goes in with high temperature sealant."
+        },
+        "fit-a-replacement-surge-tank": {
+          "title": "Fit a replacement surge tank",
+          "detail": "The complete answer and the expensive one. Worth pricing against a rebuild before committing, since the same gaskets are needed either way."
+        }
+      }
+    },
+    "es": {
+      "title": "Mariposas del múltiple de admisión variable sonando en el 3.8",
+      "summary": "Esta falla es del V6 de gasolina más grande que montan los vehículos posteriores, y la casa especializada indica el kilometraje a partir del cual empieza; la cifra está en la fuente citada abajo y no en este párrafo, para que quede escrita una sola vez. La falla es mecánica: los bujes del eje de las mariposas se desgastan, el eje deja pasar aire, y los tornillos, bujes y mariposas del depósito de admisión pueden terminar dentro de las cámaras de combustión. Entre aficionados tiene un apodo que explica el riesgo mejor que cualquier clasificación de severidad. Esta entrada está acotada a propósito a un vehículo que ya le está avisando algo —un traqueteo, marcha mínima inestable, motor disparejo— y no al kilometraje solo: kilometraje alto por sí mismo es razón para inspeccionar, no para dejar de manejar. Una vez que traquetea, hay tornillería suelta antes de unas válvulas abiertas, y ese es el punto en que el vehículo se queda parqueado. Las opciones son reconstruir el conjunto, quitarlo por completo y tapar el orificio del eje, o comprar un depósito de admisión de repuesto, y la misma casa admite con honestidad que eliminarlo cuesta una pérdida notable de torque.",
+      "slug": "mariposas-del-multiple-de-admision-3-8",
+      "symptoms": {
+        "rattle-from-the-top-of-the-engine-at-idle": "Un traqueteo en la parte alta del motor en marcha mínima que cambia con el acelerador",
+        "vacuum-leak-and-an-unsteady-idle": "Marcha mínima inestable que se comporta como una entrada de aire falsa",
+        "rough-running-with-no-obvious-cause": "El motor corre disparejo aunque ya se cambiaron bujías, bobinas y se hizo servicio de combustible"
+      },
+      "causes": {
+        "butterfly-rod-bushings-worn-and-leaking": "Los bujes del eje de las mariposas están gastados y dejan pasar aire por el eje",
+        "butterfly-valve-or-screw-loose-in-the-runner": "Una mariposa o uno de sus tornillos está flojo dentro de un conducto",
+        "surge-tank-gaskets-leaking": "Los empaques del depósito de admisión tienen fuga en el pleno o contra el múltiple inferior"
+      },
+      "diagnosticSteps": {
+        "listen-at-the-intake-plenum-with-the-engine-idling": "Escuche a lo largo del pleno de admisión en marcha mínima y note si el traqueteo sigue al acelerador",
+        "smoke-test-the-intake-for-leaks": "Haga prueba de humo a la admisión y observe en especial las puntas del eje de las mariposas",
+        "look-into-the-runners-and-check-every-screw-and-bushing": "Con el depósito de admisión afuera, mire dentro de cada conducto y confirme que cada tornillo y buje de mariposa está en su sitio"
+      },
+      "fixPaths": {
+        "rebuild-the-variable-intake-assembly": {
+          "title": "Reconstruir el conjunto",
+          "detail": "Conserva la admisión variable y su torque. Los empaques nuevos no son opcionales una vez que el depósito salió: los del pleno y el que va contra el múltiple inferior son piezas distintas."
+        },
+        "delete-the-butterfly-assembly": {
+          "title": "Eliminar el conjunto de mariposas y tapar el orificio",
+          "detail": "Saca del motor todo tornillo, buje y mariposa que pueda caer a un cilindro, a un costo declarado en torque. El disco de tapa se monta con sellador de alta temperatura."
+        },
+        "fit-a-replacement-surge-tank": {
+          "title": "Montar un depósito de admisión de repuesto",
+          "detail": "Es la respuesta completa y la cara. Vale cotizarla contra la reconstrucción antes de decidir, porque los mismos empaques hacen falta en ambos casos."
+        }
+      }
+    }
+  }
+}
