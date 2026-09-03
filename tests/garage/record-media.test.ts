@@ -320,6 +320,31 @@ type MimeRestriction =
  * rather than a change to `sql.ts`: nothing else needs it yet, and widening a
  * shared parser used by every security rule in the directory to serve one
  * caller is not a trade worth making.
+ *
+ * ## Escaped quotes: `''` is handled, and here is why (PR #96 review)
+ *
+ * The quote tracking is a bare parity toggle, which *looks* wrong for SQL's
+ * doubled-quote escape — `'it''s'` — and is not. The escape is two **adjacent**
+ * quote characters, so it flips `quoted` twice and lands back where it started,
+ * and no comma can ever sit between them to be mis-read while the flag is
+ * momentarily wrong. Parity is preserved at every position a comma can occupy,
+ * which is the only property the split depends on. Verified rather than
+ * reasoned about: the controls in "the splitter survives SQL's escaped quotes"
+ * run the ugly cases, including a literal that carries a comma *and* an escaped
+ * quote (`'a,b''c,d'`), and an end-to-end insert whose bucket **name** is
+ * `'it''s, media'`.
+ *
+ * ## The one form it does NOT handle, named rather than left to be discovered
+ *
+ * Postgres also accepts backslash escapes inside an `E''` string, and
+ * `e'a\',b'` genuinely does mis-split — the backslashed quote breaks parity.
+ * That is not a hole this function can close on its own: `normalizeSql` in
+ * `sql.ts` does not understand E-strings either, so the literal is already
+ * mangled before it arrives here, and every rule in this directory shares that
+ * limitation. It is unreachable through content (a bucket id, a bucket name and
+ * a MIME type cannot contain a backslash), but "unreachable" is not the same as
+ * "safe", so `mimeRestriction` refuses to read any `storage.buckets` statement
+ * containing a backslash and reports `unparsed` instead of guessing.
  */
 function splitTopLevelItems(text: string): string[] {
   const out: string[] = [];
@@ -390,6 +415,24 @@ function valueTuples(statement: string): string[] {
     index = cursor;
   }
   return tuples;
+}
+
+/**
+ * `true` when a statement uses string escaping this module cannot lex.
+ *
+ * Only one form qualifies: a backslash, which in an `E''` string escapes the
+ * quote that follows it and breaks the parity `splitTopLevelItems` relies on.
+ * SQL's own `''` escape is handled correctly and is *not* flagged.
+ *
+ * A backslash in a `storage.buckets` statement is anomalous to begin with — a
+ * bucket id, a bucket name and a MIME type have no use for one — so the false
+ * positive rate is zero in practice and the failure direction is the safe one.
+ * `.claude/GRADER-PRINCIPLES.md`: "the safe failure direction is
+ * over-matching — a spurious finding costs a reviewer five minutes; a missed
+ * one is a live hole."
+ */
+function hasUnreadableEscape(statement: string): boolean {
+  return statement.includes("\\");
 }
 
 /**
@@ -511,6 +554,15 @@ function mimeRestriction(sql: string, bucket: string): MimeRestriction {
 
     if (statement.startsWith("insert into storage.buckets")) {
       if (!statement.includes(literal)) continue;
+      if (hasUnreadableEscape(statement)) {
+        current = {
+          state: "unparsed",
+          raw:
+            `the statement uses backslash string escaping, which this module ` +
+            `cannot lex: ${statement.slice(0, 120)}`,
+        };
+        continue;
+      }
       const columns = parenAfter(
         statement,
         /insert into storage\.buckets\s*\(/
@@ -547,6 +599,15 @@ function mimeRestriction(sql: string, bucket: string): MimeRestriction {
     if (statement.startsWith("update storage.buckets")) {
       const scoped = /\bwhere\b/.test(statement);
       if (scoped && !statement.includes(literal)) continue;
+      if (hasUnreadableEscape(statement)) {
+        current = {
+          state: "unparsed",
+          raw:
+            `the statement uses backslash string escaping, which this module ` +
+            `cannot lex: ${statement.slice(0, 120)}`,
+        };
+        continue;
+      }
       const assigned = assignedExpression(statement, "allowed_mime_types");
       if (assigned !== null) current = readMimeExpression(assigned, current);
     }
@@ -2075,6 +2136,111 @@ describe("the MIME rule reads an end state, not a spelling", () => {
     expect(
       mimeRestrictionIssues(migrationSql(), RECEIPTS_BUCKET).join(" | ")
     ).toContain("allows application/pdf");
+  });
+});
+
+describe("the splitter survives SQL's escaped quotes", () => {
+  // Raised by a bot reviewer on PR #96: does the bare parity toggle in
+  // `splitTopLevelItems` mis-split on `''`? It does not — the escape is two
+  // ADJACENT quotes, so it flips the flag twice and no comma can sit between
+  // them — but until these controls existed that was an argument rather than a
+  // fact, and the argument is exactly the kind that is right for years and then
+  // quietly wrong after someone "simplifies" the loop.
+  //
+  // The reviewer's real finding was the coverage gap, and it was correct: not
+  // one test exercised an escaped quote.
+  const BUCKET = RECORD_MEDIA_BUCKET;
+
+  it("reads a bucket name containing an escaped quote AND a comma", () => {
+    // The nastiest shape that can legally occur: the `name` column carries
+    // both, so a mis-split would shift every later field by one and hand the
+    // MIME reader `false` instead of the array — or, worse, hand it the array
+    // from a different column and report a restriction that is not there.
+    const awkward = normalizeSql(`
+      insert into storage.buckets (id, name, public, allowed_mime_types)
+      values ('record-media', 'it''s, media', false,
+        array['image/jpeg', 'video/mp4', 'audio/mp4']);
+    `);
+
+    expect(mimeRestriction(awkward, BUCKET)).toEqual({
+      state: "restricted",
+      types: ["image/jpeg", "video/mp4", "audio/mp4"],
+    });
+    expect(mimeRestrictionIssues(awkward, BUCKET)).toEqual([]);
+  });
+
+  it("still attributes multi-row tuples correctly when a name is escaped", () => {
+    // F2's row-selection walks the same split, so the two fixes have to hold
+    // together: the escaped quote must not shift the `id` out of position and
+    // make the wrong row look like this bucket's.
+    const multiRow = normalizeSql(`
+      insert into storage.buckets (id, name, public, allowed_mime_types)
+      values
+        ('receipts', 'the owner''s, receipts', false, array['application/pdf']),
+        ('record-media', 'it''s, media', false, null);
+    `);
+
+    expect(mimeRestriction(multiRow, BUCKET).state).toBe("unrestricted");
+    expect(mimeRestriction(multiRow, RECEIPTS_BUCKET)).toEqual({
+      state: "restricted",
+      types: ["application/pdf"],
+    });
+  });
+
+  it("does not treat an escaped quote as an unreadable escape", () => {
+    // The over-matching direction: `''` is ordinary, correct SQL and must not
+    // trip the backslash guard, or a perfectly normal migration would be
+    // reported as unreadable.
+    const escaped = normalizeSql(`
+      insert into storage.buckets (id, name, public, allowed_mime_types)
+      values ('record-media', 'it''s media', false,
+        array['image/jpeg', 'video/mp4', 'audio/mp4']);
+    `);
+
+    expect(mimeRestriction(escaped, BUCKET).state).toBe("restricted");
+  });
+
+  it("MUTATION: refuses to read a backslash-escaped E-string", () => {
+    // The form the parity toggle genuinely cannot lex, and the reason the
+    // guard exists. `normalizeSql` does not understand E-strings either, so the
+    // literal is already mangled before it reaches the splitter and every rule
+    // in this directory shares the limitation. Unreachable through content — a
+    // bucket id, a bucket name and a MIME type have no use for a backslash —
+    // but unreachable is not the same as safe, so the answer is "we could not
+    // check" rather than a confident reading of a mis-split tuple.
+    const eString = normalizeSql(
+      String.raw`insert into storage.buckets (id, name, public, allowed_mime_types)
+        values ('record-media', e'it\'s, media', false, null);`
+    );
+
+    expect(mimeRestriction(eString, BUCKET).state).toBe("unparsed");
+    expect(mimeRestrictionIssues(eString, BUCKET).join(" ")).toContain(
+      "cannot read"
+    );
+  });
+
+  it("MUTATION: refuses a backslash in a later widening update too", () => {
+    // The guard has to cover both branches of the replay, or the statement
+    // that removes the restriction is the one that slips through.
+    const widened = normalizeSql(
+      String.raw`insert into storage.buckets (id, name, public, allowed_mime_types)
+        values ('record-media', 'record-media', false, array['image/jpeg', 'video/mp4', 'audio/mp4']);
+      update storage.buckets set allowed_mime_types = null
+       where name = e'record\'s media' and id = 'record-media';`
+    );
+
+    expect(mimeRestriction(widened, BUCKET).state).toBe("unparsed");
+  });
+
+  it("today's shipped migrations contain no unreadable escape", () => {
+    // The claim that makes the guard cheap: it is not silently degrading any
+    // real reading, because nothing in the directory trips it.
+    const tripped = statements(migrationSql()).filter(
+      (statement) =>
+        statement.includes("storage.buckets") && statement.includes("\\")
+    );
+
+    expect(tripped).toEqual([]);
   });
 });
 
