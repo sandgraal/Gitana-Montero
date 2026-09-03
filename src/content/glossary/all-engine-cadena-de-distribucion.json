@@ -1,0 +1,66 @@
+{
+  "id": "all-engine-cadena-de-distribucion",
+  "fitment": {
+    "gens": ["gen3", "gen4"]
+  },
+  "system": "engine",
+  "aliases": [
+    {
+      "term": "cadena de tiempo",
+      "locale": "es",
+      "countries": ["CR", "MX"]
+    },
+    {
+      "term": "cadenas de tiempo",
+      "locale": "es",
+      "countries": ["CR", "MX"]
+    },
+    {
+      "term": "timing chains",
+      "locale": "en",
+      "countries": ["US", "GB", "AU"]
+    },
+    {
+      "term": "cam chain",
+      "locale": "en",
+      "countries": ["GB"]
+    },
+    {
+      "term": "cam chains",
+      "locale": "en",
+      "countries": ["GB"]
+    }
+  ],
+  "relatedTerms": [
+    "all-engine-faja-de-distribucion",
+    "all-engine-arbol-de-levas",
+    "all-engine-ciguenal"
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "On2Wheels Costa Rica — a Costa Rican motorcycle parts catalogue whose engine-parts section carries the category \"CADENA DISTRIBUCION\"; cited for the Costa Rican wording only, not as an automotive fitment source",
+      "url": "https://www.on2wheelscr.com/index.php?category_id=53&dispatch=categories.view",
+      "archiveUrl": "https://web.archive.org/web/20260902180350id_/https://www.on2wheelscr.com/index.php?category_id=53&dispatch=categories.view",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Andrews High Tech Automotive (Australian workshop) — \"Mitsubishi Timing Chain Failure\": describes the timing chain, its upper guide and the guide's plastic wearing face on the 3.2 litre 4M41 used in the Pajero",
+      "url": "https://andrewshightech.com.au/mitsubishi-timing-chain-failure/",
+      "archiveUrl": "https://web.archive.org/web/20260902180921id_/https://andrewshightech.com.au/mitsubishi-timing-chain-failure/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "timing chain",
+      "summary": "The roller chain that keeps the camshafts in step with the crankshaft on the engines that use one instead of a belt. A chain does not have a replacement interval the way a belt does, which is often mistaken for a chain lasting forever: what wears is the chain itself, its tensioner, and above all the plastic-faced guides it runs against. A jumped chain on an interference engine does the same damage a snapped belt does. No problem entry uses this term yet — it is defined here for the third-generation coverage that will."
+    },
+    "es": {
+      "title": "cadena de distribución",
+      "summary": "La cadena de rodillos que mantiene los árboles de levas en sincronía con el cigüeñal, en los motores que la usan en vez de faja. Una cadena no tiene intervalo de cambio como lo tiene una faja, y eso se confunde muy seguido con que la cadena dura para siempre: lo que se desgasta es la cadena misma, su tensor y, sobre todo, las guías con cara plástica sobre las que corre. Una cadena que se brinca en un motor de interferencia hace el mismo daño que una faja reventada. Todavía ninguna entrada de problemas usa este término: queda definido aquí para la cobertura de tercera generación que sí lo va a usar."
+    }
+  }
+}

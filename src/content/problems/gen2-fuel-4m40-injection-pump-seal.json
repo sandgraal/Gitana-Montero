@@ -1,0 +1,193 @@
+{
+  "id": "gen2-fuel-4m40-injection-pump-seal",
+  "fitment": {
+    "gens": ["gen2", "gen2-5"],
+    "engines": ["4m40"],
+    "years": {
+      "from": 1993,
+      "to": 1999
+    }
+  },
+  "system": "fuel",
+  "severity": "stranding",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "hard-cold-starting-that-gets-worse",
+    "starts-fine-warm-never-cold",
+    "damp-diesel-film-around-the-pump",
+    "long-cranking-before-it-catches",
+    "rough-running-until-it-warms-up"
+  ],
+  "causes": [
+    { "id": "worn-injection-pump-shaft-seal" },
+    { "id": "air-drawn-in-through-the-fuel-line-or-filter" },
+    { "id": "worn-glow-plugs-or-glow-circuit" },
+    { "id": "worn-injectors" }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "clean-the-pump-and-watch-for-a-fresh-film",
+      "rulesIn": ["worn-injection-pump-shaft-seal"],
+      "rulesOut": ["worn-glow-plugs-or-glow-circuit"]
+    },
+    {
+      "id": "check-the-glow-circuit-before-blaming-the-pump",
+      "rulesIn": ["worn-glow-plugs-or-glow-circuit"],
+      "rulesOut": ["worn-injection-pump-shaft-seal"]
+    },
+    {
+      "id": "look-for-air-bubbles-in-the-fuel-line",
+      "rulesIn": ["air-drawn-in-through-the-fuel-line-or-filter"],
+      "rulesOut": ["worn-injectors"]
+    },
+    {
+      "id": "have-the-injectors-tested-off-the-engine",
+      "rulesIn": ["worn-injectors"],
+      "rulesOut": ["air-drawn-in-through-the-fuel-line-or-filter"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-pump-shaft-seal",
+      "difficulty": 5,
+      "cost": { "from": "minimal", "to": "significant" },
+      "addresses": ["worn-injection-pump-shaft-seal"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "cure-the-air-leak-and-prime-properly",
+      "difficulty": 2,
+      "cost": { "from": "minimal" },
+      "addresses": ["air-drawn-in-through-the-fuel-line-or-filter"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "renew-the-glow-plugs",
+      "difficulty": 3,
+      "cost": { "from": "minimal", "to": "moderate" },
+      "addresses": ["worn-glow-plugs-or-glow-circuit"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "have-the-injectors-serviced",
+      "difficulty": 4,
+      "cost": { "from": "moderate", "to": "significant" },
+      "addresses": ["worn-injectors"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Foro Mitsubishi 4x4 Galloper — Reparación de la bomba inyectora del Pajero/Montero 2800 (motor 4M40): un retén defectuoso, síntoma de arranque en frío que empeora, y el procedimiento de cambio",
+      "url": "https://mitsubishi4x4galloper.org/Foro/index.php?topic=1107.0",
+      "archiveUrl": "https://web.archive.org/web/20260902180348/https://mitsubishi4x4galloper.org/Foro/index.php?topic=1107.0",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "JDMBUYSELL — Mitsubishi Pajero V20/V30/V40 (1991–1999) buyer's guide: injection pump seal leaks from ageing seals, and worn injectors",
+      "url": "https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "archiveUrl": "http://web.archive.org/web/20260614140249/https://www.jdmbuysell.com/learn/mitsubishi/pajero/v20/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi 4M4 engine — Wikipedia (4M40 applications, including the 1993–1999 second-generation Pajero, and the distributor-type injection pump)",
+      "url": "https://en.wikipedia.org/wiki/Mitsubishi_4M4_engine",
+      "archiveUrl": "https://web.archive.org/web/20260902180413/https://en.wikipedia.org/wiki/Mitsubishi_4M4_engine",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Injection pump seal leaks and cold starting gets worse",
+      "summary": "A long-running Spanish-language owners' forum thread devoted to this engine's injection pump describes it as a defect the engine simply has, with one experienced member writing that they all come to it sooner or later, and warning that a truck left with the worn seal will fail to start cold and will get worse each time. A buyer's guide for this generation names the same thing more briefly, listing injection pump seal leaks among the fuel-system items to expect and attributing them to ageing seals. The two agree on the shape of it: this is a wear item on a mechanically injected diesel, not a design catastrophe, and the seal itself is a cheap part. What makes it worth its own entry is the gap between that part and the bill. The forum thread's whole point is the gap between the two: the seal itself sits at the very bottom of the cost band, and the quote the poster was given for the same job sat at the top of it, because getting to the seal means the pump comes off and goes back on, and a distributor pump that goes back on wrong does not run. The fix path below carries the whole span as a band rather than a figure, which is the only honest way to state a price that depends on your market, your currency and your year — where you land inside it is decided by who does the work, not by the part. The cold-start-only pattern is what points here rather than at the glow plugs, which fail with the same complaint and are far easier to check first. Diesel around a hot engine is a fire risk: if you can see fuel dripping rather than a damp film, that is a different and more urgent problem and the truck stops until it is fixed.",
+      "slug": "injection-pump-seal-leak",
+      "symptoms": {
+        "hard-cold-starting-that-gets-worse": "It starts harder from cold every few weeks, on a curve that only goes one way",
+        "starts-fine-warm-never-cold": "Starts on the button when warm and fights you every cold morning",
+        "damp-diesel-film-around-the-pump": "A damp, dust-caked film of diesel around the pump and down the block below it",
+        "long-cranking-before-it-catches": "Long cranking before it catches, sometimes with a puff of white smoke",
+        "rough-running-until-it-warms-up": "Rough, uneven running for the first minute and then normal"
+      },
+      "causes": {
+        "worn-injection-pump-shaft-seal": "Worn shaft seal in the injection pump",
+        "air-drawn-in-through-the-fuel-line-or-filter": "Air drawn in through a fuel line, a filter seal or the filter housing",
+        "worn-glow-plugs-or-glow-circuit": "Worn glow plugs or a fault in the glow circuit",
+        "worn-injectors": "Worn injectors no longer sealing or spraying properly"
+      },
+      "diagnosticSteps": {
+        "clean-the-pump-and-watch-for-a-fresh-film": "Degrease the pump and the block below it, run the engine, then look again the next day for a fresh film and follow it back to its highest point",
+        "check-the-glow-circuit-before-blaming-the-pump": "Test each glow plug and the relay that feeds them before anything is taken off the pump, because they produce the same cold-start complaint for far less money",
+        "look-for-air-bubbles-in-the-fuel-line": "Watch the clear section of the fuel line, or fit a clear hose in the supply, and look for bubbles travelling towards the pump while it runs",
+        "have-the-injectors-tested-off-the-engine": "Have the injectors removed and tested on a bench for opening pressure and spray pattern"
+      },
+      "fixPaths": {
+        "replace-the-pump-shaft-seal": {
+          "title": "Replace the pump shaft seal and its O-ring",
+          "detail": "The parts are inexpensive; everything else about this job is not. The forum thread's own account has the pump coming off, the seal and its rubber ring changed, and the pump going back — and it ends by stressing that the fuel filter must be primed properly afterwards. A distributor injection pump is timed to the engine, and refitting it wrongly leaves you with a truck that will not run at all. If you cannot re-time a pump, this is work for a diesel specialist."
+        },
+        "cure-the-air-leak-and-prime-properly": {
+          "title": "Find the air leak and prime the system properly",
+          "detail": "Cheapest first: a hardened filter seal or a cracked supply hose lets the fuel drain back overnight and gives exactly the cold-start complaint the pump seal gives. Change the filter, renew its seals, prime it fully, and see whether the next cold morning is different."
+        },
+        "renew-the-glow-plugs": {
+          "title": "Renew the glow plugs and repair the glow circuit",
+          "detail": "Do this before the pump comes off, not after. Plugs are replaced as a set, and the relay and its wiring are checked at the same time, because a good set of plugs with no current reaching them behaves exactly like a bad set."
+        },
+        "have-the-injectors-serviced": {
+          "title": "Have the injectors tested and serviced",
+          "detail": "Worn injectors dribble instead of atomising, which shows up worst on a cold engine. Testing is a specialist's bench job and it is worth having all of them done together so the engine is even afterwards."
+        }
+      }
+    },
+    "es": {
+      "title": "La bomba inyectora suda y el arranque en frío empeora",
+      "summary": "Un hilo largo de un foro de dueños en español dedicado a la bomba inyectora de este motor lo describe como un defecto que el motor simplemente trae, con un miembro con experiencia escribiendo que todos caen tarde o temprano, y advirtiendo que un carro que se deje con el retenedor gastado no va a arrancar en frío y va a empeorar cada vez. Una guía de compra de esta generación nombra lo mismo de forma más breve, y lista las fugas del retenedor de la bomba inyectora entre las cosas del sistema de combustible que hay que esperar, atribuyéndolas a sellos envejecidos. Los dos coinciden en la forma del asunto: esto es una pieza de desgaste en un diésel de inyección mecánica, no una catástrofe de diseño, y el retenedor en sí es un repuesto barato. Lo que le gana entrada propia es la distancia entre ese repuesto y la cuenta. El punto central del hilo del foro es la distancia entre los dos: el retenedor queda en el extremo más bajo de la banda de costo, y la cotización que le dieron al que escribe por ese mismo trabajo quedó en el extremo más alto de esa misma banda, porque llegar al retenedor significa que la bomba sale y vuelve a entrar, y una bomba distribuidora que entra mal no corre. La ruta de reparación de abajo lleva la banda completa y no una cifra, que es la única manera honesta de decir un precio que depende de su mercado, su moneda y su año: dónde caiga usted dentro de esa banda lo decide quién hace el trabajo, no el repuesto. El patrón de fallar solo en frío es lo que apunta hacia acá y no hacia las bujías de precalentamiento, que fallan con la misma queja y son mucho más fáciles de revisar primero. El diésel alrededor de un motor caliente es riesgo de incendio: si usted ve combustible goteando y no una película húmeda, ese es otro problema más urgente y el carro se queda parado hasta que se arregle.",
+      "slug": "bomba-inyectora-4m40-suda",
+      "symptoms": {
+        "hard-cold-starting-that-gets-worse": "Cada pocas semanas cuesta más arrancarlo en frío, en una curva que solo va para un lado",
+        "starts-fine-warm-never-cold": "Arranca al toque en caliente y pelea con usted cada mañana fría",
+        "damp-diesel-film-around-the-pump": "Una película húmeda de diésel con polvo pegado alrededor de la bomba y bajando por el bloque",
+        "long-cranking-before-it-catches": "Gira mucho rato antes de prender, a veces con una bocanada de humo blanco",
+        "rough-running-until-it-warms-up": "Corre disparejo y áspero el primer minuto y después normal"
+      },
+      "causes": {
+        "worn-injection-pump-shaft-seal": "Retenedor del eje de la bomba inyectora gastado",
+        "air-drawn-in-through-the-fuel-line-or-filter": "Entrada de aire por una cañería de combustible, un sello del filtro o su carcasa",
+        "worn-glow-plugs-or-glow-circuit": "Bujías de precalentamiento gastadas o falla en su circuito",
+        "worn-injectors": "Inyectores gastados que ya no sellan ni pulverizan bien"
+      },
+      "diagnosticSteps": {
+        "clean-the-pump-and-watch-for-a-fresh-film": "Desengrase la bomba y el bloque debajo de ella, haga correr el motor, y al día siguiente vuelva a ver si hay una película fresca y sígala hasta su punto más alto",
+        "check-the-glow-circuit-before-blaming-the-pump": "Pruebe cada bujía de precalentamiento y el relé que las alimenta antes de tocar la bomba, porque producen la misma queja de arranque en frío por mucho menos plata",
+        "look-for-air-bubbles-in-the-fuel-line": "Observe el tramo transparente de la cañería de combustible, o ponga una manguera transparente en la alimentación, y busque burbujas viajando hacia la bomba con el motor encendido",
+        "have-the-injectors-tested-off-the-engine": "Mande a sacar los inyectores y a probarlos en banco por presión de apertura y patrón de pulverización"
+      },
+      "fixPaths": {
+        "replace-the-pump-shaft-seal": {
+          "title": "Cambiar el retenedor del eje de la bomba y su anillo de goma",
+          "detail": "Los repuestos son baratos; todo lo demás de este trabajo no lo es. El relato del propio hilo del foro tiene a la bomba saliendo, el retenedor y su anillo de goma cambiados, y la bomba entrando de nuevo, y cierra insistiendo en que después hay que cebar bien el filtro de combustible. Una bomba inyectora distribuidora va calada al motor, y montarla mal le deja a usted un carro que no corre del todo. Si usted no puede volver a calar una bomba, este trabajo es para un especialista en diésel."
+        },
+        "cure-the-air-leak-and-prime-properly": {
+          "title": "Encontrar la entrada de aire y cebar bien el sistema",
+          "detail": "Lo barato primero: un sello de filtro endurecido o una manguera de alimentación rajada dejan que el combustible se devuelva de noche y dan exactamente la misma queja de arranque en frío que el retenedor de la bomba. Cambie el filtro de combustible, renueve sus sellos, cébelo completo, y vea si la próxima mañana fría es distinta."
+        },
+        "renew-the-glow-plugs": {
+          "title": "Renovar las bujías de precalentamiento y reparar su circuito",
+          "detail": "Haga esto antes de que la bomba salga, no después. Las bujías se cambian en juego, y de una vez se revisan el relé y su cableado, porque un juego bueno al que no le llega corriente se comporta igual que un juego malo."
+        },
+        "have-the-injectors-serviced": {
+          "title": "Mandar a probar y calibrar los inyectores",
+          "detail": "Los inyectores gastados chorrean en vez de pulverizar, y eso se nota más con el motor frío. La prueba es trabajo de banco de un especialista y vale la pena hacerlos todos juntos para que el motor quede parejo."
+        }
+      }
+    }
+  }
+}

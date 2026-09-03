@@ -1,0 +1,172 @@
+{
+  "id": "g1-fuel-throttle-sticks-open",
+  "fitment": {
+    "gens": ["gen1"],
+    "markets": ["us"],
+    "engines": ["6g72-sohc"],
+    "years": {
+      "from": 1989,
+      "to": 1991
+    }
+  },
+  "system": "fuel",
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "engine-will-not-return-to-idle",
+    "throttle-pedal-feels-stuck",
+    "surges-forward-at-a-stop",
+    "happens-in-cold-damp-weather"
+  ],
+  "causes": [
+    {
+      "id": "ice-on-the-throttle-plate"
+    },
+    {
+      "id": "recall-remedy-never-fitted"
+    },
+    {
+      "id": "binding-throttle-linkage"
+    },
+    {
+      "id": "tired-return-spring"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "note-the-weather-when-it-happens",
+      "rulesIn": ["ice-on-the-throttle-plate"],
+      "rulesOut": ["binding-throttle-linkage"]
+    },
+    {
+      "id": "check-whether-the-heated-plate-is-fitted",
+      "rulesIn": ["recall-remedy-never-fitted"],
+      "rulesOut": []
+    },
+    {
+      "id": "work-the-throttle-by-hand-engine-off",
+      "rulesIn": ["binding-throttle-linkage", "tired-return-spring"],
+      "rulesOut": []
+    },
+    {
+      "id": "let-go-of-the-pedal-and-count",
+      "rulesIn": ["tired-return-spring"],
+      "rulesOut": []
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "have-the-recall-remedy-fitted",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal",
+        "to": "moderate"
+      },
+      "addresses": ["ice-on-the-throttle-plate", "recall-remedy-never-fitted"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "free-and-service-the-linkage",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["binding-throttle-linkage", "tired-return-spring"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "US NHTSA vehicle-safety API — Mitsubishi Montero recall records for the 1989 model year, campaign 89V030000: throttle valve icing on V6 engines, remedy \"install a heated adapter plate\". The campaign is listed against this model year only",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1989",
+      "archiveUrl": "https://web.archive.org/web/20260902174734id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1989",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1990 Mitsubishi Montero (one vehicle-speed-control complaint describes the throttle sticking while driving, the vehicle increasing speed and the driver rolling it over)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
+      "archiveUrl": "https://web.archive.org/web/20260902180641id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1990",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "US NHTSA vehicle-safety API — owner complaint records for the 1991 Mitsubishi Montero (two vehicle-speed-control complaints describe the engine surging or accelerating from a stop)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "archiveUrl": "https://web.archive.org/web/20260902175215id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1991",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Throttle does not close — the V6 icing recall",
+      "slug": "throttle-does-not-close",
+      "summary": "Mitsubishi ran a safety recall on the V6 first-generation Montero because the throttle valve could ice up and stick, leaving the engine unable to drop back to idle. The remedy was a heated adapter plate under the throttle body. Owner complaints filed with the same regulator over the following years describe the outcome the recall was meant to prevent — a throttle that stayed open, a truck that surged from a stop, and in one case a rollover. The campaign record is listed against the first V6 model year only, while the owner complaints cited here come from the two later ones, so treat the model-year boundary as the paperwork's, not the fault's. Because the recall is decades old and these trucks have changed hands many times, a truck in front of you today may never have had the remedy fitted, and nobody can tell by looking. Anything that keeps the throttle from closing on its own is a safety-critical fault: do not drive the truck until it is fixed, and have the work done by a qualified mechanic.",
+      "symptoms": {
+        "engine-will-not-return-to-idle": "You lift off the accelerator and the engine keeps revving instead of dropping to idle",
+        "throttle-pedal-feels-stuck": "The accelerator pedal feels held down or gritty, and does not spring back cleanly",
+        "surges-forward-at-a-stop": "The truck surges or creeps hard forward when you come to a stop",
+        "happens-in-cold-damp-weather": "It happens on cold, damp mornings and not on warm dry days"
+      },
+      "causes": {
+        "ice-on-the-throttle-plate": "Ice forming on the throttle plate holds it open once the engine has drawn moist cold air",
+        "recall-remedy-never-fitted": "The recalled heated adapter plate was never fitted to this particular truck",
+        "binding-throttle-linkage": "The throttle linkage or cable is binding mechanically, independent of the weather",
+        "tired-return-spring": "The throttle return spring is weak or has been stretched and no longer snaps the plate shut"
+      },
+      "diagnosticSteps": {
+        "note-the-weather-when-it-happens": "Write down the weather each time it happens: cold and damp only, or any conditions?",
+        "check-whether-the-heated-plate-is-fitted": "Look under the throttle body for the heated adapter plate and its coolant hoses, and ask a dealer whether the campaign was completed against this vehicle identification number",
+        "work-the-throttle-by-hand-engine-off": "With the engine off, open and close the throttle by hand at the throttle body and feel for tight or gritty spots through the whole travel",
+        "let-go-of-the-pedal-and-count": "Open the throttle by hand and release it: does it slam shut on its own, or drift back slowly?"
+      },
+      "fixPaths": {
+        "have-the-recall-remedy-fitted": {
+          "title": "Fit the recalled heated adapter plate",
+          "detail": "The remedy the manufacturer published is a heated adapter plate under the throttle body. A campaign this old is normally long past the point where a dealer will supply the part free, so treat this as a repair to pay for and source, not as a warranty claim."
+        },
+        "free-and-service-the-linkage": {
+          "title": "Clean, free and re-spring the throttle linkage",
+          "detail": "Clean the throttle bore and shaft, free the cable and linkage, and renew a return spring that no longer snaps the plate shut. This is the half of the problem that has nothing to do with the recall and everything to do with age."
+        }
+      }
+    },
+    "es": {
+      "title": "La mariposa no cierra — la campaña de hielo en el V6",
+      "slug": "la-mariposa-no-cierra",
+      "summary": "Mitsubishi hizo una campaña de seguridad en el Montero de primera generación con V6 porque a la mariposa de aceleración se le podía formar hielo y quedarse pegada, dejando al motor sin poder bajar a marcha mínima. La solución de fábrica fue una placa adaptadora calentada debajo del cuerpo de aceleración. Los reclamos que los dueños presentaron después ante ese mismo regulador describen justo lo que la campaña quería evitar: una mariposa que se quedó abierta, un carro que se fue hacia adelante desde el alto y, en un caso, una volcadura. El registro de la campaña aparece solo contra el primer año modelo con V6, mientras que los reclamos de dueños que se citan aquí vienen de los dos años siguientes, así que el corte por año modelo es el del papeleo, no el de la falla. Como la campaña es de hace décadas y estos carros han cambiado de dueño muchas veces, es perfectamente posible que al que usted tiene enfrente nunca le pusieran la pieza, y de vista nadie lo puede saber. Cualquier cosa que impida que la mariposa cierre sola es una falla crítica para la seguridad: no maneje el carro hasta arreglarlo, y deje el trabajo en manos de un mecánico calificado.",
+      "symptoms": {
+        "engine-will-not-return-to-idle": "Usted suelta el acelerador y el motor se queda revolucionado en vez de bajar a marcha mínima",
+        "throttle-pedal-feels-stuck": "El pedal del acelerador se siente trabado o áspero y no regresa de un solo",
+        "surges-forward-at-a-stop": "El carro se va hacia adelante o jala fuerte cuando usted llega al alto",
+        "happens-in-cold-damp-weather": "Pasa en mañanas frías y húmedas y no en días secos y calientes"
+      },
+      "causes": {
+        "ice-on-the-throttle-plate": "Se forma hielo sobre la mariposa y la mantiene abierta después de que el motor chupó aire frío y húmedo",
+        "recall-remedy-never-fitted": "A este carro en particular nunca le instalaron la placa adaptadora calentada de la campaña",
+        "binding-throttle-linkage": "El varillaje o el cable del acelerador está agarrotado por desgaste, sin que el clima tenga nada que ver",
+        "tired-return-spring": "El resorte de retorno está flojo o estirado y ya no devuelve la mariposa de golpe"
+      },
+      "diagnosticSteps": {
+        "note-the-weather-when-it-happens": "Anote el clima cada vez que pase: ¿solo con frío y humedad, o en cualquier condición?",
+        "check-whether-the-heated-plate-is-fitted": "Busque debajo del cuerpo de aceleración la placa adaptadora calentada y sus mangueras de refrigerante, y pregunte en una agencia si la campaña quedó aplicada contra el número de chasis de este carro",
+        "work-the-throttle-by-hand-engine-off": "Con el motor apagado, abra y cierre la mariposa con la mano en el cuerpo de aceleración y sienta si hay puntos duros o ásperos en todo el recorrido",
+        "let-go-of-the-pedal-and-count": "Abra la mariposa con la mano y suéltela: ¿cierra de golpe sola, o se devuelve despacio?"
+      },
+      "fixPaths": {
+        "have-the-recall-remedy-fitted": {
+          "title": "Instalar la placa adaptadora calentada de la campaña",
+          "detail": "Lo que publicó el fabricante como solución es una placa adaptadora calentada debajo del cuerpo de aceleración. Una campaña tan vieja ya pasó hace rato del punto en que una agencia entrega la pieza gratis, así que tómelo como una reparación que hay que pagar y conseguir, no como una garantía."
+        },
+        "free-and-service-the-linkage": {
+          "title": "Limpiar, liberar y volver a resortear el varillaje del acelerador",
+          "detail": "Limpie el alojamiento y el eje de la mariposa, libere el cable y el varillaje, y cambie el resorte de retorno que ya no cierra de golpe. Esta es la mitad del problema que no tiene nada que ver con la campaña y todo que ver con la edad del carro."
+        }
+      }
+    }
+  }
+}

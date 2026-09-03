@@ -1,0 +1,151 @@
+{
+  "id": "g4-interior-takata-airbag-inflator",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["au", "eu"],
+    "years": {
+      "from": 2007,
+      "to": 2017
+    }
+  },
+  "system": "interior",
+  "safetyCritical": true,
+  "severity": "safety-critical",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "vehicle-identification-number-appears-on-a-recall-list",
+    "no-symptom-at-all-until-a-crash",
+    "airbag-warning-lamp-on"
+  ],
+  "causes": [
+    {
+      "id": "degraded-inflator-propellant"
+    },
+    {
+      "id": "recall-remedy-never-carried-out"
+    },
+    {
+      "id": "unrelated-restraint-system-fault"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "check-the-vehicle-identification-number-with-the-maker",
+      "rulesIn": [
+        "degraded-inflator-propellant",
+        "recall-remedy-never-carried-out"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "ask-for-the-recall-completion-record",
+      "rulesIn": ["recall-remedy-never-carried-out"],
+      "rulesOut": []
+    },
+    {
+      "id": "have-the-restraint-system-scanned",
+      "rulesIn": ["unrelated-restraint-system-fault"],
+      "rulesOut": ["degraded-inflator-propellant"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "have-the-inflator-replaced-under-recall",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": [
+        "degraded-inflator-propellant",
+        "recall-remedy-never-carried-out"
+      ],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "ACCC Product Safety Australia — recall PRA 2016/15617, Mitsubishi Pajero NS, NT, NW and NX: Takata airbag inflator propellant degrades with heat and humidity; metal fragments \"may propel out through the airbag cushion towards the vehicle occupants causing serious injury or fatality\"; free replacement inflator",
+      "url": "https://productsafety.gov.au/recall/mitsubishi-motors-australia-limited-mitsubishi-pajero-my-2007-2016-ns-nt-nw-nx",
+      "archiveUrl": "https://web.archive.org/web/20210415120355id_/https://www.productsafety.gov.au/recall/mitsubishi-motors-australia-limited-mitsubishi-pajero-my-2007-2016-ns-nt-nw-nx",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "ACCC Product Safety Australia — recall PRA 2017/15991, NS and NT Pajero built up to 31 December 2009: the metal inflator housing may rupture under too much internal pressure",
+      "url": "https://www.productsafety.gov.au/recalls/mitsubishi-motors-australia-ltd-%E2%80%94-ns-nt-pajero",
+      "archiveUrl": "https://web.archive.org/web/20240916063155id_/https://www.productsafety.gov.au/recalls/mitsubishi-motors-australia-ltd-%E2%80%94-ns-nt-pajero",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "ACCC Product Safety Australia — recall PRA 2017/16465, NW and NX Pajero built 7 January 2013 to 31 January 2017, Takata passenger airbag inflator (Beta model), 20,187 vehicles",
+      "url": "https://www.productsafety.gov.au/recalls/mitsubishi-motors-australia-ltd-%E2%80%94-my-2013-2017-nw-nx-pajero",
+      "archiveUrl": "https://web.archive.org/web/20240421013817id_/https://www.productsafety.gov.au/recalls/mitsubishi-motors-australia-ltd-%E2%80%94-my-2013-2017-nw-nx-pajero",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "car-recalls.eu — EU Safety Gate alert 40/2017 [A12/1342/17], Mitsubishi Pajero types V80W and V90W, model years 2007 to 2012: \"sharp fragments may be released from the inflators of the airbags\" on driver and passenger side deployment",
+      "url": "https://car-recalls.eu/recall/mitsubishi-pajero-2007-2012/",
+      "archiveUrl": "https://web.archive.org/web/20210107160132id_/https://car-recalls.eu/recall/mitsubishi-pajero-2007-2012/",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Takata airbag inflator recall",
+      "slug": "takata-airbag-inflator-recall",
+      "summary": "Fourth-generation trucks across several markets were recalled because the airbag inflator's propellant degrades with heat and humidity, and a degraded inflator can burst its metal housing instead of inflating the bag, firing fragments at the people it is meant to protect. The Australian and European regulator records cited below say so in those words. This is a fault with no symptom: nothing about the truck changes, nothing lights up, and the fault only exists at the one moment you would want the airbag to work. Only one of the cited records classifies the inflator by type — the Beta passenger inflator, on the 2013 to 2017 trucks — so do not read a type off this page for the earlier ones. The only diagnosis is to check the vehicle identification number with the manufacturer and to get the completion record if somebody tells you it has been done. Costa Rica is a hot, humid market, which is the exact combination the recalls name as the accelerator. The replacement is free under the recall in the markets that issued it, and a free repair with no expiry is not a repair to defer. Restraints are safety-critical: this is dealer work, not driveway work — never attempt to remove or handle an undeployed inflator yourself.",
+      "symptoms": {
+        "vehicle-identification-number-appears-on-a-recall-list": "The vehicle identification number comes back as affected on the manufacturer's recall look-up",
+        "no-symptom-at-all-until-a-crash": "Nothing at all — the truck gives no sign that the inflator has degraded",
+        "airbag-warning-lamp-on": "The airbag warning lamp stays lit, which is a different fault worth chasing separately"
+      },
+      "causes": {
+        "degraded-inflator-propellant": "The inflator propellant has degraded with age, heat and humidity",
+        "recall-remedy-never-carried-out": "The recall was issued but the remedy was never carried out on this truck",
+        "unrelated-restraint-system-fault": "A separate restraint system fault — wiring, clock spring, seat sensor — is lighting the warning lamp"
+      },
+      "diagnosticSteps": {
+        "check-the-vehicle-identification-number-with-the-maker": "Run the vehicle identification number through the manufacturer's own recall look-up for the market the truck was sold in",
+        "ask-for-the-recall-completion-record": "Ask a franchised dealer for the written record showing the campaign was completed against this vehicle identification number, rather than taking a seller's word",
+        "have-the-restraint-system-scanned": "If the airbag warning lamp is lit, have the restraint system scanned for stored fault codes before assuming it is the inflator"
+      },
+      "fixPaths": {
+        "have-the-inflator-replaced-under-recall": {
+          "title": "Have the inflator replaced by a franchised dealer",
+          "detail": "The published remedy is a replacement inflator fitted free of charge in the markets that issued the recall. In a market that did not issue it, an imported truck can still be affected, so ask anyway and be prepared to pay for the same work."
+        }
+      }
+    },
+    "es": {
+      "title": "Campaña de las bolsas de aire Takata",
+      "slug": "campana-de-las-bolsas-de-aire-takata",
+      "summary": "Los carros de cuarta generación de varios mercados fueron llamados a revisión porque el propelente del inflador de la bolsa de aire se degrada con el calor y la humedad, y un inflador degradado puede reventar su carcasa metálica en vez de inflar la bolsa, disparando fragmentos contra las personas que debía proteger. Los registros del regulador australiano y del europeo que se citan abajo lo dicen con esas palabras. Es una falla que no tiene síntoma: nada cambia en el carro, nada se enciende, y la falla solo existe en el único momento en que usted querría que la bolsa de aire funcionara. Solo uno de los registros citados clasifica el inflador por tipo —el inflador Beta del pasajero, en los carros de 2013 a 2017—, así que no dé por sentado un tipo para los años anteriores a partir de esta página. El único diagnóstico es consultar el número de chasis con el fabricante y pedir el comprobante si alguien le dice que ya se hizo. Costa Rica es un mercado caliente y húmedo, que es exactamente la combinación que las campañas nombran como acelerador del problema. El cambio es gratuito bajo la campaña en los mercados que la emitieron, y una reparación gratuita y sin vencimiento no es una reparación para dejar para después. Los sistemas de retención son críticos para la seguridad: esto es trabajo de agencia, no algo para hacer en la casa; nunca intente sacar ni manipular usted mismo un inflador sin detonar.",
+      "symptoms": {
+        "vehicle-identification-number-appears-on-a-recall-list": "El número de chasis aparece como afectado en la consulta de campañas del fabricante",
+        "no-symptom-at-all-until-a-crash": "Ninguno: el carro no da ninguna señal de que el inflador se haya degradado",
+        "airbag-warning-lamp-on": "La luz de advertencia de la bolsa de aire se queda encendida, lo cual es otra falla distinta que conviene perseguir aparte"
+      },
+      "causes": {
+        "degraded-inflator-propellant": "El propelente del inflador se degradó con los años, el calor y la humedad",
+        "recall-remedy-never-carried-out": "La campaña se emitió pero a este carro nunca le aplicaron la solución",
+        "unrelated-restraint-system-fault": "Otra falla del sistema de retención —cableado, resorte de reloj, sensor de asiento— es la que enciende la luz de advertencia"
+      },
+      "diagnosticSteps": {
+        "check-the-vehicle-identification-number-with-the-maker": "Consulte el número de chasis en la herramienta de campañas del propio fabricante para el mercado donde se vendió el carro",
+        "ask-for-the-recall-completion-record": "Pida en una agencia autorizada el comprobante escrito de que la campaña quedó aplicada contra ese número de chasis, en lugar de creerle de palabra al vendedor",
+        "have-the-restraint-system-scanned": "Si la luz de advertencia de la bolsa de aire está encendida, haga escanear el sistema de retención en busca de códigos guardados antes de dar por hecho que es el inflador"
+      },
+      "fixPaths": {
+        "have-the-inflator-replaced-under-recall": {
+          "title": "Que una agencia autorizada cambie el inflador",
+          "detail": "La solución publicada es un inflador de reemplazo instalado sin costo en los mercados que emitieron la campaña. En un mercado que no la emitió, un carro importado igual puede estar afectado, así que pregunte de todas formas y esté preparado para pagar por el mismo trabajo."
+        }
+      }
+    }
+  }
+}

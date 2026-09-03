@@ -1,0 +1,52 @@
+{
+  "id": "all-exhaust-filtro-de-particulas-diesel",
+  "fitment": {
+    "gens": ["gen4"]
+  },
+  "system": "exhaust",
+  "aliases": [
+    {
+      "term": "DPF",
+      "locale": "en",
+      "countries": ["GB", "AU", "US"]
+    },
+    {
+      "term": "FAP",
+      "locale": "es",
+      "countries": ["ES"]
+    },
+    {
+      "term": "filtro antipartículas",
+      "locale": "es",
+      "countries": ["ES"]
+    }
+  ],
+  "relatedTerms": ["all-exhaust-catalizador", "all-fuel-diesel"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Recambiofácil — \"Filtro de partículas diésel: diagnóstico, limpieza y cambio\": uses \"DPF\" and \"FAP\" interchangeably for the same part, describes it as porous ceramic in a honeycomb structure retaining soot, and sets out passive, active and forced regeneration",
+      "url": "https://articulos.recambiofacil.com/articulos/filtro-particulas-diesel-kta/",
+      "archiveUrl": "https://web.archive.org/web/20260902181204id_/https://articulos.recambiofacil.com/articulos/filtro-particulas-diesel-kta/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"DPF filter trouble on 2007 Shogun Diamond\": owners of fourth-generation trucks discussing the filter, its warning lamp, forced regeneration and the differential pressure sensing that decides whether it is blocked",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=144623",
+      "archiveUrl": "https://web.archive.org/web/20260902175419id_/https://www.pocuk.com/forums/viewtopic.php?t=144623",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "diesel particulate filter",
+      "summary": "A porous ceramic honeycomb in the exhaust that traps soot instead of letting it out of the tailpipe. It has to be emptied by burning the trapped soot off — regeneration — which happens on its own when the exhaust runs hot enough on a long run, or is forced by the engine injecting extra fuel to raise the temperature, or by a workshop with diagnostic equipment. Soot burns; ash does not, and an ash-loaded filter needs cleaning or replacing. Only the fourth generation carries one, and not every version of it."
+    },
+    "es": {
+      "title": "filtro de partículas diésel",
+      "summary": "Un panal de cerámica porosa en el escape que atrapa el hollín en vez de dejarlo salir por el tubo. Hay que vaciarlo quemando ese hollín atrapado —la regeneración—, que ocurre sola cuando el escape va lo bastante caliente en un recorrido largo, o se provoca cuando el motor inyecta combustible extra para subir la temperatura, o en un taller con equipo de diagnóstico. El hollín se quema; la ceniza no, y un filtro cargado de ceniza hay que limpiarlo o cambiarlo. Solo la cuarta generación lo trae, y no todas sus versiones."
+    }
+  }
+}
