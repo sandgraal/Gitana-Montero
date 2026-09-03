@@ -43,6 +43,30 @@
  * T501's parts pages today, so "no procedures page" is a real absence and not
  * a broken pattern.
  *
+ * ## The entry-loading pattern is a hard contract, not a preference
+ *
+ * **This harness renders the page with `props: { entry }` — T401's pattern —
+ * and supports nothing else.** T502's page must read `Astro.props.entry`; a
+ * page that instead takes `props: { entryId }` and looks the entry up through
+ * `getCollection("procedures")` (T501's pattern) will render nothing here and
+ * every marker below will fail for a harness reason rather than for PRC-02.
+ *
+ * The first draft of this file claimed to support both and passed both props.
+ * It did not support both: the `astro:content` mock returns `[]` for
+ * `getCollection("procedures")` and `undefined` for `getEntry`, because the
+ * content store is a build artefact and `vitest run` happens before `astro
+ * build` — so the lookup half was never going to resolve (T502a review, F1).
+ * A grader that offers a choice it cannot honour is worse than one that
+ * states a constraint, so the choice is gone and the constraint is stated
+ * here, on T502's own tasks.md line, and in the failure message below.
+ *
+ * Making the lookup half work is not a small fix, and it is not free: the
+ * store would have to be populated for a collection with zero content files,
+ * which means either building first (`vitest` cannot) or mocking the loader
+ * (which grades the mock). Passing the parsed entry as a prop is what T401
+ * does, it is what the container API is for, and it keeps the fixture the
+ * grader controls.
+ *
  * ## Expected-failure convention
  *
  * `it.fails` is the marker; T502 activates a grader by deleting exactly that
@@ -132,21 +156,48 @@ vi.mock("astro:content", async (importOriginal) => {
     },
   });
 
+  /*
+   * `procedures` **throws** rather than returning `[]` (T502a review, F1).
+   *
+   * The content store is a build artefact and `vitest run` happens before
+   * `astro build`, so this harness cannot serve a procedures lookup — it
+   * passes the parsed entry as `props.entry` instead. Returning an empty
+   * array would let a page that looks the entry up render an empty shell and
+   * fail 35 markers with no hint why; throwing names the contract at the
+   * exact call that broke it.
+   */
+  const unsupportedLookup = (name: string) =>
+    new Error(
+      `this grader does not serve \`${name}\` through the content store: ` +
+        `\`vitest run\` executes before \`astro build\`, so the store is ` +
+        `empty. The procedures page must read its entry from ` +
+        `\`Astro.props.entry\` (T401's pattern, pinned on T502's tasks.md ` +
+        `line) rather than looking it up. See the header of ` +
+        `tests/pages/procedure-page.render.test.ts. refs specs/001-foundation`
+    );
+
   return {
     ...actual,
-    getCollection: async (name: string) =>
-      name === "reference"
-        ? [
-            referenceEntry("test-ref-torque", "torque", {
-              torque: { value: 77, unit: "nm" },
-            }),
-            referenceEntry("test-ref-fluid", "fluid", {
-              specification: "TEST SPEC 00W-00",
-              capacity: { value: 3.3, unit: "l" },
-            }),
-          ]
-        : [],
-    getEntry: async () => undefined,
+    getCollection: async (name: string) => {
+      if (name === "procedures") throw unsupportedLookup("procedures");
+      if (name !== "reference") return [];
+      return [
+        referenceEntry("test-ref-torque", "torque", {
+          torque: { value: 77, unit: "nm" },
+        }),
+        referenceEntry("test-ref-fluid", "fluid", {
+          specification: "TEST SPEC 00W-00",
+          capacity: { value: 3.3, unit: "l" },
+        }),
+        referenceEntry("test-ref-dimension", "dimension", {
+          dimension: { value: 1.1, unit: "mm" },
+        }),
+      ];
+    },
+    getEntry: async (name: string) => {
+      if (name === "procedures") throw unsupportedLookup("procedures");
+      return undefined;
+    },
   };
 });
 
@@ -207,12 +258,6 @@ function segment(locale: Locale): string {
 /**
  * `getStaticPaths` params for the discovered page, built from the parameter
  * names in its own file path.
- *
- * T501 passes `props: { entryId }` and loads the entry itself; T401 passes the
- * whole `props: { entry }`. Both are legitimate and T502 has not chosen yet,
- * so both are supplied — an Astro component simply ignores a prop it does not
- * declare, and a grader that guessed would fail for a reason that is not the
- * requirement.
  */
 function paramsFor(pageKey: string, locale: Locale): Record<string, string> {
   const names = [...pageKey.matchAll(/\[([^\]]+)\]/g)].map(
@@ -243,7 +288,8 @@ async function renderPage(
     component as Parameters<typeof container.renderToString>[0],
     {
       params,
-      props: { entry, entryId: ENTRY_ID },
+      // `entry`, and only `entry` — see "The entry-loading pattern" above.
+      props: { entry },
       request: new Request(
         `https://monterogarage.com/${locale}/${segment(locale)}/${SLUGS[locale]}/`
       ),
@@ -440,7 +486,7 @@ describe("the confidence caveat is the shared component (PRC-02, PRB-04)", () =>
 
 describe("the entry's own safety notes render (PRC-01)", () => {
   it.fails.each(LOCALES)(
-    "renders the %s safety note on the %s page",
+    "renders the entry's own safety note on the %s page",
     async (locale) => {
       const doc = await renderPage(locale, {
         system: "brakes",

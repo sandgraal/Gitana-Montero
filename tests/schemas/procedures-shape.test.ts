@@ -48,6 +48,9 @@ import {
 } from "../helpers/procedures.ts";
 import { unrecognizedKeys } from "../helpers/schema-outcome.ts";
 import { makeProcedure, without } from "../fixtures/procedure-fixtures.ts";
+import { COLLECTION_ROUTE_SEGMENTS } from "../../src/i18n/routes.ts";
+import { ENTRY_SLUGS } from "../../src/i18n/entry-slugs.ts";
+import { LOCALES } from "../../src/i18n/routing.ts";
 
 /**
  * A boundary-table row's verdict, asserted so that **neither direction passes
@@ -182,21 +185,6 @@ describe("steps (PRC-01)", () => {
     ).toEqual([]);
   });
 
-  it.fails(
-    "rejects two steps sharing one id — the prose is keyed by it",
-    () => {
-      const issues = issuesUnder(
-        makeProcedure({
-          steps: [{ id: "test-step-same" }, { id: "test-step-same" }],
-          specs: [],
-        }),
-        "steps"
-      );
-
-      expect(issues.length).toBeGreaterThan(0);
-    }
-  );
-
   it.fails.each(["en", "es"])(
     "rejects a step whose %s sentence is missing",
     (locale) => {
@@ -232,6 +220,108 @@ describe("steps (PRC-01)", () => {
       expect(issuesUnder(entry, "prose.en.steps").length).toBeGreaterThan(0);
     }
   );
+});
+
+/* -------------------------------------------------------------------------
+ * Duplicate ids — every list, not just the one that occurred to me
+ *
+ * ## Why this is a table and not a single `steps` test
+ *
+ * The first draft graded duplicates for `steps` only, on the reasoning that
+ * the prose is keyed by a step id. That reasoning is correct and it applies
+ * *identically* to `tools` and `prerequisites`, which are keyed the same way —
+ * two rows sharing one handle share one sentence, and one of them is wrong.
+ * It applies differently but just as forcefully to `specs[]` and
+ * `partsConsumed[]`: a repeat there renders the same torque row, or the same
+ * part, twice on the page.
+ *
+ * T401's own tasks.md line records this exact defect class shipping once
+ * already — "`checkDuplicateIds` sweeps the four top-level lists only, never
+ * the id lists *inside* a step" — which is a rule that was right about the
+ * lists somebody thought of and silent about the rest. Enumerating the
+ * category rather than one member of it is `.claude/GRADER-PRINCIPLES.md`'s
+ * "grade behavior, not name lists" (T502a review, F5).
+ *
+ * The nested lists (`steps[].specs`, `steps[].parts`) are the *next* ring out
+ * and are deliberately left to the intra-entry reference rules below, which
+ * already reject anything a step names that the entry does not declare — a
+ * repeat inside one step is a weaker fault than a dangling one, and it is
+ * recorded here as a known gap rather than silently skipped.
+ * ---------------------------------------------------------------------- */
+
+describe("no list repeats an id (PRC-01)", () => {
+  it.fails.each<[string, Record<string, unknown>]>([
+    [
+      "steps",
+      {
+        steps: [{ id: "test-step-same" }, { id: "test-step-same" }],
+        specs: [],
+      },
+    ],
+    ["tools", { tools: [{ id: "test-tool-same" }, { id: "test-tool-same" }] }],
+    [
+      "prerequisites",
+      {
+        prerequisites: [{ id: "test-prereq-same" }, { id: "test-prereq-same" }],
+      },
+    ],
+    ["specs", { specs: ["test-ref-torque", "test-ref-torque"] }],
+    [
+      "partsConsumed",
+      {
+        partsConsumed: [
+          { part: "test-part-oil-filter" },
+          { part: "test-part-oil-filter" },
+        ],
+      },
+    ],
+  ])("rejects `%s` naming the same thing twice", (field, overrides) => {
+    const issues = issuesUnder(makeProcedure(overrides), field);
+
+    expect(
+      issues.length,
+      `a repeat in \`${field}\` went unreported`
+    ).toBeGreaterThan(0);
+  });
+
+  it.fails.each<[string, Record<string, unknown>]>([
+    [
+      "steps",
+      {
+        steps: [{ id: "test-step-lift" }, { id: "test-step-torque" }],
+        specs: ["test-ref-torque"],
+      },
+    ],
+    [
+      "tools",
+      {
+        tools: [{ id: "test-tool-socket" }, { id: "test-tool-wrench" }],
+      },
+    ],
+    [
+      "prerequisites",
+      {
+        prerequisites: [
+          { id: "test-prereq-cold" },
+          { id: "test-prereq-level" },
+        ],
+      },
+    ],
+    ["specs", { specs: ["test-ref-torque", "test-ref-fluid"] }],
+    [
+      "partsConsumed",
+      {
+        partsConsumed: [
+          { part: "test-part-oil-filter" },
+          { part: "test-part-drain-washer" },
+        ],
+      },
+    ],
+  ])("accepts two distinct entries in `%s`", (_field, overrides) => {
+    // The positive control for every row above: the rule is "no repeats",
+    // not "no second row".
+    expect(procedureIssuePaths(makeProcedure(overrides))).toEqual([]);
+  });
 });
 
 /* -------------------------------------------------------------------------
@@ -424,7 +514,10 @@ describe("the time estimate is a real quantity (PRC-01)", () => {
     ["a bare number", 45, false],
     ["a sentence", "about an hour", false],
   ])(
-    "a time estimate stated as %s → accepted: %s",
+    // One `%s`, one argument. Vitest fills placeholders positionally, so a
+    // second `%s` here would print the *time object* and call it the verdict —
+    // the same title bug the T502a review found in the render file (F7).
+    "a time estimate stated as %s",
     (_label, time, expected) => {
       expectFieldVerdict("time", makeProcedure({ time }), expected);
     }
@@ -555,5 +648,76 @@ describe("a step references only what the entry declares (PRC-01)", () => {
         })
       )
     ).toEqual([]);
+  });
+});
+
+/* -------------------------------------------------------------------------
+ * The collection has a bilingual route (I18N-01, I18N-05)
+ *
+ * ## Why these are here, and why they were not
+ *
+ * `src/schemas/procedures.ts` claimed, in its own docstring, that the graders
+ * "require only that `COLLECTION_ROUTE_SEGMENTS.procedures` exists, carries
+ * both locales, and does not put the English word in the Spanish URL". None of
+ * that was true: nothing anywhere asserted it, and the repo-wide slug-registry
+ * graders pin the `es !== en` property for `glossary` by name only — so a
+ * `procedures` row reading `{ en: "procedures", es: "procedures" }` would have
+ * passed every check in the repository (T502a review, F4).
+ *
+ * A docstring is not a grader. These are the grader.
+ *
+ * **What is still T502's call:** the actual Spanish word. Whether the segment
+ * is `procedimientos` or something else is a glossary ruling, and T502's
+ * tasks.md line owns it. What is graded is the shape around the choice —
+ * present, bilingual, distinct, and not the English word — which is I18N-01's
+ * "neither locale is privileged" in the one place a reader can see it.
+ * ---------------------------------------------------------------------- */
+
+describe("the collection has a bilingual route (I18N-01, I18N-05)", () => {
+  function segments(): Record<string, string> | undefined {
+    return (
+      COLLECTION_ROUTE_SEGMENTS as Record<string, Record<string, string>>
+    )["procedures"];
+  }
+
+  it.fails("registers a `procedures` route segment", () => {
+    // Without a row the collection has no URL in either locale, so the page
+    // T502 writes builds nothing and `check:hreflang` never sees it.
+    expect(segments()).toBeDefined();
+  });
+
+  it.fails.each(LOCALES)("carries a %s segment", (locale) => {
+    expect(typeof segments()?.[locale]).toBe("string");
+    expect(segments()?.[locale]).not.toBe("");
+  });
+
+  it.fails("does not put the English word in the Spanish URL", () => {
+    const row = segments();
+
+    // The whole of I18N-01 in one assertion: `/es/procedures/` would be the
+    // English word wearing a Spanish accent, exactly what `repuestos` and
+    // `taller` were chosen to avoid on the collections that came before.
+    expect(row?.["es"]).not.toBe(row?.["en"]);
+    expect(row?.["es"]).not.toBe("procedures");
+  });
+
+  it.fails.each(LOCALES)(
+    "uses a lowercase, hyphen-safe %s segment",
+    (locale) => {
+      // Segments are "lowercase, hyphenated, and never URL-encoded" —
+      // `src/i18n/routes.ts`' own rule for this registry.
+      expect(segments()?.[locale]).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    }
+  );
+
+  it.fails("opens a `procedures` namespace in the slug registry", () => {
+    /*
+     * `parts: {}` is the precedent: T501 registered an empty namespace so the
+     * build's "every entry has a slug row, every row names an entry" check has
+     * something to compare against, and so `slugRegistryIds("procedures")`
+     * answers `[]` rather than `undefined`. T504 fills it; the namespace has
+     * to exist before it can.
+     */
+    expect(Object.keys(ENTRY_SLUGS)).toContain("procedures");
   });
 });

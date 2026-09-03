@@ -122,13 +122,35 @@ describe("T502a vocabularies agree with the modules they bind to", () => {
     }
   });
 
-  it("covers PRC-03's own two words plus PRC-01's capacities", () => {
-    expect([...PROCEDURE_SPEC_KINDS]).toEqual(["torque", "fluid", "capacity"]);
+  it("covers PRC-03's own two words plus REF-01's capacities and dimensions", () => {
+    expect([...PROCEDURE_SPEC_KINDS]).toEqual([
+      "torque",
+      "fluid",
+      "capacity",
+      "dimension",
+    ]);
+  });
+
+  it("leaves an author a legal way to cite every numeric reference kind (F2)", () => {
+    /*
+     * The closed-loop check the T502a review found missing. A clearance, a
+     * belt deflection, an endplay and an alignment figure are all `dimension`
+     * rows, and they are all figures a *procedure* sets — so if `dimension`
+     * were not citable, the only remaining way to state one would be to write
+     * it into a sentence, which is precisely what PRC-03 forbids. Every kind
+     * that carries a figure must therefore be citable.
+     */
+    const numericKinds = ["torque", "fluid", "capacity", "dimension"];
+
+    for (const kind of numericKinds) {
+      expect(PROCEDURE_SPEC_KINDS as readonly string[]).toContain(kind);
+    }
   });
 
   it("excludes the kinds a procedure cites as a source, not as a value", () => {
     // `fsm-section` is a citation and belongs in `sources`; the decoder kinds
-    // answer "what does this code mean", which no procedure sets.
+    // answer "what does this code mean", which no procedure sets. None of
+    // them carries a figure, so excluding them closes no loop on an author.
     for (const kind of [
       "fsm-section",
       "vin-position",

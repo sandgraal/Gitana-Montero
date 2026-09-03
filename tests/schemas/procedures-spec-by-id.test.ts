@@ -295,13 +295,38 @@ describe("a procedure states no spec of its own (PRC-03)", () => {
  * it, because it is a string, and `check:citations` does not either, because
  * it walks numeric *leaves* and this is text.
  *
- * **Scope, deliberately narrow.** The rule this file grades is: *a digit
- * bound to a torque or volume unit* in step or safety-note prose. Not every
- * number — a step legitimately says "remove the three bolts", "torque in two
- * stages", "1982–1991". Not a standard's designation either: `SAE 75W-90`,
- * `10W-30` and `API GL-5` are the fluid's *name*, they are the same string in
- * both languages, and `reference`'s `fluid.specification` already stores them
- * as shared data.
+ * **The rule is a category, not a spelling list.** *A digit bound to a torque
+ * or volume unit*, in any spelling of that unit, in step or safety-note prose.
+ * The reject table below is evidence for the category and is **not
+ * exhaustive** — `N·m`, `N.m`, `Nm`, `N m`, `lb-ft`, `ft-lb`, `ft lbs`,
+ * `ft·lb`, `kgf·m`, `L`, `litros`, `qt`, `ml` are all one unit family wearing
+ * different punctuation, and a detector written to match the eight strings
+ * that occurred to a grader author is a detector with a bypass per spelling
+ * (`.claude/GRADER-PRINCIPLES.md`, "grade behavior, not name lists"; T502a
+ * review, F8). Expect to find a spelling this table misses; add it here and
+ * widen the pattern, do not narrow the rule to the table.
+ *
+ * **What is deliberately outside the category.** Not every number — a step
+ * legitimately says "remove the three bolts", "torque in two stages",
+ * "1982–1991". Not a standard's designation: `SAE 75W-90`, `10W-30` and `API
+ * GL-5` are the fluid's *name*, identical in both languages, and
+ * `reference`'s `fluid.specification` already stores them as shared data. And
+ * not a **displacement used as a component's name** — "the 3.5 L 6G74" — which
+ * AGENTS.md carves out in as many words: "count descriptors that are part of a
+ * component's NAME … are naming, not specs". The project's own truck is
+ * described as a 3.5 L 6G74 and T504's wave-1 set is led by "timing belt
+ * 6G74", so this is not a hypothetical; a litre figure bound to an engine code
+ * is naming and must pass (T502a review, F3).
+ *
+ * **Millimetres are deliberately not in the category, and that is a stated
+ * gap.** A socket size, a drill bit and a valve clearance are all written
+ * `14 mm`, and no regex separates the tool from the specification. The
+ * clearance case is closed the other way instead — `dimension` is citable by
+ * id (`PROCEDURE_SPEC_KINDS`), so an author *has* a correct move — and the
+ * remaining risk is carried by review, not by this heuristic. If a future
+ * round finds a way to tell the two apart, the rule can widen; until then a
+ * detector that flagged every `mm` would flag the socket-size sentence in the
+ * accept table below, which is how a real rule gets deleted in frustration.
  *
  * The positive controls below are that budget, written down. If the
  * implementer finds a real sentence this rejects wrongly, the fix is to
@@ -319,13 +344,24 @@ describe("a figure written into a sentence is still an inlined value (PRC-03)", 
 
   it.fails.each<[string, "en" | "es", string]>([
     ["N·m", "en", "Torque the bolts to 88 N·m in sequence."],
+    ["N.m, full stop", "en", "Torque the bolts to 88 N.m in sequence."],
+    ["N m, plain space", "en", "Torque the bolts to 88 N m in sequence."],
     ["Nm, no separator", "en", "Torque the bolts to 88Nm in sequence."],
-    ["lbf-ft", "en", "Torque the bolts to 65 lb-ft in sequence."],
+    ["lb-ft", "en", "Torque the bolts to 65 lb-ft in sequence."],
+    ["ft-lb, reversed", "en", "Torque the bolts to 65 ft-lb in sequence."],
+    [
+      "ft lbs, spaced plural",
+      "en",
+      "Torque the bolts to 65 ft lbs in sequence.",
+    ],
+    ["ft·lb, middle dot", "en", "Torque the bolts to 65 ft·lb in sequence."],
     ["kgf·m", "es", "Apriete los pernos a 9 kgf·m en secuencia."],
+    ["kgf-m, hyphen", "es", "Apriete los pernos a 9 kgf-m en secuencia."],
     ["N·m in ES", "es", "Apriete los pernos a 88 N·m en secuencia."],
     ["litres", "en", "Refill with 4.5 L of fluid."],
     ["litros", "es", "Rellene con 4,5 litros de aceite."],
     ["quarts", "en", "Refill with 4.8 qt of fluid."],
+    ["millilitres", "en", "Add 250 ml of assembly lube to the housing."],
   ])(
     "rejects a step whose %s prose states the figure itself",
     (_label, locale, text) => {
@@ -359,6 +395,39 @@ describe("a figure written into a sentence is still an inlined value (PRC-03)", 
     ],
     ["a year", "en", "On 1999 trucks the bracket is different."],
     ["a socket size", "en", "Use the 14 mm socket on the drain plug."],
+    /*
+     * AGENTS.md, verbatim: "count descriptors that are part of a component's
+     * NAME — '24-valve', 'five-speed', 'veinticuatro válvulas', like 'SOHC' or
+     * 'V6' — are naming, not specs". A displacement bound to an engine code is
+     * that carve-out exactly, and it is the single most likely false positive
+     * this collection will produce: the owner's truck *is* a 3.5 L 6G74, and
+     * T504's first wave leads with "timing belt 6G74" (T502a review, F3).
+     *
+     * The distinguishing feature a detector can actually use is the engine
+     * code next to the figure — `6G74`, `6G72`, `6G75`, `4M40`, `4M41`,
+     * `4D56`, `4G54` — not the litre token, which is identical to the one in
+     * "Refill with 4.5 L of fluid" above. Both spacings, both locales.
+     */
+    [
+      "an engine displacement used as a name",
+      "en",
+      "Install the 3.5 L 6G74 engine cover.",
+    ],
+    [
+      "an engine displacement, no space",
+      "en",
+      "The 3.0L 6G72 uses a different bracket.",
+    ],
+    [
+      "an engine displacement in ES",
+      "es",
+      "Instale la tapa del motor 3.5 L 6G74.",
+    ],
+    [
+      "a diesel displacement as a name",
+      "en",
+      "The 2.8 L 4M40 timing case is not interchangeable.",
+    ],
   ])("accepts a step whose %s prose states no spec", (_label, locale, text) => {
     // The false-positive budget. A rule that flagged these would make the
     // collection unwritable, and the next author would delete the rule

@@ -98,12 +98,17 @@
  *
  * ## What T502a deliberately did NOT decide
  *
- * - **The ES route segment.** T502's tasks.md line puts "segments and
- *   canonical-vs-alias term choice per the glossary" in T502's hands, and the
- *   glossary is the authority — `procedimiento` vs anything else is a
- *   bilingual ruling, not a grader's call. The graders require only that
- *   `COLLECTION_ROUTE_SEGMENTS.procedures` exists, carries both locales, and
- *   does not put the English word in the Spanish URL (I18N-01).
+ * - **The ES route segment's actual word.** T502's tasks.md line puts
+ *   "segments and canonical-vs-alias term choice per the glossary" in T502's
+ *   hands, and the glossary is the authority — `procedimientos` vs anything
+ *   else is a bilingual ruling, not a grader's call. What *is* graded, in
+ *   `tests/schemas/procedures-shape.test.ts` ("the collection has a bilingual
+ *   route"), is the shape around that choice: a `procedures` row exists, it
+ *   carries both locales, the two differ, and the ES segment is not the
+ *   English word (I18N-01 — neither locale is privileged, and the one place a
+ *   reader can see it privileged is the URL). Those assertions were claimed
+ *   here before they existed; the review that caught it (F4) is the reason
+ *   they now do.
  * - **The page file's path.** `tests/pages/procedure-page.render.test.ts`
  *   discovers it by glob rather than by a hard-coded specifier; see that
  *   file's header for the one naming convention it does rely on.
@@ -139,21 +144,40 @@ function seam(symbol: string): Error {
 /**
  * The `reference` kinds a procedure may cite by id (PRC-03).
  *
- * PRC-03's own words are "a torque or fluid spec". `capacity` is here as well
- * because PRC-01 asks for "fluid specs **and capacities**" in the same breath,
- * and a capacity is a number exactly like a torque is: if a procedure may not
- * inline "88 N·m" it may not inline "2.3 L" either. The three are the numeric
- * `reference` kinds a job actually consumes.
+ * PRC-03's own words are "a torque or fluid spec". `capacity` and `dimension`
+ * are here as well, and the reason is the same one twice: PRC-01 asks for
+ * "fluid specs **and capacities**" in the same breath, REF-01 files
+ * "capacities/dimensions" as one line, and a capacity or a clearance is a
+ * number exactly like a torque is. If a procedure may not inline "88 N·m" it
+ * may not inline "2.3 L" or "0.15 mm" either.
+ *
+ * **`dimension` was excluded in the first draft of this file and that was
+ * wrong** (T502a review, F2). The stated reason — "a fact about the truck, not
+ * a figure a procedure sets" — does not survive contact with the collection
+ * T504 is about to write: valve clearance, belt deflection, endplay, runout
+ * and alignment specs are all figures a *procedure* sets, and all of them are
+ * `dimension` rows (`src/schemas/reference.ts`, whose `DIMENSION_UNITS` covers
+ * length, mass and angle). Excluding the kind left an author with no legal way
+ * to cite a clearance, and the only remaining path was to write the number
+ * into a sentence — the exact outcome PRC-03 exists to prevent. A closed loop
+ * with no correct move in it is a schema bug, not a strict rule.
  *
  * Deliberately **not** here: `fsm-section` (a citation, not a value — it
- * belongs in `sources`), `dimension` (a fact about the truck, not a figure a
- * procedure sets), and the three decoder kinds. Citing one of those as a
- * "spec" is an authoring mistake with a clear message rather than a silently
- * rendered empty row — see `PROCEDURE_ISSUE_CODES.wrong-spec-kind`.
+ * belongs in `sources`) and the three decoder kinds (`vin-position`,
+ * `vin-code`, `option-code`), which answer "what does this code mean" and are
+ * not figures any job sets. Citing one of those as a "spec" is an authoring
+ * mistake with a clear message rather than a silently rendered empty row —
+ * see `PROCEDURE_ISSUE_CODES.wrong-spec-kind`. None of them carries a figure,
+ * so excluding them closes no loop on an author.
  *
  * Every member must be a real `ReferenceKind`; the canary pins that.
  */
-export const PROCEDURE_SPEC_KINDS = ["torque", "fluid", "capacity"] as const;
+export const PROCEDURE_SPEC_KINDS = [
+  "torque",
+  "fluid",
+  "capacity",
+  "dimension",
+] as const;
 
 export type ProcedureSpecKind = (typeof PROCEDURE_SPEC_KINDS)[number];
 
