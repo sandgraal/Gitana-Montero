@@ -2,7 +2,6 @@
   "id": "gen3-automatic-transmission-fluid",
   "fitment": {
     "gens": ["gen3"],
-    "transmissions": ["automatic-4-speed", "automatic-5-speed"],
     "years": {
       "from": 2001,
       "to": 2006

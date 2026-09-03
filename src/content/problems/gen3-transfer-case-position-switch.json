@@ -5,7 +5,8 @@
     "years": {
       "from": 2001,
       "to": 2006
-    }
+    },
+    "trims": ["limited"]
   },
   "system": "transfer-case",
   "severity": "degrading",
@@ -99,8 +100,8 @@
     {
       "title": "Luso Overland — MONTERO Gen3 Transfer Case Position Switch",
       "url": "https://lusooverland.com/VP-MMC-MR58015X",
-      "archiveUrl": "https://web.archive.org/web/20260902175141id_/https://lusooverland.com/VP-MMC-MR58015X",
-      "accessed": "2026-09-02",
+      "archiveUrl": "https://web.archive.org/web/20260903165756id_/https://lusooverland.com/VP-MMC-MR58015X",
+      "accessed": "2026-09-03",
       "kind": "vendor"
     },
     {
@@ -187,7 +188,7 @@
         },
         "clean-the-connector-and-repair-the-pins": {
           "title": "Limpiar los conectores",
-          "detail": "Los dueños del hilo en español reportan desconectar los conectores de los interruptores y aplicarles limpiador de contactos eléctricos en spray, y revisar de paso las mangueras. Unos terminales sucios dan la misma luz parpadeando que un interruptor dañado, y confirmarlo o descartarlo no cuesta nada."
+          "detail": "Los dueños del hilo en español reportan desconectar los conectores de los interruptores y aplicarles limpiador de contactos eléctricos en spray, y revisar en la misma visita las mangueras de vacío. Unos terminales sucios dan la misma luz parpadeando que un interruptor dañado, y confirmarlo o descartarlo no cuesta nada."
         },
         "replace-the-failed-switch-and-clean-the-detent": {
           "title": "Cambiar solo el interruptor que señala el código",

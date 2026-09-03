@@ -156,7 +156,7 @@
       "diagnosticSteps": {
         "clean-both-differentials-and-drive-a-week": "Limpie las dos carcasas de diferencial, ande una semana y vuelva a ver dónde nace el aceite",
         "work-out-whether-the-oil-starts-at-the-nose-or-at-a-side": "Determine si el rastro húmedo empieza en la punta del piñón o donde sale un eje de la carcasa",
-        "check-the-breather-hose-is-clear-and-routed-up": "Revise que el respiradero esté destapado, que su manguera no esté aplastada y que vaya ruteada hacia arriba",
+        "check-the-breather-hose-is-clear-and-routed-up": "Revise que el respiradero esté destapado, que su manguera no esté aplastada y que vaya hacia arriba",
         "check-the-level-and-look-at-what-drains-out": "Revise el nivel en el tapón de llenado, y si lo drena, busque metal en el aceite"
       },
       "fixPaths": {

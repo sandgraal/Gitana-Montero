@@ -17,10 +17,18 @@
     "engine-turns-over-but-will-not-start-after-a-bang"
   ],
   "causes": [
-    { "id": "timing-belt-past-its-service-life" },
-    { "id": "tensioner-or-idler-pulley-failing" },
-    { "id": "water-pump-leaking-onto-the-belt" },
-    { "id": "cheap-aftermarket-kit-parts-failing-early" }
+    {
+      "id": "timing-belt-past-its-service-life"
+    },
+    {
+      "id": "tensioner-or-idler-pulley-failing"
+    },
+    {
+      "id": "water-pump-leaking-onto-the-belt"
+    },
+    {
+      "id": "cheap-aftermarket-kit-parts-failing-early"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -79,7 +87,7 @@
       "procedures": []
     }
   ],
-  "confidence": "community-consensus",
+  "confidence": "anecdotal",
   "sources": [
     {
       "title": "Luso Overland — MONTERO Gen3 OEM Timing Belt Kit (kit contents, service interval and the recommended additional items)",
@@ -92,7 +100,7 @@
   "prose": {
     "en": {
       "title": "Timing belt service overdue or unknown",
-      "summary": "The Montero specialist who assembles the OEM kit for this generation states it plainly: these are timing-belt-driven interference engines on a fixed service interval, and after collision damage the most common reason they see a Montero reach a scrapyard is a blown engine from a timing failure. That makes an unknown belt history a real problem rather than a paperwork gap — on an interference engine the belt does not strand you, it ends the engine. The same source warns that cheap aftermarket kit parts fail early, and lists what should always be replaced together: the belt, the tensioner and its pulley, the idler pulley, and the water pump with its gaskets. If you have just bought a Gen 3 and there is no receipt for this job, treat it as due. On a truck that lives at the end of a bad road, the arithmetic is not close.",
+      "summary": "The Montero specialist who assembles the OEM kit for this generation states it plainly: these are timing-belt-driven interference engines on a fixed service interval, and after collision damage the most common reason they see a Montero reach a scrapyard is a blown engine from a timing failure. That makes an unknown belt history a real problem rather than a paperwork gap — on an interference engine the belt does not strand you, it ends the engine. The same source warns that cheap aftermarket kit parts fail early, and lists what should always be replaced together: the belt, the tensioner and its pulley, the idler pulley, and the water pump with its gaskets. If you have just bought a Gen 3 and there is no receipt for this job, treat it as due. On a truck that lives at the end of a bad road, the arithmetic is not close. The interval and the interference-engine claim both come from one specialist supplier's kit documentation, so this entry is filed at the weakest tier. Treat the recommendation as sound trade practice rather than as a factory specification, and confirm the interval for your own market's service schedule.",
       "slug": "timing-belt-service-overdue",
       "symptoms": {
         "no-record-of-when-the-belt-was-last-changed": "Nobody can say when the timing belt was last replaced",
@@ -125,7 +133,7 @@
     },
     "es": {
       "title": "Servicio de faja de distribución vencido o sin historial",
-      "summary": "La casa especializada en Montero que arma el juego original para esta generación lo dice sin rodeos: estos motores mueven la distribución por faja, son de interferencia y llevan un intervalo de servicio fijo, y después de los choques la razón más común por la que ven llegar una Montero a un deshuesadero es un motor fundido por una falla de distribución. Eso convierte un historial desconocido en un problema real y no en un vacío de papeles: en un motor de interferencia la faja no lo deja botado, le termina el motor. La misma fuente advierte que las piezas baratas no originales del juego fallan temprano, y enumera lo que siempre debe cambiarse junto: la faja, el tensor y su polea, la polea loca y la bomba de agua con sus empaques. Si usted acaba de comprar una tercera generación y no aparece la factura de este trabajo, tómelo por vencido. En un vehículo que vive al final de un camino malo, la cuenta ni siquiera es reñida.",
+      "summary": "La casa especializada en Montero que arma el juego original para esta generación lo dice sin rodeos: estos motores mueven la distribución por faja, son de interferencia y llevan un intervalo de servicio fijo, y después de los choques la razón más común por la que ven llegar una Montero a un deshuesadero es un motor fundido por una falla de distribución. Eso convierte un historial desconocido en un problema real y no en un vacío de papeles: en un motor de interferencia la faja no lo deja botado, le termina el motor. La misma fuente advierte que las piezas baratas no originales del juego fallan temprano, y enumera lo que siempre debe cambiarse junto: la faja, el tensor y su polea, la polea loca y la bomba de agua con sus empaques. Si usted acaba de comprar una tercera generación y no aparece la factura de este trabajo, tómelo por vencido. En un vehículo que vive al final de un camino malo, la cuenta ni siquiera es reñida. El intervalo y la afirmación de que el motor es de interferencia salen los dos de la documentación del juego de una sola casa especializada, así que esta entrada queda en el nivel de confianza más bajo. Tómelo como buena práctica del gremio y no como una especificación de fábrica, y confirme el intervalo contra el plan de servicio de su propio mercado.",
       "slug": "faja-de-distribucion-vencida",
       "symptoms": {
         "no-record-of-when-the-belt-was-last-changed": "Nadie sabe decir cuándo se cambió la faja de distribución por última vez",

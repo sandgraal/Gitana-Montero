@@ -81,6 +81,13 @@
       "kind": "tsb"
     },
     {
+      "title": "NHTSA recalls database — Mitsubishi Montero, 2004 model year: the same campaign 04V319000, confirming the campaign's later covered model years",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2004",
+      "archiveUrl": "https://web.archive.org/web/20260903165556id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2004",
+      "accessed": "2026-09-03",
+      "kind": "tsb"
+    },
+    {
       "title": "Luso Overland — MONTERO Gen3 Fuel Tank Safety Valve",
       "url": "https://lusooverland.com/VP-LO-MR512157",
       "archiveUrl": "https://web.archive.org/web/20260902205617id_/https://lusooverland.com/VP-LO-MR512157",

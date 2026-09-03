@@ -17,9 +17,15 @@
     "weak-first-stop-after-parking"
   ],
   "causes": [
-    { "id": "accumulator-lost-its-charge" },
-    { "id": "hydraulic-pump-or-unit-failing" },
-    { "id": "hydraulic-unit-internal-leak" }
+    {
+      "id": "accumulator-lost-its-charge"
+    },
+    {
+      "id": "hydraulic-pump-or-unit-failing"
+    },
+    {
+      "id": "hydraulic-unit-internal-leak"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -90,6 +96,13 @@
       "kind": "tsb"
     },
     {
+      "title": "NHTSA recalls database — Mitsubishi Montero, 2001 model year: the same campaign 01V254001, confirming the campaign's other covered model year",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2001",
+      "archiveUrl": "https://web.archive.org/web/20260903170345id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2001",
+      "accessed": "2026-09-03",
+      "kind": "tsb"
+    },
+    {
       "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filings (ODI 10199672, 10160855, 10160966, 10183354, 10547098, 10509412, 10918621, 10908227, 10855279, 11022029, 10981628, 10159689)",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
       "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
@@ -97,7 +110,21 @@
       "kind": "reference"
     },
     {
-      "title": "Luso Overland — MONTERO Gen3 NP Brake Booster Accumulator (4630A012): the chirping or gobbling noise as the telltale; a large silver cylinder on trucks with traction control, a smaller round one (MR977223) on trucks without",
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2004 model year; VIN-confirmed full-size Montero filings (ODI 11470732, VIN JA4MW51S54J — «Hydraulic Brake Booster is malfunctioning, making a (\"gobble-gobble\", squirrel-like chirping sound)»; and ODI 10631989, VIN JA4MW51R81J — hard pedal, noise from the driver-side instrument panel, dealer diagnosed the hydraulic booster system)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2004",
+      "archiveUrl": "https://web.archive.org/web/20260903165104id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2004",
+      "accessed": "2026-09-03",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2006 model year; VIN-confirmed full-size Montero filing (ODI 10649737, VIN JA4MW51S26J — total loss of pedal braking at speed, the ABS master cylinder assembly found failed)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2006",
+      "archiveUrl": "https://web.archive.org/web/20260903165321id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2006",
+      "accessed": "2026-09-03",
+      "kind": "reference"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 NP Brake Booster Accumulator (4630A012): the chirping or gobbling noise as the telltale. Fitment row 2003-2006, 3.8L V6; part 4630A012 for 2003-2006 Monteros with traction control, a smaller round part (MR977223) for those without",
       "url": "https://lusooverland.com/VP-MMC-4630A012",
       "archiveUrl": "https://web.archive.org/web/20260902205047id_/https://lusooverland.com/VP-MMC-4630A012",
       "accessed": "2026-09-02",
@@ -114,7 +141,7 @@
   "prose": {
     "en": {
       "title": "Brake accumulator has lost its charge",
-      "summary": "The third generation's brakes are assisted by a hydraulic booster with a gas-charged accumulator bolted to it, and that accumulator is the single most reported fault on this truck. Mitsubishi recalled it for the 2001 and 2002 model years: the campaign says the accumulator may have been improperly manufactured, that it can leak its pressurised nitrogen over time, and that the result is an abnormal noise from the left of the dash panel plus a delayed first application of boost after the truck has been parked. Owners describe the noise the same way in every language — a chirp, a gobble, the honk of a goose — and the specialist supplier who sells the replacement names the same sound as the telltale. Two things this entry is careful about. The campaign covered vehicles built up to a cut-off date in mid-2001, and owner after owner reports the identical failure on a truck whose VIN is not on the list, including VIN-confirmed cases on 2004 and 2006 trucks — so the entry is not claiming factory authority outside the campaign's own years, and its tier reflects that. And the triage is not this site being cautious: one owner's mechanic told him not to drive it until it was repaired, another lost the brakes entirely at highway speed, and a third was told the truck could not be driven until the part was replaced.",
+      "summary": "The third generation's brakes are assisted by a hydraulic booster with a gas-charged accumulator bolted to it, and that accumulator is the single most reported fault on this truck. Mitsubishi recalled it for the first two model years this generation was sold in North America: the campaign says the accumulator may have been improperly manufactured, that it can leak its pressurised nitrogen over time, and that the result is an abnormal noise from the left of the dash panel plus a delayed first application of boost after the truck has been parked. Owners describe the noise the same way in every language — a chirp, a gobble, the honk of a goose — and the specialist supplier who sells the replacement names the same sound as the telltale. Two things this entry is careful about. The campaign covered vehicles built up to a cut-off date partway through its first year, and owner after owner reports the identical failure on a truck whose VIN is not on the list — including filings from later model years, each cited below and confirmed as a full-size Montero by its VIN. The entry therefore claims no factory authority outside the campaign's own years, and its tier reflects that. And the triage is not this site being cautious: one owner's mechanic told him not to drive it until it was repaired, another lost the brakes entirely at highway speed, and a third was told the truck could not be driven until the part was replaced.",
       "slug": "brake-accumulator-lost-its-charge",
       "symptoms": {
         "honk-or-chirp-when-braking": "A chirp, honk or gobbling noise from the left of the dash each time you use the brake",
@@ -140,7 +167,7 @@
         },
         "replace-the-accumulator": {
           "title": "Replace the accumulator alone",
-          "detail": "The accumulator is sold separately from the booster it bolts to, and trucks fitted with traction control take a different one — a large silver cylinder — from those without, which take a smaller round part. Check which yours is before ordering. The system has to be bled afterwards."
+          "detail": "The accumulator is sold separately from the booster it bolts to. On the later trucks the supplier's listing splits it two ways — a large silver cylinder for those with traction control, a smaller round part for those without — and that listing covers the last four model years only, so do not carry the split back to an earlier truck without checking. Confirm the part against your own VIN before ordering. The system has to be bled afterwards."
         },
         "replace-the-hydraulic-booster-unit": {
           "title": "Replace the hydraulic booster unit",
@@ -150,7 +177,7 @@
     },
     "es": {
       "title": "Depósito de presión del booster de freno descargado",
-      "summary": "Los frenos de la tercera generación llevan asistencia de un booster hidráulico con un depósito de presión cargado con gas atornillado a él, y ese depósito es la falla más reportada de este vehículo. Mitsubishi lo llamó a revisión para los años modelo 2001 y 2002: la campaña dice que la pieza pudo haberse fabricado mal, que con el tiempo puede fugar el nitrógeno a presión que lleva adentro, y que el resultado es un ruido anormal del lado izquierdo del tablero más un retardo en la primera asistencia de frenado después de que el carro estuvo parqueado. Los dueños describen el ruido igual en todos los idiomas —un chillido, un graznido de ganso, un pato— y la casa especializada que vende el repuesto señala ese mismo sonido como la seña. Esta entrada cuida dos cosas. La campaña cubrió vehículos fabricados hasta una fecha de corte a mediados de 2001, y dueño tras dueño reporta la falla idéntica en vehículos cuyo número de chasis no está en la lista, incluidos casos confirmados por chasis en vehículos de 2004 y 2006; por eso la entrada no reclama autoridad de fábrica fuera de los años de la campaña, y su nivel de confianza lo refleja. Y la clasificación no es este sitio siendo precavido: a un dueño su mecánico le dijo que no manejara el vehículo hasta repararlo, otro perdió los frenos por completo a velocidad de carretera, y a un tercero le dijeron que el vehículo no se podía manejar hasta cambiar la pieza.",
+      "summary": "Los frenos de la tercera generación llevan asistencia de un booster hidráulico con un depósito de presión cargado con gas atornillado a él, y ese depósito es la falla más reportada de este vehículo. Mitsubishi lo llamó a revisión para los dos primeros años modelo en que esta generación se vendió en Norteamérica: la campaña dice que la pieza pudo haberse fabricado mal, que con el tiempo puede fugar el nitrógeno a presión que lleva adentro, y que el resultado es un ruido anormal del lado izquierdo del tablero más un retardo en la primera asistencia de frenado después de que el carro estuvo parqueado. Los dueños describen el ruido igual en todos los idiomas —un chillido, un graznido de ganso, un graznido de pato— y la casa especializada que vende el repuesto señala ese mismo sonido como la seña. Esta entrada cuida dos cosas. La campaña cubrió vehículos fabricados hasta una fecha de corte que cae dentro de su primer año, y dueño tras dueño reporta la falla idéntica en vehículos cuyo número de chasis no está en la lista, incluidas quejas de años modelo posteriores, cada una citada abajo y confirmada como Montero de tamaño completo por su número de chasis. Por eso la entrada no reclama autoridad de fábrica fuera de los años de la campaña, y su nivel de confianza lo refleja. Y la clasificación no es este sitio siendo precavido: a un dueño su mecánico le dijo que no manejara el vehículo hasta repararlo, otro perdió los frenos por completo a velocidad de carretera, y a un tercero le dijeron que el vehículo no se podía manejar hasta cambiar la pieza.",
       "slug": "deposito-de-presion-del-booster-descargado",
       "symptoms": {
         "honk-or-chirp-when-braking": "Un chillido, graznido o ruido de pato al lado izquierdo del tablero cada vez que usted frena",
@@ -176,7 +203,7 @@
         },
         "replace-the-accumulator": {
           "title": "Cambiar solo el depósito de presión",
-          "detail": "El depósito se vende aparte del booster de freno al que va atornillado, y los vehículos con control de tracción llevan uno distinto —un cilindro plateado grande— al de los que no lo traen, que llevan una pieza redonda más pequeña. Confirme cuál es el suyo antes de pedirlo. Después hay que purgar el sistema."
+          "detail": "El depósito se vende aparte del booster de freno al que va atornillado. En los vehículos más nuevos el listado de la casa especializada lo divide en dos —un cilindro plateado grande para los que traen control de tracción y una pieza redonda más pequeña para los que no—, y ese listado cubre solo los últimos cuatro años modelo, así que no traslade esa división a un vehículo anterior sin confirmarla. Verifique la pieza contra su propio número de chasis antes de pedirla. Después hay que purgar el sistema."
         },
         "replace-the-hydraulic-booster-unit": {
           "title": "Cambiar el conjunto del booster de freno hidráulico",

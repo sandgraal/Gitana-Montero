@@ -92,7 +92,7 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filings (ODI 11583242, 11063563, 10653550, 10678964: horn sounding by itself, cold-weather pattern, contacts under the steering wheel pad, horn relay replaced without curing it)",
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filings (ODI 11583242, 11063563, 10653550: horn sounding by itself, the cold-weather pattern, the contacts under the steering wheel pad, and a horn relay replaced three times without curing it)",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
       "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
       "accessed": "2026-09-02",
@@ -129,11 +129,11 @@
         },
         "have-a-shop-service-the-wheel-pad-contacts": {
           "title": "Have the wheel pad contacts serviced by a shop",
-          "detail": "This means disturbing the driver's airbag module. Do not attempt it on the strength of a video: an airbag deploying in a workshop injures people, and see a qualified mechanic is the honest answer here."
+          "detail": "This means disturbing the driver's airbag module. Do not attempt it on the strength of a video: an airbag that deploys in a workshop injures people, and the honest answer here is to see a qualified mechanic."
         },
         "have-the-clock-spring-and-column-wiring-checked": {
           "title": "Have the clock spring and column wiring checked",
-          "detail": "The path to look at when the fault follows steering angle. Same warning: the clock spring is part of the restraint circuit and is not a place to improvise."
+          "detail": "The path to look at when the fault follows steering angle. Costa Rican shops usually ask for the part by its English name, so \"clock spring\" is the word to use at the counter in either language. Same warning: the clock spring is part of the restraint circuit and is not a place to improvise."
         }
       }
     },
@@ -150,7 +150,7 @@
       "causes": {
         "horn-contacts-on-the-airbag-module-shorting": "Los contactos de la bocina que van sobre el módulo de la bolsa de aire están haciendo corto",
         "steering-wheel-trim-shrinking-onto-the-contacts": "El forro que cubre el módulo se contrae con el frío y junta los contactos",
-        "clock-spring-or-column-wiring-chafed": "El espiral de contacto del airbag detrás del volante, o el cableado de la columna, está pelado",
+        "clock-spring-or-column-wiring-chafed": "El espiral de contacto de la bolsa de aire detrás del volante, o el cableado de la columna, está pelado",
         "horn-relay-sticking": "El relé de la bocina se queda pegado"
       },
       "diagnosticSteps": {
@@ -169,7 +169,7 @@
           "detail": "Esto implica mover el módulo de la bolsa de aire del conductor. No lo intente por haber visto un video: una bolsa de aire que se dispara en un taller lastima gente, y aquí la respuesta honesta es acudir a un mecánico calificado."
         },
         "have-the-clock-spring-and-column-wiring-checked": {
-          "title": "Que revisen el espiral de contacto del airbag y el cableado de la columna",
+          "title": "Que revisen el espiral de contacto de la bolsa de aire y el cableado de la columna",
           "detail": "Es el camino a revisar cuando la falla sigue al ángulo del volante. En los talleres ticos esa pieza se pide muchas veces por su nombre en inglés, clock spring. Misma advertencia: es parte del circuito de retención y no es lugar para improvisar."
         }
       }

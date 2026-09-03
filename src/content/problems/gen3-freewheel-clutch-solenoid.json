@@ -178,7 +178,7 @@
         "cycle-the-selector-forwards-and-in-reverse": "Meta doble tracción, avance unos metros, quítela, retroceda unos metros y escuche el desacople",
         "trace-the-vacuum-hoses-at-the-right-inner-fender": "Siga las mangueras de vacío del guardabarros interno derecho, apretando cada una para hallar rajaduras y revisando cada espiga",
         "apply-vacuum-directly-at-the-actuator": "Aplique vacío directo al actuador del diferencial delantero y observe si el eje acopla",
-        "fit-a-known-good-solenoid-and-try-again": "Monte una válvula solenoide sana, copiando el ruteo de mangueras de la vieja, y pruebe otra vez la palanca"
+        "fit-a-known-good-solenoid-and-try-again": "Monte una válvula solenoide sana, copiando cómo van las mangueras en la vieja, y pruebe otra vez la palanca"
       },
       "fixPaths": {
         "use-the-four-wheel-drive-regularly": {

@@ -17,9 +17,15 @@
     "black-rubber-dust-around-the-front-cover"
   ],
   "causes": [
-    { "id": "front-camshaft-seal-hardened" },
-    { "id": "front-crankshaft-seal-hardened" },
-    { "id": "valve-cover-gasket-leaking-onto-the-cover" }
+    {
+      "id": "front-camshaft-seal-hardened"
+    },
+    {
+      "id": "front-crankshaft-seal-hardened"
+    },
+    {
+      "id": "valve-cover-gasket-leaking-onto-the-cover"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -69,7 +75,7 @@
       "procedures": []
     }
   ],
-  "confidence": "community-consensus",
+  "confidence": "anecdotal",
   "sources": [
     {
       "title": "Luso Overland — MONTERO Gen3 OEM Timing Belt Kit: «Front Camshaft Seal - A common oil leak point», with the recommended replacement cadence and the quantity per vehicle",
@@ -82,7 +88,7 @@
   "prose": {
     "en": {
       "title": "Oil leak at the front camshaft seals",
-      "summary": "The kit supplier for this engine names the front camshaft seals as a common oil leak point and recommends replacing them on a fixed cadence rather than waiting for them to weep — and the reason is not the oil you lose. These seals sit behind the timing covers, which means the oil they leak lands on the timing belt, and a belt that has been soaked in oil is a belt on borrowed time regardless of how new it is. The economics follow from the geometry: the labour to reach the seals is the labour of a timing belt service, so a seal replaced during that job is nearly free and a seal replaced on its own is not. If the front of your engine is wet and the belt history is unknown, read this entry and the timing belt one together — they are the same afternoon of work.",
+      "summary": "The kit supplier for this engine names the front camshaft seals as a common oil leak point and recommends replacing them on a fixed cadence rather than waiting for them to weep — and the reason is not the oil you lose. These seals sit behind the timing covers, which means the oil they leak lands on the timing belt, and a belt that has been soaked in oil is a belt on borrowed time regardless of how new it is. The economics follow from the geometry: the labour to reach the seals is the labour of a timing belt service, so a seal replaced during that job is nearly free and a seal replaced on its own is not. If the front of your engine is wet and the belt history is unknown, read this entry and the timing belt one together — they are the same afternoon of work. This entry rests on one specialist supplier's product documentation, so it is filed at the weakest tier — the reasoning below is sound, but nobody has corroborated it here yet.",
       "slug": "oil-leak-front-camshaft-seals",
       "symptoms": {
         "oil-weeping-from-the-timing-cover-area": "Oil weeping from the area of the timing covers",
@@ -113,7 +119,7 @@
     },
     "es": {
       "title": "Fuga de aceite en los retenedores delanteros del árbol de levas",
-      "summary": "El proveedor del juego para este motor señala los retenedores delanteros del árbol de levas como un punto de fuga común y recomienda cambiarlos con una periodicidad fija en vez de esperar a que rezumen, y la razón no es el aceite que se pierde. Estos retenedores van detrás de las tapas de distribución, lo que significa que el aceite que dejan pasar cae sobre la faja de distribución, y una faja empapada en aceite es una faja con los días contados por nueva que esté. La economía se deduce de la geometría: la mano de obra para llegar a los retenedores es la misma del servicio de faja de distribución, así que un retenedor cambiado durante ese trabajo sale casi gratis y uno cambiado aparte no. Si el frente de su motor está húmedo y no se sabe el historial de la faja, lea esta entrada junto con la de la faja de distribución: son la misma tarde de trabajo.",
+      "summary": "El proveedor del juego para este motor señala los retenedores delanteros del árbol de levas como un punto de fuga común y recomienda cambiarlos con una periodicidad fija en vez de esperar a que rezumen, y la razón no es el aceite que se pierde. Estos retenedores van detrás de las tapas de distribución, lo que significa que el aceite que dejan pasar cae sobre la faja de distribución, y una faja empapada en aceite es una faja con los días contados por nueva que esté. La economía se deduce de la geometría: la mano de obra para llegar a los retenedores es la misma del servicio de faja de distribución, así que un retenedor cambiado durante ese trabajo sale casi gratis y uno cambiado aparte no. Si el frente de su motor está húmedo y no se sabe el historial de la faja, lea esta entrada junto con la de la faja de distribución: son la misma tarde de trabajo. Esta entrada se apoya en la documentación de producto de una sola casa especializada, así que queda en el nivel de confianza más bajo: el razonamiento de abajo es sólido, pero aquí todavía nadie lo ha corroborado.",
       "slug": "fuga-de-aceite-retenedores-del-arbol-de-levas",
       "symptoms": {
         "oil-weeping-from-the-timing-cover-area": "Aceite rezumando por la zona de las tapas de distribución",

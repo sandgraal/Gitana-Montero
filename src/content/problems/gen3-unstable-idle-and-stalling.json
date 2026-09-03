@@ -102,7 +102,7 @@
   "confidence": "community-consensus",
   "sources": [
     {
-      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filings (ODI 10041117, 10010812, 10003369, 10398763, 10193583: idle vibration, stalling, idle control valve replacement)",
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filings (ODI 10041117 and 10010812: engine vibration at idle with the needle sinking towards zero; ODI 10003369: repeated stalling, «they replaced the idle speed control»)",
       "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
       "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
       "accessed": "2026-09-02",
@@ -112,7 +112,7 @@
   "prose": {
     "en": {
       "title": "Shakes at idle and stalls at a stop",
-      "summary": "A recognisable cluster in the owner-complaint record for this generation: the engine vibrates at a standstill, the tachometer needle sinks towards zero as though the engine is about to die, and it either catches itself or stalls and restarts without drama. Several owners describe dealers replacing plugs and leads, then an idle control valve, before the fault settled; one lists plugs, wires, coils, a timing belt, an idler pulley and a thermostat and still had a check engine light. That history is the useful part — it says the symptom has more than one cause and that parts-swapping in the dark is expensive. The triage is drive-gently-repair-soon rather than drive-normally for one reason: an engine that stalls unpredictably will eventually do it pulling into traffic. Get the codes read before anybody sells you an ignition service.",
+      "summary": "A recognisable cluster in the owner-complaint record for this generation: the engine vibrates at a standstill, the tachometer needle sinks towards zero as though the engine is about to die, and it either catches itself or stalls and restarts without drama. The useful part of those filings is what happened next. One owner had the dealer change plugs and cables and was told to use premium fuel; the vibration was back within a week. Another had the idle speed control replaced after repeated stalling and kept filing. Nobody in the cited set reports the fault being cured on the first attempt — which says the symptom has more than one cause, and that parts-swapping in the dark is expensive. The triage is drive-gently-repair-soon rather than drive-normally for one reason: an engine that stalls unpredictably will eventually do it pulling into traffic. Get the codes read before anybody sells you an ignition service.",
       "slug": "shakes-at-idle-and-stalls",
       "symptoms": {
         "engine-shakes-at-idle-and-nearly-stalls": "The engine shakes at idle and feels as if it is about to die",
@@ -154,7 +154,7 @@
     },
     "es": {
       "title": "Tiembla en marcha mínima y se apaga en los altos",
-      "summary": "Es un grupo reconocible dentro del registro de quejas de dueños de esta generación: el motor vibra con el vehículo detenido, la aguja del tacómetro se cae hacia cero como si se fuera a apagar, y o se recupera sola o se apaga y vuelve a arrancar sin drama. Varios dueños describen concesionarios que cambiaron bujías y cables, luego una válvula de marcha mínima, y hasta entonces se calmó la falla; uno enumera bujías, cables, bobinas, faja de distribución, polea loca y termostato y aun así seguía con la luz de check encendida. Esa historia es la parte útil: dice que el síntoma tiene más de una causa y que cambiar repuestos a ciegas sale caro. La clasificación es manejar suave y reparar pronto, y no manejar normal, por una razón: un motor que se apaga sin avisar tarde o temprano lo va a hacer al incorporarse al tráfico. Haga leer los códigos antes de que alguien le venda un servicio de encendido.",
+      "summary": "Es un grupo reconocible dentro del registro de quejas de dueños de esta generación: el motor vibra con el vehículo detenido, la aguja del tacómetro se cae hacia cero como si se fuera a apagar, y o se recupera sola o se apaga y vuelve a arrancar sin drama. Lo útil de esas quejas es lo que pasó después. A un dueño el concesionario le cambió bujías y cables y le dijo que usara gasolina súper; a la semana la vibración había vuelto. A otro le cambiaron el control de marcha mínima después de apagones repetidos y siguió reportando. Ninguno de los casos citados reporta que la falla se resolviera al primer intento, lo que dice que el síntoma tiene más de una causa y que cambiar repuestos a ciegas sale caro. La clasificación es manejar suave y reparar pronto, y no manejar normal, por una razón: un motor que se apaga sin avisar tarde o temprano lo va a hacer al incorporarse al tráfico. Haga leer los códigos antes de que alguien le venda un servicio de encendido.",
       "slug": "tiembla-en-marcha-minima-y-se-apaga",
       "symptoms": {
         "engine-shakes-at-idle-and-nearly-stalls": "El motor tiembla en marcha mínima y se siente como si se fuera a apagar",
@@ -190,7 +190,7 @@
         },
         "service-the-fuel-filter-and-check-delivery": {
           "title": "Atender el lado de combustible y medir la entrega",
-          "detail": "Va de último porque es lo más invasivo, pero un motor con hambre de combustible y uno andando con combustible malo se sienten parecido desde el asiento del chofer."
+          "detail": "Va de último porque es lo más invasivo. Aun así vale tenerlo presente: desde el asiento del chofer, un motor al que no le llega bien el combustible y uno que anda con combustible de mala calidad se sienten casi igual."
         }
       }
     }

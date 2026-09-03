@@ -18,9 +18,15 @@
     "sweet-smell-and-steam-from-underneath"
   ],
   "causes": [
-    { "id": "plastic-tee-joint-pipe-broken" },
-    { "id": "rear-heater-line-or-hose-perished" },
-    { "id": "radiator-or-front-hose-leak" }
+    {
+      "id": "plastic-tee-joint-pipe-broken"
+    },
+    {
+      "id": "rear-heater-line-or-hose-perished"
+    },
+    {
+      "id": "radiator-or-front-hose-leak"
+    }
   ],
   "diagnosticSteps": [
     {
@@ -73,7 +79,7 @@
       "procedures": []
     }
   ],
-  "confidence": "community-consensus",
+  "confidence": "anecdotal",
   "sources": [
     {
       "title": "Luso Overland — MONTERO Gen3 OEM Timing Belt Kit (recommended additional items: «Rear Heater Tee Joint Pipe, Limited Trim Only»)",
@@ -86,7 +92,7 @@
   "prose": {
     "en": {
       "title": "Rear heater tee pipes dump the coolant",
-      "summary": "The trucks fitted with the rear heater carry the coolant a long way back and return it through plastic tee joints in the middle of the vehicle. The specialist supplier's standing advice is to replace those tees preventively whenever the cooling system is already drained, and their reasoning is the whole entry: if one of the old plastic pipes breaks, all of the vehicle's coolant drains out, which can overheat the engine and turn a cheap plastic fitting into cylinder head work. That is why this sits at do-not-drive. Nobody is hurt by it, but the distance between the puddle and a warped head is measured in minutes of running, and the temperature gauge on a system that has already emptied itself does not necessarily rise in time to be useful. If your Montero has rear heating and you are already draining the system for something else, this is the cheapest insurance on the truck.",
+      "summary": "The trucks fitted with the rear heater carry the coolant a long way back and return it through plastic tee joints in the middle of the vehicle. The specialist supplier's standing advice is to replace those tees preventively whenever the cooling system is already drained, and their reasoning is the whole entry: if one of the old plastic pipes breaks, all of the vehicle's coolant drains out, which can overheat the engine and turn a cheap plastic fitting into cylinder head work. That is why this sits at do-not-drive. Nobody is hurt by it, but the distance between the puddle and a warped head is measured in minutes of running, and the temperature gauge on a system that has already emptied itself does not necessarily rise in time to be useful. If your Montero has rear heating and you are already draining the system for something else, this is the cheapest insurance on the truck. This entry rests on one specialist supplier's standing recommendation, so it is filed at the weakest tier — the consequence it describes is severe, and it is still one source.",
       "slug": "rear-heater-tee-pipes-coolant-loss",
       "symptoms": {
         "coolant-dumped-under-the-middle-of-the-vehicle": "A large puddle of coolant under the middle of the vehicle rather than under the nose",
@@ -118,7 +124,7 @@
     },
     "es": {
       "title": "Los tubos plásticos en T del calefactor trasero botan el refrigerante",
-      "summary": "Los vehículos que traen calefactor trasero llevan el refrigerante muy atrás y lo devuelven por unas uniones plásticas en T que van a media carrocería. La recomendación permanente de la casa especializada es cambiar esas uniones de forma preventiva cada vez que el sistema de refrigeración ya esté drenado, y su razonamiento es la entrada entera: si uno de esos tubos plásticos viejos se quiebra, se sale todo el refrigerante del vehículo, lo que puede sobrecalentar el motor y convertir una unión plástica barata en trabajo de cabezote. Por eso queda en no manejar. No lastima a nadie, pero la distancia entre el charco y un cabezote torcido se mide en minutos de motor andando, y el indicador de temperatura de un sistema que ya se vació no necesariamente sube a tiempo para servir de algo. Si su Montero tiene calefacción trasera y usted ya va a drenar el sistema por otra cosa, este es el seguro más barato del vehículo.",
+      "summary": "Los vehículos que traen calefactor trasero llevan el refrigerante muy atrás y lo devuelven por unas uniones plásticas en T que van a media carrocería. La recomendación permanente de la casa especializada es cambiar esas uniones de forma preventiva cada vez que el sistema de refrigeración ya esté drenado, y su razonamiento es la entrada entera: si uno de esos tubos plásticos viejos se quiebra, se sale todo el refrigerante del vehículo, lo que puede sobrecalentar el motor y convertir una unión plástica barata en trabajo de cabezote. Por eso queda en no manejar. No lastima a nadie, pero la distancia entre el charco y un cabezote torcido se mide en minutos de motor andando, y el indicador de temperatura de un sistema que ya se vació no necesariamente sube a tiempo para servir de algo. Si su Montero tiene calefacción trasera y usted ya va a drenar el sistema por otra cosa, este es el seguro más barato del vehículo. Esta entrada se apoya en la recomendación permanente de una sola casa especializada, así que queda en el nivel de confianza más bajo: la consecuencia que describe es grave, y aun así es una sola fuente.",
       "slug": "tubos-en-t-del-calefactor-trasero",
       "symptoms": {
         "coolant-dumped-under-the-middle-of-the-vehicle": "Un charco grande de refrigerante a media carrocería y no debajo de la trompa",

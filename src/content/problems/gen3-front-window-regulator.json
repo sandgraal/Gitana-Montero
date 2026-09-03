@@ -69,7 +69,7 @@
       "procedures": []
     }
   ],
-  "confidence": "community-consensus",
+  "confidence": "anecdotal",
   "sources": [
     {
       "title": "Luso Overland — MONTERO Gen3 2004-2006 Window Regulator & Motor Assembly, FRONT (fits 2004-2006 only)",
@@ -82,7 +82,7 @@
   "prose": {
     "en": {
       "title": "Front window drops into the door",
-      "summary": "A comfort failure rather than a mechanical one, but it is the fault most likely to leave a Montero unlockable in the rain, so it earns a place in the first wave. The regulator and motor are supplied as one assembly for the later trucks, and the fitment note on that part is worth reading before ordering: the assembly the specialist stocks is listed for the last three model years of the generation only, so a truck from earlier in the run needs a different part even though the door looks the same. Before buying anything, separate a dead motor from a broken regulator and both of those from a switch or a loom fault in the door jamb, where the wires flex every time the door opens. The order of those three tests costs nothing and decides whether this is a part or a splice.",
+      "summary": "A comfort failure rather than a mechanical one, but it is the fault most likely to leave a Montero unlockable in the rain, so it earns a place in the first wave. The regulator and motor are supplied as one assembly for the later trucks, and the fitment note on that part is worth reading before ordering: the assembly the specialist stocks is listed for the last three model years of the generation only, so a truck from earlier in the run needs a different part even though the door looks the same. Before buying anything, separate a dead motor from a broken regulator and both of those from a switch or a loom fault in the door jamb, where the wires flex every time the door opens. The order of those three tests costs nothing and decides whether this is a part or a splice. This entry rests on one specialist supplier's parts listing, so it is filed at the weakest tier.",
       "slug": "front-window-drops-into-the-door",
       "symptoms": {
         "window-drops-into-the-door-and-will-not-come-back": "The glass drops into the door and will not come back up",
@@ -114,7 +114,7 @@
     },
     "es": {
       "title": "El vidrio delantero se cae dentro de la puerta",
-      "summary": "Es una falla de confort y no de mecánica, pero es la que con más probabilidad deja una Montero sin poder cerrarse bajo la lluvia, así que se gana un lugar en la primera tanda. En los vehículos más nuevos el mecanismo elevador y el motor se venden como un solo conjunto, y vale leer la nota de compatibilidad de ese repuesto antes de pedirlo: el conjunto que tiene la casa especializada aparece listado solo para los últimos tres años modelo de la generación, así que un vehículo de años anteriores necesita otra pieza aunque la puerta se vea igual. Antes de comprar nada, separe un motor muerto de un mecanismo quebrado, y ambos de una falla del suiche o del cableado en el marco de la puerta, donde los cables se doblan cada vez que la puerta se abre. El orden de esas tres pruebas no cuesta nada y decide si esto es un repuesto o un empalme.",
+      "summary": "Es una falla de confort y no de mecánica, pero es la que con más probabilidad deja una Montero sin poder cerrarse bajo la lluvia, así que se gana un lugar en la primera tanda. En los vehículos más nuevos el mecanismo elevador y el motor se venden como un solo conjunto, y vale leer la nota de compatibilidad de ese repuesto antes de pedirlo: el conjunto que tiene la casa especializada aparece listado solo para los últimos tres años modelo de la generación, así que un vehículo de años anteriores necesita otra pieza aunque la puerta se vea igual. Antes de comprar nada, separe un motor muerto de un mecanismo quebrado, y ambos de una falla del suiche o del cableado en el marco de la puerta, donde los cables se doblan cada vez que la puerta se abre. El orden de esas tres pruebas no cuesta nada y decide si esto es un repuesto o un empalme. Esta entrada se apoya en el listado de repuestos de una sola casa especializada, así que queda en el nivel de confianza más bajo.",
       "slug": "vidrio-delantero-se-cae-dentro-de-la-puerta",
       "symptoms": {
         "window-drops-into-the-door-and-will-not-come-back": "El vidrio se cae dentro de la puerta y ya no sube",
