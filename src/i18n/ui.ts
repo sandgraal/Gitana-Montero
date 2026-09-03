@@ -600,6 +600,14 @@ export interface UiStrings
   readonly problemsEmpty: string;
   /** `{shown}` / `{total}`, computed and interpolated — see `glossaryCountTemplate`. */
   readonly problemsCountTemplate: string;
+  /* Symptom-first navigation — T402, PRB-02 */
+  readonly problemsSearchLabel: string;
+  readonly problemsSearchPlaceholder: string;
+  /** `aria-label` for the symptom-pill group, same role as `glossaryFilterLabel`. */
+  readonly problemsSymptomIndexLabel: string;
+  /** The pill that clears a picked symptom, same role as `glossaryFilterAll`. */
+  readonly problemsSymptomIndexAll: string;
+  readonly problemsNoResults: string;
   readonly problemBreadcrumbLabel: string;
   readonly problemSymptomsHeading: string;
   readonly problemDiagnosticsHeading: string;
@@ -1242,6 +1250,12 @@ const en: UiStrings = {
     "Start from what the truck is doing. Every entry says what is safe to do about it right now, what to check, what usually causes it, and what fixing it takes.",
   problemsEmpty: "No problems have been written up yet.",
   problemsCountTemplate: "{shown} of {total} problems",
+  problemsSearchLabel: "Search symptoms and problems",
+  problemsSearchPlaceholder:
+    "Search a symptom — grinding noise, hard shifting…",
+  problemsSymptomIndexLabel: "Browse by symptom",
+  problemsSymptomIndexAll: "All symptoms",
+  problemsNoResults: "No problems match that symptom or search.",
   problemBreadcrumbLabel: "Breadcrumb",
   problemSymptomsHeading: "Symptoms",
   problemDiagnosticsHeading: "Diagnostic steps",
@@ -1752,6 +1766,12 @@ const es: UiStrings = {
     "Empiece por lo que está haciendo el carro. Cada entrada dice qué se puede hacer con seguridad en este momento, qué revisar, cuál suele ser la causa y qué implica la reparación.",
   problemsEmpty: "Todavía no hay problemas documentados.",
   problemsCountTemplate: "{shown} de {total} problemas",
+  problemsSearchLabel: "Busque síntomas y problemas",
+  problemsSearchPlaceholder:
+    "Busque un síntoma — ruido de rechinido, cambios duros…",
+  problemsSymptomIndexLabel: "Explore por síntoma",
+  problemsSymptomIndexAll: "Todos los síntomas",
+  problemsNoResults: "Ningún problema coincide con ese síntoma o esa búsqueda.",
   problemBreadcrumbLabel: "Ruta de navegación",
   problemSymptomsHeading: "Síntomas",
   problemDiagnosticsHeading: "Pasos de diagnóstico",
