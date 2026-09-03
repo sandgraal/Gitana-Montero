@@ -1,0 +1,178 @@
+{
+  "id": "gen3-differential-seal-leak",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "drivetrain",
+  "severity": "damaging",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "gear-oil-film-around-the-pinion-or-side-of-a-differential",
+    "oil-flung-onto-the-underside-and-the-inner-wheel",
+    "differential-oil-level-low-at-the-filler-plug",
+    "whine-that-changes-with-road-speed"
+  ],
+  "causes": [
+    {
+      "id": "pinion-seal-hardened"
+    },
+    {
+      "id": "side-shaft-seal-hardened"
+    },
+    {
+      "id": "breather-blocked-and-pressurising-the-housing"
+    },
+    {
+      "id": "differential-already-damaged-by-low-oil"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "clean-both-differentials-and-drive-a-week",
+      "rulesIn": ["pinion-seal-hardened", "side-shaft-seal-hardened"]
+    },
+    {
+      "id": "work-out-whether-the-oil-starts-at-the-nose-or-at-a-side",
+      "rulesIn": ["pinion-seal-hardened"],
+      "rulesOut": ["side-shaft-seal-hardened"]
+    },
+    {
+      "id": "check-the-breather-hose-is-clear-and-routed-up",
+      "rulesIn": ["breather-blocked-and-pressurising-the-housing"]
+    },
+    {
+      "id": "check-the-level-and-look-at-what-drains-out",
+      "rulesIn": ["differential-already-damaged-by-low-oil"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "clear-the-breather-and-top-up",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["breather-blocked-and-pressurising-the-housing"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-leaking-seal",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["pinion-seal-hardened", "side-shaft-seal-hardened"],
+      "parts": ["gen3-differential-seal"],
+      "procedures": []
+    },
+    {
+      "id": "have-the-differential-opened-and-assessed",
+      "difficulty": 5,
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
+      "addresses": ["differential-already-damaged-by-low-oil"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 Differential Seal, four positions (MB393883, MB664285, MR350883, MR580530)",
+      "url": "https://lusooverland.com/VP-MMC-M3-DS",
+      "archiveUrl": "https://web.archive.org/web/20260902210034id_/https://lusooverland.com/VP-MMC-M3-DS",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Pajero 4WD Club of Victoria — «NP Diff Problems» (oil escaping past a rear shaft, and the smell as the first sign)",
+      "url": "https://www.pajeroforum.com.au/forum/general-information/mechanical/3934-np-diff-problems",
+      "archiveUrl": "https://web.archive.org/web/20260902173834id_/https://www.pajeroforum.com.au/forum/general-information/mechanical/3934-np-diff-problems",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Gear oil weeping from a differential seal",
+      "summary": "Both differentials on this truck use seals at the pinion nose and where the shafts leave the housing, and the specialist supplier lists four separate part numbers to cover those positions — which is a fair map of where the oil comes out. The failure is slow and quiet, which is exactly the danger: the level falls over months and there is no gauge, no warning light and no noise until the gears have already been running short. A forum thread about the same axle notes that the distinctive smell of gear oil is usually what tells an owner first, before any stain is obvious. One cause worth checking before you condemn a seal is the housing breather. If it is blocked, the housing pressurises as it heats and pushes oil past seals that were doing their job perfectly well, and clearing it costs nothing.",
+      "slug": "gear-oil-weeping-from-a-differential-seal",
+      "symptoms": {
+        "gear-oil-film-around-the-pinion-or-side-of-a-differential": "An oily film around the pinion nose or the side of a differential housing",
+        "oil-flung-onto-the-underside-and-the-inner-wheel": "Oil flung along the underside or onto the inner face of a wheel",
+        "differential-oil-level-low-at-the-filler-plug": "The oil level is below the filler plug when you check it",
+        "whine-that-changes-with-road-speed": "A whine that rises and falls with road speed rather than with engine speed"
+      },
+      "causes": {
+        "pinion-seal-hardened": "The pinion seal at the nose of the differential has hardened and is passing oil",
+        "side-shaft-seal-hardened": "A side shaft seal has hardened and is passing oil",
+        "breather-blocked-and-pressurising-the-housing": "The housing breather is blocked and the pressure is pushing oil past the seals",
+        "differential-already-damaged-by-low-oil": "The differential has already been damaged by running short of oil"
+      },
+      "diagnosticSteps": {
+        "clean-both-differentials-and-drive-a-week": "Clean both differential housings, drive for a week and look again at where the oil begins",
+        "work-out-whether-the-oil-starts-at-the-nose-or-at-a-side": "Work out whether the wet trail begins at the pinion nose or where a shaft leaves the housing",
+        "check-the-breather-hose-is-clear-and-routed-up": "Check the breather is clear, its hose is not crushed, and it is routed upward",
+        "check-the-level-and-look-at-what-drains-out": "Check the level at the filler plug, and if you drain it look for metal in the oil"
+      },
+      "fixPaths": {
+        "clear-the-breather-and-top-up": {
+          "title": "Clear the breather and correct the level",
+          "detail": "The cheapest possible outcome, and it costs an hour to confirm. Do it before ordering seals, not after."
+        },
+        "replace-the-leaking-seal": {
+          "title": "Replace the seal the trail points at",
+          "detail": "The positions take different part numbers, so identify which one is leaking before ordering. Refill to the level the manual specifies rather than to where it looks right."
+        },
+        "have-the-differential-opened-and-assessed": {
+          "title": "Have the differential opened and assessed",
+          "detail": "What is left if the level was low for a long time and the whine has already started. Ask for the drained oil to be shown to you — metal in the pan changes what a rebuild is worth."
+        }
+      }
+    },
+    "es": {
+      "title": "Aceite de engranajes rezumando por un retenedor del diferencial",
+      "summary": "Los dos diferenciales de este vehículo llevan retenedores en la punta del piñón y donde salen los ejes de la carcasa, y la casa especializada enumera cuatro números de parte distintos para cubrir esas posiciones, lo cual es un buen mapa de por dónde sale el aceite. La falla es lenta y silenciosa, y ahí está el peligro: el nivel baja durante meses y no hay indicador, ni luz de advertencia, ni ruido, hasta que los engranajes ya llevan rato trabajando escasos de aceite. Un hilo de foro sobre el mismo eje anota que lo que primero avisa al dueño suele ser el olor característico del aceite de engranajes, antes de que la mancha sea evidente. Una causa que vale revisar antes de condenar un retenedor es el respiradero de la carcasa. Si está tapado, la carcasa se presuriza al calentarse y empuja aceite por retenedores que estaban haciendo bien su trabajo, y destaparlo no cuesta nada.",
+      "slug": "fuga-de-aceite-en-retenedor-del-diferencial",
+      "symptoms": {
+        "gear-oil-film-around-the-pinion-or-side-of-a-differential": "Una película aceitosa alrededor de la punta del piñón o del costado de la carcasa del diferencial",
+        "oil-flung-onto-the-underside-and-the-inner-wheel": "Aceite regado por los bajos o sobre la cara interna de una rueda",
+        "differential-oil-level-low-at-the-filler-plug": "El nivel de aceite queda por debajo del tapón de llenado al revisarlo",
+        "whine-that-changes-with-road-speed": "Un zumbido que sube y baja con la velocidad del vehículo y no con las vueltas del motor"
+      },
+      "causes": {
+        "pinion-seal-hardened": "El retenedor del piñón, en la punta del diferencial, se endureció y deja pasar aceite",
+        "side-shaft-seal-hardened": "Un retenedor de salida de eje se endureció y deja pasar aceite",
+        "breather-blocked-and-pressurising-the-housing": "El respiradero de la carcasa está tapado y la presión empuja el aceite por los retenedores",
+        "differential-already-damaged-by-low-oil": "El diferencial ya se dañó por haber trabajado escaso de aceite"
+      },
+      "diagnosticSteps": {
+        "clean-both-differentials-and-drive-a-week": "Limpie las dos carcasas de diferencial, ande una semana y vuelva a ver dónde nace el aceite",
+        "work-out-whether-the-oil-starts-at-the-nose-or-at-a-side": "Determine si el rastro húmedo empieza en la punta del piñón o donde sale un eje de la carcasa",
+        "check-the-breather-hose-is-clear-and-routed-up": "Revise que el respiradero esté destapado, que su manguera no esté aplastada y que vaya hacia arriba",
+        "check-the-level-and-look-at-what-drains-out": "Revise el nivel en el tapón de llenado, y si lo drena, busque metal en el aceite"
+      },
+      "fixPaths": {
+        "clear-the-breather-and-top-up": {
+          "title": "Destapar el respiradero y corregir el nivel",
+          "detail": "Es el desenlace más barato posible y cuesta una hora confirmarlo. Hágalo antes de pedir retenedores, no después."
+        },
+        "replace-the-leaking-seal": {
+          "title": "Cambiar el retenedor que señala el rastro",
+          "detail": "Las posiciones llevan números de parte distintos, así que identifique cuál está goteando antes de pedir. Rellene al nivel que indica el manual y no hasta donde se vea bien."
+        },
+        "have-the-differential-opened-and-assessed": {
+          "title": "Que abran y valoren el diferencial",
+          "detail": "Es lo que queda si el nivel estuvo bajo mucho tiempo y el zumbido ya empezó. Pida que le muestren el aceite drenado: el metal en la bandeja cambia cuánto vale reconstruirlo."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,215 @@
+{
+  "id": "gen3-brake-booster-accumulator",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "brakes",
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "honk-or-chirp-when-braking",
+    "brake-and-abs-lights-with-buzzer",
+    "pedal-goes-long-or-to-the-floor",
+    "weak-first-stop-after-parking"
+  ],
+  "causes": [
+    {
+      "id": "accumulator-lost-its-charge"
+    },
+    {
+      "id": "hydraulic-pump-or-unit-failing"
+    },
+    {
+      "id": "hydraulic-unit-internal-leak"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "listen-at-the-left-of-the-dash-while-braking",
+      "rulesIn": ["accumulator-lost-its-charge"]
+    },
+    {
+      "id": "note-whether-the-first-stop-after-parking-is-unassisted",
+      "rulesIn": ["accumulator-lost-its-charge"]
+    },
+    {
+      "id": "check-fluid-level-and-look-for-wet-fittings",
+      "rulesIn": ["hydraulic-unit-internal-leak"]
+    },
+    {
+      "id": "have-the-hydraulic-unit-read-and-tested",
+      "rulesIn": [
+        "hydraulic-pump-or-unit-failing",
+        "hydraulic-unit-internal-leak"
+      ]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "check-the-vin-and-build-date-against-the-campaign",
+      "difficulty": 1,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["accumulator-lost-its-charge"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-accumulator",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": ["accumulator-lost-its-charge"],
+      "parts": ["gen3-brake-booster-accumulator"],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-hydraulic-booster-unit",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant",
+        "to": "major"
+      },
+      "addresses": [
+        "accumulator-lost-its-charge",
+        "hydraulic-pump-or-unit-failing",
+        "hydraulic-unit-internal-leak"
+      ],
+      "parts": ["gen3-hydraulic-brake-booster"],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "NHTSA recalls database — Mitsubishi Montero, 2002 model year: campaign 01V254001, hydraulic brake booster accumulator, model years 2001-2002",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902173755id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "tsb"
+    },
+    {
+      "title": "NHTSA recalls database — Mitsubishi Montero, 2001 model year: the same campaign 01V254001, confirming the campaign's other covered model year",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2001",
+      "archiveUrl": "https://web.archive.org/web/20260903170345id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2001",
+      "accessed": "2026-09-03",
+      "kind": "tsb"
+    },
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filings (ODI 10199672, 10160855, 10160966, 10183354, 10547098, 10509412, 10918621, 10908227, 10855279, 11022029, 10981628, 10159689)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2004 model year; VIN-confirmed full-size Montero filings (ODI 11470732, VIN JA4MW51S54J — «Hydraulic Brake Booster is malfunctioning, making a (\"gobble-gobble\", squirrel-like chirping sound)»; and ODI 10631989, VIN JA4MW51R81J — hard pedal, noise from the driver-side instrument panel, dealer diagnosed the hydraulic booster system)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2004",
+      "archiveUrl": "https://web.archive.org/web/20260903165104id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2004",
+      "accessed": "2026-09-03",
+      "kind": "reference"
+    },
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2006 model year; VIN-confirmed full-size Montero filing (ODI 10649737, VIN JA4MW51S26J — total loss of pedal braking at speed, the ABS master cylinder assembly found failed)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2006",
+      "archiveUrl": "https://web.archive.org/web/20260903165321id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2006",
+      "accessed": "2026-09-03",
+      "kind": "reference"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 NP Brake Booster Accumulator (4630A012): the chirping or gobbling noise as the telltale. Fitment row 2003-2006, 3.8L V6; part 4630A012 for 2003-2006 Monteros with traction control, a smaller round part (MR977223) for those without",
+      "url": "https://lusooverland.com/VP-MMC-4630A012",
+      "archiveUrl": "https://web.archive.org/web/20260902205047id_/https://lusooverland.com/VP-MMC-4630A012",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Opinautos — «Ruido como un pato en la bomba del sistema de frenos», Mitsubishi Montero 2005 Limited",
+      "url": "https://www.opinautos.com/mitsubishi/montero/defectos/274707/ruido-como-un-pato-en-la-bomba-del-sistema-de-frenos",
+      "archiveUrl": "https://web.archive.org/web/20260902205221id_/https://www.opinautos.com/mitsubishi/montero/defectos/274707/ruido-como-un-pato-en-la-bomba-del-sistema-de-frenos",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Brake accumulator has lost its charge",
+      "summary": "The third generation's brakes are assisted by a hydraulic booster with a gas-charged accumulator bolted to it, and that accumulator is the single most reported fault on this truck. Mitsubishi recalled it for the first two model years this generation was sold in North America: the campaign says the accumulator may have been improperly manufactured, that it can leak its pressurised nitrogen over time, and that the result is an abnormal noise from the left of the dash panel plus a delayed first application of boost after the truck has been parked. Owners describe the noise the same way in every language — a chirp, a gobble, the honk of a goose — and the specialist supplier who sells the replacement names the same sound as the telltale. Two things this entry is careful about. The campaign covered vehicles built up to a cut-off date partway through its first year, and owner after owner reports the identical failure on a truck whose VIN is not on the list — including filings from later model years, each cited below and confirmed as a full-size Montero by its VIN. The entry therefore claims no factory authority outside the campaign's own years, and its tier reflects that. And the triage is not this site being cautious: one owner's mechanic told him not to drive it until it was repaired, another lost the brakes entirely at highway speed, and a third was told the truck could not be driven until the part was replaced.",
+      "slug": "brake-accumulator-lost-its-charge",
+      "symptoms": {
+        "honk-or-chirp-when-braking": "A chirp, honk or gobbling noise from the left of the dash each time you use the brake",
+        "brake-and-abs-lights-with-buzzer": "Brake and ABS warning lights together, often with a buzzer",
+        "pedal-goes-long-or-to-the-floor": "The pedal travels much further than it used to, sometimes to the floor",
+        "weak-first-stop-after-parking": "The first stop after the truck has sat is unassisted, then normal assistance returns"
+      },
+      "causes": {
+        "accumulator-lost-its-charge": "The accumulator has leaked its nitrogen charge and no longer stores pressure",
+        "hydraulic-pump-or-unit-failing": "The hydraulic pump in the brake unit is failing",
+        "hydraulic-unit-internal-leak": "The hydraulic booster unit is leaking internally and cannot hold pressure"
+      },
+      "diagnosticSteps": {
+        "listen-at-the-left-of-the-dash-while-braking": "With the engine running, press and release the pedal several times and listen at the left of the dash panel",
+        "note-whether-the-first-stop-after-parking-is-unassisted": "After the truck has sat for a few hours, note whether the very first brake application is unassisted",
+        "check-fluid-level-and-look-for-wet-fittings": "Check the brake fluid level, then inspect the booster unit and its fittings for damp spots",
+        "have-the-hydraulic-unit-read-and-tested": "Have the braking system read with a scan tool and the hydraulic unit tested by a shop"
+      },
+      "fixPaths": {
+        "check-the-vin-and-build-date-against-the-campaign": {
+          "title": "Check the VIN and build date against the factory campaign first",
+          "detail": "If the truck is inside the recall population the remedy is the manufacturer's to pay for. Owners report the cut-off is a build date rather than a model year, so ask about both. It costs nothing, and the answer decides which of the paths below you are on."
+        },
+        "replace-the-accumulator": {
+          "title": "Replace the accumulator alone",
+          "detail": "The accumulator is sold separately from the booster it bolts to. On the later trucks the supplier's listing splits it two ways — a large silver cylinder for those with traction control, a smaller round part for those without — and that listing covers the last four model years only, so do not carry the split back to an earlier truck without checking. Confirm the part against your own VIN before ordering. The system has to be bled afterwards."
+        },
+        "replace-the-hydraulic-booster-unit": {
+          "title": "Replace the hydraulic booster unit",
+          "detail": "The honest answer when the pump or the unit itself is at fault rather than the accumulator, and the expensive one. Have a shop confirm which before you buy anything."
+        }
+      }
+    },
+    "es": {
+      "title": "Depósito de presión del booster de freno descargado",
+      "summary": "Los frenos de la tercera generación llevan asistencia de un booster hidráulico con un depósito de presión cargado con gas atornillado a él, y ese depósito es la falla más reportada de este vehículo. Mitsubishi lo llamó a revisión para los dos primeros años modelo en que esta generación se vendió en Norteamérica: la campaña dice que la pieza pudo haberse fabricado mal, que con el tiempo puede fugar el nitrógeno a presión que lleva adentro, y que el resultado es un ruido anormal del lado izquierdo del tablero más un retardo en la primera asistencia de frenado después de que el carro estuvo parqueado. Los dueños describen el ruido igual en todos los idiomas —un chillido, un graznido de ganso, un graznido de pato— y la casa especializada que vende el repuesto señala ese mismo sonido como la seña. Esta entrada cuida dos cosas. La campaña cubrió vehículos fabricados hasta una fecha de corte que cae dentro de su primer año, y dueño tras dueño reporta la falla idéntica en vehículos cuyo número de chasis no está en la lista, incluidas quejas de años modelo posteriores, cada una citada abajo y confirmada como Montero de tamaño completo por su número de chasis. Por eso la entrada no reclama autoridad de fábrica fuera de los años de la campaña, y su nivel de confianza lo refleja. Y la clasificación no es este sitio siendo precavido: a un dueño su mecánico le dijo que no manejara el vehículo hasta repararlo, otro perdió los frenos por completo a velocidad de carretera, y a un tercero le dijeron que el vehículo no se podía manejar hasta cambiar la pieza.",
+      "slug": "deposito-de-presion-del-booster-descargado",
+      "symptoms": {
+        "honk-or-chirp-when-braking": "Un chillido, graznido o ruido de pato al lado izquierdo del tablero cada vez que usted frena",
+        "brake-and-abs-lights-with-buzzer": "Se encienden juntas la luz de freno y la del ABS, muchas veces con una alarma sonora",
+        "pedal-goes-long-or-to-the-floor": "El pedal recorre mucho más que antes, a veces hasta el fondo",
+        "weak-first-stop-after-parking": "El primer frenazo después de que el carro estuvo parqueado sale sin asistencia y luego vuelve a la normalidad"
+      },
+      "causes": {
+        "accumulator-lost-its-charge": "El depósito de presión fugó su carga de nitrógeno y ya no almacena presión",
+        "hydraulic-pump-or-unit-failing": "La bomba hidráulica del conjunto de frenos está fallando",
+        "hydraulic-unit-internal-leak": "El conjunto del booster de freno hidráulico tiene fuga interna y no sostiene la presión"
+      },
+      "diagnosticSteps": {
+        "listen-at-the-left-of-the-dash-while-braking": "Con el motor encendido, pise y suelte el pedal varias veces y escuche al lado izquierdo del tablero",
+        "note-whether-the-first-stop-after-parking-is-unassisted": "Después de que el vehículo pasó unas horas parqueado, fíjese si el primerísimo frenazo sale sin asistencia",
+        "check-fluid-level-and-look-for-wet-fittings": "Revise el nivel del líquido de frenos y busque humedad en el conjunto del booster de freno y en sus conexiones",
+        "have-the-hydraulic-unit-read-and-tested": "Haga leer el sistema de frenos con un escáner y que un taller pruebe el conjunto hidráulico"
+      },
+      "fixPaths": {
+        "check-the-vin-and-build-date-against-the-campaign": {
+          "title": "Primero consulte chasis y fecha de fabricación contra la campaña de fábrica",
+          "detail": "Si el vehículo entra en la campaña, la reparación le corresponde al fabricante. Los dueños reportan que el corte es por fecha de fabricación y no por año modelo, así que pregunte por las dos. No cuesta nada, y la respuesta decide en cuál de los caminos de abajo está usted."
+        },
+        "replace-the-accumulator": {
+          "title": "Cambiar solo el depósito de presión",
+          "detail": "El depósito se vende aparte del booster de freno al que va atornillado. En los vehículos más nuevos el listado de la casa especializada lo divide en dos —un cilindro plateado grande para los que traen control de tracción y una pieza redonda más pequeña para los que no—, y ese listado cubre solo los últimos cuatro años modelo, así que no traslade esa división a un vehículo anterior sin confirmarla. Verifique la pieza contra su propio número de chasis antes de pedirla. Después hay que purgar el sistema."
+        },
+        "replace-the-hydraulic-booster-unit": {
+          "title": "Cambiar el conjunto del booster de freno hidráulico",
+          "detail": "Es la respuesta honesta cuando lo dañado es la bomba o el conjunto mismo, y no el depósito; también es la cara. Confirme en un taller cuál de las dos es antes de comprar nada."
+        }
+      }
+    }
+  }
+}

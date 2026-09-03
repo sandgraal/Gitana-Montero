@@ -1,0 +1,181 @@
+{
+  "id": "gen3-crankshaft-bolt-failure",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "engine",
+  "safetyCritical": true,
+  "severity": "damaging",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "wobble-or-knock-at-the-crankshaft-pulley",
+    "accessory-belt-thrown-or-shredded",
+    "battery-light-and-heavy-steering-at-the-same-moment"
+  ],
+  "causes": [
+    {
+      "id": "original-long-crank-bolt-still-fitted"
+    },
+    {
+      "id": "crank-bolt-backed-out-or-broken"
+    },
+    {
+      "id": "belt-tensioner-or-idler-seized"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "identify-the-fitted-bolt-by-part-number",
+      "rulesIn": ["original-long-crank-bolt-still-fitted"]
+    },
+    {
+      "id": "watch-the-crankshaft-pulley-at-idle-for-wobble",
+      "rulesIn": ["crank-bolt-backed-out-or-broken"]
+    },
+    {
+      "id": "spin-each-accessory-pulley-by-hand-with-the-belt-off",
+      "rulesIn": ["belt-tensioner-or-idler-seized"],
+      "rulesOut": ["crank-bolt-backed-out-or-broken"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "have-the-bolt-checked-against-the-torque-specification",
+      "difficulty": 3,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": [
+        "original-long-crank-bolt-still-fitted",
+        "crank-bolt-backed-out-or-broken"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "fit-the-updated-crank-bolt-and-washer",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": [
+        "original-long-crank-bolt-still-fitted",
+        "crank-bolt-backed-out-or-broken"
+      ],
+      "parts": ["gen3-updated-crankshaft-bolt-and-washer-set"],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-tensioner-and-idler-pulleys",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["belt-tensioner-or-idler-seized"],
+      "parts": [
+        "gen3-accessory-drive-belt-tensioner",
+        "gen3-accessory-drive-belt-idler-pulley",
+        "gen3-accessory-drive-belt"
+      ],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen 2, 2.5, 3; SPORT Updated V6 Crankshaft Center Bolt & Washer Set: «the original bolt design was defective and would often back out & break, ruining the crankshaft and possibly other engine components in the process», and the updated bolt's pre-applied thread locker",
+      "url": "https://lusooverland.com/VP-MMC-K-M23-CBWS41",
+      "archiveUrl": "https://web.archive.org/web/20250916222608id_/https://lusooverland.com/VP-MMC-K-M23-CBWS41",
+      "accessed": "2026-09-03",
+      "kind": "vendor"
+    },
+    {
+      "title": "NHTSA recalls database — Mitsubishi Montero, 1996 model year: campaign 00V311001, crankshaft pulley bolt on 3.0L Montero, Montero Sport and 1.5L Mirage engines. Consequence: loss of power steering assist. Remedy on Montero models: tighten to the correct torque specification, replace the bolt only if damaged. Adjacent generation and engine, not this one",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "archiveUrl": "https://web.archive.org/web/20260903015952id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=1996",
+      "accessed": "2026-09-03",
+      "kind": "tsb"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 OEM Timing Belt Kit: recommended additional items, «Revised Crank bolt & Washer — If your Montero is still running with the original defective crank bolt, now is the time to get that out of there!»",
+      "url": "https://lusooverland.com/VP-LO-K-TB005",
+      "archiveUrl": "https://web.archive.org/web/20260902205852id_/https://lusooverland.com/VP-LO-K-TB005",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Crankshaft pulley bolt letting go",
+      "summary": "The Montero specialist who supplies the updated fastener describes the original crankshaft centre bolt as a defective design that would often back out and break, ruining the crankshaft and sometimes other engine components with it, and sells the replacement with thread locker already applied. Mitsubishi ran a factory campaign for the same fastener on the previous generation's smaller V6 and on another model. That campaign is not this engine and this entry does not claim it is — but it is worth reading, because the manufacturer's own stated consequence is a loss of power steering assist and an increased risk of a crash, and the manufacturer's own remedy was to tighten the bolt to the correct torque specification, replacing it only where it was damaged. This entry is scoped to the bolt already going: every symptom below — a pulley you can see wobbling, a knock from the nose of the crankshaft, a thrown accessory belt — is the failure in progress, which is why the triage is do not drive. A truck that simply still has the original bolt in it, with none of those signs, is a different situation: that is the factory campaign's own remedy, a torque check at the next service, not a reason to park it. **A warning about the popular shortcut.** Enthusiasts pass around a way to tell the two bolts apart by eye, from how far the head stands out of the pulley. The suppliers who sell the part do not describe it the same way round as each other, and this site could not reach a source good enough to settle which direction is correct — so it is not printed here. Identify the bolt by its part number instead. Getting that test backwards would tell an owner the defective bolt is the good one.",
+      "slug": "crankshaft-pulley-bolt-letting-go",
+      "symptoms": {
+        "wobble-or-knock-at-the-crankshaft-pulley": "A visible wobble or a knock at the crankshaft pulley with the engine running",
+        "accessory-belt-thrown-or-shredded": "The accessory drive belt thrown off or shredded",
+        "battery-light-and-heavy-steering-at-the-same-moment": "The battery warning light and heavy steering arriving together"
+      },
+      "causes": {
+        "original-long-crank-bolt-still-fitted": "The original long-pattern crankshaft bolt is still in the engine",
+        "crank-bolt-backed-out-or-broken": "The crankshaft bolt has already backed out or broken",
+        "belt-tensioner-or-idler-seized": "A tensioner or idler pulley has seized and thrown the belt"
+      },
+      "diagnosticSteps": {
+        "watch-the-crankshaft-pulley-at-idle-for-wobble": "Watch the crankshaft pulley at idle from the side and look for wobble or movement on the nose",
+        "spin-each-accessory-pulley-by-hand-with-the-belt-off": "With the accessory belt off, spin each pulley by hand and feel for roughness or drag",
+        "identify-the-fitted-bolt-by-part-number": "Have the fitted crankshaft bolt identified by its part number — from a dealer, or by removing it during a timing belt service — rather than by how it looks"
+      },
+      "fixPaths": {
+        "have-the-bolt-checked-against-the-torque-specification": {
+          "title": "Have the bolt checked against the torque specification",
+          "detail": "This is what the factory campaign on the earlier engine asked dealers to do, and it is the cheapest way to find out whether yours has started to move. The figure is a factory specification and belongs on a torque wrench, not on feel."
+        },
+        "fit-the-updated-crank-bolt-and-washer": {
+          "title": "Fit the updated bolt and washer",
+          "detail": "The updated bolt comes with thread locker already applied, and the washer is directional — the bevelled side faces the bolt head. Best done as part of a timing belt service, because that is when the pulley is off anyway, and it is also when the old bolt can be read rather than guessed at."
+        },
+        "replace-the-tensioner-and-idler-pulleys": {
+          "title": "Replace the accessory tensioner and idlers",
+          "detail": "The other reason a belt leaves. Cheaper than the bolt job, and worth confirming first if the pulley itself runs true."
+        }
+      }
+    },
+    "es": {
+      "title": "El tornillo de la polea del cigüeñal cediendo",
+      "summary": "La casa especializada en Montero que suministra el tornillo actualizado describe el tornillo central original del cigüeñal como un diseño defectuoso que se aflojaba y se quebraba con frecuencia, arruinando el cigüeñal y a veces otras piezas del motor, y vende el repuesto con traba-roscas ya aplicado. Mitsubishi corrió una campaña de fábrica por el mismo tornillo en el V6 más pequeño de la generación anterior y en otro modelo. Esa campaña no es de este motor y esta entrada no pretende que lo sea, pero vale leerla: la consecuencia que declara el propio fabricante es la pérdida de asistencia de la dirección hidráulica y mayor riesgo de choque, y la solución del propio fabricante fue apretar el tornillo al torque correcto y cambiarlo solo donde estuviera dañado. Esta entrada está acotada al tornillo que ya va cediendo: todos los síntomas de abajo —una polea que usted ve bambolearse, un golpeteo en la punta del cigüeñal, una faja de accesorios botada— son la falla en curso, y por eso la clasificación es no manejar. Un vehículo que sencillamente todavía trae el tornillo original, sin ninguna de esas señas, es otra situación: eso es lo que la campaña de fábrica resolvía con una revisión de torque en el siguiente servicio, y no es razón para parquearlo. **Una advertencia sobre el atajo popular.** Entre aficionados circula una forma de distinguir los dos tornillos a simple vista, por cuánto sobresale la cabeza de la polea. Las casas que venden la pieza no la describen en el mismo sentido entre ellas, y este sitio no logró alcanzar una fuente lo bastante buena para resolver cuál dirección es la correcta, así que aquí no se imprime. Identifique el tornillo por su número de parte. Equivocarse en esa prueba le diría a un dueño que el tornillo defectuoso es el bueno.",
+      "slug": "tornillo-de-la-polea-del-ciguenal-cediendo",
+      "symptoms": {
+        "wobble-or-knock-at-the-crankshaft-pulley": "Un bamboleo visible o un golpeteo en la polea del cigüeñal con el motor andando",
+        "accessory-belt-thrown-or-shredded": "La faja de accesorios botada o deshilachada",
+        "battery-light-and-heavy-steering-at-the-same-moment": "La luz de la batería y la dirección pesada apareciendo al mismo tiempo"
+      },
+      "causes": {
+        "original-long-crank-bolt-still-fitted": "El tornillo largo original del cigüeñal sigue puesto en el motor",
+        "crank-bolt-backed-out-or-broken": "El tornillo del cigüeñal ya se aflojó o se quebró",
+        "belt-tensioner-or-idler-seized": "Un tensor o una polea loca se trabó y botó la faja"
+      },
+      "diagnosticSteps": {
+        "watch-the-crankshaft-pulley-at-idle-for-wobble": "Observe de lado la polea del cigüeñal en marcha mínima y busque bamboleo o movimiento en la punta",
+        "spin-each-accessory-pulley-by-hand-with-the-belt-off": "Con la faja de accesorios quitada, gire cada polea con la mano y sienta si raspa o se arrastra",
+        "identify-the-fitted-bolt-by-part-number": "Haga identificar el tornillo del cigüeñal montado por su número de parte —en el concesionario, o al sacarlo durante un servicio de faja de distribución— y no por cómo se ve"
+      },
+      "fixPaths": {
+        "have-the-bolt-checked-against-the-torque-specification": {
+          "title": "Que le revisen el tornillo contra la especificación de torque",
+          "detail": "Es lo que la campaña de fábrica del motor anterior les pidió hacer a los concesionarios, y es la forma más barata de averiguar si el suyo ya empezó a moverse. La cifra es una especificación de fábrica y va en llave de torque, no al tacto."
+        },
+        "fit-the-updated-crank-bolt-and-washer": {
+          "title": "Montar el tornillo y la arandela actualizados",
+          "detail": "El tornillo actualizado viene con traba-roscas ya aplicado, y la arandela va en un solo sentido: el lado biselado va hacia la cabeza del tornillo. Conviene hacerlo dentro del servicio de faja de distribución, porque ahí la polea ya está afuera y ahí mismo se puede leer el tornillo viejo en vez de adivinarlo."
+        },
+        "replace-the-tensioner-and-idler-pulleys": {
+          "title": "Cambiar el tensor y las poleas locas de accesorios",
+          "detail": "Es la otra razón por la que se va una faja. Sale más barato que el trabajo del tornillo, y si la polea gira derecha vale confirmarlo primero."
+        }
+      }
+    }
+  }
+}

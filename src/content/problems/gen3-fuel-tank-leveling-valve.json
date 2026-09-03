@@ -1,0 +1,173 @@
+{
+  "id": "gen3-fuel-tank-leveling-valve",
+  "fitment": {
+    "gens": ["gen3"],
+    "markets": ["us"],
+    "years": {
+      "from": 2002,
+      "to": 2004
+    }
+  },
+  "system": "fuel",
+  "severity": "safety-critical",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "petrol-smell-when-parked-facing-uphill",
+    "wet-patch-or-puddle-under-the-rear",
+    "it-only-happens-with-a-full-tank"
+  ],
+  "causes": [
+    {
+      "id": "leveling-valve-not-sealing"
+    },
+    {
+      "id": "filler-neck-or-hose-perished"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "fill-the-tank-then-park-facing-uphill",
+      "rulesIn": ["leveling-valve-not-sealing"]
+    },
+    {
+      "id": "check-whether-it-only-leaks-with-a-full-tank",
+      "rulesIn": ["leveling-valve-not-sealing"],
+      "rulesOut": ["filler-neck-or-hose-perished"]
+    },
+    {
+      "id": "inspect-the-filler-neck-and-hose-from-below",
+      "rulesIn": ["filler-neck-or-hose-perished"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "have-the-campaign-remedy-done",
+      "difficulty": 1,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["leveling-valve-not-sealing"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-fuel-tank-safety-valve",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["leveling-valve-not-sealing"],
+      "parts": ["gen3-fuel-tank-safety-valve"],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-filler-hose",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["filler-neck-or-hose-perished"],
+      "parts": ["gen3-fuel-filler-hose"],
+      "procedures": []
+    }
+  ],
+  "confidence": "tsb",
+  "sources": [
+    {
+      "title": "NHTSA recalls database — Mitsubishi Montero, 2002 model year: campaign 04V319000, fuel tank leveling valve (Mitsubishi recall SR-04-008)",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902173755id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "tsb"
+    },
+    {
+      "title": "NHTSA recalls database — Mitsubishi Montero, 2004 model year: the same campaign 04V319000, confirming the campaign's later covered model years",
+      "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2004",
+      "archiveUrl": "https://web.archive.org/web/20260903165556id_/https://api.nhtsa.gov/recalls/recallsByVehicle?make=mitsubishi&model=montero&modelYear=2004",
+      "accessed": "2026-09-03",
+      "kind": "tsb"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 Fuel Tank Safety Valve",
+      "url": "https://lusooverland.com/VP-LO-MR512157",
+      "archiveUrl": "https://web.archive.org/web/20260902205617id_/https://lusooverland.com/VP-LO-MR512157",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "NHTSA owner-complaint database — Mitsubishi Montero, 2002 model year; VIN-confirmed full-size Montero filings (ODI 769049, 10105501: fuel leaking at the rear wheel well on three separate occasions, and a leak that returned after the campaign repair)",
+      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "archiveUrl": "https://web.archive.org/web/20260902204945id_/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=2002",
+      "accessed": "2026-09-02",
+      "kind": "reference"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Fuel leaks onto the ground with a full tank on a slope",
+      "summary": "A factory safety recall, and one of the few faults on this truck that can start a fire without any warning light. The campaign describes it exactly: with the tank full and the vehicle parked facing forward on an upward slope, the fuel tank leveling valve may stop sealing if the fuel expands as the ambient temperature rises, and fuel can then leak onto the ground. The manufacturer's stated consequence is fire in the presence of an ignition source, and the remedy was to replace the valve. The pattern is what identifies it: no leak on level ground, no leak with half a tank, a puddle and a smell after the truck has sat nose-up in the sun on a full one. It is worth knowing that owners also report fuel leaking at the rear wheel well without that pattern, and one reports a leak that came back after the campaign repair — so a smell of fuel that does not fit the slope-and-full-tank picture still needs finding. Costa Rican driveways and parking spots are rarely level, which makes this a more likely find here than the campaign's home market would suggest.",
+      "slug": "fuel-leak-full-tank-on-a-slope",
+      "symptoms": {
+        "petrol-smell-when-parked-facing-uphill": "A strong petrol smell after the truck has been parked nose-up",
+        "wet-patch-or-puddle-under-the-rear": "A wet patch or a puddle under the rear of the vehicle",
+        "it-only-happens-with-a-full-tank": "It happens with a full tank and never with a half-empty one"
+      },
+      "causes": {
+        "leveling-valve-not-sealing": "The fuel tank leveling valve is no longer sealing as the fuel expands",
+        "filler-neck-or-hose-perished": "Another leak path in the tank plumbing — the filler neck, the rubber filler hose, or a fitting at the rear wheel well"
+      },
+      "diagnosticSteps": {
+        "fill-the-tank-then-park-facing-uphill": "Fill the tank, park facing up a slope in the sun, and come back to look underneath",
+        "check-whether-it-only-leaks-with-a-full-tank": "Repeat the same parking spot with the tank about half full",
+        "inspect-the-filler-neck-and-hose-from-below": "Look up at the filler neck and the rubber hose behind the rear wheel for staining or cracking"
+      },
+      "fixPaths": {
+        "have-the-campaign-remedy-done": {
+          "title": "Have the campaign remedy done",
+          "detail": "Where the campaign applies, a dealer replaces the valve. Ask before you pay for anything else — this is the manufacturer's own fix for the manufacturer's own defect."
+        },
+        "replace-the-fuel-tank-safety-valve": {
+          "title": "Replace the tank valve",
+          "detail": "The part is still supplied for this generation outside the campaign. Fuel work belongs to somebody with the right extinguisher within reach."
+        },
+        "replace-the-filler-hose": {
+          "title": "Replace the filler hose",
+          "detail": "The other place a full tank weeps from, and a cheaper find. Worth checking first because it is visible from underneath without dropping anything."
+        }
+      }
+    },
+    "es": {
+      "title": "Fuga de combustible con el tanque lleno en una cuesta",
+      "summary": "Es una campaña de seguridad de fábrica, y una de las pocas fallas de este vehículo que puede provocar un incendio sin encender ninguna luz de advertencia. La campaña la describe con precisión: con el tanque lleno y el vehículo parqueado de frente en una subida, la válvula niveladora del tanque puede dejar de sellar si el combustible se dilata al subir la temperatura ambiente, y entonces el combustible se derrama al suelo. La consecuencia que declara el fabricante es fuego si hay una fuente de ignición cerca, y la solución fue cambiar la válvula. Lo que la identifica es el patrón: no gotea en plano, no gotea con medio tanque, y aparece el charco y el olor cuando el carro pasó rato con la trompa arriba, al sol y con el tanque lleno. Conviene saber que también hay dueños que reportan fuga de combustible en el pase de rueda trasero sin ese patrón, y uno reporta una fuga que volvió después de la reparación de la campaña: un olor a combustible que no calce con el cuadro de la cuesta y el tanque lleno igual hay que ubicarlo. En Costa Rica los parqueos y las entradas de casa rara vez son planos, así que aquí es un hallazgo más probable de lo que sugeriría el mercado donde salió la campaña.",
+      "slug": "fuga-de-combustible-tanque-lleno-en-cuesta",
+      "symptoms": {
+        "petrol-smell-when-parked-facing-uphill": "Olor fuerte a gasolina después de que el carro estuvo parqueado con la trompa hacia arriba",
+        "wet-patch-or-puddle-under-the-rear": "Mancha húmeda o charco debajo de la parte trasera del vehículo",
+        "it-only-happens-with-a-full-tank": "Ocurre con el tanque lleno y nunca con el tanque a medias"
+      },
+      "causes": {
+        "leveling-valve-not-sealing": "La válvula niveladora del tanque ya no sella cuando el combustible se dilata",
+        "filler-neck-or-hose-perished": "Otra vía de fuga en la tubería del tanque: el cuello de llenado, la manguera de hule de llenado, o una conexión en el pase de rueda trasero"
+      },
+      "diagnosticSteps": {
+        "fill-the-tank-then-park-facing-uphill": "Llene el tanque, parquee de frente en una subida al sol y vuelva a revisar por debajo",
+        "check-whether-it-only-leaks-with-a-full-tank": "Repita en el mismo lugar con el tanque a la mitad",
+        "inspect-the-filler-neck-and-hose-from-below": "Revise desde abajo el cuello de llenado y la manguera de hule detrás de la rueda trasera, buscando manchas o grietas"
+      },
+      "fixPaths": {
+        "have-the-campaign-remedy-done": {
+          "title": "Que le hagan la reparación de la campaña",
+          "detail": "Donde aplica la campaña, el concesionario cambia la válvula. Pregunte antes de pagar cualquier otra cosa: esta es la solución del propio fabricante para un defecto propio."
+        },
+        "replace-the-fuel-tank-safety-valve": {
+          "title": "Cambiar la válvula del tanque",
+          "detail": "El repuesto se sigue consiguiendo para esta generación fuera de la campaña. El trabajo con combustible es de alguien que tenga el extintor a mano."
+        },
+        "replace-the-filler-hose": {
+          "title": "Cambiar la manguera de llenado",
+          "detail": "El otro punto por donde rezuma un tanque lleno, y sale más barato. Vale revisarla primero porque se ve desde abajo sin desmontar nada."
+        }
+      }
+    }
+  }
+}

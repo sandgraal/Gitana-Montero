@@ -176,18 +176,241 @@ export const SKIP_REASONS = {
     "GARAGE_LIVE is set but no Supabase stack answered on the local URL",
   nonLocal:
     "SUPABASE_URL points somewhere that is not loopback — refusing to run",
+  wrongProject:
+    "the stack on that port is NOT this project's — refusing to run",
 } as const;
+
+/**
+ * The tables a stack must expose to be recognised as this project's.
+ *
+ * Not a version check and not a hash — a fingerprint. A PostgREST instance
+ * exposing all four of these is this repo's stack for any purpose a grader
+ * cares about, and one exposing none of them is somebody else's.
+ */
+const PROJECT_FINGERPRINT_TABLES = [
+  "profiles",
+  "vehicles",
+  "records",
+  "receipts",
+] as const;
+
+/**
+ * Whether an exposed-table list identifies this project's stack, or a sentence
+ * saying why not.
+ *
+ * ## Loopback is not the same question as "this project" (T2-401 review, F8)
+ *
+ * `assertLocalTarget` answers "is this my machine". It does not answer "is this
+ * my project", and on a developer machine those come apart constantly: the
+ * Supabase CLI gives every project the same default ports, so
+ * `127.0.0.1:54321` is **whichever checkout started first**. Observed on this
+ * machine while T2-401 was written — an unrelated project held 54321/54322 and
+ * monterogarage came up on 56321/56322.
+ *
+ * That is not a cosmetic problem here. `provisionScenario` creates two accounts
+ * and `teardownScenario` deletes them, the harness mints its own `service_role`
+ * JWT from the CLI's **published default secret**, and a foreign local stack
+ * shares that secret. So `GARAGE_LIVE=1 npm run test:garage` with default URLs
+ * would have provisioned and deleted users in a stranger's database. The blast
+ * radius is bounded — teardown only removes the two accounts it created — but
+ * "bounded" is not the standard this directory holds itself to, and the
+ * constitution's "never a production credential" is the same instinct one port
+ * over.
+ *
+ * Pure and exported so it is graded without a stack: the failure it prevents
+ * only happens on a machine running two projects, which is precisely the
+ * failure an integration test on a clean runner will never reproduce.
+ */
+export function projectFingerprintIssue(
+  exposed: readonly string[],
+  expected: readonly string[] = PROJECT_FINGERPRINT_TABLES
+): string | null {
+  if (expected.length === 0) {
+    return "no fingerprint tables declared — nothing identifies this project";
+  }
+
+  // ## The asymmetry, and why it runs this way round
+  //
+  // An empty enumeration is **"cannot tell"**, not "wrong project", and the
+  // difference was measured rather than assumed. PostgREST's OpenAPI document
+  // lists only what the *calling role* can reach, so:
+  //
+  // - probed as `anon`, a correctly locked-down project enumerates **nothing**
+  //   — which is true of this repo's own schema, since T2-202 revokes every
+  //   privilege from `anon`. An anon-based fingerprint would therefore have
+  //   refused the real stack and switched the whole behavioural tier off in
+  //   silence. Observed: 0 tables from a real, healthy stack.
+  // - probed as `service_role`, a foreign stack sharing the CLI's default
+  //   secret enumerates its own tables happily. Observed: 7, including
+  //   `subscriptions` and `stripe_webhook_events` — a project that is
+  //   emphatically not this one.
+  //
+  // So the guard refuses only on **positive** evidence of a different schema,
+  // and stays out of the way when the answer is uninformative. Refusing on
+  // silence would trade a rare, bounded, human-noticeable hazard for a
+  // permanent and invisible loss of Tier B, and a tier that never runs is
+  // indistinguishable from a tier that passes.
+  if (exposed.length === 0) return null;
+
+  const present = new Set(exposed);
+  const missing = expected.filter((table) => !present.has(table));
+  if (missing.length === 0) return null;
+
+  const found = exposed
+    .filter((name) => !name.startsWith("rpc/"))
+    .slice(0, 5)
+    .join(", ");
+  return (
+    `${SKIP_REASONS.wrongProject} (it does not expose ${missing.join(", ")}; ` +
+    `it exposes ${found || "no tables"}). The Supabase CLI gives every project ` +
+    `the same default ports, so the stack on this one belongs to another ` +
+    `checkout — set SUPABASE_URL to the port \`supabase status\` reports here`
+  );
+}
+
+/**
+ * The table and RPC names a PostgREST instance exposes, from its OpenAPI
+ * document, **as the service role**.
+ *
+ * The role matters and is the whole reason this works — see the note in
+ * `projectFingerprintIssue`. The service-role token is the credential the
+ * harness is about to use to create accounts anyway, so probing with it asks
+ * exactly the question that matters: *what would I be writing into?*
+ *
+ * Returns `null` when the document cannot be read or parsed — **not** an empty
+ * list. An empty list is a different answer ("this role sees no tables") and
+ * the caller treats it differently (AGENTS.md: a failure is not a zero).
+ */
+async function exposedTables(
+  url: string,
+  token: string
+): Promise<string[] | null> {
+  try {
+    const response = await fetch(`${url}/rest/v1/`, {
+      signal: AbortSignal.timeout(3000),
+      headers: { apikey: token, authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return null;
+    const document = (await response.json()) as {
+      paths?: Record<string, unknown>;
+    };
+    if (!document.paths) return null;
+    return Object.keys(document.paths)
+      .filter((path) => path.startsWith("/") && path.length > 1)
+      .map((path) => path.slice(1));
+  } catch {
+    return null;
+  }
+}
 
 export type LiveDecision =
   | { readonly available: true; readonly stack: LiveStack }
   | { readonly available: false; readonly reason: string };
 
 /**
+ * The role the fingerprint probe asks as.
+ *
+ * **`service_role`, and the choice is the guard.** See
+ * `projectFingerprintIssue`: probed as `anon`, a correctly locked-down project
+ * enumerates *nothing*, so an anon probe silently disables the whole
+ * wrong-project check while every test stays green. That is not hypothetical —
+ * it is a one-word mutation, and the second review demonstrated it surviving.
+ *
+ * It is also the honest question to ask: `service_role` is the credential the
+ * harness is about to create and delete accounts with, so probing with it asks
+ * *what would I be writing into?* rather than *what can a stranger read?*
+ *
+ * Named here, used once, and asserted by `harness-contract.test.ts` through an
+ * injected observer that decodes the token it was handed.
+ */
+export const FINGERPRINT_PROBE_ROLE: JwtClaims["role"] = "service_role";
+
+/** What one look at a candidate stack found. */
+export interface StackObservation {
+  /** `null` when the health endpoint answered; a sentence when it did not. */
+  readonly unreachable: string | null;
+  /**
+   * The relations the probe role can see, or `null` when the instance did not
+   * describe itself. `null` and `[]` are different answers — see
+   * `projectFingerprintIssue`.
+   */
+  readonly exposed: readonly string[] | null;
+}
+
+/**
+ * Turn an observation into a decision. **Pure.**
+ *
+ * ## Why this is split out (T2-401 second review)
+ *
+ * `projectFingerprintIssue` was well covered, and the code that *used* it was
+ * not: mutating `if (wrongProject !== null)` to `if (false && …)` left the
+ * whole suite green. The detection logic was graded; the refusal was not, and
+ * the refusal is the part that stops the harness writing into a stranger's
+ * database. A guard whose only untested line is the one that acts on the
+ * finding is a guard that can be deleted in a code review nobody questions.
+ *
+ * So the decision is a pure function of what was observed, and
+ * `harness-contract.test.ts` drives it directly with a foreign table list.
+ */
+export function liveDecisionFrom(
+  observation: StackObservation,
+  stack: LiveStack
+): LiveDecision {
+  if (observation.unreachable !== null) {
+    return {
+      available: false,
+      reason: `${SKIP_REASONS.unreachable} (${stack.url}: ${observation.unreachable})`,
+    };
+  }
+  const wrongProject =
+    observation.exposed === null
+      ? null
+      : projectFingerprintIssue(observation.exposed);
+  if (wrongProject !== null) {
+    return { available: false, reason: `${wrongProject} — ${stack.url}` };
+  }
+  return { available: true, stack };
+}
+
+/** Look at a stack: is it answering, and what does the probe role see? */
+async function observeStack(
+  stack: LiveStack,
+  probeToken: string
+): Promise<StackObservation> {
+  try {
+    const response = await fetch(`${stack.url}/auth/v1/health`, {
+      signal: AbortSignal.timeout(3000),
+      headers: { apikey: mintJwt({ role: "anon" }, stack.jwtSecret) },
+    });
+    if (!response.ok) {
+      return { unreachable: `→ ${response.status}`, exposed: null };
+    }
+  } catch (error) {
+    return { unreachable: (error as Error).message, exposed: null };
+  }
+  return {
+    unreachable: null,
+    exposed: await exposedTables(stack.url, probeToken),
+  };
+}
+
+/** How `detectLiveStack` looks at a stack. Injected so the wiring is gradeable. */
+export type StackObserver = (
+  stack: LiveStack,
+  probeToken: string
+) => Promise<StackObservation>;
+
+/**
  * Decide whether Tier B can run, without ever touching the network unless
  * someone asked for it by setting `GARAGE_LIVE`.
+ *
+ * `observe` is a parameter so a grader can hand this a stack that answers
+ * however the grader likes — and, critically, can decode the probe token it
+ * receives and assert the role it was minted with.
  */
 export async function detectLiveStack(
-  env: NodeJS.ProcessEnv = process.env
+  env: NodeJS.ProcessEnv = process.env,
+  observe: StackObserver = observeStack
 ): Promise<LiveDecision> {
   if (env.GARAGE_LIVE !== "1") {
     return { available: false, reason: SKIP_REASONS.notEnabled };
@@ -202,24 +425,15 @@ export async function detectLiveStack(
     };
   }
   const jwtSecret = env.SUPABASE_JWT_SECRET ?? DEFAULT_LOCAL_JWT_SECRET;
-  try {
-    const response = await fetch(`${url}/auth/v1/health`, {
-      signal: AbortSignal.timeout(3000),
-      headers: { apikey: mintJwt({ role: "anon" }, jwtSecret) },
-    });
-    if (!response.ok) {
-      return {
-        available: false,
-        reason: `${SKIP_REASONS.unreachable} (${url} → ${response.status})`,
-      };
-    }
-  } catch (error) {
-    return {
-      available: false,
-      reason: `${SKIP_REASONS.unreachable} (${url}: ${(error as Error).message})`,
-    };
-  }
-  return { available: true, stack: { url, jwtSecret } };
+  const stack: LiveStack = { url, jwtSecret };
+
+  // Loopback is not the same question as "this project" — see
+  // `projectFingerprintIssue`. This runs before any grader provisions an
+  // account, because provisioning is the irreversible half.
+  return liveDecisionFrom(
+    await observe(stack, mintJwt({ role: FINGERPRINT_PROBE_ROLE }, jwtSecret)),
+    stack
+  );
 }
 
 /**

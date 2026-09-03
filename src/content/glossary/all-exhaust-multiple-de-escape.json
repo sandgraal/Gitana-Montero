@@ -1,0 +1,67 @@
+{
+  "id": "all-exhaust-multiple-de-escape",
+  "fitment": {
+    "gens": ["gen1", "gen2", "gen2-5", "gen3", "gen4"]
+  },
+  "system": "exhaust",
+  "aliases": [
+    {
+      "term": "exhaust manifolds",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "header",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "headers",
+      "locale": "en",
+      "countries": ["US"]
+    },
+    {
+      "term": "manifold",
+      "locale": "es",
+      "countries": ["CR"]
+    },
+    {
+      "term": "colector de escape",
+      "locale": "es",
+      "countries": ["ES", "CR"]
+    },
+    {
+      "term": "colectores de escape",
+      "locale": "es",
+      "countries": ["ES", "CR"]
+    }
+  ],
+  "relatedTerms": ["all-exhaust-catalizador", "all-exhaust-mufla"],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Truck Depot Costa Rica — «Manifold / Colector / Múltiple de escape y accesorios», categoría de repuestos",
+      "url": "https://truckdepot.cr/componentes-de-motor/motor/manifold-colector-multiple-de-escape-accesorios.html",
+      "archiveUrl": "https://web.archive.org/web/20260902210346id_/https://truckdepot.cr/componentes-de-motor/motor/manifold-colector-multiple-de-escape-accesorios.html",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 NM 3.5L Exhaust Manifold, Left / Driver",
+      "url": "https://lusooverland.com/VP-LO-MR497481",
+      "archiveUrl": "https://web.archive.org/web/20260902205706id_/https://lusooverland.com/VP-LO-MR497481",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "exhaust manifold",
+      "summary": "The cast iron part bolted to the cylinder head that gathers the exhaust from each cylinder into one pipe. A V6 has one per bank. They crack with age and heat cycling, and the crack usually announces itself as a tick that fades as the engine warms. Costa Rican parts catalogues list it as múltiple de escape, and also under the English word manifold."
+    },
+    "es": {
+      "title": "múltiple de escape",
+      "summary": "La pieza de hierro fundido atornillada al cabezote que junta el escape de cada cilindro en un solo tubo. Un V6 lleva uno por banco. Se rajan con los años y con los ciclos de calor, y la rajadura suele avisar con un tictac que se apaga conforme el motor calienta. Pídalo así, como múltiple de escape: es el nombre con que lo listan las casas de repuestos ticas, aunque en el mostrador le entiendan también los otros nombres que aparecen abajo."
+    }
+  }
+}

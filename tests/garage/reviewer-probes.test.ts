@@ -55,6 +55,8 @@ import {
   authUidComparands,
   bucketPolicyIssues,
   bucketPrivacyIssues,
+  capabilityGateIssues,
+  defaultPrivilegeGrantIssues,
   definerSearchPathIssues,
   effectiveCheck,
   expiryCheckIssues,
@@ -64,13 +66,18 @@ import {
   isOptionalColumn,
   isOwnerScoped,
   isTautological,
+  optimisticBooleanDefaultIssues,
   plaintextTokenColumnIssues,
+  presetBranchIssues,
   projectionIssues,
+  refusalShapeIssues,
   revocationCheckIssues,
+  revocationGatingIssues,
   rowAliases,
   splitTopLevel,
   storagePolicyIssues,
   stripSubqueries,
+  subqueryCorrelationIssues,
   subqueryTables,
   tableGrantIssues,
   tokenHashIssues,
@@ -90,6 +97,7 @@ import {
   functions,
   grants,
   isNotNullFor,
+  migrationSql,
   normalizeSql,
   policies,
   privilegeVerdict,
@@ -1292,6 +1300,71 @@ const G9B_REVOKE_ONLY = sql(`
 `);
 
 /**
+ * G26 — **T2-401 review, F1**: the same leak, spelled with identifier quotes.
+ *
+ * `grant select on public.records to "anon";` is valid SQL and means exactly
+ * what G9's last line means. Before the fix, `parseRoles` kept the quotes, so
+ * the role was recorded as the literal `"anon"`, matched nothing in
+ * `ANONYMOUS_ROLES`, and **every rule built on the grant replay returned zero
+ * findings** — verified by direct execution against the shipped parser.
+ *
+ * Two characters, and the whole of T2-401a is switched off. That is why the
+ * variants below are a table rather than one probe: the bypass is available at
+ * every call site that names a role, so each of them is asked.
+ */
+const G26_QUOTED_ROLE_GRANT = sql(`
+  revoke all on public.records from anon;
+  revoke all on public.records from public;
+  revoke all on public.records from authenticated;
+  grant select, insert, update, delete on public.records to authenticated;
+  grant select on public.records to "anon";
+`);
+
+/** G26b — quoted `"public"`, which reaches `anon` without naming it. */
+const G26B_QUOTED_PUBLIC_GRANT = sql(`
+  revoke all on public.records from anon;
+  revoke all on public.records from public;
+  revoke all on public.records from authenticated;
+  grant select, insert, update, delete on public.records to authenticated;
+  grant select on public.records to "public";
+`);
+
+/** G26c — the default-privileges half, quoted (T2-401's own new rule). */
+const G26C_QUOTED_ADP_GRANT = sql(`
+  alter default privileges in schema public grant select on tables to "anon";
+`);
+
+/** G26d — a quoted role in a bulk grant over a quoted schema. */
+const G26D_QUOTED_BULK_GRANT = sql(`
+  create table public.records (id uuid primary key);
+  revoke all on public.records from anon;
+  revoke all on public.records from public;
+  revoke all on public.records from authenticated;
+  grant select, insert, update, delete on public.records to authenticated;
+  grant select on all tables in schema "public" to "anon";
+`);
+
+/** G26e — a quoted role on an anon-executable function. */
+const G26E_QUOTED_FUNCTION_GRANT = sql(`
+  create function public.share_read_everything(p_token text)
+  returns table (id uuid)
+  language sql stable security definer set search_path = ''
+  as $share$ select r.id from public.records r; $share$;
+
+  revoke all on function public.share_read_everything(text) from public;
+  grant execute on function public.share_read_everything(text) to "anon";
+`);
+
+/** G26f — a quoted role on a policy. */
+const G26F_QUOTED_POLICY_ROLE = sql(`
+  create table public.records (id uuid primary key, vehicle_id uuid not null);
+  alter table public.records enable row level security;
+  alter table public.records force row level security;
+  create policy "records readable" on public.records
+    for select to "anon" using (true);
+`);
+
+/**
  * G10 — **the recorded defect (2)**: a fifth user table nothing enumerates.
  *
  * `for all to anon using (true)` and no `force`. Every table-level grader is
@@ -1706,8 +1779,28 @@ describe("WIDE-OPEN: the two recorded grader defects", () => {
     );
   });
 
+  /**
+   * The enumerated list as it stood when G10 was recorded — the four tables
+   * T2-202 shipped.
+   *
+   * Passed explicitly rather than read from `USER_TABLE_NAMES`, because
+   * T2-401 added `shares` to the contract (pending T2-404) and the live list
+   * therefore no longer reproduces the defect. A probe that grades a rule must
+   * not silently become a probe that grades the contract: this keeps G10
+   * asking "is a table outside the list invisible?", which is the question the
+   * rule exists to answer, for as long as the rule exists.
+   */
+  const ENUMERATED_BEFORE_G10 = [
+    "profiles",
+    "vehicles",
+    "records",
+    "receipts",
+  ] as const;
+
   it("G10 rejects a fifth table nothing enumerates", () => {
-    const issues = ungradedTableIssues(G10_FIFTH_TABLE).join(" | ");
+    const issues = ungradedTableIssues(G10_FIFTH_TABLE, {
+      enumerated: ENUMERATED_BEFORE_G10,
+    }).join(" | ");
 
     expect(issues).toContain("public.shares");
     expect(issues).toContain("not enumerated in USER_TABLES");
@@ -1715,14 +1808,32 @@ describe("WIDE-OPEN: the two recorded grader defects", () => {
   });
 
   it("G10: the graders it dodges report nothing about it — the false pass", () => {
-    // Recorded verbatim. `userTablePolicyIssues` filters to
-    // `USER_TABLE_NAMES`, so the wide-open `for all to anon using (true)`
-    // policy on `shares` is invisible to it. The finding has to come from the
-    // other direction — from what the directory *creates*.
-    const blind = userTablePolicyIssues(G10_FIFTH_TABLE, [...USER_TABLE_NAMES]);
+    // Recorded verbatim. `userTablePolicyIssues` filters to the enumerated
+    // list, so the wide-open `for all to anon using (true)` policy on `shares`
+    // is invisible to it. The finding has to come from the other direction —
+    // from what the directory *creates*.
+    const blind = userTablePolicyIssues(G10_FIFTH_TABLE, ENUMERATED_BEFORE_G10);
 
     expect(blind.filter((issue) => issue.includes("shares"))).toEqual([]);
-    expect(ungradedTableIssues(G10_FIFTH_TABLE)).not.toEqual([]);
+    expect(
+      ungradedTableIssues(G10_FIFTH_TABLE, {
+        enumerated: ENUMERATED_BEFORE_G10,
+      })
+    ).not.toEqual([]);
+  });
+
+  it("G10: the contract now enumerates `shares` — the defect is closed", () => {
+    // The other half of the historical note, and the reason the probes above
+    // pass their list explicitly. T2-401 declared `shares` in `USER_TABLES` as
+    // a pending entry, so the live default no longer reports it as ungraded —
+    // which is the fix working, not the rule weakening. Asserted here so that
+    // if `shares` were ever quietly dropped from the contract, this file says
+    // so rather than the G10 probes silently starting to grade the contract
+    // instead of the rule.
+    expect([...USER_TABLE_NAMES]).toContain("shares");
+    expect(ungradedTableIssues(G10_FIFTH_TABLE).join(" | ")).not.toContain(
+      "not enumerated"
+    );
   });
 
   it("G10: enumerating the table clears the enumeration finding, not the RLS one", () => {
@@ -2509,5 +2620,879 @@ describe("createdTables() — what exists, replayed", () => {
     expect(createdTables(other).map((table) => table.identity)).toEqual([
       "public.shares",
     ]);
+  });
+});
+
+/* =========================================================================
+ * F. T2-401's probes — the typed-grant rules, and defect (d)
+ *
+ * Same standard as everything above: every rule gets a fixture it must reject
+ * **and** a fixture it must accept, and each was mutation-tested by breaking
+ * the rule on purpose and confirming the corpus went red. A rule with no
+ * accept-case can drift over-strict for months before anyone notices, which is
+ * how a real security rule gets deleted instead of fixed — and that is exactly
+ * defect (d) below.
+ * ====================================================================== */
+
+/** Rewrite one line of the reference reader, for the T2-401 rules. */
+function variantReader(from: string, to: string): FunctionDefinition {
+  const rewritten = CORRECT_SHARE_READER.replace(from, to);
+  if (rewritten === CORRECT_SHARE_READER) {
+    throw new Error(`probe fixture did not change: "${from}" not found`);
+  }
+  return readerOf(rewritten);
+}
+
+/**
+ * **(d) — the missing accept-case on the `setof` rule.** Recorded in T2-401's
+ * brief, found in T2-401a's round-2 review, and this is the one fixture that
+ * closes it.
+ *
+ * `returns setof <user table>` is rejected and pinned by G6. Nothing asserted
+ * that `returns setof <non-user-table>` is **accepted** — so the rule could
+ * become over-strict, start rejecting a legitimate return shape, and no test
+ * would say a word. That is the direction that gets a security rule deleted
+ * rather than fixed: a rule which flags correct code is a rule somebody
+ * removes under deadline.
+ *
+ * Three legitimate shapes, because `setof` has three common non-table
+ * operands and a naive tightening breaks a different one each time: a composite
+ * type, a view, and a scalar/base type.
+ */
+const G18_SETOF_NON_USER_TABLE: [string, string][] = [
+  [
+    "a composite type",
+    `create type public.share_record as (id uuid, occurred_on date);
+     create function public.share_read_records(p_token text)
+     returns setof public.share_record
+     language sql stable security definer set search_path = ''
+     as $share$
+       select r.id, r.occurred_on
+       from public.records r
+       join public.shares s on s.vehicle_id = r.vehicle_id
+       where s.token_hash = extensions.digest(p_token, 'sha256')
+         and s.revoked_at is null
+         and s.expires_at > now();
+     $share$;`,
+  ],
+  [
+    "a view",
+    `create function public.share_read_records(p_token text)
+     returns setof public.share_records_view
+     language sql stable security definer set search_path = ''
+     as $share$
+       select v.id, v.occurred_on
+       from public.share_records_view v
+       join public.shares s on s.vehicle_id = v.vehicle_id
+       where s.token_hash = extensions.digest(p_token, 'sha256')
+         and s.revoked_at is null
+         and s.expires_at > now();
+     $share$;`,
+  ],
+  [
+    "a base type",
+    `create function public.share_read_record_ids(p_token text)
+     returns setof uuid
+     language sql stable security definer set search_path = ''
+     as $share$
+       select r.id
+       from public.records r
+       join public.shares s on s.vehicle_id = r.vehicle_id
+       where s.token_hash = extensions.digest(p_token, 'sha256')
+         and s.revoked_at is null
+         and s.expires_at > now();
+     $share$;`,
+  ],
+];
+
+/** G19 — a reader that branches on the preset instead of the capabilities. */
+const G19_BRANCHES_ON_KIND = variantReader(
+  "and s.expires_at > now()",
+  "and s.expires_at > now() and s.kind = 'mechanic'"
+);
+
+/** G20 — cost columns returned with no capability gate at all (SHR-06). */
+const G20_UNGATED_COSTS = variantReader(
+  "select r.id, r.occurred_on, r.kind",
+  "select r.id, r.occurred_on, r.kind, r.cost_amount, r.cost_currency"
+);
+
+/**
+ * G20c — **T2-401 review, F2**: the two decisions collapsed into one.
+ *
+ * A receipts reader that requires `includes_costs` **as well as**
+ * `includes_receipts`. SHR-06 says the two open independently, so a grant with
+ * `costs=false receipts=true` — the cell this branch's own files call "the cell
+ * that matters most", the one a single `full_access` boolean cannot express —
+ * gets nothing from this reader.
+ *
+ * The clause that catches it shipped with **no probe at all**: the reviewer
+ * neutered it and the whole suite stayed green. It is the only detector for
+ * this defect, so it was the one clause in the rule that could not fail.
+ */
+const G20C_RECEIPTS_BEHIND_COSTS = readerOf(
+  sql(`
+    create function public.share_read_receipts(p_token text)
+    returns table (id uuid, storage_path text)
+    language sql stable security definer set search_path = ''
+    as $share$
+      select x.id, x.storage_path
+      from public.receipts x
+      join public.records r on r.id = x.record_id
+      join public.shares s on s.vehicle_id = r.vehicle_id
+      where s.token_hash = extensions.digest(p_token, 'sha256')
+        and s.revoked_at is null
+        and s.expires_at > now()
+        and s.includes_costs = true
+        and s.includes_receipts = true;
+    $share$;
+  `)
+);
+
+/** G20d — the same reader gated on receipts ALONE. The accept case. */
+const G20D_RECEIPTS_ALONE = readerOf(
+  sql(`
+    create function public.share_read_receipts(p_token text)
+    returns table (id uuid, storage_path text)
+    language sql stable security definer set search_path = ''
+    as $share$
+      select x.id, x.storage_path
+      from public.receipts x
+      join public.records r on r.id = x.record_id
+      join public.shares s on s.vehicle_id = r.vehicle_id
+      where s.token_hash = extensions.digest(p_token, 'sha256')
+        and s.revoked_at is null
+        and s.expires_at > now()
+        and s.includes_receipts = true;
+    $share$;
+  `)
+);
+
+/** G20b — the same columns, correctly gated. The accept case. */
+const G20B_GATED_COSTS = readerOf(
+  sql(`
+    create function public.share_read_records(p_token text)
+    returns table (id uuid, cost_amount numeric)
+    language sql stable security definer set search_path = ''
+    as $share$
+      select r.id, r.cost_amount
+      from public.records r
+      join public.shares s on s.vehicle_id = r.vehicle_id
+      where s.token_hash = extensions.digest(p_token, 'sha256')
+        and s.revoked_at is null
+        and s.expires_at > now()
+        and s.includes_costs = true;
+    $share$;
+  `)
+);
+
+/** G21 — a refusal that tells the caller which of the three cases it hit. */
+const G21_TALKATIVE_REFUSAL = readerOf(
+  sql(`
+    create function public.share_read_records(p_token text)
+    returns table (id uuid)
+    language plpgsql stable security definer set search_path = ''
+    as $share$
+    declare g public.shares;
+    begin
+      select * into g from public.shares
+       where token_hash = extensions.digest(p_token, 'sha256');
+      if not found then raise exception 'not found'; end if;
+      if g.revoked_at is not null then raise exception 'grant revoked'; end if;
+      if g.expires_at < now() then raise exception 'grant expired'; end if;
+      return query select r.id from public.records r where r.vehicle_id = g.vehicle_id;
+    end;
+    $share$;
+  `)
+);
+
+/** G21b — one refusal, said the same way whatever happened. The accept case. */
+const G21B_UNIFORM_REFUSAL = readerOf(
+  sql(`
+    create function public.share_read_records(p_token text)
+    returns table (id uuid)
+    language plpgsql stable security definer set search_path = ''
+    as $share$
+    declare g public.shares;
+    begin
+      select * into g from public.shares
+       where token_hash = extensions.digest(p_token, 'sha256')
+         and revoked_at is null
+         and expires_at > now();
+      if not found then raise exception 'no'; end if;
+      return query select r.id from public.records r where r.vehicle_id = g.vehicle_id;
+    end;
+    $share$;
+  `)
+);
+
+/**
+ * G22 — revocation that consults a plan (SHR-08, 003 MON-02).
+ *
+ * Signature matches `SHARE_REVOKE_ARGUMENTS` (`p_share_id`), which is the
+ * contract every call site now builds from — see F3 in `share-fixtures.ts`.
+ * A probe modelling a signature nothing else uses is a probe about a function
+ * that will never exist.
+ */
+const G22_GATED_REVOCATION = readerOf(
+  sql(`
+    create function public.revoke_share_grant(p_share_id uuid)
+    returns void
+    language sql security definer set search_path = ''
+    as $revoke$
+      update public.shares s set revoked_at = now()
+       where s.id = p_share_id
+         and exists (select 1 from public.subscriptions b
+                      where b.owner_id = (select auth.uid())
+                        and b.status = 'active');
+    $revoke$;
+  `)
+);
+
+/** G22b — revocation that consults ownership and nothing else. Accept case. */
+const G22B_UNGATED_REVOCATION = readerOf(
+  sql(`
+    create function public.revoke_share_grant(p_share_id uuid)
+    returns void
+    language sql security definer set search_path = ''
+    as $revoke$
+      update public.shares s set revoked_at = now()
+       where s.id = p_share_id
+         and exists (select 1 from public.vehicles v
+                      where v.id = s.vehicle_id
+                        and v.owner_id = (select auth.uid()));
+    $revoke$;
+  `)
+);
+
+/** G23 — every future object in the schema, handed to anon by one line. */
+const G23_ADP_GRANT = sql(`
+  alter default privileges in schema public grant select on tables to anon;
+`);
+
+/** G23b — the revoke half, which is what the schema actually ships. */
+const G23B_ADP_REVOKE = sql(`
+  alter default privileges in schema public revoke all on tables from anon;
+  alter default privileges in schema public revoke all on tables from public;
+`);
+
+/**
+ * G24 — the two optimistic defaults the old name-shaped sweep walked past.
+ *
+ * Both verified against the shipped regex, which needed `is_` *and*
+ * `public|shared|visible` *and* `default true`, all three.
+ */
+const G24_OPTIMISTIC_DEFAULTS = sql(`
+  create table public.shares (
+    id uuid primary key,
+    includes_costs boolean not null default true,
+    is_active boolean not null default true,
+    includes_receipts boolean not null default false
+  );
+`);
+
+/** G24b — the same table, private by default. The accept case. */
+const G24B_HONEST_DEFAULTS = sql(`
+  create table public.shares (
+    id uuid primary key,
+    includes_costs boolean not null default false,
+    is_active boolean not null default false,
+    includes_receipts boolean not null default false
+  );
+`);
+
+/** G24c — created honest, flipped later by an `alter table`. */
+const G24C_FLIPPED_LATER = sql(`
+  create table public.shares (
+    id uuid primary key,
+    includes_costs boolean not null default false
+  );
+  alter table public.shares alter column includes_costs set default true;
+`);
+
+describe("T2-401 (d): the `setof` rule has an ACCEPT case at last", () => {
+  it.each(G18_SETOF_NON_USER_TABLE)(
+    "accepts `returns setof` %s",
+    (_label, fixture) => {
+      // The defect, closed. Without this, `projectionIssues` could be tightened
+      // — say, to reject every `setof` — and the only signal would be T2-404
+      // failing to ship a legitimate return shape, at which point the rule gets
+      // deleted rather than fixed.
+      const routines = functions(sql(fixture));
+
+      expect(routines.length).toBeGreaterThan(0);
+      expect(routines.flatMap(projectionIssues)).toEqual([]);
+    }
+  );
+
+  it("still rejects `returns setof` a USER table — the rule did not go soft", () => {
+    // The paired half. An accept-case that was added by loosening the rule
+    // would be worse than no accept-case at all.
+    expect(
+      projectionIssues(readerOf(G6_SETOF_USER_TABLE)).join(" | ")
+    ).toContain("returns `setof records`");
+  });
+
+  it("the accept and reject cases differ ONLY in the return type", () => {
+    // Guards against the accept fixtures passing for an unrelated reason —
+    // a body that names its columns, say, which every one of them does.
+    for (const [, fixture] of G18_SETOF_NON_USER_TABLE) {
+      expect(fixture).toMatch(/returns setof/);
+      expect(fixture).not.toMatch(/select\s+[a-z]*\.?\*/);
+    }
+  });
+});
+
+describe("T2-401 F1: an identifier-quoted role is still that role", () => {
+  // The bypass, at every call site that names a role. One-line root fix in
+  // `parseRoles`; six probes, because the rule it defeats is different at each
+  // of them and a fix that only reached one would look complete.
+
+  it('G26 rejects `to "anon"` — the end-state ACL, quotes and all', () => {
+    expect(
+      tableGrantIssues(G26_QUOTED_ROLE_GRANT, ["records"]).join(" | ")
+    ).toContain("anon holds select");
+  });
+
+  it("G26: the UNQUOTED spelling of the same leak is caught identically", () => {
+    // The pair that makes the claim "quoting changes nothing" checkable rather
+    // than asserted. Same directory, same verdict.
+    expect(tableGrantIssues(G26_QUOTED_ROLE_GRANT, ["records"])).toEqual(
+      tableGrantIssues(G9_REVOKE_THEN_GRANT, ["records"])
+    );
+  });
+
+  it('G26b rejects `to "public"` — the role that IS anon', () => {
+    // `public` is not a role beside `anon`, it is every role. Quoted or not, a
+    // privilege granted to it is a privilege `anon` holds.
+    expect(
+      tableGrantIssues(G26B_QUOTED_PUBLIC_GRANT, ["records"]).join(" | ")
+    ).toContain("public holds select");
+  });
+
+  it("G26c rejects a quoted role in `alter default privileges`", () => {
+    // T2-401's own new rule, defeated by the same two characters. Recorded
+    // separately because `defaultPrivilegeGrantIssues` reads a different parser
+    // path (`adp`) from the object grants above.
+    expect(
+      defaultPrivilegeGrantIssues(G26C_QUOTED_ADP_GRANT).join(" | ")
+    ).toContain("every FUTURE object");
+  });
+
+  it("G26d rejects a quoted role over a quoted schema in a bulk grant", () => {
+    // Two quoted identifiers in one statement, and the schema half had its own
+    // character class excluding `"` — so the bulk grant matched nothing at all
+    // and applied to no object.
+    expect(
+      tableGrantIssues(G26D_QUOTED_BULK_GRANT, ["records"]).join(" | ")
+    ).toContain("anon holds select");
+  });
+
+  it("G26e counts a quoted-role function grant as anon-reachable", () => {
+    // The closed allow-list. A reader granted to `"anon"` was invisible to the
+    // complement computation, which is the one thing standing between the
+    // schema and an unaccounted anon surface.
+    expect(
+      anonExecutableFunctions(G26E_QUOTED_FUNCTION_GRANT).map(
+        (routine) => routine.name
+      )
+    ).toEqual(["share_read_everything"]);
+    expect(
+      anonFunctionAllowListIssues(G26E_QUOTED_FUNCTION_GRANT, []).unexpected
+    ).not.toEqual([]);
+  });
+
+  it("G26f names the role a quoted policy actually grants to", () => {
+    // This half already failed *closed* — the old regex excluded `"`, so the
+    // policy parsed with no roles and was reported as "granted to public (no
+    // `to` clause)". A finding, but one whose message named the wrong defect,
+    // and a reviewer looking for a missing `to` clause that is plainly there
+    // concludes the grader is broken.
+    const issues = userTablePolicyIssues(G26F_QUOTED_POLICY_ROLE, ["records"]);
+
+    expect(issues.join(" | ")).toContain("granted to anon");
+    expect(issues.join(" | ")).not.toContain("no `to` clause");
+  });
+
+  it("G26 CONTROL: quoting a role does not INVENT a finding", () => {
+    // The over-strict direction. Stripping quotes must not make a correct
+    // directory look wrong: the same revokes, quoted, still leave anon holding
+    // nothing.
+    const quotedRevokes = sql(`
+      revoke all on public.records from "anon";
+      revoke all on public.records from "public";
+      revoke all on public.records from "authenticated";
+      grant select, insert, update, delete on public.records to "authenticated";
+    `);
+
+    expect(tableGrantIssues(quotedRevokes, ["records"])).toEqual([]);
+    expect(tableGrantIssues(quotedRevokes, ["records"])).toEqual(
+      tableGrantIssues(G9B_REVOKE_ONLY, ["records"])
+    );
+  });
+
+  it("G26 CONTROL: the real migrations are unaffected by the fix", () => {
+    // The whole point of a parser change in a shipped harness. If stripping
+    // quotes had altered any verdict about the schema that exists, that would
+    // be the change breaking something rather than fixing it.
+    expect(defaultPrivilegeGrantIssues(migrationSql())).toEqual([]);
+    expect(
+      tableGrantIssues(
+        migrationSql(),
+        [...USER_TABLE_NAMES].filter((t) => t !== "shares")
+      )
+    ).toEqual([]);
+  });
+});
+
+describe("T2-401: SHR-05, the preset is a label", () => {
+  it("G19 rejects a reader that branches on `kind`", () => {
+    expect(presetBranchIssues(G19_BRANCHES_ON_KIND).join(" | ")).toContain(
+      "branches on the grant's `kind`"
+    );
+  });
+
+  it("G19 rejects a hard-coded preset name even without a comparison", () => {
+    // The second spelling of the same mistake: `coalesce(s.kind, 'mechanic')`
+    // compares nothing and still makes the label load-bearing.
+    const named = variantReader(
+      "select r.id, r.occurred_on, r.kind",
+      "select r.id, r.occurred_on, coalesce(s.kind, 'buyer')"
+    );
+
+    expect(presetBranchIssues(named).join(" | ")).toContain("names the preset");
+  });
+
+  it.each<[string, string]>([
+    ["equality", "and s.kind = 'x'"],
+    ["inequality", "and s.kind <> 'x'"],
+    ["an IN list", "and s.kind in ('x', 'y')"],
+    ["a CASE subject", "and (case s.kind when 'x' then true else false end)"],
+    // `= p_kind`, not `= 'x'`: with a quoted literal this row also matches the
+    // equality pattern, so it would pass even if the `when … kind =` pattern
+    // were deleted — the same confound as the IN row, one clause over
+    // (second review, F-D).
+    ["a WHEN comparison", "and (case when s.kind = p_kind then true end)"],
+  ])("G19 rejects the preset branch spelled as %s", (_label, clause) => {
+    // Every alternative in the rule, one probe each, and **none of them names a
+    // real preset**. That is the point: the first version of this table used
+    // `'mechanic'`, which fires the rule's *other* clause, so every row passed
+    // no matter what the pattern under test did. The per-clause mutation
+    // battery caught it — deleting the `kind in (...)` pattern left the suite
+    // green — which is the same shape of hole as F2 in a rule whose other
+    // branches were already covered.
+    //
+    // "Mutation-test each clause separately, not just the rule as a whole" is
+    // the principle; a probe that reaches the clause only through a neighbour
+    // is not testing it.
+    const branching = variantReader("and s.expires_at > now()", clause);
+
+    expect(presetBranchIssues(branching).join(" | ")).toContain(
+      "branches on the grant's `kind`"
+    );
+  });
+
+  it("G19 CONTROL: returning `kind` without comparing it is fine", () => {
+    // The reference reader selects `r.kind` — a *record's* kind, not the
+    // grant's — and a rule that flagged it would be unusable from the first
+    // day. This is the accept case that keeps the rule narrow enough to keep.
+    expect(presetBranchIssues(readerOf(CORRECT_SHARE_READER))).toEqual([]);
+  });
+});
+
+describe("T2-401: SHR-06, capabilities gate what they return", () => {
+  it("G20 rejects cost columns with no `includes_costs` test", () => {
+    expect(capabilityGateIssues(G20_UNGATED_COSTS).join(" | ")).toContain(
+      "without testing `includes_costs`"
+    );
+  });
+
+  it("G20 CONTROL: the same columns behind the gate are accepted", () => {
+    expect(capabilityGateIssues(G20B_GATED_COSTS)).toEqual([]);
+  });
+
+  it("G20 rejects receipt data with no `includes_receipts` test", () => {
+    const receipts = variantReader(
+      "select r.id, r.occurred_on, r.kind",
+      "select r.id, r.occurred_on, x.storage_path"
+    );
+
+    expect(capabilityGateIssues(receipts).join(" | ")).toContain(
+      "without testing `includes_receipts`"
+    );
+  });
+
+  it("G20 CONTROL: a reader returning neither is not accused of either", () => {
+    // The reference reader returns no cost and no receipt column. A rule that
+    // reported on it would fire on every correct reader in the schema.
+    expect(capabilityGateIssues(readerOf(CORRECT_SHARE_READER))).toEqual([]);
+  });
+
+  it("G20c rejects receipts gated BEHIND costs — the collapse", () => {
+    // **T2-401 review, F2.** This clause is the only detector for the
+    // two-decisions-collapsed defect, and it shipped with no probe: the
+    // reviewer neutered it and the entire suite stayed green. It was the one
+    // clause in the rule that could not fail.
+    //
+    // The defect it catches costs a real user something specific: a grant
+    // issued as `costs=false receipts=true` — an owner handing a mechanic the
+    // scans without the prices — returns nothing at all.
+    expect(
+      capabilityGateIssues(G20C_RECEIPTS_BEHIND_COSTS).join(" | ")
+    ).toContain("gates receipts behind `includes_costs`");
+  });
+
+  it("G20d CONTROL: the same reader gated on receipts ALONE is accepted", () => {
+    // One line different from G20c. Without this, the rejection above is
+    // equally satisfied by a clause that fires on every receipts reader.
+    expect(capabilityGateIssues(G20D_RECEIPTS_ALONE)).toEqual([]);
+  });
+
+  it("G20c/d differ ONLY in the extra `includes_costs` conjunct", () => {
+    // Pins that the two fixtures are a matched pair rather than two unrelated
+    // readers that happen to differ in verdict.
+    expect(G20C_RECEIPTS_BEHIND_COSTS.body).toContain(
+      "s.includes_costs = true"
+    );
+    expect(G20D_RECEIPTS_ALONE.body).not.toContain("includes_costs");
+    expect(
+      G20C_RECEIPTS_BEHIND_COSTS.body.replace(
+        /\s*and s\.includes_costs = true/,
+        ""
+      )
+    ).toBe(G20D_RECEIPTS_ALONE.body);
+  });
+
+  it("G20e rejects ONE routine serving both capabilities", () => {
+    // ## The "stated limit" that was not a limit (second review, MEDIUM)
+    //
+    // The first version of this file asserted the opposite of this test. It
+    // guarded clause 3 with `!mentionsCosts`, declared a routine returning both
+    // kinds "off-architecture and therefore somebody else's problem", and
+    // pinned that as a deliberate limit.
+    //
+    // It was wrong. This is the reviewer's fixture, verbatim in shape: the
+    // contract's **own approved name**, one extra column, both gates present —
+    // and it produced zero findings from all seven Tier A rules. The closed
+    // allow-list checks the function name; it has nothing to say about an
+    // extra column. So the "architecture closes it" argument closed nothing.
+    //
+    // It is now a rule, and a total one rather than a heuristic: one query has
+    // one predicate for one result set, so a `costs=false receipts=true` grant
+    // cannot be served correctly by any gating of this shape.
+    const both = readerOf(
+      sql(`
+        create function public.share_read_receipts(p_token text)
+        returns table (id uuid, cost_amount numeric, storage_path text)
+        language sql stable security definer set search_path = ''
+        as $share$
+          select r.id, r.cost_amount, x.storage_path
+          from public.records r
+          join public.receipts x on x.record_id = r.id
+          join public.shares s on s.vehicle_id = r.vehicle_id
+          where s.token_hash = extensions.digest(p_token, 'sha256')
+            and s.revoked_at is null
+            and s.expires_at > now()
+            and s.includes_costs = true
+            and s.includes_receipts = true;
+        $share$;
+      `)
+    );
+
+    expect(capabilityGateIssues(both).join(" | ")).toContain(
+      "returns cost columns AND receipt data from one routine"
+    );
+  });
+
+  it("G20e CONTROL: either kind ALONE, correctly gated, is accepted", () => {
+    // The pair. A rule that rejected both single-capability readers would
+    // reject the architecture it exists to enforce.
+    expect(capabilityGateIssues(G20B_GATED_COSTS)).toEqual([]);
+    expect(capabilityGateIssues(G20D_RECEIPTS_ALONE)).toEqual([]);
+  });
+});
+
+describe("T2-401: SHR-08, the refusal is one refusal", () => {
+  it("G21 rejects three distinct refusal messages", () => {
+    expect(refusalShapeIssues(G21_TALKATIVE_REFUSAL).join(" | ")).toContain(
+      "distinct messages"
+    );
+  });
+
+  it("G21 rejects refusal text that names the case", () => {
+    // The oracle, stated in words. "grant expired" tells a caller that the
+    // token they guessed was once real, which is the whole thing SHR-08 exists
+    // to withhold.
+    expect(refusalShapeIssues(G21_TALKATIVE_REFUSAL).join(" | ")).toContain(
+      "existence oracle"
+    );
+  });
+
+  it("G21 CONTROL: one uniform refusal produces nothing", () => {
+    expect(refusalShapeIssues(G21B_UNIFORM_REFUSAL)).toEqual([]);
+  });
+
+  it("G21 CONTROL: `revoked_at` and `expires_at` are not refusal text", () => {
+    // A reader that names the columns it checks is not an oracle; only what it
+    // *tells the caller* can be. The rule reads the raised messages, not the
+    // body, so `s.revoked_at is null` is invisible to it.
+    expect(refusalShapeIssues(readerOf(CORRECT_SHARE_READER))).toEqual([]);
+  });
+
+  it("G21 CONTROL: plpgsql's `if not found` is control flow, not a message", () => {
+    // **This control found a real over-match**, on the first run. The rule
+    // originally scanned the whole body, and `if not found then raise …` is the
+    // idiomatic way to test a `select … into` — present in every correct
+    // implementation of this routine. Reporting on it would have flagged the
+    // one shape SHR-08 actually wants, which is exactly how a security rule
+    // ends up deleted instead of fixed. Fixed by scoping the rule to the raised
+    // messages; pinned here so it cannot come back.
+    expect(G21B_UNIFORM_REFUSAL.body).toContain("if not found");
+    expect(refusalShapeIssues(G21B_UNIFORM_REFUSAL)).toEqual([]);
+  });
+});
+
+describe("T2-401: SHR-08 / 003 MON-02, revocation is never gated", () => {
+  it("G22 rejects a revoke that consults a subscription", () => {
+    expect(revocationGatingIssues(G22_GATED_REVOCATION).join(" | ")).toContain(
+      "subscription"
+    );
+  });
+
+  it.each<[string]>([
+    ["subscription"],
+    ["entitlement"],
+    ["plan_id"],
+    ["billing"],
+    ["stripe"],
+    ["customer_id"],
+    ["quota"],
+  ])("G22 rejects a revoke that consults `%s`", (token) => {
+    // One probe per deny-list entry, not one probe for the list (second
+    // review, F-E). A single-token probe means six of the seven entries can be
+    // deleted with the suite staying green — and the entry most likely to be
+    // "tidied away" is whichever one nobody wrote a test for. "Any other
+    // condition" is SHR-08's phrase; the enumeration is how it is enforced.
+    const gated = readerOf(
+      sql(`
+        create function public.revoke_share_grant(p_share_id uuid)
+        returns void
+        language sql security definer set search_path = ''
+        as $revoke$
+          update public.shares s set revoked_at = now()
+           where s.id = p_share_id
+             and exists (select 1 from public.${token}s b
+                          where b.owner_id = (select auth.uid()));
+        $revoke$;
+      `)
+    );
+
+    expect(revocationGatingIssues(gated).join(" | ")).toContain(token);
+  });
+
+  it("G22 CONTROL: a revoke scoped to ownership alone is accepted", () => {
+    // Ungated is not unowned. A rule that could not tell those apart would
+    // reject the only correct implementation.
+    expect(revocationGatingIssues(G22B_UNGATED_REVOCATION)).toEqual([]);
+  });
+});
+
+describe("T2-401: default privileges, the grant half", () => {
+  it("G23 rejects `alter default privileges … grant … to anon`", () => {
+    expect(defaultPrivilegeGrantIssues(G23_ADP_GRANT).join(" | ")).toContain(
+      "every FUTURE object"
+    );
+  });
+
+  it("G23 CONTROL: the revoke half produces nothing", () => {
+    expect(defaultPrivilegeGrantIssues(G23B_ADP_REVOKE)).toEqual([]);
+  });
+
+  it("G23: the replay saw the statements — neither verdict is vacuous", () => {
+    // Both fixtures must actually parse into ADP records, or "no findings"
+    // above would be a statement about a parser that read nothing.
+    expect(grants(G23_ADP_GRANT).defaultPrivileges).toHaveLength(1);
+    expect(grants(G23B_ADP_REVOKE).defaultPrivileges).toHaveLength(2);
+  });
+});
+
+describe("T2-401: the optimistic-default sweep, inverted", () => {
+  const NONE = new Map<string, string>();
+
+  it.each<[string]>([["includes_costs"], ["is_active"]])(
+    "G24 rejects `%s boolean not null default true`",
+    (column) => {
+      // Both verified against the *old* name-shaped regex, which required
+      // `is_` AND `public|shared|visible` AND `default true` — so both walked
+      // straight past the guard that existed to catch "a fifth flag this file
+      // does not know about".
+      expect(
+        optimisticBooleanDefaultIssues(G24_OPTIMISTIC_DEFAULTS, NONE).join(
+          " | "
+        )
+      ).toContain(column);
+    }
+  );
+
+  it("G24: the OLD rule scores both of them clean — the false pass", () => {
+    // Recorded verbatim, the way G9 records the revoke-then-grant false pass.
+    // This is the evidence that the rewrite was necessary rather than tidy.
+    const oldRule = [
+      ...G24_OPTIMISTIC_DEFAULTS.matchAll(
+        /(is_[a-z_]*(public|shared|visible)[a-z_]*)[^,)]*default true/g
+      ),
+    ].map((match) => match[1]);
+
+    expect(oldRule).toEqual([]);
+    expect(
+      optimisticBooleanDefaultIssues(G24_OPTIMISTIC_DEFAULTS, NONE).length
+    ).toBe(2);
+  });
+
+  it("G24b CONTROL: booleans defaulting to false produce nothing", () => {
+    expect(optimisticBooleanDefaultIssues(G24B_HONEST_DEFAULTS, NONE)).toEqual(
+      []
+    );
+  });
+
+  it("G24c rejects a default flipped by a later `alter table`", () => {
+    // A migration directory is a sequence. A column created honest and flipped
+    // three files later is invisible to any rule that only reads `create table`
+    // — the same lesson as the revoke-then-grant defect, one surface over.
+    expect(
+      optimisticBooleanDefaultIssues(G24C_FLIPPED_LATER, NONE).join(" | ")
+    ).toContain("flipped to true");
+  });
+
+  it("G24: a NAMED exemption is honoured, an unnamed one is not", () => {
+    // The `EXEMPT_PAGES` mechanism again, graded against a synthetic map so the
+    // real one can stay empty and still be proven to work.
+    const allowed = new Map([
+      ["shares.is_active", "a probe fixture, not a real column"],
+    ]);
+
+    expect(
+      optimisticBooleanDefaultIssues(G24_OPTIMISTIC_DEFAULTS, allowed).join(
+        " | "
+      )
+    ).not.toContain("is_active");
+    expect(
+      optimisticBooleanDefaultIssues(G24_OPTIMISTIC_DEFAULTS, allowed).join(
+        " | "
+      )
+    ).toContain("includes_costs");
+  });
+
+  it("G24: does not report a non-boolean column that defaults to true-ish", () => {
+    // The over-match direction. A `text` column defaulting to `'true'` is not a
+    // visibility flag, and a rule that said so would be reporting on data.
+    const text = sql(`
+      create table public.shares (
+        id uuid primary key,
+        note text not null default 'true'
+      );
+    `);
+
+    expect(optimisticBooleanDefaultIssues(text, NONE)).toEqual([]);
+  });
+});
+
+describe("T2-401: every new probe fires, and every control stays silent", () => {
+  it("every wide-open T2-401 probe produces at least one finding", () => {
+    // The sweep, in the shape sections A and D use. A rule refactor that
+    // quietly stopped detecting one of these would otherwise show up as a
+    // single silent green test.
+    const verdicts: [string, string[]][] = [
+      ["G19 branches on kind", presetBranchIssues(G19_BRANCHES_ON_KIND)],
+      ["G20 ungated costs", capabilityGateIssues(G20_UNGATED_COSTS)],
+      [
+        "G20c receipts behind costs",
+        capabilityGateIssues(G20C_RECEIPTS_BEHIND_COSTS),
+      ],
+      [
+        "G26 quoted role grant",
+        tableGrantIssues(G26_QUOTED_ROLE_GRANT, ["records"]),
+      ],
+      [
+        "G26b quoted public grant",
+        tableGrantIssues(G26B_QUOTED_PUBLIC_GRANT, ["records"]),
+      ],
+      [
+        "G26c quoted ADP grant",
+        defaultPrivilegeGrantIssues(G26C_QUOTED_ADP_GRANT),
+      ],
+      [
+        "G26d quoted bulk grant",
+        tableGrantIssues(G26D_QUOTED_BULK_GRANT, ["records"]),
+      ],
+      [
+        "G26e quoted function grant",
+        anonFunctionAllowListIssues(G26E_QUOTED_FUNCTION_GRANT, []).unexpected,
+      ],
+      [
+        "G26f quoted policy role",
+        userTablePolicyIssues(G26F_QUOTED_POLICY_ROLE, ["records"]),
+      ],
+      ["G21 talkative refusal", refusalShapeIssues(G21_TALKATIVE_REFUSAL)],
+      ["G22 gated revocation", revocationGatingIssues(G22_GATED_REVOCATION)],
+      ["G23 ADP grant to anon", defaultPrivilegeGrantIssues(G23_ADP_GRANT)],
+      [
+        "G24 optimistic defaults",
+        optimisticBooleanDefaultIssues(G24_OPTIMISTIC_DEFAULTS, new Map()),
+      ],
+      [
+        "G24c default flipped later",
+        optimisticBooleanDefaultIssues(G24C_FLIPPED_LATER, new Map()),
+      ],
+      [
+        "G25 mis-joined policy",
+        subqueryCorrelationIssues(
+          sql(`
+            create policy "records owner all" on public.records
+              for all to authenticated
+              using (exists (select 1 from public.vehicles v
+                              where records.vehicle_id is not null
+                                and v.owner_id = (select auth.uid())));
+          `),
+          ["records"]
+        ),
+      ],
+    ];
+
+    expect(
+      verdicts.filter(([, issues]) => issues.length === 0).map(([name]) => name)
+    ).toEqual([]);
+  });
+
+  it("every correct T2-401 probe produces none", () => {
+    // The single assertion that would catch a rule which has become
+    // over-strict. Every rejection above is only meaningful because this
+    // passes.
+    expect(
+      [
+        presetBranchIssues(readerOf(CORRECT_SHARE_READER)),
+        capabilityGateIssues(readerOf(CORRECT_SHARE_READER)),
+        capabilityGateIssues(G20B_GATED_COSTS),
+        capabilityGateIssues(G20D_RECEIPTS_ALONE),
+        refusalShapeIssues(readerOf(CORRECT_SHARE_READER)),
+        refusalShapeIssues(G21B_UNIFORM_REFUSAL),
+        revocationGatingIssues(G22B_UNGATED_REVOCATION),
+        defaultPrivilegeGrantIssues(G23B_ADP_REVOKE),
+        optimisticBooleanDefaultIssues(G24B_HONEST_DEFAULTS, new Map()),
+        subqueryCorrelationIssues(
+          sql(`
+            create policy "records owner all" on public.records
+              for all to authenticated
+              using (exists (select 1 from public.vehicles v
+                              where v.id = records.vehicle_id
+                                and v.owner_id = (select auth.uid())));
+          `),
+          ["records"]
+        ),
+        ...G18_SETOF_NON_USER_TABLE.map(([, fixture]) =>
+          functions(sql(fixture)).flatMap(projectionIssues)
+        ),
+      ].flat()
+    ).toEqual([]);
   });
 });

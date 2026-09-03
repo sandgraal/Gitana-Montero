@@ -1,0 +1,173 @@
+{
+  "id": "gen3-front-lower-ball-joint",
+  "fitment": {
+    "gens": ["gen3"],
+    "years": {
+      "from": 2001,
+      "to": 2006
+    }
+  },
+  "system": "suspension",
+  "severity": "safety-critical",
+  "drivability": "drive-gently-repair-soon",
+  "symptoms": [
+    "clunk-from-one-front-corner-turning-at-low-speed",
+    "the-truck-wanders-and-needs-constant-correction",
+    "uneven-wear-across-one-front-tire",
+    "torn-rubber-boot-at-the-joint"
+  ],
+  "causes": [
+    {
+      "id": "lower-ball-joint-worn"
+    },
+    {
+      "id": "upper-ball-joint-worn"
+    },
+    {
+      "id": "boot-torn-and-the-joint-run-dry"
+    },
+    {
+      "id": "control-arm-bushings-worn"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "support-the-lower-arm-and-lever-under-the-tire",
+      "rulesIn": ["lower-ball-joint-worn"]
+    },
+    {
+      "id": "rock-the-tire-top-to-bottom-with-a-hand-on-each-joint",
+      "rulesIn": ["lower-ball-joint-worn", "upper-ball-joint-worn"],
+      "rulesOut": ["control-arm-bushings-worn"]
+    },
+    {
+      "id": "inspect-both-rubber-boots-for-splits",
+      "rulesIn": ["boot-torn-and-the-joint-run-dry"]
+    },
+    {
+      "id": "watch-the-arm-bushings-while-somebody-rocks-the-steering",
+      "rulesIn": ["control-arm-bushings-worn"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "replace-the-worn-ball-joint",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": [
+        "lower-ball-joint-worn",
+        "upper-ball-joint-worn",
+        "boot-torn-and-the-joint-run-dry"
+      ],
+      "parts": ["gen3-front-lower-ball-joint", "gen3-front-upper-ball-joint"],
+      "procedures": []
+    },
+    {
+      "id": "do-the-joints-and-the-arm-bushings-together",
+      "difficulty": 5,
+      "cost": {
+        "from": "significant"
+      },
+      "addresses": [
+        "lower-ball-joint-worn",
+        "upper-ball-joint-worn",
+        "control-arm-bushings-worn"
+      ],
+      "parts": [
+        "gen3-front-lower-ball-joint",
+        "gen3-front-upper-ball-joint",
+        "gen3-front-lower-control-arm-bushing",
+        "gen3-front-upper-control-arm-bushing"
+      ],
+      "procedures": []
+    }
+  ],
+  "confidence": "community-consensus",
+  "sources": [
+    {
+      "title": "Luso Overland — MONTERO Gen3 Ball Joint, Front / Lower (MR496799): fitment, quantity per vehicle, and the OEM-only recommendation for steering and suspension parts",
+      "url": "https://lusooverland.com/VP-MMC-MR496799",
+      "archiveUrl": "https://web.archive.org/web/20260902205425id_/https://lusooverland.com/VP-MMC-MR496799",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    },
+    {
+      "title": "Luso Overland — MONTERO Gen3 Front Lower Control Arm Bushings (front of arm 4634, rear of arm 4635; two of each per vehicle)",
+      "url": "https://lusooverland.com/VS-SP-SPF4634K",
+      "archiveUrl": "https://web.archive.org/web/20260606012300id_/https://lusooverland.com/VS-SP-SPF4634K",
+      "accessed": "2026-09-03",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Play in a front ball joint",
+      "summary": "The third generation runs independent front suspension with an upper and a lower ball joint per side, and both are wear items on a truck this heavy. A worn joint announces itself as a clunk turning into a driveway and a truck that wanders enough that you are always correcting it; a torn boot that let the grease out is what usually got it there. The supplier who stocks the genuine parts is explicit that on trucks carrying larger tires or working off-road, factory joints are the only ones they will recommend — a joint is not the place to find out an aftermarket part was optimistic. The triage here is deliberately drive-gently-repair-soon and not do-not-drive, because a joint with detectable play is not the same thing as a joint about to separate. If the play is gross, or the boot is gone and the joint is dry and notchy, stop driving it and get it looked at.",
+      "slug": "play-in-a-front-ball-joint",
+      "symptoms": {
+        "clunk-from-one-front-corner-turning-at-low-speed": "A clunk from one front corner turning slowly, as into a driveway",
+        "the-truck-wanders-and-needs-constant-correction": "The truck wanders on the road and needs constant small corrections",
+        "uneven-wear-across-one-front-tire": "One front tire wearing unevenly across its width",
+        "torn-rubber-boot-at-the-joint": "A split or missing rubber boot at the joint, with grease thrown around it"
+      },
+      "causes": {
+        "lower-ball-joint-worn": "The lower ball joint has play",
+        "upper-ball-joint-worn": "The upper ball joint has play",
+        "boot-torn-and-the-joint-run-dry": "The boot tore, the grease escaped, and the joint has been running dry",
+        "control-arm-bushings-worn": "The control arm bushings are worn and the movement is not in the joint at all"
+      },
+      "diagnosticSteps": {
+        "support-the-lower-arm-and-lever-under-the-tire": "With the lower arm supported and the wheel off the ground, lever under the tire and watch the lower joint",
+        "rock-the-tire-top-to-bottom-with-a-hand-on-each-joint": "Rock the tire top to bottom with a hand on each joint in turn to feel where the movement is",
+        "inspect-both-rubber-boots-for-splits": "Inspect both rubber boots for splits and for grease thrown onto surrounding parts",
+        "watch-the-arm-bushings-while-somebody-rocks-the-steering": "Have somebody rock the steering while you watch the control arm bushings for shifting"
+      },
+      "fixPaths": {
+        "replace-the-worn-ball-joint": {
+          "title": "Replace the joint the test named",
+          "detail": "Genuine joints come with a new castle nut and cotter pin. The truck needs an alignment afterwards, and that cost belongs in the estimate rather than as a surprise."
+        },
+        "do-the-joints-and-the-arm-bushings-together": {
+          "title": "Do the joints and the arm bushings in one visit",
+          "detail": "The arms have to come apart for either job. On a truck old enough to need one, the other is rarely far behind, and one alignment covers both."
+        }
+      }
+    },
+    "es": {
+      "title": "Juego en una rótula delantera",
+      "summary": "La tercera generación lleva suspensión delantera independiente con una rótula superior y una inferior por lado, y las dos son piezas de desgaste en un vehículo de este peso. Una rótula gastada se anuncia con un golpe al entrar despacio a la entrada de una casa y con un vehículo que se va de lado lo suficiente como para que usted lo esté corrigiendo todo el tiempo; lo que suele llevarla a ese estado es un fuelle roto que dejó salir la grasa. La casa que vende las piezas originales es explícita: en vehículos con llantas grandes o que trabajan fuera de carretera, las rótulas de fábrica son las únicas que recomiendan, y una rótula no es el lugar donde uno quiere descubrir que un repuesto no original era optimista. La clasificación aquí es a propósito manejar suave y reparar pronto, y no no manejar, porque una rótula con juego detectable no es lo mismo que una rótula a punto de soltarse. Si el juego es grande, o si el fuelle ya no está y la rótula se siente seca y con topes, deje de manejar el vehículo y llévelo a revisar.",
+      "slug": "juego-en-una-rotula-delantera",
+      "symptoms": {
+        "clunk-from-one-front-corner-turning-at-low-speed": "Un golpe en una esquina delantera al girar despacio, como al entrar a la entrada de una casa",
+        "the-truck-wanders-and-needs-constant-correction": "El vehículo se va de lado en la carretera y hay que corregirlo a cada rato",
+        "uneven-wear-across-one-front-tire": "Una llanta delantera desgastada disparejo a lo ancho",
+        "torn-rubber-boot-at-the-joint": "Fuelle de hule roto o faltante en la rótula, con grasa regada alrededor"
+      },
+      "causes": {
+        "lower-ball-joint-worn": "La rótula inferior tiene juego",
+        "upper-ball-joint-worn": "La rótula superior tiene juego",
+        "boot-torn-and-the-joint-run-dry": "El fuelle se rompió, se salió la grasa y la rótula viene trabajando seca",
+        "control-arm-bushings-worn": "Los bujes de la tijereta están gastados y el movimiento no está en la rótula"
+      },
+      "diagnosticSteps": {
+        "support-the-lower-arm-and-lever-under-the-tire": "Con la tijereta inferior apoyada y la rueda en el aire, haga palanca bajo la llanta y observe la rótula inferior",
+        "rock-the-tire-top-to-bottom-with-a-hand-on-each-joint": "Mueva la llanta de arriba abajo con una mano sobre cada rótula por turno para sentir dónde está el juego",
+        "inspect-both-rubber-boots-for-splits": "Revise los dos fuelles de hule buscando rajaduras y grasa tirada sobre las piezas vecinas",
+        "watch-the-arm-bushings-while-somebody-rocks-the-steering": "Pida que alguien mueva el volante de lado a lado mientras usted observa si los bujes de la tijereta se corren"
+      },
+      "fixPaths": {
+        "replace-the-worn-ball-joint": {
+          "title": "Cambiar la rótula que señaló la prueba",
+          "detail": "Las rótulas originales vienen con tuerca almenada y chaveta nuevas. Después el vehículo necesita alineamiento, y ese costo va en el presupuesto y no como sorpresa."
+        },
+        "do-the-joints-and-the-arm-bushings-together": {
+          "title": "Hacer rótulas y bujes de tijereta en una sola visita",
+          "detail": "Las tijeretas hay que desarmarlas para cualquiera de los dos trabajos. En un vehículo con edad para necesitar uno, el otro rara vez viene lejos, y un solo alineamiento cubre los dos."
+        }
+      }
+    }
+  }
+}
