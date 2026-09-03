@@ -115,6 +115,18 @@
  * looks identical in the report to one that fails because the guarantee is
  * missing, and they mean opposite things.
  *
+ * **A live denial is always paired with a live success in the same test.** Four
+ * Tier-B graders here originally asserted only `expect(response.ok).toBe(false)`
+ * — owner B cannot upload, owner B cannot attach, the bucket refuses a PDF, the
+ * table refuses an unnamed kind — and every one of them *passed* against a
+ * stack with no bucket and no table, because absence refuses everybody just as
+ * convincingly as a correct policy does. They could not distinguish "enforced"
+ * from "not built", which is the whole question they exist to answer. The
+ * Tier-B CI job caught it by reporting `Expect test to fail` on a marked
+ * grader: a marker that passes is not a small bookkeeping error, it is a
+ * grader that will still pass when the feature ships broken. Each now proves
+ * the legitimate actor succeeds before asserting the illegitimate one fails.
+ *
  * refs specs/002-montero-garage (GAR-06′, GAR-05′, SHR-01, ACC-03)
  */
 import { describe, expect, it } from "vitest";
@@ -1509,6 +1521,14 @@ describe.skipIf(!live.available)(
     it.fails("owner B cannot upload into owner A's prefix", async () => {
       // Write access to someone else's prefix is also the ability to replace
       // their documentation with something else entirely.
+      //
+      // **The refusal is asserted next to a success, and it has to be.** With
+      // only `expect(uploaded.ok).toBe(false)` this grader passed against a
+      // stack where the bucket did not exist yet — every upload fails when
+      // there is nothing to upload into, so it could not tell "the policy
+      // refused owner B" from "the feature is missing". Caught by the Tier-B
+      // CI job reporting `Expect test to fail` on a marked grader, which is
+      // the signal that a negative assertion is being satisfied by absence.
       const scenario = await provisionScenario(stackOf(live));
       try {
         const fixture = await createRecordFixture(scenario, scenario.ownerA);
@@ -1520,10 +1540,27 @@ describe.skipIf(!live.available)(
           EXTENSION.video
         );
 
+        // The surface exists and works for the person it belongs to …
+        const byOwner = await uploadMedia(
+          scenario,
+          scenario.ownerA,
+          forged,
+          "video"
+        );
+        expect(byOwner.ok, byOwner.text).toBe(true);
+
+        // … and refuses the person it does not.
+        const forgedByB = testRecordMediaPath(
+          scenario.ownerA.userId ?? "",
+          fixture.vehicleId,
+          fixture.recordId,
+          "forged-b",
+          EXTENSION.video
+        );
         const uploaded = await uploadMedia(
           scenario,
           scenario.ownerB,
-          forged,
+          forgedByB,
           "video"
         );
 
@@ -1553,10 +1590,23 @@ describe.skipIf(!live.available)(
       // The FK keeps an attachment on a record; the policy keeps it on *your*
       // record. This is the seam between them, and a correct FK with a lazy
       // `with check` fails exactly here.
+      //
+      // Paired with a success for the same reason as the upload grader above:
+      // a 404 from a table that does not exist is not a policy refusing
+      // anybody, and unpaired this assertion could not tell the two apart.
       const scenario = await provisionScenario(stackOf(live));
       try {
         const fixture = await createRecordFixture(scenario, scenario.ownerA);
 
+        // Owner A can attach to their own record …
+        const byOwner = await insertRow(scenario, scenario.ownerA, TABLE, {
+          record_id: fixture.recordId,
+          storage_path: mediaPathFor(scenario.ownerA, fixture, "video", "own"),
+          media_kind: "video",
+        });
+        expect(byOwner.ok, byOwner.text).toBe(true);
+
+        // … and owner B cannot attach to owner A's.
         const response = await insertRow(scenario, scenario.ownerB, TABLE, {
           record_id: fixture.recordId,
           storage_path: testRecordMediaPath(
@@ -1612,9 +1662,23 @@ describe.skipIf(!live.available)(
     it.fails(`refuses a ${NON_MEDIA_MIME_TYPE} upload`, async () => {
       // The negative half, and the GAR-05′/GAR-06′ boundary made real: the
       // media bucket is not a second place to put receipts.
+      //
+      // The declared-kind upload has to succeed in the same test. A bucket
+      // that does not exist refuses a PDF exactly as convincingly as a bucket
+      // with a correct MIME filter, so unpaired this asserted nothing about
+      // the filter at all.
       const scenario = await provisionScenario(stackOf(live));
       try {
         const fixture = await createRecordFixture(scenario, scenario.ownerA);
+
+        const allowed = await uploadMedia(
+          scenario,
+          scenario.ownerA,
+          mediaPathFor(scenario.ownerA, fixture, "video", "allowed"),
+          "video"
+        );
+        expect(allowed.ok, allowed.text).toBe(true);
+
         const path = testRecordMediaPath(
           scenario.ownerA.userId ?? "",
           fixture.vehicleId,
@@ -1622,7 +1686,6 @@ describe.skipIf(!live.available)(
           "pdf",
           "pdf"
         );
-
         const uploaded = await uploadObject(scenario, scenario.ownerA, path, {
           bucket: RECORD_MEDIA_BUCKET,
           bytes: Buffer.from("%PDF-1.4 TEST-T2-305 synthetic receipt\n"),
@@ -1638,10 +1701,24 @@ describe.skipIf(!live.available)(
     it.fails(
       "refuses a media row whose kind is not one of the three",
       async () => {
-        // The closed set, proved rather than read out of the DDL.
+        // The closed set, proved rather than read out of the DDL — and paired
+        // with an accepted kind, because a missing table rejects every insert
+        // and would have made this look like a working `check` constraint.
         const scenario = await provisionScenario(stackOf(live));
         try {
           const fixture = await createRecordFixture(scenario, scenario.ownerA);
+
+          const named = await insertRow(scenario, scenario.ownerA, TABLE, {
+            record_id: fixture.recordId,
+            storage_path: mediaPathFor(
+              scenario.ownerA,
+              fixture,
+              "video",
+              "akind"
+            ),
+            media_kind: "video",
+          });
+          expect(named.ok, named.text).toBe(true);
 
           const response = await insertRow(scenario, scenario.ownerA, TABLE, {
             record_id: fixture.recordId,
