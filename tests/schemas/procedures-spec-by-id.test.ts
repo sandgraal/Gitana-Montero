@@ -318,6 +318,13 @@ describe("a procedure states no spec of its own (PRC-03)", () => {
  * 6G74", so this is not a hypothetical; a litre figure bound to an engine code
  * is naming and must pass (T502a review, F3).
  *
+ * **That carve-out is token-scoped, and the reject table pins it.** The engine
+ * code excuses the figure it is attached to, never every figure in the same
+ * sentence — "Torque the crank bolt to 185 N·m on the 6G74" states a spec and
+ * must still be rejected. A sentence-scoped implementation would satisfy every
+ * accept row and let that through, which is why three reject rows below pair
+ * an engine code with a real figure (T502a review round 2).
+ *
  * **Millimetres are deliberately not in the category, and that is a stated
  * gap.** A socket size, a drill bit and a valve clearance are all written
  * `14 mm`, and no regex separates the tool from the specification. The
@@ -362,6 +369,35 @@ describe("a figure written into a sentence is still an inlined value (PRC-03)", 
     ["litros", "es", "Rellene con 4,5 litros de aceite."],
     ["quarts", "en", "Refill with 4.8 qt of fluid."],
     ["millilitres", "en", "Add 250 ml of assembly lube to the housing."],
+    /*
+     * The carve-out below is **token-scoped, not sentence-scoped**, and these
+     * two rows are what force that (T502a review round 2).
+     *
+     * An implementer reading "the distinguishing feature is the engine code
+     * beside the figure" could reasonably scope it to the sentence — skip any
+     * sentence mentioning `6G74`/`6G72`/`4M40`/… — and every accept row below
+     * would still pass while a real torque spec walked through. And it *would*
+     * walk through: "torque the crank bolt to N on the 6G74" is exactly the
+     * sentence T504's wave-1 timing-belt entry will want to write.
+     *
+     * The rule these pin: the engine code excuses the figure **it is attached
+     * to**, not every figure in its sentence.
+     */
+    [
+      "a torque figure in an engine-code sentence",
+      "en",
+      "Torque the crank bolt to 185 N·m on the 6G74.",
+    ],
+    [
+      "a torque figure in an engine-code sentence, ES",
+      "es",
+      "Apriete el perno del cigüeñal a 185 N·m en el 6G74.",
+    ],
+    [
+      "a capacity in an engine-code sentence",
+      "en",
+      "The 6G74 takes 4.5 L of oil with the filter.",
+    ],
   ])(
     "rejects a step whose %s prose states the figure itself",
     (_label, locale, text) => {

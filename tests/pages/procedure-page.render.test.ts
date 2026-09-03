@@ -176,11 +176,37 @@ vi.mock("astro:content", async (importOriginal) => {
         `tests/pages/procedure-page.render.test.ts. refs specs/001-foundation`
     );
 
+  /*
+   * Which collection a call is about, **whichever call form it used**.
+   *
+   * `astro:content` accepts `getEntry("procedures", id)` *and*
+   * `getEntry({ collection: "procedures", id })`, and `getEntries` takes an
+   * array of those reference objects. The first version of this guard compared
+   * the first argument to the string `"procedures"`, so the object form walked
+   * straight past it and the mock answered `undefined` — a page that looked
+   * its entry up rendered an empty "not found" shell and **17 of 35 markers
+   * passed against it** (T502a review round 2). That is the same
+   * "test that cannot fail" this guard exists to close, surviving in a second
+   * spelling: `.claude/GRADER-PRINCIPLES.md`, "grade behavior, not name lists"
+   * — a rule that recognises one spelling of a call is a rule with a bypass.
+   */
+  const collectionOf = (value: unknown): string | undefined => {
+    if (typeof value === "string") return value;
+    if (typeof value !== "object" || value === null) return undefined;
+    const { collection } = value as { collection?: unknown };
+    return typeof collection === "string" ? collection : undefined;
+  };
+
+  const refuseProcedures = (value: unknown): void => {
+    if (collectionOf(value) !== "procedures") return;
+    throw unsupportedLookup("procedures");
+  };
+
   return {
     ...actual,
-    getCollection: async (name: string) => {
-      if (name === "procedures") throw unsupportedLookup("procedures");
-      if (name !== "reference") return [];
+    getCollection: async (name: unknown) => {
+      refuseProcedures(name);
+      if (collectionOf(name) !== "reference") return [];
       return [
         referenceEntry("test-ref-torque", "torque", {
           torque: { value: 77, unit: "nm" },
@@ -194,9 +220,16 @@ vi.mock("astro:content", async (importOriginal) => {
         }),
       ];
     },
-    getEntry: async (name: string) => {
-      if (name === "procedures") throw unsupportedLookup("procedures");
+    getEntry: async (name: unknown) => {
+      refuseProcedures(name);
       return undefined;
+    },
+    // Plural form, same rule: `getEntries` takes an array of references, so
+    // every one of them is checked rather than the array itself.
+    getEntries: async (references: unknown) => {
+      if (Array.isArray(references)) references.forEach(refuseProcedures);
+      else refuseProcedures(references);
+      return [];
     },
   };
 });
