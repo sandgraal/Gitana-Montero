@@ -25,6 +25,7 @@ import { z } from "astro/zod";
 import { defineEntrySchema } from "./schemas/entry";
 import { communitySchema } from "./schemas/community";
 import { glossaryEntrySchema } from "./schemas/glossary";
+import { modsSchema } from "./schemas/mods";
 import { partsSchema } from "./schemas/parts";
 import { problemsEntrySchema } from "./schemas/problems";
 import { referenceEntrySchema } from "./schemas/reference";
@@ -164,8 +165,12 @@ export const collections = {
   parts: entryCollection("parts", partsSchema),
   /** PRC-01…03 — step-by-step procedures. */
   procedures: entryCollection("procedures", baseEntrySchema()),
-  /** MOD-01, MOD-02 — modifications and their tradeoffs. */
-  mods: entryCollection("mods", baseEntrySchema()),
+  /**
+   * MOD-01, MOD-02 — modifications, their typed prerequisites and what they
+   * break (T601). Cross-entry resolution of those references is the build's,
+   * in `src/integrations/validate-mods.ts`.
+   */
+  mods: entryCollection("mods", modsSchema),
   /** COM-01, COM-02 — the bilingual community directory (T700). */
   community: entryCollection("community", communitySchema),
 };
