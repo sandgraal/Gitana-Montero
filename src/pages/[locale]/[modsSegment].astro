@@ -115,7 +115,9 @@ const taxonomy = buildTaxonomy(
 const entries = await getCollection("mods");
 
 /**
- * A locale-independent route path turned into a real `href`.
+ * An unprefixed route path turned into a real `href` — `localeHref` adds the
+ * `/en` or `/es` prefix and the deploy base. See the note on the `href` field
+ * below for why the path arrives without them.
  *
  * `null` in, `null` out — a card whose entry has no slug row renders its title
  * unlinked rather than linking somewhere plausible-but-wrong. (The build
@@ -146,11 +148,14 @@ const mods = entries
       id,
       domId: `mod-${id.replace(/\//g, "--")}`,
       /*
-       * `entryRoutePath` returns a **locale-independent** route (`/mods/x/`) —
-       * that is its contract, because `BaseLayout` needs the whole set to
-       * build hreflang pairs. An `href` needs the locale prefix and the deploy
-       * base on top, which is `localeHref`'s job; without it every card links
-       * to a 404 (the defect T501 shipped twice and this page does not repeat).
+       * `entryRoutePath` returns a path that is **already this locale's own
+       * and still unprefixed**: in ES it is `/modificaciones/<es slug>/` —
+       * translated segment, translated slug, no `/es` in front and no deploy
+       * base. It is unprefixed on purpose, because `BaseLayout` needs every
+       * locale's path side by side to build the hreflang pairs, so the prefix
+       * goes on last, per link, via `localeHref`. Without that step every card
+       * links to a 404 (the defect T501 shipped twice and this page does not
+       * repeat — graded in `tests/pages/mods-index.render.test.ts`).
        */
       href: routePathHref(entryRoutePath("mods", id, locale)),
       system,

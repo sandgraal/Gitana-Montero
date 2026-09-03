@@ -172,7 +172,23 @@ if (registryIssues.length > 0) {
   );
 }
 
-/** The locale-independent route for a collection's page in `locale`. */
+/**
+ * A collection page's route **in `locale`, without the locale prefix**:
+ * `/glossary/` for `en`, `/glosario/` for `es`.
+ *
+ * The word to avoid here is "locale-independent" — the returned path is very
+ * much locale-*specific* (that is the point of a translated segment, I18N-01).
+ * What it omits is the `/en` / `/es` prefix and the deploy base, which
+ * `localeHref` adds at the moment a link is rendered. Everything in this
+ * module returns paths in that shape, because `BaseLayout` needs all of a
+ * page's locale paths side by side to emit the hreflang pairs, and prefixing
+ * them earlier would leave nothing to compare (T601 review, PR #94).
+ *
+ * `splitLocalePath` in `src/i18n/routing.ts` does call its second return value
+ * the "locale-independent route", and that is a different, correct use of the
+ * phrase: there it means "what is left after the locale prefix is stripped".
+ * The value is the same shape; only the emphasis differs.
+ */
 export function collectionRoutePath(
   collection: CollectionRouteId,
   locale: Locale

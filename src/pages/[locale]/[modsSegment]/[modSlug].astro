@@ -145,12 +145,24 @@ const genLabels = expandGenerations(data.fitment.gens, taxonomy).map((gen) =>
 );
 
 /**
- * A route path from `src/i18n/routes.ts` is **locale-independent** — that is
- * its contract, because `BaseLayout` needs the whole set to build hreflang
- * pairs. Anything rendered into an `href` therefore has to go through
- * `localeHref`, which adds the `/en` or `/es` prefix and the deploy base.
- * Without it every internal link on this page points at a 404 — the defect
- * T501 shipped on both of its pages, and the reason this one is graded.
+ * A route path from `src/i18n/routes.ts` is **already this locale's own, and
+ * still unprefixed** — `entryRoutePath("parts", id, "es")` gives
+ * `/repuestos/bomba-de-agua-6g74/`, with the ES segment and the ES slug but
+ * no `/es` in front of it and no deploy base.
+ *
+ * Both halves matter, and the second is the one that bites. The path is *not*
+ * "the same in every locale" — the segment and the slug are translated, which
+ * is the whole of I18N-01/I18N-05. What it lacks is the locale **prefix**, and
+ * it lacks it on purpose: `BaseLayout` needs every locale's path side by side
+ * to build the hreflang pairs, so the prefix is added last, per rendered link,
+ * by `localeHref`.
+ *
+ * So anything going into an `href` goes through `localeHref` first. Without it
+ * every internal link on this page points at `/mods/x/` rather than
+ * `/en/mods/x/` — i.e. at a 404. That is the defect T501 shipped on both of
+ * its pages and the reason this one is graded
+ * (`tests/pages/mod-page.render.test.ts`, "never emits a bare, locale-less
+ * route").
  */
 function hrefFor(routePath: string | null): string | null {
   return routePath === null ? null : localeHref(locale, routePath);
