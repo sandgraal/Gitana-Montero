@@ -75,7 +75,7 @@
       "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=98V220000",
       "archiveUrl": "https://web.archive.org/web/20260902205057/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=98V220000",
       "accessed": "2026-09-02",
-      "kind": "tsb"
+      "kind": "manufacturer"
     },
     {
       "title": "NHTSA owner complaint database — 1997 Mitsubishi Montero",
@@ -146,7 +146,7 @@
         },
         "replace-the-damaged-line": {
           "title": "Cambiar el tramo dañado de cañería rígida",
-          "detail": "La cañería nueva se dobla y se abocina igual a la original, se enruta lejos de cualquier cosa que la roce, y después se purga el sistema. En un carro con edad suficiente para haber corroído una cañería, las cañerías vecinas vivieron lo mismo: este es el momento de verlas todas. Las cañerías de freno son una reparación de seguridad crítica con una unión abocinada que no puede sudar; si usted no tiene con qué abocinar y purgar bien, este trabajo es para un mecánico calificado."
+          "detail": "La cañería nueva se dobla y se abocina igual a la original, se acomoda lejos de cualquier cosa que la roce, y después se purga el sistema. En un carro con edad suficiente para haber corroído una cañería, las cañerías vecinas vivieron lo mismo: este es el momento de verlas todas. Las cañerías de freno son una reparación crítica para la seguridad, con una unión abocinada que no puede sudar; si usted no tiene con qué abocinar y purgar bien, este trabajo es para un mecánico calificado."
         }
       }
     }

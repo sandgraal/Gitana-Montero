@@ -4,7 +4,7 @@
     "gens": ["gen2", "gen2-5"],
     "markets": ["us"],
     "years": {
-      "from": 1992,
+      "from": 1996,
       "to": 1999
     }
   },
@@ -104,7 +104,7 @@
   "prose": {
     "en": {
       "title": "Brake judder through the pedal and the steering wheel",
-      "summary": "Owner reports filed with the United States road safety agency return to this one across the whole run of the generation: the pedal pulses, the steering wheel shakes when the brakes come on, the front discs get machined, and the judder is back a few thousand miles later. The repeat is the useful part of the story. A disc that is machined and then judders again was rarely the whole fault — something is still making one part of the disc face run hotter, or thicker, than the rest. This is a heavy truck on a front disc that was sized for a heavy truck, and the two usual culprits are a caliper that no longer slides freely and a wheel that was hammered on with an impact gun instead of torqued in sequence. It is uncomfortable rather than dangerous on its own: the brakes still work, and they still work well enough to stop the truck. What earns the caution is what tends to be underneath it — a caliper that drags is also cooking the fluid and the pads on that corner, and a bearing loose enough to show as judder is a different problem wearing a brake costume. Drive it gently, avoid long descents on the brakes, and get it looked at.",
+      "summary": "Owner reports filed with the United States road safety agency return to this one across the later model years of the generation — the fitment above is set to the years those reports actually cover, not to the whole run: the pedal pulses, the steering wheel shakes when the brakes come on, the front discs get machined, and the judder is back well before the next set of pads is due. The repeat is the useful part of the story. A disc that is machined and then judders again was rarely the whole fault — something is still making one part of the disc face run hotter, or thicker, than the rest. This is a heavy truck on a front disc that was sized for a heavy truck, and the two usual culprits are a caliper that no longer slides freely and a wheel that was hammered on with an impact gun instead of torqued in sequence. It is uncomfortable rather than dangerous on its own: the brakes still work, and they still work well enough to stop the truck. What earns the caution is what tends to be underneath it — a caliper that drags is also cooking the fluid and the pads on that corner, and a bearing loose enough to show as judder is a different problem wearing a brake costume. Drive it gently, avoid long descents on the brakes, and get it looked at.",
       "slug": "brake-judder",
       "symptoms": {
         "pedal-pulses-under-braking": "The pedal pushes back in a rhythm while you brake",
@@ -143,7 +143,7 @@
     },
     "es": {
       "title": "Vibración de frenos en el pedal y en el volante",
-      "summary": "Los reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos vuelven a este tema a lo largo de toda la generación: el pedal pulsa, el volante tiembla cuando entran los frenos, se rectifican los discos de freno delanteros, y la vibración regresa unos miles de kilómetros después. Esa reincidencia es la parte útil de la historia. Un disco de freno que se rectifica y vuelve a vibrar rara vez era toda la falla: algo sigue haciendo que una parte de la cara del disco corra más caliente, o más gruesa, que el resto. Este es un carro pesado sobre un disco de freno delantero dimensionado para un carro pesado, y los dos culpables de siempre son un cáliper que ya no desliza libre y una rueda que se apretó a pistola de impacto en vez de apretarse en cruz con llave de torque. Por sí sola es más incómoda que peligrosa: los frenos siguen sirviendo y siguen alcanzando para detener el carro. Lo que justifica la precaución es lo que suele venir por debajo: un cáliper que arrastra también está cocinando el líquido de frenos y las pastillas de freno de esa esquina, y un rodamiento con suficiente juego como para sentirse como vibración es otro problema disfrazado de freno. Maneje suave, evite bajadas largas colgado del freno, y llévelo a revisar.",
+      "summary": "Los reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos vuelven a este tema en los años modelo tardíos de la generación —la compatibilidad de arriba está puesta en los años que esos reportes de verdad cubren, no en toda la serie—: el pedal pulsa, el volante tiembla cuando entran los frenos, se rectifican los discos de freno delanteros, y la vibración regresa bastante antes de que toque el siguiente juego de pastillas de freno. Esa reincidencia es la parte útil de la historia. Un disco de freno que se rectifica y vuelve a vibrar rara vez era toda la falla: algo sigue haciendo que una parte de la cara del disco corra más caliente, o más gruesa, que el resto. Este es un carro pesado sobre un disco de freno delantero dimensionado para un carro pesado, y los dos culpables de siempre son un cáliper que ya no desliza libre y una rueda que se apretó a pistola de impacto en vez de apretarse en cruz con llave de torque. Por sí sola es más incómoda que peligrosa: los frenos siguen sirviendo y siguen alcanzando para detener el carro. Lo que justifica la precaución es lo que suele venir por debajo: un cáliper que arrastra también está cocinando el líquido de frenos y las pastillas de freno de esa esquina, y un rodamiento con suficiente juego como para sentirse como vibración es otro problema disfrazado de freno. Maneje suave, evite bajadas largas colgado del freno, y llévelo a revisar.",
       "slug": "vibracion-de-frenos",
       "symptoms": {
         "pedal-pulses-under-braking": "El pedal devuelve un pulso rítmico mientras usted frena",
@@ -162,7 +162,7 @@
         "feel-where-the-shake-arrives": "Frene suave desde velocidad y note si el temblor llega al volante, al pedal, o a los dos",
         "compare-wheel-temperature-after-a-drive": "Después de un manejo normal sin frenadas fuertes, acerque el dorso de la mano a cada rueda delantera y compare cuánto calor sale de cada una",
         "measure-disc-thickness-around-the-face": "Mida el disco de freno con micrómetro en varios puntos de la vuelta, siempre al mismo radio, y compare las lecturas",
-        "check-hub-play-and-disc-runout": "Levante la rueda, muévala de arriba y de abajo buscando juego, y luego gire el disco de freno contra un reloj comparador observando la aguja",
+        "check-hub-play-and-disc-runout": "Levante la rueda, muévala de arriba abajo y de lado a lado buscando juego, y luego gire el disco de freno contra un reloj comparador observando la aguja",
         "check-how-the-wheel-was-last-tightened": "Revise las tuercas de rueda y la cara de la maza buscando raspaduras, costra de óxido o pintura, y pregunte si la última vez la rueda se puso con pistola de impacto"
       },
       "fixPaths": {

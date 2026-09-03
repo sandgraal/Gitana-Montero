@@ -180,7 +180,7 @@
       },
       "causes": {
         "clogged-or-split-radiator": "Panal del radiador tapado, o un tanque lateral partido",
-        "tired-viscous-fan-coupling": "Acople viscoso del ventilador del radiador que ya no engrana cuando está caliente",
+        "tired-viscous-fan-coupling": "Acople viscoso del ventilador del radiador que ya no endurece cuando está caliente",
         "stuck-thermostat": "Termostato pegado cerrado, o una bolsa de aire detrás de él",
         "perished-hoses-or-weak-cap": "Mangueras cristalizadas o una tapa que ya no sostiene presión",
         "failing-water-pump": "Bomba de agua que ya no mueve bien el refrigerante",

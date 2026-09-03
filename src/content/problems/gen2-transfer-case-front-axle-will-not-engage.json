@@ -96,7 +96,7 @@
       "kind": "vendor"
     },
     {
-      "title": "Opinautos — fallas de 4x4 reportadas por dueños de Mitsubishi Montero (luces delanteras que parpadean, sensores de vacío junto a la caja de transferencia, conectores flojos)",
+      "title": "Opinautos — fallas de 4x4 reportadas por dueños de Mitsubishi Montero: luces de las ruedas delanteras que parpadean y palanca de 4x4 trabada (reportes de varios años modelo; la página mezcla generaciones, así que solo se toman de aquí los síntomas, no las causas que propone cada quien)",
       "url": "https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
       "archiveUrl": "https://web.archive.org/web/20260902205429/https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
       "accessed": "2026-09-02",
@@ -113,7 +113,7 @@
   "prose": {
     "en": {
       "title": "Front axle will not engage and the indicator blinks",
-      "summary": "On Super Select trucks the front axle is locked and unlocked by a vacuum-operated clutch, and the dash indicator only settles when the transfer lever and the front axle agree about which mode the truck is in. When they disagree, the indicator blinks — which is why a blinking front-wheel display is not a fault in the display. A specialist supplier of parts for these trucks states the same thing on its own product page for the control solenoid: blinking front-wheel lights mean the front axle is having trouble engaging or disengaging. A buyer's guide for this generation tells buyers to try every mode and treats flashing lights as an actuator or position-switch fault. Owner reports in Spanish add the two failures that are easiest to miss: vacuum switching parts near the transfer case that clean up and work again, and connectors under the truck that have simply worked loose. This entry is the half where the front axle never comes in. It is a lost capability rather than a hazard: the truck drives and stops exactly as it always did on the rear axle, and nothing is being damaged. The half where the axle will not release is a different problem and has its own entry, because that one does damage things.",
+      "summary": "On Super Select trucks the front axle is locked and unlocked by a vacuum-operated clutch, and the dash indicator only settles when the transfer lever and the front axle agree about which mode the truck is in. When they disagree, the indicator blinks — which is why a blinking front-wheel display is not a fault in the display. A specialist supplier of parts for these trucks states the same thing on its own product page for the control solenoid: blinking front-wheel lights mean the front axle is having trouble engaging or disengaging. A buyer's guide for this generation tells buyers to try every mode and treats flashing lights as an actuator or position-switch fault. Spanish-language owner reports show the same two complaints reaching drivers in the same words — the front-wheel lights flashing and the lever refusing to go where it is asked — and they are cited here for that and for nothing else: the reports on that page span several generations of this truck, and the causes individual posters propose for their own vehicles are not carried over to this one. This entry is the half where the front axle never comes in. It is a lost capability rather than a hazard: the truck drives and stops exactly as it always did on the rear axle, and nothing is being damaged. The half where the axle will not release is a different problem and has its own entry, because that one does damage things.",
       "slug": "front-axle-will-not-engage",
       "symptoms": {
         "front-wheel-indicator-blinks-and-never-settles": "The front-wheel indicator on the dash blinks and never settles",
@@ -148,13 +148,13 @@
         },
         "repair-the-switch-circuit": {
           "title": "Repair the position switch circuit",
-          "detail": "The indicator compares the lever position with the axle position, so a switch or connector that reports the wrong thing makes the dash blink while the mechanism is doing exactly as it is told. Owner reports describe loose connectors under the truck as a real and common version of this."
+          "detail": "The indicator compares the lever position with the axle position, so a switch or connector that reports the wrong thing makes the dash blink while the mechanism is doing exactly as it is told. Check the connectors before the switch: they live under the truck, they have been there for decades, and a loose one costs nothing to find."
         }
       }
     },
     "es": {
       "title": "El eje delantero no entra y el indicador parpadea",
-      "summary": "En los carros con Super Select el eje delantero se bloquea y se desbloquea con un embrague accionado por vacío, y el indicador del tablero solo se queda fijo cuando la palanca de transferencia y el eje delantero coinciden en cuál modo está el carro. Cuando no coinciden, el indicador parpadea, y por eso unas luces delanteras parpadeando no son una falla de las luces. Un proveedor especializado en repuestos para estos carros dice lo mismo en la página de su propio solenoide de control: las luces de las ruedas delanteras parpadeando significan que el eje delantero está teniendo problemas para entrar o para salir. Una guía de compra de esta generación le dice al comprador que pruebe todos los modos y trata las luces parpadeando como una falla del actuador o del interruptor de posición. Reportes de dueños en español agregan las dos fallas más fáciles de pasar por alto: piezas de conmutación de vacío junto a la caja de transferencia que se limpian y vuelven a servir, y conectores debajo del carro que simplemente se aflojaron. Esta entrada es la mitad en que el eje delantero nunca entra. Es una capacidad perdida y no un peligro: el carro anda y frena igual que siempre sobre el eje trasero, y no se está dañando nada. La mitad en que el eje no quiere salir es otro problema y tiene su propia entrada, porque esa sí daña cosas.",
+      "summary": "En los carros con Super Select el eje delantero se bloquea y se desbloquea con un embrague accionado por vacío, y el indicador del tablero solo se queda fijo cuando la palanca de transferencia y el eje delantero coinciden en cuál modo está el carro. Cuando no coinciden, el indicador parpadea, y por eso unas luces delanteras parpadeando no son una falla de las luces. Un proveedor especializado en repuestos para estos carros dice lo mismo en la página de su propio solenoide de control: las luces de las ruedas delanteras parpadeando significan que el eje delantero está teniendo problemas para entrar o para salir. Una guía de compra de esta generación le dice al comprador que pruebe todos los modos y trata las luces parpadeando como una falla del actuador o del interruptor de posición. Los reportes de dueños en español muestran esas dos mismas quejas llegándole al conductor con las mismas palabras —las luces de las ruedas delanteras parpadeando y la palanca que no quiere ir donde se le pide— y se citan aquí por eso y por nada más: los reportes de esa página abarcan varias generaciones de este carro, y las causas que cada quien propone para su propio vehículo no se trasladan a esta entrada. Esta entrada es la mitad en que el eje delantero nunca entra. Es una capacidad perdida y no un peligro: el carro anda y frena igual que siempre sobre el eje trasero, y no se está dañando nada. La mitad en que el eje no quiere salir es otro problema y tiene su propia entrada, porque esa sí daña cosas.",
       "slug": "el-eje-delantero-no-entra",
       "symptoms": {
         "front-wheel-indicator-blinks-and-never-settles": "El indicador de ruedas delanteras del tablero parpadea y nunca se queda fijo",
@@ -177,11 +177,11 @@
       "fixPaths": {
         "replace-the-freewheel-clutch-solenoid": {
           "title": "Cambiar el solenoide de control del embrague de rueda libre",
-          "detail": "El proveedor citado describe esta pieza como de acceso fácil, y el tiempo que aparece aquí es la cifra de esa misma fuente para el cambio y no un cálculo nuestro. Anote cómo van enrutadas las mangueras en la unidad vieja antes de sacarla, porque volverlas a poner en el orden equivocado le deja la misma falla con una pieza nueva montada."
+          "detail": "El proveedor citado describe esta pieza como de acceso fácil, y el tiempo que aparece aquí es la cifra de esa misma fuente para el cambio y no un cálculo nuestro. Anote por dónde van las mangueras en la unidad vieja antes de sacarla, porque volverlas a poner en el orden equivocado le deja la misma falla con una pieza nueva montada."
         },
         "renew-the-vacuum-hoses": {
           "title": "Renovar las mangueras de vacío",
-          "detail": "El hule de décadas debajo de un carro se endurece y se raja en las puntas, donde se estira sobre una espiga. Renueve el tramo completo en vez de parchar el pedazo que encontró, y enrútelo lejos del escape."
+          "detail": "El hule de décadas debajo de un carro se endurece y se raja en las puntas, donde se estira sobre una espiga. Renueve el tramo completo en vez de parchar el pedazo que encontró, y hágalo pasar lejos del escape."
         },
         "free-or-replace-the-actuator": {
           "title": "Liberar o cambiar el actuador del eje delantero",
@@ -189,7 +189,7 @@
         },
         "repair-the-switch-circuit": {
           "title": "Reparar el circuito del interruptor de posición",
-          "detail": "El indicador compara la posición de la palanca con la del eje, así que un interruptor o un conector que reporte lo que no es hace parpadear el tablero mientras el mecanismo hace exactamente lo que se le pidió. Los reportes de dueños describen conectores flojos debajo del carro como una versión real y frecuente de esto."
+          "detail": "El indicador compara la posición de la palanca con la del eje, así que un interruptor o un conector que reporte lo que no es hace parpadear el tablero mientras el mecanismo hace exactamente lo que se le pidió. Revise los conectores antes que el interruptor: viven debajo del carro, llevan décadas ahí, y encontrar uno flojo no cuesta nada."
         }
       }
     }

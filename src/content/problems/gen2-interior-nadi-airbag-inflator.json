@@ -65,7 +65,7 @@
       "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=20V035000",
       "archiveUrl": "https://web.archive.org/web/20260902174830/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=20V035000",
       "accessed": "2026-09-02",
-      "kind": "tsb"
+      "kind": "manufacturer"
     },
     {
       "title": "NHTSA owner complaint database — 1998 Mitsubishi Montero",
@@ -134,7 +134,7 @@
         },
         "have-the-srs-diagnosed-properly": {
           "title": "Hacer diagnosticar el sistema de bolsas de aire con un mecánico calificado",
-          "detail": "Una luz de advertencia que se queda encendida, o una que nunca enciende, significa que el sistema registró una falla y puede no desplegarse cuando haga falta. Esto necesita un escáner que hable con el sistema de bolsas de aire y alguien que conozca el procedimiento de desarmado: no se adivina cambiando un fusible."
+          "detail": "Una luz de advertencia que se queda encendida, o una que nunca enciende, significa que el sistema registró una falla y puede no desplegarse cuando haga falta. Esto necesita un escáner que hable con el sistema de bolsas de aire y alguien que conozca el procedimiento de desactivación del sistema SRS: no se adivina cambiando un fusible."
         }
       }
     }

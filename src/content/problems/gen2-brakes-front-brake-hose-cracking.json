@@ -70,14 +70,14 @@
       "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=96V143001",
       "archiveUrl": "https://web.archive.org/web/20260902174723/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=96V143001",
       "accessed": "2026-09-02",
-      "kind": "tsb"
+      "kind": "manufacturer"
     },
     {
       "title": "NHTSA safety recall 00V226001 (Mitsubishi) — front lower brake hoses can crack",
       "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=00V226001",
       "archiveUrl": "https://web.archive.org/web/20260902174734/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=00V226001",
       "accessed": "2026-09-02",
-      "kind": "tsb"
+      "kind": "manufacturer"
     },
     {
       "title": "NHTSA owner complaint database — 1992 Mitsubishi Montero",

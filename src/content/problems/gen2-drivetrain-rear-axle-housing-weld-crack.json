@@ -1,11 +1,11 @@
 {
   "id": "gen2-drivetrain-rear-axle-housing-weld-crack",
   "fitment": {
-    "gens": ["gen2", "gen2-5"],
+    "gens": ["gen2"],
     "markets": ["us"],
     "years": {
-      "from": 1992,
-      "to": 1999
+      "from": 1995,
+      "to": 1995
     }
   },
   "system": "drivetrain",
@@ -87,19 +87,12 @@
       "archiveUrl": "http://web.archive.org/web/20260902175019/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1995",
       "accessed": "2026-09-02",
       "kind": "reference"
-    },
-    {
-      "title": "NHTSA owner complaint database — 1999 Mitsubishi Montero",
-      "url": "https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
-      "archiveUrl": "https://web.archive.org/web/20260902175310/https://api.nhtsa.gov/complaints/complaintsByVehicle?make=mitsubishi&model=montero&modelYear=1999",
-      "accessed": "2026-09-02",
-      "kind": "reference"
     }
   ],
   "prose": {
     "en": {
       "title": "Cracked weld on the rear axle housing",
-      "summary": "A small group of owner reports filed with the United States road safety agency describes something that does not appear on most fault lists for this truck: welds on the rear axle housing cracking and separating, with gear oil escaping along the seam, the wheel on that side no longer standing square, and owners describing the wheel as heading for separation. There is no recall behind this and no factory bulletin cited here — it is a pattern in owner reports, several of them, describing the same failure in the same place. That is exactly why it is written down at community-consensus rather than presented with the authority of a bulletin, and why the triage below is set where it is. The reason this entry says tow rather than drive carefully is that the failure has no useful middle. An axle housing is what holds the wheel at the right angle to the road and keeps the differential's gears in mesh; when it is cracked, load is being carried by less metal every kilometre, and the failure that ends it is a wheel going somewhere the truck is not. If you find a wet seam along a weld on the axle, or a rear wheel that has started leaning, the sensible next move is a flatbed and a qualified mechanic looking at it on a hoist, not a careful drive to the workshop.",
+      "summary": "A small group of owner reports filed with the United States road safety agency describes something that does not appear on most fault lists for this truck: welds on the rear axle housing cracking and separating, with gear oil escaping along the seam, the wheel on that side no longer standing square, and owners describing the wheel as heading for separation. One of them describes the housing as having separated at the weld three quarters of the way around. There is no recall behind this and no factory bulletin cited here — it is a pattern in owner reports, several of them, describing the same failure in the same place. **Every one of those reports is from a single model year**, and the fitment above is deliberately narrowed to it rather than spread across the generation: the evidence says what it says, and no more. If your truck is an adjacent year, the inspection below is still worth ten minutes, but nothing here claims your year is affected. That scoping, and the absence of any bulletin, is why the entry sits at community-consensus rather than carrying documentary authority. The reason it says tow rather than drive carefully is that the failure has no useful middle. An axle housing is what holds the wheel at the right angle to the road and keeps the differential's gears in mesh; when it is cracked, load is being carried by less metal every kilometre, and the failure that ends it is a wheel going somewhere the truck is not. If you find a wet seam along a weld on the axle, or a rear wheel that has started leaning, the sensible next move is a flatbed and a qualified mechanic looking at it on a hoist, not a careful drive to the workshop.",
       "slug": "cracked-rear-axle-housing-weld",
       "symptoms": {
         "gear-oil-weeping-along-a-seam-on-the-axle": "Gear oil weeping along a seam or a weld on the rear axle housing",
@@ -137,12 +130,12 @@
     },
     "es": {
       "title": "Soldadura rajada en la carcasa del eje trasero",
-      "summary": "Un grupo pequeño de reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos describe algo que no sale en la mayoría de las listas de fallas de este carro: soldaduras de la carcasa del eje trasero que se rajan y se separan, con aceite de engranajes escapándose por la costura, la rueda de ese lado ya sin quedar a escuadra, y dueños describiendo que la rueda iba camino a soltarse. Detrás de esto no hay llamado a revisión y aquí no se cita ningún boletín de fábrica: es un patrón en reportes de dueños, varios de ellos, describiendo la misma falla en el mismo lugar. Justamente por eso queda anotado como consenso de la comunidad y no se presenta con la autoridad de un boletín, y por eso el triaje de abajo está donde está. La razón por la que esta entrada dice grúa y no manejar con cuidado es que esta falla no tiene un punto medio útil. La carcasa del eje es lo que sostiene la rueda en el ángulo correcto contra el camino y lo que mantiene engranados los piñones del diferencial; cuando está rajada, cada kilómetro la carga la lleva menos metal, y la falla que la termina es una rueda yéndose para donde el carro no va. Si usted encuentra una costura húmeda a lo largo de una soldadura del eje, o una rueda trasera que empezó a inclinarse, lo sensato es una plataforma y un mecánico calificado viéndolo en un elevador, no un viaje cuidadoso hasta el taller.",
+      "summary": "Un grupo pequeño de reportes de dueños presentados ante la agencia de seguridad vial de Estados Unidos describe algo que no sale en la mayoría de las listas de fallas de este carro: soldaduras de la carcasa del eje trasero que se rajan y se separan, con aceite de engranajes escapándose por la costura, la rueda de ese lado ya sin quedar a escuadra, y dueños describiendo que la rueda iba camino a soltarse. Uno de ellos describe la carcasa separada por la soldadura en tres cuartas partes de la vuelta. Detrás de esto no hay llamado a revisión y aquí no se cita ningún boletín de fábrica: es un patrón en reportes de dueños, varios de ellos, describiendo la misma falla en el mismo lugar. **Todos esos reportes son de un solo año modelo**, y la compatibilidad de arriba se recortó a propósito a ese año en vez de repartirse por toda la generación: la evidencia dice lo que dice y nada más. Si su carro es de un año vecino, la revisión de abajo igual vale diez minutos, pero aquí no se afirma que su año esté afectado. Ese recorte, y la ausencia de cualquier boletín, es la razón por la que la entrada queda en consenso de la comunidad y no lleva autoridad documental. La razón por la que dice grúa y no manejar con cuidado es que esta falla no tiene un punto medio útil. La carcasa del eje es lo que sostiene la rueda en el ángulo correcto contra el camino y lo que mantiene engranados los piñones del diferencial; cuando está rajada, cada kilómetro la carga la lleva menos metal, y la falla que la termina es una rueda yéndose para donde el carro no va. Si usted encuentra una costura húmeda a lo largo de una soldadura del eje, o una rueda trasera que empezó a inclinarse, lo sensato es una plataforma y un mecánico calificado viéndolo en un elevador, no un viaje cuidadoso hasta el taller.",
       "slug": "soldadura-rajada-en-el-eje-trasero",
       "symptoms": {
         "gear-oil-weeping-along-a-seam-on-the-axle": "Aceite de engranajes sudando por una costura o una soldadura de la carcasa del eje trasero",
         "one-rear-wheel-leaning-out-of-true": "Una rueda trasera visiblemente inclinada mientras la otra queda a escuadra",
-        "clunk-and-a-change-in-tracking-under-power": "Un golpe seco y un cambio en cómo agarra el carro cuando entra la fuerza",
+        "clunk-and-a-change-in-tracking-under-power": "Un golpe seco y un cambio en cómo se mantiene en línea el carro cuando entra la fuerza",
         "visible-crack-along-a-weld-on-the-housing": "Una rajadura visible, o una línea brillante de metal limpio, a lo largo de una soldadura de la carcasa",
         "rear-tyre-wearing-on-one-edge-suddenly": "Una llanta trasera que de pronto empezó a gastarse solo de un borde"
       },
@@ -161,7 +154,7 @@
       "fixPaths": {
         "replace-the-axle-housing": {
           "title": "Cambiar la carcasa del eje",
-          "detail": "Una carcasa rajada se cambia, y volverla a soldar no es una reparación que nadie deba aceptar para la calle: la rajadura empezó en una soldadura, el metal alrededor quedó fatigado, y un cordón encima de eso deja un punto duro al lado de uno cansado. Este es un trabajo de eje completo con el diferencial vuelto a calibrar después, y le corresponde a un mecánico calificado."
+          "detail": "Una carcasa rajada se cambia, y volverla a soldar no es una reparación que nadie deba aceptar para la calle: la rajadura empezó en una soldadura, el metal alrededor quedó fatigado, y un cordón encima de eso deja un punto duro al lado de uno cansado. Este es un trabajo de eje completo con el diferencial recalibrado después, y le corresponde a un mecánico calificado."
         },
         "renew-the-bearing-and-shaft": {
           "title": "Renovar el rodamiento de rueda trasera y revisar el palier",

@@ -92,7 +92,7 @@
       "kind": "vendor"
     },
     {
-      "title": "Opinautos — fallas de 4x4 reportadas por dueños de Mitsubishi Montero (la 4x4 entra y no sale, luces que parpadean, palanca trabada)",
+      "title": "Opinautos — fallas de 4x4 reportadas por dueños de Mitsubishi Montero: luces de las ruedas delanteras que parpadean y palanca de 4x4 trabada (reportes de varios años modelo; la página mezcla generaciones, así que solo se toman de aquí los síntomas, no las causas que propone cada quien)",
       "url": "https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
       "archiveUrl": "https://web.archive.org/web/20260902205429/https://www.opinautos.com/us/mitsubishi/montero/defectos/4x4",
       "accessed": "2026-09-02",
@@ -147,7 +147,7 @@
     },
     "es": {
       "title": "El eje delantero no sale y el tren motriz se amarra",
-      "summary": "Esta es la mitad cara del mismo eje delantero accionado por vacío. Cuando el embrague se queda enganchado después de que usted pidió tracción sencilla, el eje delantero y el trasero quedan amarrados sobre un piso con agarre, y en asfalto seco los dos no pueden tener razón a la vez sobre cuánto recorrió el carro en una curva. Alguien tiene que ceder la diferencia, y en este carro eso se traduce en una llanta chillando, la dirección peleando y el tren motriz cargándose de torsión hasta que se suelta de un golpe. Repita eso y el desgaste cae en la caja de transferencia y en el eje delantero, que es la razón por la que esta entrada está marcada como dañina y su gemela —el eje que nunca entra— no lo está. Hay algo que revisar antes de suponer una falla, y no cuesta nada. El Super Select está hecho para usarse con el diferencial central abierto en asfalto, y si el carro quedó en un modo bloqueado se va a amarrar exactamente así mientras se comporta de manera completamente correcta. Salga del modo bloqueado, maneje en línea recta sobre piso suelto para descargar la torsión guardada en el tren motriz, y vea si la queja sigue ahí. Si sigue, es el lado de control o el actuador, y vale la pena hacerle caso a la nota del proveedor sobre respetar el enrutado de las mangueras al cambiar un solenoide: mangueras cruzadas convierten un 'no entra' en un 'no sale'.",
+      "summary": "Esta es la mitad cara del mismo eje delantero accionado por vacío. Cuando el embrague se queda enganchado después de que usted pidió tracción sencilla, el eje delantero y el trasero quedan amarrados sobre un piso con agarre, y en asfalto seco los dos no pueden tener razón a la vez sobre cuánto recorrió el carro en una curva. Alguien tiene que ceder la diferencia, y en este carro eso se traduce en una llanta chillando, la dirección peleando y el tren motriz cargándose de torsión hasta que se suelta de un golpe. Repita eso y el desgaste cae en la caja de transferencia y en el eje delantero, que es la razón por la que esta entrada está marcada como dañina y su gemela —el eje que nunca entra— no lo está. Hay algo que revisar antes de suponer una falla, y no cuesta nada. El Super Select está hecho para usarse con el diferencial central abierto en asfalto, y si el carro quedó en un modo bloqueado se va a amarrar exactamente así mientras se comporta de manera completamente correcta. Salga del modo bloqueado, maneje en línea recta sobre piso suelto para descargar la torsión guardada en el tren motriz, y vea si la queja sigue ahí. Si sigue, es el lado de control o el actuador, y vale la pena hacerle caso a la nota del proveedor sobre respetar por dónde van las mangueras al cambiar un solenoide: mangueras cruzadas convierten un 'no entra' en un 'no sale'.",
       "slug": "el-eje-delantero-no-sale",
       "symptoms": {
         "binding-and-hopping-in-tight-turns-on-pavement": "El carro se amarra y brinca en curvas cerradas sobre asfalto seco",
@@ -166,12 +166,12 @@
         "confirm-the-lever-is-really-in-two-wheel-drive": "Confirme que la palanca llegó completa a la posición de tracción sencilla y no quedó entre topes, y revise qué dice el tablero sobre el diferencial central",
         "release-the-wind-up-then-retest": "Sobre piso suelto, maneje en línea recta y luego un poco en reversa para descargar la torsión del tren motriz, y después vuelva a probar la curva cerrada en asfalto",
         "disconnect-the-vacuum-at-the-actuator": "Con el motor encendido y la tracción sencilla puesta, saque la manguera de vacío del actuador y vea si el eje se suelta",
-        "compare-the-hose-routing-against-the-old-unit": "Si hace poco se cambió un bloque de solenoides, compare su enrutado de mangueras contra el patrón de la unidad que reemplazó"
+        "compare-the-hose-routing-against-the-old-unit": "Si hace poco se cambió un bloque de solenoides, compare por dónde le van las mangueras contra el recorrido de la unidad que reemplazó"
       },
       "fixPaths": {
         "replace-the-solenoid-and-route-the-hoses-right": {
-          "title": "Cambiar el solenoide de control y dejar bien el enrutado de mangueras",
-          "detail": "El tiempo que aparece es la cifra del propio proveedor para el cambio. Su instrucción es la parte que importa acá: anote el enrutado en la unidad existente y repítalo en la nueva. Es una pieza barata que produce un síntoma caro cuando su plomería queda corrida un puerto."
+          "title": "Cambiar el solenoide de control y dejar bien el recorrido de las mangueras",
+          "detail": "El tiempo que aparece es la cifra del propio proveedor para el cambio. Su instrucción es la parte que importa acá: anote el recorrido en la unidad existente y repítalo en la nueva. Es una pieza barata que produce un síntoma caro cuando sus mangueras quedan corridas un puerto."
         },
         "free-or-replace-the-stuck-actuator": {
           "title": "Liberar o cambiar el actuador pegado",

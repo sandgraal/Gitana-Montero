@@ -3,6 +3,7 @@
   "fitment": {
     "gens": ["gen2"],
     "markets": ["us"],
+    "engines": ["6g72-sohc"],
     "years": {
       "from": 1992,
       "to": 1996
@@ -87,11 +88,11 @@
   "confidence": "tsb",
   "sources": [
     {
-      "title": "NHTSA safety recall 00V311001 (Mitsubishi) — crankshaft pulley bolt can loosen and the pulley can fall off, with loss of power steering assist",
+      "title": "NHTSA safety recall 00V311001 (Mitsubishi) — crankshaft pulley bolt can loosen and the pulley can fall off, with loss of power steering assist; the Montero half of the campaign is scoped to trucks with the 3.0L engine",
       "url": "https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=00V311001",
       "archiveUrl": "https://web.archive.org/web/20260902174544/https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=00V311001",
       "accessed": "2026-09-02",
-      "kind": "tsb"
+      "kind": "manufacturer"
     },
     {
       "title": "NHTSA owner complaint database — 1995 Mitsubishi Montero",
@@ -118,7 +119,7 @@
   "prose": {
     "en": {
       "title": "Crankshaft pulley bolt loosens and the pulley departs",
-      "summary": "This is the defining mechanical failure of the second-generation Montero and the one worth knowing before anything else on the engine. Mitsubishi's United States recall states that the bolt securing the crankshaft pulley can work loose and that the pulley can then fall off the vehicle, and it names the consequence in plain terms: loss of power steering assist, with an increased risk of a crash. The pulley is what drives every belt on the front of the engine, so when it leaves, the steering pump, the alternator and the water pump all stop at once — heavy steering, no charging and a rising temperature gauge, arriving together and without warning. Owner reports filed with the same agency are unusually numerous for this component and they add two things the campaign does not: some describe the bolt loosening again after it was tightened, and several describe the crankshaft nose itself being chewed out, which turns a fastener job into an engine. The recall covers a defined range of United States trucks; a great many owners reported the identical failure on trucks outside it. Treat a knock or a visible wobble at the front of the engine as this fault until it is proven otherwise, and do not drive the truck to find out.",
+      "summary": "This is the defining mechanical failure of the second-generation Montero and the one worth knowing before anything else on the engine. Mitsubishi's United States recall states that the bolt securing the crankshaft pulley can work loose and that the pulley can then fall off the vehicle, and it names the consequence in plain terms: loss of power steering assist, with an increased risk of a crash. The pulley is what drives every belt on the front of the engine, so when it leaves, the steering pump, the alternator and the water pump all stop at once — heavy steering, no charging and a rising temperature gauge, arriving together and without warning. Owner reports filed with the same agency are unusually numerous for this component and they add two things the campaign does not: some describe the bolt loosening again after it was tightened, and several describe the crankshaft nose itself being chewed out, which turns a fastener job into an engine. **Read the campaign's scope carefully, because it is narrower than the truck.** It names Monteros fitted with the smaller of the two petrol V6s, and the fitment above is set to that engine for exactly that reason — a truck with the larger V6 was never part of it. That boundary is not a statement that the larger engine is immune, and the cited owner reports are blunt about how it felt from outside: one asks why there is no recall for the bigger engine, another records being told their truck was excluded by its identification number. Owners of an excluded truck get the same inspection and none of the free repair. Treat a knock or a visible wobble at the front of the engine as this fault until it is proven otherwise, whichever engine you have, and do not drive the truck to find out.",
       "slug": "crankshaft-pulley-bolt-loosens",
       "symptoms": {
         "knock-or-rattle-from-the-front-of-the-engine": "A knock or rattle from the front of the engine that changes with engine speed",
@@ -157,7 +158,7 @@
     },
     "es": {
       "title": "Se afloja el perno de la polea del cigüeñal y la polea se sale",
-      "summary": "Esta es la falla mecánica que define al Montero de segunda generación y la primera que conviene conocer del motor. El llamado a revisión de Mitsubishi en Estados Unidos dice que el perno que sujeta la polea del cigüeñal se puede aflojar y que después la polea se puede salir del carro, y nombra la consecuencia sin rodeos: pérdida de la asistencia de la dirección hidráulica, con mayor riesgo de choque. Esa polea es la que mueve todas las fajas del frente del motor, así que cuando se va se detienen de un solo golpe la bomba de la dirección hidráulica, el alternador y la bomba de agua: dirección pesada, sin carga y con la aguja de temperatura subiendo, todo junto y sin aviso. Los reportes de dueños presentados ante la misma agencia son llamativamente numerosos para esta pieza y agregan dos cosas que la campaña no dice: algunos describen que el perno se volvió a aflojar después de haberlo apretado, y varios describen que la punta del cigüeñal quedó comida, lo que convierte un trabajo de tornillería en un motor. El llamado a revisión cubre un rango definido de carros estadounidenses; muchísimos dueños reportaron la falla idéntica en carros fuera de ese rango. Trate cualquier golpeteo o bamboleo visible en el frente del motor como esta falla mientras no se demuestre otra cosa, y no maneje el carro para salir de dudas.",
+      "summary": "Esta es la falla mecánica que define al Montero de segunda generación y la primera que conviene conocer del motor. El llamado a revisión de Mitsubishi en Estados Unidos dice que el perno que sujeta la polea del cigüeñal se puede aflojar y que después la polea se puede salir del carro, y nombra la consecuencia sin rodeos: pérdida de la asistencia de la dirección hidráulica, con mayor riesgo de choque. Esa polea es la que mueve todas las fajas del frente del motor, así que cuando se va se detienen de un solo golpe la bomba de la dirección hidráulica, el alternador y la bomba de agua: dirección pesada, sin carga y con la aguja de temperatura subiendo, todo junto y sin aviso. Los reportes de dueños presentados ante la misma agencia son llamativamente numerosos para esta pieza y agregan dos cosas que la campaña no dice: algunos describen que el perno se volvió a aflojar después de haberlo apretado, y varios describen que la punta del cigüeñal quedó comida, lo que convierte un trabajo de tornillería en un motor. **Lea con cuidado el alcance de la campaña, porque es más angosto que el carro.** Nombra los Monteros equipados con el menor de los dos V6 de gasolina, y la compatibilidad de arriba está puesta en ese motor justamente por eso: un carro con el V6 más grande nunca estuvo dentro. Ese límite no dice que el motor más grande sea inmune, y los reportes de dueños citados son francos sobre cómo se sintió desde afuera: uno pregunta por qué no hay llamado a revisión para el motor grande, y otro deja constancia de que le dijeron que su carro quedaba excluido por su número de identificación. El dueño de un carro excluido recibe la misma revisión y nada de la reparación gratuita. Trate cualquier golpeteo o bamboleo visible en el frente del motor como esta falla mientras no se demuestre otra cosa, tenga el motor que tenga, y no maneje el carro para salir de dudas.",
       "slug": "perno-de-polea-del-ciguenal-flojo",
       "symptoms": {
         "knock-or-rattle-from-the-front-of-the-engine": "Un golpeteo o cascabeleo en el frente del motor que cambia con las revoluciones",
@@ -182,7 +183,7 @@
       "fixPaths": {
         "retorque-with-the-improved-bolt": {
           "title": "Poner el perno mejorado y apretarlo al torque correcto",
-          "detail": "Este es el remedio de la propia campaña cuando la polea y la punta del cigüeñal están sanas: el perno mejorado, apretado al valor de fábrica con llave de torque, y las caras de apoyo limpias y secas. Apretar este perno a puro cálculo es como la falla se repite, y varios reportes de dueños describen exactamente eso."
+          "detail": "Este es el remedio de la propia campaña cuando la polea y la punta del cigüeñal están sanas: el perno mejorado, apretado al valor de fábrica con llave de torque, y las caras de apoyo limpias y secas. Apretar este perno a puro cálculo es así como la falla se repite, y varios reportes de dueños describen exactamente eso."
         },
         "replace-the-damper": {
           "title": "Cambiar la polea del cigüeñal con su amortiguador",
