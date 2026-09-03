@@ -71,6 +71,13 @@ the user's own record and is not fact-checked by the site.
 - **GAR-05′** Receipts SHALL be first-class: uploadable (image/PDF) into
   user-private storage, with vendor/date/amount fields, never publicly
   accessible unless the specific record's cost visibility is opened.
+- **GAR-06′** (owner-approved addition, 2026-09-02) A record SHALL support
+  general documentation attachments — photo, video, or audio, in addition to
+  GAR-05′'s image/PDF receipts — uploaded into user-private storage,
+  independent of a receipt's vendor/date/amount fields. Never publicly
+  accessible unless the record's visibility is opened. Motivating case: an
+  owner's WhatsApp media (photos, videos, voice notes) documenting a shop's
+  work, none of which is a receipt in GAR-05′'s financial sense.
 
 ## 5. Sharing (SHR)
 

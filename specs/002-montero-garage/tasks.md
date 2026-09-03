@@ -532,6 +532,46 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   interview (001 T303's content) entered as real records with receipts;
   conductor+owner refine the garage views against it before generalization.
   Depends: T2-302. *(MIG-04)*
+  <br>**Added mid-task (2026-09-02): the interview surfaced a real gap.**
+  Gitana Blanca's seed data includes WhatsApp photos, videos, and voice notes
+  documenting a shop's repair work — none of which are receipts in GAR-05′'s
+  financial sense (vendor/date/amount), and video/audio have no attachment
+  type at all today (the `vehicle-photos` bucket's `allowed_mime_types` is
+  image-only per T2-301a). Owner-approved spec addition **GAR-06′** and new
+  tasks **T2-305a/T2-305** below cover it. 11 of 12 documentation photos and
+  the ROSOGA quote PDF (as a GAR-05′ receipt) were seeded directly against
+  production via the conductor's Supabase connection, with the owner's
+  explicit sign-off on that write path; the 12th photo silently failed to
+  reach storage (not a data-loss risk — nothing references it) and is a
+  loose end if anyone wants to chase it. **A real bug found in the process
+  (ticketed below as T2-305):** uploading vehicle photos back-to-back fast enough
+  triggers a lost-update race on `vehicles.photo_paths` — one upload's
+  read-modify-write of the array can clobber another's, leaving a real
+  storage object with no `photo_paths` entry pointing at it (recovered by
+  hand this time via direct SQL). Whoever picks up hardening the photo
+  upload flow should fix this — likely `array_append` at the SQL layer
+  instead of a client-computed replacement array, or a serialized upload
+  queue.
+
+- [ ] **T2-305a [TEST]** Graders for record media attachments (GAR-06′):
+  a private bucket for photo/video/audio; RLS scoped to owner via the
+  vehicle→owner ownership path (same shape as T2-301a's photos and receipts);
+  `allowed_mime_types` restricted to the three declared kinds only; a
+  delete-record trigger reaches its attachments (same defense-in-depth
+  pattern T2-301a used for `on_vehicle_deleted`, and the same gap T2-302
+  flagged and left open for receipts — do not repeat that gap a third time
+  without at least naming it in this task's own notes); storage_path
+  contract; distinct from and independent of GAR-05′'s receipt fields
+  (vendor/date/amount stay receipt-only, never required on an attachment).
+  Depends: T2-302. *(GAR-06′)*
+- [ ] **T2-305 [PLATFORM]** Record media attachments (owner-approved
+  addition, 2026-09-02): new private bucket (photo/video/audio) + attachment
+  rows scoped to a record, path `<owner uuid>/<vehicle id>/<record id>/<file>`
+  per the T2-301a photos precedent; upload UI on the record edit page,
+  alongside but visually distinct from receipts. Fix the lost-update race on
+  `vehicles.photo_paths` noted above while touching this surface, if not
+  already fixed elsewhere first. Activates T2-305a graders. Depends: T2-305a
+  merged. *(GAR-06′)*
 
 - [ ] **T2-306a [TEST]** Graders for the cover-photo designation (GAR-01′):
   a nullable `vehicles.cover_photo_path` column (or equivalent) naming one entry already
