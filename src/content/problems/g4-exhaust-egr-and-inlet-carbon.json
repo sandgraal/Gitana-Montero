@@ -1,0 +1,204 @@
+{
+  "id": "g4-exhaust-egr-and-inlet-carbon",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["cr", "uk", "au", "jdm", "eu", "me", "global"],
+    "engines": ["4m41"],
+    "years": {
+      "from": 2006,
+      "to": 2021
+    }
+  },
+  "system": "exhaust",
+  "severity": "degrading",
+  "drivability": "drive-normally",
+  "symptoms": [
+    "hesitates-when-you-ask-for-throttle",
+    "rough-idle",
+    "reduced-throttle-response"
+  ],
+  "causes": [
+    {
+      "id": "carbon-packed-inlet-manifold"
+    },
+    {
+      "id": "recirculation-valve-stuck-open"
+    },
+    {
+      "id": "short-trip-urban-use"
+    },
+    {
+      "id": "another-air-path-restriction"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "read-the-stored-fault-codes",
+      "rulesIn": ["recirculation-valve-stuck-open"],
+      "rulesOut": []
+    },
+    {
+      "id": "describe-how-the-truck-is-actually-used",
+      "rulesIn": ["short-trip-urban-use"],
+      "rulesOut": []
+    },
+    {
+      "id": "remove-the-valve-and-look-into-the-manifold",
+      "rulesIn": [
+        "carbon-packed-inlet-manifold",
+        "recirculation-valve-stuck-open"
+      ],
+      "rulesOut": []
+    },
+    {
+      "id": "check-the-air-filter-and-intercooler-pipes",
+      "rulesIn": ["another-air-path-restriction"],
+      "rulesOut": ["carbon-packed-inlet-manifold"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "professional-inlet-clean",
+      "difficulty": 4,
+      "cost": {
+        "from": "moderate",
+        "to": "significant"
+      },
+      "addresses": [
+        "carbon-packed-inlet-manifold",
+        "recirculation-valve-stuck-open"
+      ],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "replace-the-recirculation-valve",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["recirculation-valve-stuck-open"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "change-the-driving-pattern",
+      "difficulty": 1,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["short-trip-urban-use"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "restore-the-air-path",
+      "difficulty": 2,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["another-air-path-restriction"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero 4x4 Life — \"Pajero 3.2 DI-D common problems\": lists exhaust gas recirculation valve and inlet manifold carbonisation as affecting both the third and fourth generations, with symptoms of \"rough running, hesitation, reduced throttle response, and in severe cases, poor idle quality\", attributed to carbon accumulation from urban, short-trip conditions, and a professional inlet clean and valve service as the fix",
+      "url": "https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "archiveUrl": "https://web.archive.org/web/20260902175907id_/https://mitsubishipajero4x4life.com/3-2-did-common-problems/",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "Repuestos USA Motors, Tres Ríos, Cartago, Costa Rica — catalogue category page listing \"VALVULA EGR\" among the valves the shop catalogues; a quote-request listing, not a per-vehicle stock or price check",
+      "url": "https://repuestosusamotorscr.com/producto/valvulas-variedad/",
+      "archiveUrl": "https://web.archive.org/web/20260902180204id_/https://repuestosusamotorscr.com/producto/valvulas-variedad/",
+      "accessed": "2026-09-02",
+      "kind": "vendor"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Carbon in the inlet and the EGR valve",
+      "slug": "carbon-in-the-inlet",
+      "summary": "Exhaust gas recirculation sends a measured amount of exhaust back into the inlet to lower combustion temperature. Soot in that exhaust meets oil mist in the inlet, and over enough short cold journeys the two build a hard deposit that narrows the manifold and can hold the valve off its seat. The result is a truck that hesitates, idles roughly and no longer answers the throttle the way it used to. The cited source names this on both the third and fourth generations; it is one source and the entry is tiered accordingly. The honest framing is that this is a wear-and-use problem rather than a defect: a truck that does long runs at load rarely gets there, and a truck used for short urban trips gets there sooner. Nothing about it makes the truck unsafe, which is why the triage says drive normally — but it will cost you fuel and throttle response until it is cleaned, and a valve stuck open will keep dumping soot into the inlet you just paid to clean.",
+      "symptoms": {
+        "hesitates-when-you-ask-for-throttle": "It hesitates for a beat when you ask for throttle",
+        "rough-idle": "The idle is rough or uneven, especially cold",
+        "reduced-throttle-response": "The truck feels flat and slow to respond compared with how it used to"
+      },
+      "causes": {
+        "carbon-packed-inlet-manifold": "The inlet manifold is packed with hard carbon that has narrowed the passages",
+        "recirculation-valve-stuck-open": "The EGR valve is stuck open by soot and is feeding exhaust in continuously",
+        "short-trip-urban-use": "Short, cold, urban journeys never get the engine hot enough to keep the deposits down",
+        "another-air-path-restriction": "Something else in the air path — filter, intercooler pipe, hose — is restricting or leaking"
+      },
+      "diagnosticSteps": {
+        "read-the-stored-fault-codes": "Read the stored fault codes and note whether the recirculation system is being reported at all",
+        "describe-how-the-truck-is-actually-used": "Be honest about the journeys the truck actually does, because that is what predicts this problem",
+        "remove-the-valve-and-look-into-the-manifold": "Take the EGR valve off and look into the manifold behind it — carbon you cannot get a finger past is your answer",
+        "check-the-air-filter-and-intercooler-pipes": "Check the air filter and every intercooler hose and clamp for restriction, splits and oil before blaming carbon"
+      },
+      "fixPaths": {
+        "professional-inlet-clean": {
+          "title": "Professional inlet and recirculation clean",
+          "detail": "The manifold comes off and gets cleaned properly. Doing it without cleaning or replacing the valve at the same time leaves the source of the soot bolted to the clean part."
+        },
+        "replace-the-recirculation-valve": {
+          "title": "Replace the EGR valve",
+          "detail": "If the valve will not seat after cleaning, it is a replacement. A Costa Rican counter catalogues this part category, which is worth knowing before anybody quotes you an import — though the listing is a quote request, not a stock check."
+        },
+        "change-the-driving-pattern": {
+          "title": "Give the truck regular long runs",
+          "detail": "Free, and the only thing on this page that slows the deposit down instead of removing it after the fact. It pairs with the particulate filter entry for this generation, which wants the same change for the same reason."
+        },
+        "restore-the-air-path": {
+          "title": "Restore the air path",
+          "detail": "A new air filter and a proper look at the intercooler pipework. Cheap, quick, and the thing to eliminate before paying for a manifold clean you may not need."
+        }
+      }
+    },
+    "es": {
+      "title": "Carbón en la admisión y en la válvula EGR",
+      "slug": "carbon-en-la-admision",
+      "summary": "La recirculación de gases de escape devuelve una cantidad medida de escape a la admisión para bajar la temperatura de combustión. El hollín de ese escape se junta con la neblina de aceite de la admisión y, con suficientes recorridos cortos y en frío, los dos forman un depósito duro que angosta el múltiple y puede dejar la válvula sin asentar. El resultado es un carro que titubea, que trabaja disparejo en marcha mínima y que ya no responde al acelerador como antes. La fuente citada lo señala tanto en la tercera como en la cuarta generación; es una sola fuente y el nivel de confianza va acorde. La lectura honesta es que esto es un problema de uso y desgaste, no un defecto: un carro que hace recorridos largos con carga rara vez llega ahí, y uno que se usa en trayectos urbanos cortos llega más rápido. Nada de esto vuelve inseguro el carro, y por eso el triaje dice manejar normal; pero le va a costar combustible y respuesta hasta que se limpie, y una válvula pegada abierta va a seguir metiendo hollín a la admisión que usted acaba de pagar por limpiar.",
+      "symptoms": {
+        "hesitates-when-you-ask-for-throttle": "Titubea un instante cuando usted pide acelerador",
+        "rough-idle": "La marcha mínima está áspera o dispareja, sobre todo en frío",
+        "reduced-throttle-response": "El carro se siente plano y lento para responder comparado con cómo era antes"
+      },
+      "causes": {
+        "carbon-packed-inlet-manifold": "El múltiple de admisión está lleno de carbón duro que le angostó los conductos",
+        "recirculation-valve-stuck-open": "La válvula EGR quedó pegada abierta por el hollín y está metiendo escape todo el tiempo",
+        "short-trip-urban-use": "Los recorridos cortos, urbanos y en frío nunca calientan el motor lo suficiente para mantener a raya los depósitos",
+        "another-air-path-restriction": "Otra cosa en el camino del aire —filtro de aire, tubería del enfriador, manguera— está restringiendo o fugando"
+      },
+      "diagnosticSteps": {
+        "read-the-stored-fault-codes": "Lea los códigos guardados y fíjese si el sistema de recirculación aparece reportado del todo",
+        "describe-how-the-truck-is-actually-used": "Sea honesto sobre los recorridos que el carro realmente hace, porque eso es lo que predice este problema",
+        "remove-the-valve-and-look-into-the-manifold": "Desmonte la válvula EGR y mire hacia adentro del múltiple: carbón por el que no le pasa un dedo ya es su respuesta",
+        "check-the-air-filter-and-intercooler-pipes": "Revise el filtro de aire y todas las mangueras y abrazaderas del enfriador de aire buscando restricción, rajaduras y aceite antes de echarle la culpa al carbón"
+      },
+      "fixPaths": {
+        "professional-inlet-clean": {
+          "title": "Limpieza profesional de admisión y recirculación",
+          "detail": "Se baja el múltiple y se limpia como se debe. Hacerlo sin limpiar o cambiar la válvula al mismo tiempo deja la fuente del hollín atornillada a la pieza recién limpia."
+        },
+        "replace-the-recirculation-valve": {
+          "title": "Cambiar la válvula EGR",
+          "detail": "Si después de limpiarla la válvula no asienta, toca cambiarla. Hay mostrador en Costa Rica que cataloga esta categoría de pieza, lo cual conviene saber antes de que alguien le cotice una importación, aunque el listado es para pedir cotización y no una consulta de existencias."
+        },
+        "change-the-driving-pattern": {
+          "title": "Darle al carro recorridos largos con regularidad",
+          "detail": "Gratis, y lo único de esta página que frena el depósito en vez de quitarlo después. Va de la mano con la entrada del filtro de partículas de esta generación, que pide el mismo cambio por la misma razón."
+        },
+        "restore-the-air-path": {
+          "title": "Devolverle el paso libre al aire",
+          "detail": "Filtro de aire nuevo y una revisión seria de la tubería del enfriador de aire. Barato, rápido, y lo que hay que descartar antes de pagar una limpieza de múltiple que quizá no necesita."
+        }
+      }
+    }
+  }
+}

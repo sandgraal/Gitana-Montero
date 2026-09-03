@@ -1,0 +1,194 @@
+{
+  "id": "g4-engine-oil-level-rising",
+  "fitment": {
+    "gens": ["gen4"],
+    "markets": ["uk", "eu"],
+    "engines": ["4m41"],
+    "years": {
+      "from": 2007,
+      "to": 2009
+    },
+    "transmissions": ["automatic-5-speed", "automatic-4-speed"]
+  },
+  "system": "engine",
+  "safetyCritical": true,
+  "severity": "damaging",
+  "drivability": "do-not-drive",
+  "symptoms": [
+    "oil-level-above-the-full-mark-without-a-top-up",
+    "oil-smells-of-diesel",
+    "oil-thin-and-black-very-early",
+    "particulate-filter-warnings-in-the-weeks-before"
+  ],
+  "causes": [
+    {
+      "id": "repeated-failed-regenerations-diluting-the-oil"
+    },
+    {
+      "id": "leaking-injector-passing-fuel-into-the-sump"
+    },
+    {
+      "id": "coolant-entering-the-oil"
+    },
+    {
+      "id": "simply-overfilled-at-the-last-service"
+    }
+  ],
+  "diagnosticSteps": [
+    {
+      "id": "check-the-level-cold-on-level-ground",
+      "rulesIn": ["simply-overfilled-at-the-last-service"],
+      "rulesOut": []
+    },
+    {
+      "id": "smell-and-feel-the-oil-on-the-dipstick",
+      "rulesIn": [
+        "repeated-failed-regenerations-diluting-the-oil",
+        "leaking-injector-passing-fuel-into-the-sump"
+      ],
+      "rulesOut": ["coolant-entering-the-oil"]
+    },
+    {
+      "id": "look-for-emulsion-under-the-filler-cap",
+      "rulesIn": ["coolant-entering-the-oil"],
+      "rulesOut": []
+    },
+    {
+      "id": "read-the-particulate-filter-history",
+      "rulesIn": ["repeated-failed-regenerations-diluting-the-oil"],
+      "rulesOut": []
+    },
+    {
+      "id": "run-an-injector-leak-off-test",
+      "rulesIn": ["leaking-injector-passing-fuel-into-the-sump"],
+      "rulesOut": ["repeated-failed-regenerations-diluting-the-oil"]
+    }
+  ],
+  "fixPaths": [
+    {
+      "id": "change-the-oil-and-cure-the-regeneration-problem",
+      "difficulty": 3,
+      "cost": {
+        "from": "moderate"
+      },
+      "addresses": ["repeated-failed-regenerations-diluting-the-oil"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "repair-the-leaking-injector",
+      "difficulty": 4,
+      "cost": {
+        "from": "significant"
+      },
+      "addresses": ["leaking-injector-passing-fuel-into-the-sump"],
+      "parts": [],
+      "procedures": []
+    },
+    {
+      "id": "drain-to-the-correct-level",
+      "difficulty": 1,
+      "cost": {
+        "from": "minimal"
+      },
+      "addresses": ["simply-overfilled-at-the-last-service"],
+      "parts": [],
+      "procedures": []
+    }
+  ],
+  "confidence": "anecdotal",
+  "sources": [
+    {
+      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"Mk 4\" thread: an owner of a 2007 truck reports that after severe particulate filter regeneration problems \"the sump contained about 4 litres of diesel\", alongside members' advice to avoid the 2007 to 2009 automatics for their filter system",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=171496",
+      "archiveUrl": "https://web.archive.org/web/20260902175526id_/https://www.pocuk.com/forums/viewtopic.php?t=171496",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    },
+    {
+      "title": "Mitsubishi Pajero Owners Club (UK) forum — \"DPF filter trouble on 2007 Shogun Diamond\": repeated dealer forced regenerations that failed on a fourth-generation truck, with the resolution including an oil change to the correct specification",
+      "url": "https://www.pocuk.com/forums/viewtopic.php?t=144623",
+      "archiveUrl": "https://web.archive.org/web/20260902175419id_/https://www.pocuk.com/forums/viewtopic.php?t=144623",
+      "accessed": "2026-09-02",
+      "kind": "forum"
+    }
+  ],
+  "prose": {
+    "en": {
+      "title": "Engine oil level rising — fuel in the sump",
+      "slug": "engine-oil-level-rising",
+      "summary": "An owner of an early fourth-generation diesel reported, after a long fight with particulate filter regeneration, that the sump had filled with a large quantity of diesel. That is one account, so this entry sits at the site's lowest confidence tier — but the mechanism behind it is not in dispute and is worth knowing before it happens to you. To burn the filter clean, the engine injects extra fuel late in the cycle; if the regeneration never completes, some of that fuel runs down the bores into the oil instead of burning. Diluted oil is thinner oil, and thinner oil does not protect bearings, so a filter problem quietly becomes an engine problem. This is why the triage here is stricter than the filter entry it follows from: an oil level that is rising on its own means the oil is no longer oil. Stop driving, check it cold, and get the cause found. Have this diagnosed by a qualified mechanic — and never keep driving a diesel whose oil level is climbing.",
+      "symptoms": {
+        "oil-level-above-the-full-mark-without-a-top-up": "The dipstick reads above full and nobody has topped it up",
+        "oil-smells-of-diesel": "The oil on the dipstick smells strongly of diesel",
+        "oil-thin-and-black-very-early": "The oil is thin, watery and black long before the next service is due",
+        "particulate-filter-warnings-in-the-weeks-before": "The particulate filter has been warning or regenerating repeatedly in the weeks before"
+      },
+      "causes": {
+        "repeated-failed-regenerations-diluting-the-oil": "Repeated incomplete filter regenerations have washed fuel past the rings into the sump",
+        "leaking-injector-passing-fuel-into-the-sump": "An injector is leaking and passing fuel into the engine",
+        "coolant-entering-the-oil": "Coolant, not fuel, is entering the oil — a different and equally serious fault",
+        "simply-overfilled-at-the-last-service": "The engine was simply overfilled at the last service"
+      },
+      "diagnosticSteps": {
+        "check-the-level-cold-on-level-ground": "Check the level properly: cold engine, level ground, dipstick wiped and re-inserted, and compare against what it read at the last service",
+        "smell-and-feel-the-oil-on-the-dipstick": "Smell the oil on the dipstick and rub it between your fingers — fuel dilution smells of diesel and feels thin",
+        "look-for-emulsion-under-the-filler-cap": "Look under the oil filler cap for a pale creamy emulsion, which points at coolant rather than fuel",
+        "read-the-particulate-filter-history": "Have the particulate filter's stored data and fault history read, looking for a run of incomplete regenerations",
+        "run-an-injector-leak-off-test": "Have an injector leak-off test done to find an injector returning far more fuel than the others"
+      },
+      "fixPaths": {
+        "change-the-oil-and-cure-the-regeneration-problem": {
+          "title": "Change the oil and fix the regeneration problem",
+          "detail": "Changing the oil buys back the protection; it does nothing about the cause. Fix the filter and the regeneration cycle in the same visit or the new oil goes the same way as the old."
+        },
+        "repair-the-leaking-injector": {
+          "title": "Repair or replace the leaking injector",
+          "detail": "The more expensive answer, and the one that keeps filling the sump if it is ignored. Replace the seals and have the injector coding done properly."
+        },
+        "drain-to-the-correct-level": {
+          "title": "Drain down to the correct level",
+          "detail": "The happy ending, if the oil smells and feels normal and the level simply came from an overfill. Draining excess oil takes minutes; confirming that is all it was takes the steps above."
+        }
+      }
+    },
+    "es": {
+      "title": "El nivel de aceite de motor sube solo — combustible en el cárter",
+      "slug": "el-nivel-de-aceite-sube-solo",
+      "summary": "Un dueño de un diésel de cuarta generación temprana reportó, después de una larga pelea con la regeneración del filtro de partículas, que el cárter se le había llenado con una cantidad grande de diésel. Es un solo testimonio, así que esta entrada lleva el nivel de confianza más bajo del sitio; pero el mecanismo detrás no está en discusión y conviene conocerlo antes de que le pase a usted. Para quemar y limpiar el filtro, el motor inyecta combustible extra tarde en el ciclo; si la regeneración nunca se completa, parte de ese combustible baja por las paredes de los cilindros al aceite en vez de quemarse. Aceite diluido es aceite más delgado, y el aceite delgado no protege los cojinetes, así que un problema de filtro se vuelve calladamente un problema de motor. Por eso el triaje aquí es más estricto que el de la entrada del filtro de la que se desprende: un nivel de aceite que sube solo significa que ese aceite ya no es aceite. Deje de manejar, revíselo en frío y busque la causa. Deje el diagnóstico en manos de un mecánico calificado, y nunca siga manejando un diésel al que le está subiendo el nivel de aceite.",
+      "symptoms": {
+        "oil-level-above-the-full-mark-without-a-top-up": "La varilla marca por encima del máximo y nadie le ha agregado aceite",
+        "oil-smells-of-diesel": "El aceite de la varilla huele fuerte a diésel",
+        "oil-thin-and-black-very-early": "El aceite está delgado, aguado y negro mucho antes del próximo servicio",
+        "particulate-filter-warnings-in-the-weeks-before": "El filtro de partículas ha estado avisando o regenerando una y otra vez en las semanas anteriores"
+      },
+      "causes": {
+        "repeated-failed-regenerations-diluting-the-oil": "Regeneraciones incompletas repetidas del filtro han lavado combustible por los anillos hasta el cárter",
+        "leaking-injector-passing-fuel-into-the-sump": "Un inyector está fugando y dejando pasar combustible al motor",
+        "coolant-entering-the-oil": "Lo que está entrando al aceite es refrigerante, no combustible: otra falla distinta e igual de seria",
+        "simply-overfilled-at-the-last-service": "Al motor sencillamente le pusieron aceite de más en el último servicio"
+      },
+      "diagnosticSteps": {
+        "check-the-level-cold-on-level-ground": "Mida el nivel como se debe: motor frío, piso parejo, varilla limpiada y vuelta a meter, y compare contra lo que marcaba en el último servicio",
+        "smell-and-feel-the-oil-on-the-dipstick": "Huela el aceite de la varilla y frótelo entre los dedos: la dilución por combustible huele a diésel y se siente delgada",
+        "look-for-emulsion-under-the-filler-cap": "Revise bajo la tapa de llenado de aceite si hay una nata clara y cremosa, que apunta a refrigerante y no a combustible",
+        "read-the-particulate-filter-history": "Haga leer los datos guardados y el historial de fallas del filtro de partículas, buscando una racha de regeneraciones incompletas",
+        "run-an-injector-leak-off-test": "Mande a hacer una prueba de retorno de inyectores para encontrar el que devuelve mucho más combustible que los demás"
+      },
+      "fixPaths": {
+        "change-the-oil-and-cure-the-regeneration-problem": {
+          "title": "Cambiar el aceite y arreglar el problema de regeneración",
+          "detail": "Cambiar el aceite le devuelve la protección; no hace nada contra la causa. Arregle el filtro y el ciclo de regeneración en la misma visita, o el aceite nuevo va a terminar igual que el viejo."
+        },
+        "repair-the-leaking-injector": {
+          "title": "Reparar o cambiar el inyector que fuga",
+          "detail": "La respuesta más cara, y la que sigue llenando el cárter si se ignora. Cambie los empaques y haga que codifiquen el inyector como corresponde."
+        },
+        "drain-to-the-correct-level": {
+          "title": "Drenar hasta el nivel correcto",
+          "detail": "El final feliz, si el aceite huele y se siente normal y el nivel venía nada más de un llenado de más. Sacar el aceite sobrante toma minutos; confirmar que era solo eso toma los pasos de arriba."
+        }
+      }
+    }
+  }
+}
