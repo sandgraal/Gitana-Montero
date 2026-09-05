@@ -445,29 +445,26 @@ function completeNoticeCount(html: string, locale: Locale): number {
  * ---------------------------------------------------------------------- */
 
 describe("a flagged hazard with no system id, on a page that already has a band", () => {
-  it.fails(
-    "renders the flag's OWN band ALONGSIDE the system-derived one",
-    async () => {
-      /*
-       * `test-mod-t601a-flag-plus-system` is `body`-filed, flagged for an
-       * SRS hazard, and carries a `suspension` row. Both ids are named
-       * explicitly rather than counted: "at least two bands render" would be
-       * satisfied by a fix that drew the wrong two, and T601's F2 is this
-       * repo's own record of what an under-specified safety grader costs.
-       *
-       * `body` is the flag's band because that is the entry's own `system` —
-       * the same string the existing flag-only fallback already uses, and
-       * therefore not a new vocabulary this grader is inventing.
-       */
-      for (const locale of LOCALES) {
-        const html = await render(locale, FLAG_PLUS_SYSTEM_ID);
-        expect(html).toContain('id="safety-notice-suspension"');
-        expect(html).toContain('id="safety-notice-body"');
-      }
+  it("renders the flag's OWN band ALONGSIDE the system-derived one", async () => {
+    /*
+     * `test-mod-t601a-flag-plus-system` is `body`-filed, flagged for an
+     * SRS hazard, and carries a `suspension` row. Both ids are named
+     * explicitly rather than counted: "at least two bands render" would be
+     * satisfied by a fix that drew the wrong two, and T601's F2 is this
+     * repo's own record of what an under-specified safety grader costs.
+     *
+     * `body` is the flag's band because that is the entry's own `system` —
+     * the same string the existing flag-only fallback already uses, and
+     * therefore not a new vocabulary this grader is inventing.
+     */
+    for (const locale of LOCALES) {
+      const html = await render(locale, FLAG_PLUS_SYSTEM_ID);
+      expect(html).toContain('id="safety-notice-suspension"');
+      expect(html).toContain('id="safety-notice-body"');
     }
-  );
+  });
 
-  it.fails("names the flagged system in words, in both locales", async () => {
+  it("names the flagged system in words, in both locales", async () => {
     // The id is the machine's handle; the heading is what a reader sees, and
     // the two can drift. Both locales, because "standing bilingual safety
     // notice" is AGENTS.md's own phrase.
@@ -478,76 +475,67 @@ describe("a flagged hazard with no system id, on a page that already has a band"
     }
   });
 
-  it.fails(
-    "gives the flag's band a labelled region of its own (aria-labelledby)",
-    async () => {
-      /*
-       * A heading with no region pointing at it is decoration. `SafetyNotice`
-       * puts `headingId` in both places; this asserts the region side, so a
-       * fix that emitted bare heading text would still be red.
-       */
-      const html = await render("en", FLAG_PLUS_SYSTEM_ID);
-      expect(html).toContain('aria-labelledby="safety-notice-body"');
-      expect(html).toContain('aria-labelledby="safety-notice-suspension"');
-    }
-  );
+  it("gives the flag's band a labelled region of its own (aria-labelledby)", async () => {
+    /*
+     * A heading with no region pointing at it is decoration. `SafetyNotice`
+     * puts `headingId` in both places; this asserts the region side, so a
+     * fix that emitted bare heading text would still be red.
+     */
+    const html = await render("en", FLAG_PLUS_SYSTEM_ID);
+    expect(html).toContain('aria-labelledby="safety-notice-body"');
+    expect(html).toContain('aria-labelledby="safety-notice-suspension"');
+  });
 
-  it.fails(
-    "makes the flag's band a REAL notice — one bilingual WARNING per band",
-    async () => {
-      /*
-       * Review F-A. Everything above grades the band's heading, its id and its
-       * region — all of which a bespoke `<section><h2>…</h2></section>` would
-       * satisfy while carrying no warning at all. AGENTS.md requires the
-       * standing bilingual notice and the "see a qualified mechanic" framing,
-       * which live in `safetyNoticeBody`, not in the heading.
-       *
-       * So: the count of warning sentences equals the count of bands. Two
-       * bands on `test-mod-t601a-flag-plus-system`, therefore two sentences —
-       * which fails in BOTH failure directions at once. Too few means the
-       * added band is a heading with nothing under it; too many means a
-       * duplicated or orphaned warning. Counted in each locale independently
-       * because `SafetyNotice` carries both languages in every band, so a
-       * band that lost one of them is a half-bilingual notice and red here.
-       */
-      for (const locale of LOCALES) {
-        const html = await render(locale, FLAG_PLUS_SYSTEM_ID);
-        const bands = safetyNoticeSystems(html).length;
-        expect(bands).toBe(2);
-        expect(completeNoticeCount(html, "en")).toBe(bands);
-        expect(completeNoticeCount(html, "es")).toBe(bands);
-      }
+  it("makes the flag's band a REAL notice — one bilingual WARNING per band", async () => {
+    /*
+     * Review F-A. Everything above grades the band's heading, its id and its
+     * region — all of which a bespoke `<section><h2>…</h2></section>` would
+     * satisfy while carrying no warning at all. AGENTS.md requires the
+     * standing bilingual notice and the "see a qualified mechanic" framing,
+     * which live in `safetyNoticeBody`, not in the heading.
+     *
+     * So: the count of warning sentences equals the count of bands. Two
+     * bands on `test-mod-t601a-flag-plus-system`, therefore two sentences —
+     * which fails in BOTH failure directions at once. Too few means the
+     * added band is a heading with nothing under it; too many means a
+     * duplicated or orphaned warning. Counted in each locale independently
+     * because `SafetyNotice` carries both languages in every band, so a
+     * band that lost one of them is a half-bilingual notice and red here.
+     */
+    for (const locale of LOCALES) {
+      const html = await render(locale, FLAG_PLUS_SYSTEM_ID);
+      const bands = safetyNoticeSystems(html).length;
+      expect(bands).toBe(2);
+      expect(completeNoticeCount(html, "en")).toBe(bands);
+      expect(completeNoticeCount(html, "es")).toBe(bands);
     }
-  );
+  });
 
-  it.fails(
-    "is ADDITIVE — every system-derived band survives the flag's arrival",
-    async () => {
-      /*
-       * The load-bearing half of the fix's shape. `test-mod-t601a-flag-plus-
-       * two-systems` promotes `brakes` and `suspension` and is flagged for a
-       * `body`-filed hazard, so the correct page carries exactly three bands.
-       *
-       * Asserted as an exact set, in both directions:
-       *  · all three present — a fix that REPLACED the system-derived bands
-       *    with the flag's one (trading one omission for another, the
-       *    mirror-image defect) fails here;
-       *  · exactly three, all distinct — a fix that appended the flag's band
-       *    unconditionally, or twice, fails here too.
-       * Order is deliberately NOT asserted: which band reads first is a
-       * presentation decision this grader has no standing to pin.
-       */
-      for (const locale of LOCALES) {
-        const systems = safetyNoticeSystems(
-          await render(locale, FLAG_PLUS_TWO_ID)
-        );
-        expect([...systems].sort()).toEqual(["body", "brakes", "suspension"]);
-        expect(new Set(systems).size).toBe(3);
-      }
+  it("is ADDITIVE — every system-derived band survives the flag's arrival", async () => {
+    /*
+     * The load-bearing half of the fix's shape. `test-mod-t601a-flag-plus-
+     * two-systems` promotes `brakes` and `suspension` and is flagged for a
+     * `body`-filed hazard, so the correct page carries exactly three bands.
+     *
+     * Asserted as an exact set, in both directions:
+     *  · all three present — a fix that REPLACED the system-derived bands
+     *    with the flag's one (trading one omission for another, the
+     *    mirror-image defect) fails here;
+     *  · exactly three, all distinct — a fix that appended the flag's band
+     *    unconditionally, or twice, fails here too.
+     * Order is deliberately NOT asserted: which band reads first is a
+     * presentation decision this grader has no standing to pin.
+     */
+    for (const locale of LOCALES) {
+      const systems = safetyNoticeSystems(
+        await render(locale, FLAG_PLUS_TWO_ID)
+      );
+      expect([...systems].sort()).toEqual(["body", "brakes", "suspension"]);
+      expect(new Set(systems).size).toBe(3);
     }
-  );
+  });
 
-  it.fails.each<[string, string, readonly string[]]>([
+  it.each<[string, string, readonly string[]]>([
     [
       "SRS/airbag flag behind a suspension row (steel-front-bumper shape)",
       REPRO_BUMPER_ID,
