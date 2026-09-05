@@ -236,6 +236,17 @@ Stop and ask before any of these:
   grader asserting that wrong system as correct**. A grader written by the
   author of the code under test can pin a defect as the specification; that
   is what this ledger exists to buy back.
+  **T702 joined the ledger on 2026-09-05** (client-side search, no paired
+  `[TEST]` task, graders self-authored; substituted assurance was an
+  independent code-reviewer pass with mutation testing of the matching logic
+  and live-browser verification of the rendered page) — **and is closed the
+  same day**: that review found a real defect (the search toolbar's CSS never
+  rendered in any browser, in either locale — a `:global()` escape hatch
+  written inside a block already marked `is:global`, so the browser silently
+  dropped the whole rule), which is now fixed and independently re-verified
+  live in a browser. Exactly the failure mode this ledger exists to catch,
+  and exactly why the substituted assurance has to be an independent pass,
+  not the author's own tests passing.
 - A clean fact-check, a clean bilingual edit, and all required branch-protection
   checks authorize the `pr-shepherd` to merge without another confirmation.
 - Never `--no-verify`, never a bare force-push, never `gh pr merge --admin`,
