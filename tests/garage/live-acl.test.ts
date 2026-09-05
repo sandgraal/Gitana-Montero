@@ -340,7 +340,26 @@ describe.skipIf(!db.available)(
       // A guard on the guard: if `SHIPPED` emptied, every `it.each` above
       // would register zero graders and this file would report green while
       // asking nothing at all.
-      expect(SHIPPED.length).toBe(4);
+      //
+      // This used to be `expect(SHIPPED.length).toBe(4)` — a literal that
+      // went stale the moment T2-305 promoted `record_media` into
+      // `USER_TABLES` and made `SHIPPED_USER_TABLES` five long, not four.
+      // Re-deriving the *count* here (e.g. `USER_TABLE_NAMES.length -
+      // PENDING.length`) would not fix that: `SHIPPED_USER_TABLES` and
+      // `UNSHIPPED_USER_TABLES` in contract.ts are built from the same
+      // `USER_TABLES` array by two complementary predicates (`pending ===
+      // undefined` / `pending !== undefined`), so
+      // `SHIPPED.length + PENDING.length === USER_TABLE_NAMES.length` (the
+      // line below) is a tautology of `Array.filter` on a two-valued split —
+      // true regardless of whether the partition is even correct, and it can
+      // never go red. Restating it as a subtraction is the same assertion
+      // wearing different arithmetic; it would still be a magic-shaped
+      // number that happens to be un-stale only because it's unfalsifiable.
+      // The actual, falsifiable invariant this test exists to hold is
+      // "shipped is not empty" — that survives every future promotion
+      // without editing, and a bug that emptied `SHIPPED` (e.g. an inverted
+      // predicate) still trips it.
+      expect(SHIPPED.length).toBeGreaterThan(0);
       expect(SHIPPED.length + PENDING.length).toBe(USER_TABLE_NAMES.length);
     });
   }
