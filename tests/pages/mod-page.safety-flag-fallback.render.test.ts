@@ -73,9 +73,36 @@
  * status quo is a real SRS hazard with no band at all. Over-notifying is the
  * safe failure direction here, and it is chosen on purpose.
  *
- * **Where the fix lands is not graded.** Widening `ModSafety` to carry the
- * flag's own band, or correcting the page's `safetySystems` derivation, both
- * satisfy every assertion below. The graders read the rendered page, per
+ * **Standing owner decision this file is downstream of.** Because there is no
+ * hazard taxonomy, these graders necessarily require the flag's band to name
+ * the entry's own `system` — "Safety notice — Body" for an SRS hazard on a
+ * `body`-filed bumper, which says *where* to look and not *what* the hazard
+ * is. That is the existing flag-only fallback's own vocabulary, deliberately
+ * reused rather than re-minted. If a hazard taxonomy is ever ratified (a
+ * separate AGENTS.md "Boundaries" stop-and-ask), the correct heading becomes
+ * the hazard, and **the assertions in this file that name `body`,
+ * `interior` and `electrical` as the flag's band all need rewriting** — they
+ * are not incidental. Recorded on T601a's `tasks.md` line as an open
+ * follow-up, not only here.
+ *
+ * **A band is a WARNING, not a heading.** Every id/heading/region assertion
+ * below is also satisfied by a bespoke `<section><h2>…</h2></section>` with
+ * nothing under it — which would put a label on the page where AGENTS.md asks
+ * for the standing bilingual notice and the "see a qualified mechanic"
+ * framing. Two graders therefore count `safetyNoticeBody` occurrences and
+ * require one per band, per locale (review F-A). Keep using
+ * `SafetyNotice.astro` and this is free.
+ *
+ * **Where the fix lands is mostly not graded — with one route to avoid.**
+ * Correcting the page's `safetySystems` derivation satisfies everything below,
+ * and so does giving `ModSafety` a **new** field for the flag's own band. What
+ * does *not* work is the naive `modSafety` route: pushing the entry's own
+ * `system` into `ModSafety.systems` when the flag is set turns every grader in
+ * this file green **and turns `tests/lib/mods/safety.test.ts:42` red** — an
+ * existing, correct assertion that a flag-only verdict reports `systems: []`,
+ * because that array is documented as *the systems that are the reason*, and
+ * a flag-only entry has none (review F-B). Do not "fix" that grader; it is
+ * right. The graders here read the rendered page, per
  * `.claude/GRADER-PRINCIPLES.md` ("grade the end state, not the text").
  *
  * ## Expected-failure convention (read before editing)
@@ -388,6 +415,31 @@ function safetyHeading(locale: Locale, system: GlossarySystem): string {
   );
 }
 
+/**
+ * How many times `needle` occurs in `haystack` — non-overlapping, literal.
+ *
+ * `split` rather than a `RegExp`, because the needles here are translated UI
+ * strings full of characters a regex would read as syntax.
+ */
+function countOccurrences(haystack: string, needle: string): number {
+  return haystack.split(needle).length - 1;
+}
+
+/**
+ * The standing warning sentence itself, counted per locale.
+ *
+ * A heading is a label; `safetyNoticeBody` is the warning AGENTS.md actually
+ * requires ("a standing bilingual safety notice on the page", and the site is
+ * "never presented as a substitute for a qualified mechanic"). `SafetyNotice`
+ * renders it once per band **per locale**, so the count of either locale's
+ * sentence is the count of real, complete notices on the page — which is what
+ * distinguishes a genuine band from a bespoke heading with nothing under it
+ * (review F-A).
+ */
+function completeNoticeCount(html: string, locale: Locale): number {
+  return countOccurrences(text(html), t(locale).safetyNoticeBody);
+}
+
 /* -------------------------------------------------------------------------
  * The defect (T601 review, F4) — expected failures
  * ---------------------------------------------------------------------- */
@@ -437,6 +489,34 @@ describe("a flagged hazard with no system id, on a page that already has a band"
       const html = await render("en", FLAG_PLUS_SYSTEM_ID);
       expect(html).toContain('aria-labelledby="safety-notice-body"');
       expect(html).toContain('aria-labelledby="safety-notice-suspension"');
+    }
+  );
+
+  it.fails(
+    "makes the flag's band a REAL notice — one bilingual WARNING per band",
+    async () => {
+      /*
+       * Review F-A. Everything above grades the band's heading, its id and its
+       * region — all of which a bespoke `<section><h2>…</h2></section>` would
+       * satisfy while carrying no warning at all. AGENTS.md requires the
+       * standing bilingual notice and the "see a qualified mechanic" framing,
+       * which live in `safetyNoticeBody`, not in the heading.
+       *
+       * So: the count of warning sentences equals the count of bands. Two
+       * bands on `test-mod-t601a-flag-plus-system`, therefore two sentences —
+       * which fails in BOTH failure directions at once. Too few means the
+       * added band is a heading with nothing under it; too many means a
+       * duplicated or orphaned warning. Counted in each locale independently
+       * because `SafetyNotice` carries both languages in every band, so a
+       * band that lost one of them is a half-bilingual notice and red here.
+       */
+      for (const locale of LOCALES) {
+        const html = await render(locale, FLAG_PLUS_SYSTEM_ID);
+        const bands = safetyNoticeSystems(html).length;
+        expect(bands).toBe(2);
+        expect(completeNoticeCount(html, "en")).toBe(bands);
+        expect(completeNoticeCount(html, "es")).toBe(bands);
+      }
     }
   );
 
@@ -523,6 +603,23 @@ describe("controls", () => {
       const html = await render(locale, FLAG_ONLY_ID);
       expect(safetyNoticeSystems(html)).toEqual(["interior"]);
       expect(text(html)).toContain(safetyHeading(locale, "interior"));
+    }
+  });
+
+  it("INVERSE: that fallback band still carries the bilingual WARNING", async () => {
+    /*
+     * Review F-A, the control half. The fix rewrites the expression that
+     * produces this page's only band, so a fix that replaced `SafetyNotice`
+     * with bespoke markup would strip the actual warning from
+     * `gen3-body-steel-side-rails`' shape — the one entry of the three that
+     * works today — while every heading-and-id grader stayed green. Exactly
+     * one band, therefore exactly one warning sentence per locale, and both
+     * languages present regardless of which locale the page is in.
+     */
+    for (const locale of LOCALES) {
+      const html = await render(locale, FLAG_ONLY_ID);
+      expect(completeNoticeCount(html, "en")).toBe(1);
+      expect(completeNoticeCount(html, "es")).toBe(1);
     }
   });
 
