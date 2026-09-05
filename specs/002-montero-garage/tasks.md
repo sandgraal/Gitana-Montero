@@ -564,7 +564,7 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   contract; distinct from and independent of GAR-05′'s receipt fields
   (vendor/date/amount stay receipt-only, never required on an attachment).
   Depends: T2-302. *(GAR-06′)*
-- [ ] **T2-305 [PLATFORM]** Record media attachments (owner-approved
+- [x] **T2-305 [PLATFORM]** Record media attachments (owner-approved
   addition, 2026-09-02): new private bucket (photo/video/audio) + attachment
   rows scoped to a record, path `<owner uuid>/<vehicle id>/<record id>/<file>`
   per the T2-301a photos precedent; upload UI on the record edit page,
@@ -572,6 +572,116 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   `vehicles.photo_paths` noted above while touching this surface, if not
   already fixed elsewhere first. Activates T2-305a graders. Depends: T2-305a
   merged. *(GAR-06′)*
+  <br>**All 41 `it.fails` markers in `tests/garage/record-media.test.ts`
+  activated by deleting exactly the `.fails`** — 33 declaration, 8 live (20
+  live cases once `it.fails.each` expands). Mutation-checked rather than
+  assumed: with the migration moved aside, 32 of the 33 declaration graders go
+  red and only the promotion one stays green, which is correct — promotion is a
+  contract edit, not a migration one.
+  <br>**Promotion, the three edits `RECORD_MEDIA_TABLE`'s docstring names**,
+  plus one it could not have predicted: the entry had to *move* to above
+  `USER_TABLES` in `contract.ts`, because `const` has no hoisting and
+  `USER_TABLE_NAMES` reads the array a hundred lines before the old
+  declaration site. `PENDING_USER_TABLES` is emptied but still exported —
+  `rules.ts` reads it so `isCorrelated` has columns for a pending table's
+  policy. `harness-contract.test.ts` needed **two** lists updated, not one:
+  the shipped/pending split is a second hard equality in the same block.
+  <br>**The record-delete belt narrows on `vehicle_id` AND `id`, not on the
+  owner.** A records row has no `owner_id` to read, and matching the owner
+  segment alone would empty that owner's whole garage on the deletion of one
+  note. `for each row` on purpose, so it also fires for records cascaded away
+  by a vehicle delete — which is the one live grader that would catch a
+  statement-level trigger.
+  <br>**Named for the third time and still not fixed: `receipts` has no belt.**
+  T2-302 recorded it, T2-305a repeated it, and this task does not close it
+  either — the cause is the receipt *path* shape (`<owner>/<file>`), which
+  carries nothing identifying a record or a vehicle, so the fix is a migration
+  of object names already in storage. That is a data migration this task did
+  not authorise. It stays open for whoever owns receipts hardening.
+  <br>**The lost-update race is fixed at the SQL layer** —
+  `append_vehicle_photo` / `remove_vehicle_photo`, `security invoker` so
+  `vehicles`' own policy still decides whose row it is, `array_append` /
+  `array_remove` inside one `update` under the row lock Postgres already
+  takes. Not a client-side queue: a queue is a promise one tab makes that a
+  second tab has never heard of. The append is idempotent, because a retry
+  after a lost response must not list the same object twice. New graders in
+  `src/lib/supabase/garage-writes.test.ts` (12) run against a recording fake
+  client; mutation-checked by restoring the client-computed array, which turns
+  6 of them red including the named concurrency one. Before this branch the
+  whole request layer of `garage.ts` had no graders at all, so a revert would
+  have been silent.
+  <br>**The media section is deliberately field-less.** GAR-06′ says an
+  attachment is "independent of a receipt's vendor/date/amount fields", so the
+  form is one file input and a button — the WhatsApp voice note that motivated
+  the requirement cannot be filed at all if the form asks for a vendor first.
+  `media_kind` is read from the declared MIME type rather than chosen by the
+  reader, and each row renders as exactly one of `<img>`/`<video>`/`<audio>`
+  with the other two removed.
+  <br>**Two numbers differ from receipts and both are about video.** The bucket
+  limit is 100 MB (receipts 20, photos 10) because a two-minute phone video of
+  a noise is the motivating case; the signed-URL TTL is 30 minutes rather than
+  10 because a browser streaming a large file makes range requests for as long
+  as playback lasts, and a 10-minute signature expires *mid-playback* on a slow
+  connection with an error that looks like a broken file.
+  <br>**Not done, deliberately: no media chip on the timeline.** Receipts have
+  one; adding a second would mean a second per-timeline request and a second
+  "unknown is not zero" surface (PR #68), and the task scopes the UI to the
+  record edit page. `mediaCountsByRecord` exists and returns the same
+  three-state `ReadonlyMap | null` for whoever adds it.
+  <br>**Tier B was not run: Docker is not running on this machine**
+  (`supabase start` → `failed to connect to the docker API`). The 20 live
+  graders are activated and unexercised locally; CI's informational `tier-b`
+  job is the first thing that will run them. Every Tier-A grader, the whole
+  unit suite and `npm run verify` are green.
+  <br>**Review (no blocking findings; five Low/Informational, two fixed).**
+  <br>*F1 — a docstring claimed a guarantee the code did not implement.*
+  `record-media.ts` said `mediaPathBelongsTo` refuses to ask the storage API to
+  "sign or remove" a foreign path. It guards `removeRecordMedia`,
+  `deleteRecord` and `vehicleMediaPaths`; it does **not** guard
+  `signRecordMediaUrls`. Not a live exposure — the bucket policy pins
+  `(storage.foldername(name))[1]` to `auth.uid()`, so signing another owner's
+  object is refused at the point it is asked for — and `signReceiptUrls` /
+  `signPhotoUrls` have the identical unguarded shape. Fixed as documentation:
+  the module docstring now names the three guarded call sites, names signing as
+  deliberately unguarded, and says why (a refused signature is a player that
+  does not render; a delete on an invented name is irreversible). Adding a
+  fourth, differently-shaped sign path to prove what the database already
+  proves would have left the other two looking careless by comparison.
+  <br>*F2 — `in` and a bare bracket lookup walk the prototype chain.* Fixed in
+  all three sibling modules (`record-media.ts`, and the pre-existing copies in
+  `photos.ts` and `receipt.ts`) via one `Object.hasOwn` accessor each, so the
+  next lookup added cannot get it wrong. **The sharper half was not in
+  `mediaIssue`:** `mediaObjectPath` / `photoObjectPath` / `receiptObjectPath`
+  guard with `=== undefined`, and `MIME_MAP["constructor"]` returns `Object`
+  rather than `undefined` — so the guard did not fire at all and the builder
+  returned a name whose "extension" was a function's source text. Six new
+  graders (two per module), all six red against the old idiom.
+  **`toLowerCase()` runs before the lookup**, so `toString`/`valueOf`/
+  `hasOwnProperty` lower-case into members of nothing and make vacuous graders
+  — verified by running them, and the reachable set is exactly `constructor`
+  and `__proto__`. Pinned by a control asserting that fact.
+  <br>*F3 — the hand-rolled supabase-js fake in `garage-writes.test.ts` has
+  three modelling gaps*, now named in that file's own header rather than left
+  for the next person to discover: `.eq()`/`.in()`/`.order()` ignore their
+  arguments, `.single()` and a bare `select()` both resolve to one object where
+  production returns an array without `.single()`, and `outcome("insert", …)`
+  is used for every verb so only insert failures can be injected. Each would
+  let a *future* grader pass while production did something else.
+  <br>*F4 — the `photo_paths` race graders are self-authored.* There is no
+  `[TEST]` task for GAR-01′'s race fix and no independent grader pass; the 12
+  graders in `garage-writes.test.ts` were written by the same instance that
+  wrote the fix. They mutation-test correctly (6 red against the restored
+  client-computed array), but that is a weaker guarantee than the
+  test-writer/implementer split this project normally gets, and this line does
+  not claim otherwise. Whether it belongs on the AGENTS.md debt ledger is the
+  conductor's call.
+  <br>*F5 — nothing on the required merge path executes the migration SQL.*
+  `npm run verify` is Tier A only, which parses migration text; the SQL is run
+  only by CI's **non-required** `tier-b` job. Review did a static
+  `libpg_query` parse (grammar valid; the alias-in-`RETURNING` this task
+  flagged as its own biggest risk is in fact required and correct), but a parse
+  is not an execution. **`tier-b`'s actual output must be read once CI runs,
+  not assumed green.**
 
 - [ ] **T2-306a [TEST]** Graders for the cover-photo designation (GAR-01′):
   a nullable `vehicles.cover_photo_path` column (or equivalent) naming one entry already
