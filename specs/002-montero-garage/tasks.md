@@ -905,6 +905,36 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   machine); the changed Tier B lines sit inside `it.fails` markers that cannot
   execute until T2-404 activates them, and the Tier A/pure paths are covered by
   the battery.
+  <br>**Grader correction 2026-09-05 — `gitana` was graded both ways at once.**
+  The T2-402 code review found `handles.test.ts` asserting
+  `handleIssues("gitana") === []` (claimable by anyone) while `contract.ts`
+  already listed `gitana` under its impersonation heading. Both cannot hold,
+  and as things stood the *positive control* was the operative one: `gitana`
+  was claimable. The reservation survives — MIG-04 makes Gitana Blanca user
+  page #1 and the template every other garage is shaped by, so on
+  monterogarage.com `/en/garage/gitana/` is the same impersonation surface as
+  `montero`, which sits beside it in that list; and `contract.ts`'s own
+  asymmetry argument (un-reserving later is safe, reserving later is not)
+  decides ties like this. Reserving the word is not denying the owner the
+  name: `handleIssues` gates *self-service claims*, MIG-04's seeding is a
+  migration, and the display name's handle form `gitana-blanca` stays
+  unreserved. **Grader-only change** — `contract.ts` was already correct and
+  was not touched.
+  <br>*Fix:* `blanca` replaces `gitana` in the claimable table (same "plain
+  alphabetic word" shape, so no control was lost); `gitana` and `montero` join
+  the reserved-rejection table and the Tier B database probes; the fixture
+  lists are hoisted to `CLAIMABLE_FIXTURES` / `RESERVED_FIXTURES` and
+  cross-checked against `RESERVED_HANDLES` in both directions, because the
+  contradiction was only possible while the two lists were inline literals in
+  blocks that never met. **5 mutants, all killed** — including one that
+  restores the original defect verbatim. Documented limit: de-deriving the
+  rejection table from `RESERVED_FIXTURES` silently shrinks it rather than
+  going red; the derivation is what buys the guarantee.
+  <br>*Owed by T2-402:* `gitana` (and `montero`) must reach the hand-written
+  impersonation list in `handles.ts` **and** the SQL check constraint. Two
+  open questions for the owner are in that branch's report: whether a
+  reserved-word check constraint needs a seed/admin path for MIG-04's own
+  profile, and whether `gitana-blanca` should be reserved too.
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*
