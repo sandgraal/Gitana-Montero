@@ -216,19 +216,39 @@ begin
     -- ## One refusal for "taken" and for "released by somebody else"
     --
     -- Both conditions are asked here, together, and answered with a single
-    -- exception spelled exactly as Postgres spells its own unique violation on
-    -- `profiles_handle_lower_uk` — same message, same detail, same SQLSTATE.
-    -- PostgREST hands the raw message back, so two different sentences would
-    -- have let any token holder tell "somebody has it" from "somebody used to
-    -- have it" by reading the error text (T2-402 review, F6). The UI copy
-    -- already refuses to make that distinction (`garageHandleUnavailable`); the
-    -- API layer has to refuse it too, or the careful sentence is decoration
-    -- over an oracle about other people's accounts.
+    -- exception, so the two are byte-identical over HTTP. PostgREST hands the
+    -- raw message back, so two different sentences would have let any token
+    -- holder tell "somebody has it" from "somebody used to have it" by reading
+    -- the error text (T2-402 review, F6). The UI copy already refuses to make
+    -- that distinction (`garageHandleUnavailable`); the API layer has to refuse
+    -- it too, or the careful sentence is decoration over an oracle about other
+    -- people's accounts.
     --
-    -- Asking the held case here as well as the retired one is what puts the
-    -- common path through this branch instead of through the index. The index
-    -- stays as the concurrency backstop — two claims in flight at once — and in
-    -- that narrow race it raises this same text, because this text is its text.
+    -- Asking the held case here as well as the retired one is what puts BOTH
+    -- refusals through this branch rather than one of them through the unique
+    -- index, and that — not the wording — is what makes them identical.
+    --
+    -- ## What the index does instead, measured rather than assumed
+    --
+    -- The message and the SQLSTATE below are Postgres's own for a violation of
+    -- `profiles_handle_lower_uk`; the `detail` is not, and cannot be. Postgres
+    -- suppresses `BuildIndexValueDescription` on an RLS-protected table — it
+    -- will not quote key values out of a row the caller is not allowed to see —
+    -- so a genuine index violation here arrives with `details: null`, and only
+    -- this explicit `detail` produces the descriptive line.
+    --
+    -- An earlier version of this comment claimed the index "raises this same
+    -- text, because this text is its text". It does not, and nobody had checked
+    -- (T2-402 review round 2, found by disabling the trigger and forcing a real
+    -- violation over HTTP).
+    --
+    -- It is left as it is because the difference runs in the safe direction and
+    -- reaches nothing that matters: the index is only the concurrency backstop
+    -- for two claims in flight at once, both of *this* branch's refusals carry
+    -- the same detail as each other, and the race — when it happens — says
+    -- less, not more. Making the two paths identical is one line (drop the
+    -- `detail`); it is not taken here because the behaviour above has been
+    -- verified byte-for-byte and this would change what was verified.
     if exists (
       select 1
         from public.profiles p
