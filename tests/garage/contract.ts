@@ -1439,6 +1439,9 @@ export const RESERVED_HANDLES = [
   // named both locales here too.
   "procedures",
   "procedimientos",
+  // T702's site-wide search page — same precedent as `mods` above.
+  "search",
+  "buscar",
 ] as const;
 
 /* -------------------------------------------------------------------------
