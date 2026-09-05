@@ -176,11 +176,13 @@ const genLabels = expandGenerations(data.fitment.gens, taxonomy).map((gen) =>
 );
 
 /**
- * A route path from `src/i18n/routes.ts` is locale-independent — that is its
- * contract, because `BaseLayout` needs the whole set to build hreflang pairs.
- * Anything rendered into an `href` therefore goes through `localeHref`, which
- * adds the `/en` or `/es` prefix and the deploy base. Without it every internal
- * link on this page would point at a 404 — the defect
+ * A route path from `src/i18n/routes.ts` is **already this locale's own, and
+ * still unprefixed** — `entryRoutePath("procedures", id, "es")` gives the ES
+ * segment and the ES slug, but no `/es` in front of it and no deploy base. It
+ * is unprefixed on purpose, because `BaseLayout` needs every locale's path
+ * side by side to build the hreflang pairs, so the prefix is added last, per
+ * rendered link, by `localeHref`. Without it every internal link on this page
+ * would point at a 404 — the defect
  * `tests/pages/part-page.render.test.ts` caught on T501 and now pins.
  */
 function hrefFor(routePath: string | null): string | null {

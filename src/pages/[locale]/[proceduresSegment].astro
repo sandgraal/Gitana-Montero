@@ -110,10 +110,13 @@ const procedures = entries
       id,
       domId: `procedure-${id.replace(/\//g, "--")}`,
       /*
-       * `entryRoutePath` returns a **locale-independent** route — that is its
-       * contract, because `BaseLayout` needs the whole set to build hreflang
-       * pairs — so an `href` needs `localeHref` on top. Without it every card
-       * links to a 404, which is the defect the T501 render grader caught.
+       * `entryRoutePath` returns a path that is **already this locale's own
+       * and still unprefixed**: translated segment, translated slug, no
+       * `/en`/`/es` in front and no deploy base. It is unprefixed on purpose,
+       * because `BaseLayout` needs every locale's path side by side to build
+       * the hreflang pairs, so the prefix goes on last, per link, via
+       * `localeHref`. Without it every card links to a 404, which is the
+       * defect the T501 render grader caught.
        */
       href: (() => {
         const path = entryRoutePath("procedures", id, locale);
