@@ -80,11 +80,17 @@ const JOIN = String.raw`\s*[·⋅.\-]?\s*`;
 /**
  * The same separator set with the *space* removed — punctuation or nothing.
  *
- * Used only where a bare space would make the rule too eager: `lb…in` and
- * `in…lb`. "Add 5 lbs in the bag" is a mass and an English preposition, not an
- * inch-pound figure, and `5 lb-in` / `5 in-lb` / `5 inlb` are the spellings a
- * chart actually prints. Every other family keeps the space, because `88 N m`
- * and `65 ft lbs` are real.
+ * Used in exactly **one** direction, `lb…in`, and the asymmetry is the whole
+ * point (review round 2, N2). "Put the 5 lbs in the parts tray" is a mass and
+ * an English preposition, so `lb` followed by a space and `in` must not read as
+ * an inch-pound figure; charts print `5 lb-in`, never `5 lb in`, so nothing is
+ * lost by requiring punctuation there.
+ *
+ * The other direction, `in…lb`, keeps the ordinary spaced {@link JOIN}: "45 in
+ * lbs" is a real spelling with no innocent reading — no English or Spanish
+ * sentence puts a bare `lb`/`lbs` token immediately after "in" — and the first
+ * version's symmetric tight join missed it. Spacing one direction and not the
+ * other is what catches the real spelling without reopening the false positive.
  */
 const TIGHT_JOIN = String.raw`[·⋅.\-]?`;
 
@@ -97,7 +103,8 @@ const TIGHT_JOIN = String.raw`[·⋅.\-]?`;
  * and `kg·m` are exactly what an author transcribing one will type (review F5).
  * `lb…ft` / `ft…lb` are both orders of the imperial symbol, with the optional
  * `f` (`lbf`) and plural `s` (`ft lbs`); `lb…in` / `in…lb` are the same pair
- * for small fasteners, on {@link TIGHT_JOIN} for the reason recorded there.
+ * for small fasteners, with the one-directional spacing {@link TIGHT_JOIN}
+ * records.
  *
  * The spelled-out forms are here for the same reason the punctuation is
  * enumerated rather than the spellings: a rule that recognised `N·m` and not
@@ -113,7 +120,7 @@ const TORQUE_UNIT =
   String.raw`|lbf?s?${JOIN}ft` +
   String.raw`|ft${JOIN}lbf?s?` +
   String.raw`|lbf?s?${TIGHT_JOIN}in` +
-  String.raw`|in${TIGHT_JOIN}lbf?s?` +
+  String.raw`|in${JOIN}lbf?s?` +
   // "88 newton metres", "9 kilogram-meters", "9 kilogramo metro"
   String.raw`|(?:newton|kilogramo?)s?${JOIN}met(?:er|re|ro)s?` +
   // "9 kilográmetros", "9 newtonmetros" — the closed compound

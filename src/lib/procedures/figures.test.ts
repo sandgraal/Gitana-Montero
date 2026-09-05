@@ -51,17 +51,27 @@ describe("the imperial spellings, both orders and both scales", () => {
     ["lb-in", "Torque the cover screws to 25 lb-in."],
     ["in-lb, reversed", "Torque the cover screws to 25 in-lb."],
     ["inlb, closed", "Torque the cover screws to 25 inlb."],
+    // Review round 2, N2: the first version's symmetric tight join missed
+    // this, which is a spelling a chart prints and an author types.
+    ["in lbs, spaced", "Torque the cover screws to 45 in lbs."],
+    ["in lb, spaced singular", "Torque the cover screws to 45 in lb."],
   ])("rejects %s", (_label, text) => {
     expect(findInlinedFigure(text)).not.toBeNull();
   });
 
   it("accepts a mass followed by the English preposition", () => {
     /*
-     * The reason `lb…in` and `in…lb` are the one family that does not admit a
-     * bare space: "5 lbs in the bag" is a mass and a preposition. Charts print
-     * `5 lb-in`, never `5 lb in`, so nothing is lost.
+     * The other half of N2, and the reason the spacing is **one-directional**
+     * rather than simply loosened: "5 lbs in the bag" is a mass and a
+     * preposition. Charts print `5 lb-in`, never `5 lb in`, so requiring
+     * punctuation in the `lb…in` direction costs nothing — while the `in…lb`
+     * direction can take a space, because no sentence puts a bare `lb`/`lbs`
+     * token immediately after "in".
      */
     expect(findInlinedFigure("Put the 5 lbs in the parts tray.")).toBeNull();
+    expect(
+      findInlinedFigure("Leave the 10 lbs in the bed until you are done.")
+    ).toBeNull();
   });
 });
 

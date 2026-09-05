@@ -301,8 +301,18 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
     (`newton metres`, `kilográmetros`, `foot-pounds`, `libras-pie`).
   All four fixes are pinned by new regression tests —
   `src/schemas/procedures.test.ts` (F1, F2) and
-  `src/lib/procedures/figures.test.ts` (F5) — mutation-verified: reverting the
-  three code fixes turns exactly those 10 tests red and nothing else.
+  `src/lib/procedures/figures.test.ts` (F5, N2) — and mutation-verified.
+  **State the mutant set with the count, because the number is meaningless
+  without it:** reverting all four code fixes at once (drop
+  `checkOptionalSafetyNotesAreSymmetric` from the rule list; empty
+  `FIGURE_SCANNED_PROSE` and cut `prerequisites` from
+  `FIGURE_SCANNED_RECORDS`; `kgf?` → `kgf`; `in${JOIN}` → `in${TIGHT_JOIN}`)
+  turns **12 tests red across the full 110-file suite and nothing else**. An
+  earlier round of this record said "10", which was a two-file run taken before
+  the N2 and F6/F7 tests existed; the reviewer measured 21 under a wider mutant
+  set. All three numbers are consistent — they differ in what was reverted and
+  what was run, which is exactly why the set is now written down beside the
+  count.
   <br>**Review findings also closed, though the reviewer marked them optional:**
   **F6**, `UNIT_SYMBOLS` had no completeness grader, so a unit added to
   `src/schemas/reference.ts` would have silently rendered its raw id — now
@@ -326,6 +336,36 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
   <br>**F8/F9 informational, no action:** the third difficulty-template string
   (see judgment call 7 above) and the absence of extra listing prominence for
   safety-critical cards — both owner/precedent questions rather than defects.
+  <br>**Independent-review round 2 (2026-09-05) — two LOW findings. N2 fixed,
+  N1 recorded as an authoring note. READ N1 BEFORE WRITING T504's PROSE.**
+  - **N1 (low, no code change) — the engine-code carve-out is *positional*, and
+    the F2 widening made that more reachable.** The detector excuses a volume
+    figure only when a Mitsubishi engine code **follows** it (`3.5 L 6G74`),
+    because that is the position in which the code is naming the figure. Write
+    the displacement with the code *before* it — "Cambio de aceite del 3.5 L",
+    "6G74 3.5 L oil change" — and the sentence is rejected as an inlined
+    capacity. This is pre-existing detector behaviour and not introduced by the
+    F2 fix, but F2 brought `title` and `summary` into scope, which is precisely
+    where a displacement gets used as a name, so an author is now much more
+    likely to meet it.
+    **Authoring rule for T504: write engine-code-adjacent displacement as
+    `3.5 L 6G74` — figure first, code second.** That is also how the FSM, the
+    catalogue and the owner's own description of Gitana Blanca write it, so the
+    rule costs nothing.
+    **If T504's author hits it anyway, fixing it properly is the better move
+    than working around it:** make the adjacency check bidirectional (a
+    lookbehind for the code as well as the lookahead), keeping it strictly
+    *token-adjacent* in both directions. The property that must survive is the
+    one three T502a reject rows pin: the code excuses the figure it is attached
+    to, never every figure in its sentence — "The 6G74 takes 4.5 L of oil" must
+    stay rejected, because there the code is attached to nothing.
+  - **N2 (low) — FIXED.** `TIGHT_JOIN` was applied symmetrically to both
+    `lb…in` and `in…lb`, so "Torque to 45 in lbs" was a live bypass while the
+    tight join was only ever needed to keep "Put the 5 lbs in the parts tray"
+    from firing. The spacing is now one-directional: `lb…in` still requires
+    punctuation, `in…lb` takes the ordinary spaced `JOIN`. Both the newly-caught
+    spelling and the false positive it must not reopen are pinned in
+    `src/lib/procedures/figures.test.ts`.
 - [ ] **T503 [CONTENT]** Parts wave 1: every part referenced by T303/T403/T404 garage+problem entries. Depends: T501, gaps report. *(PRT-01, PRT-02)*
 - [ ] **T504 [CONTENT]** Procedures wave 1: maintenance set (oil, filters, timing belt 6G74, diffs/tcase fluid, brakes, plugs) — bilingual, cited, safety-flagged where due. Depends: T502. *(PRC-01, PRC-02, PRC-03)*
 
