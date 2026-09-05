@@ -330,6 +330,46 @@ export async function loadProfile(): Promise<GarageResult<ProfileRow | null>> {
 }
 
 /**
+ * The SQLSTATEs that mean *the database looked at this handle and said no*.
+ *
+ * An allow-list, not "has a code", and the difference is the whole point. The
+ * earlier test — `error.code ? "rejected" : "failed"` — read as "constraint
+ * violations carry a code, transport failures do not", which is true and not
+ * sufficient: **PostgREST's own errors carry codes too**, in its own `PGRST…`
+ * namespace rather than Postgres's five characters. The one that mattered is
+ * `PGRST116` ("JSON object requested, multiple (or no) rows returned"), which
+ * `.single()` produces when the update matched nothing — precisely the
+ * just-after-signup beat `loadProfile` exists to survive, and precisely the
+ * moment somebody would have been told "that address is not available" about a
+ * name nobody holds (T2-402 review, Copilot). `PGRST301` (expired JWT),
+ * `42501` (RLS/insufficient privilege) and `57014` (statement timeout) are the
+ * same mistake with different wording.
+ *
+ * So only these two, both of which the schema raises deliberately and both of
+ * which are statements about the string that was typed:
+ *
+ * - `23505` unique_violation — `profiles_handle_lower_uk`, and the
+ *   `normalize_profile_handle` trigger's `raise … using errcode = '23505'`,
+ *   which answers "held by somebody else" and "retired by somebody else" in
+ *   one byte-identical refusal (see `20260903120100_public_handles.sql`).
+ * - `23514` check_violation — `profiles_handle_ck`: length, character set, and
+ *   the reserved-word list.
+ *
+ * Anything else is `failed`, deliberately, and the asymmetry is the honest
+ * direction: "we could not reach the database" over a real refusal costs a
+ * retry, while "that address is taken" over a missing row sends somebody off
+ * inventing a new name for nothing (AGENTS.md — a failure is not a zero).
+ */
+const HANDLE_REFUSAL_SQLSTATES: ReadonlySet<string> = new Set([
+  "23505",
+  "23514",
+]);
+
+function refusesTheValue(error: { readonly code?: string | null }): boolean {
+  return HANDLE_REFUSAL_SQLSTATES.has(error.code ?? "");
+}
+
+/**
  * Claim, change, or release the caller's handle (SHR-02).
  *
  * `null` releases it. Releasing is not deleting: the database retires the old
@@ -341,8 +381,9 @@ export async function loadProfile(): Promise<GarageResult<ProfileRow | null>> {
  * applies — so the row and the form agree about which string was stored. Every
  * rule that can refuse it (format, length, the reserved list, uniqueness, and
  * another account's retired handle) is enforced in the database; this returns
- * `"rejected"` when one of them does, which is a different outcome from a
- * request that never arrived.
+ * `"rejected"` when one of them does — recognised by SQLSTATE, see
+ * `HANDLE_REFUSAL_SQLSTATES` — which is a different outcome from a request that
+ * never arrived, and from one that arrived and found no row.
  *
  * `rejected` versus `failed` matters because the two have different honest
  * sentences: one is "that handle is not available", the other is "we could not
@@ -360,14 +401,16 @@ export async function saveHandle(
     .update({ handle })
     .eq("id", open.value.userId)
     .select(PROFILE_COLUMNS)
-    .single();
+    .maybeSingle();
   if (error) {
-    // Every constraint this write can break is a statement about the *value*:
-    // the check constraint, the unique index, and the trigger's retired-handle
-    // refusal all arrive as a 4xx with a Postgres error code. A transport
-    // failure has none.
-    return { ok: false, reason: error.code ? "rejected" : "failed" };
+    return {
+      ok: false,
+      reason: refusesTheValue(error) ? "rejected" : "failed",
+    };
   }
+  // `maybeSingle`, so no row is `data === null` with no error — the same beat
+  // `loadProfile` documents, and it is a failure to report rather than a
+  // statement about the handle. RLS hiding the row lands here too, identically.
   if (!data) return failed();
   return { ok: true, value: asProfile(data) };
 }

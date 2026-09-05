@@ -3729,16 +3729,26 @@ const hasReferences = Object.values(referenceCatalogue).some(
      * switches are inert until a handle is claimed — and the three reasons they
      * might be inert are kept apart, because they need different words:
      * the profile has not loaded (say nothing yet), it failed to load (say so),
-     * or it loaded and carries no handle (say what to do about it).
+     * or it loaded and carries no handle (say what to do about it) — that last
+     * one through `visibilityGate`, not through the message line.
+     *
+     * The message line is therefore written on EVERY call, in both directions.
+     * Setting it only on `"failed"` left the sentence on screen after the
+     * status recovered: boot's `loadProfile` fails, the reader claims a handle
+     * anyway, `submitHandle` succeeds and sets `profileStatus = "loaded"`,
+     * `paintHandle` calls back in here — and the switches unlock underneath a
+     * line still saying the request did not arrive (T2-402 review, Copilot). A
+     * paint function that can only add is not a paint function; it is a log.
      */
     function paintVisibility(row: VehicleRow): void {
       const claimed = profileStatus === "loaded" && profile?.handle != null;
       if (els.visibilityGate) {
         els.visibilityGate.hidden = !(profileStatus === "loaded" && !claimed);
       }
-      if (profileStatus === "failed") {
-        say(els.visibilityMessage, text.stringError ?? "");
-      }
+      say(
+        els.visibilityMessage,
+        profileStatus === "failed" ? (text.stringError ?? "") : ""
+      );
       for (const [control, open] of [
         [els.showcasePublic, row.is_showcase_public],
         [els.worklogPublic, row.is_worklog_public],
