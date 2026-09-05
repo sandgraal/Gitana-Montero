@@ -77,6 +77,7 @@ import {
   USER_TABLES,
   testVehicleName,
   testVehiclePhotoPath,
+  type TableContract,
 } from "./contract.ts";
 import {
   type Actor,
@@ -107,6 +108,22 @@ const live = await detectLiveStack();
 
 /** The table the designation lives on. */
 const TABLE = "vehicles";
+
+/**
+ * A column name no migration will ever declare.
+ *
+ * ## Why a synthetic name and not `cover_photo_path` (re-review, F2 residual)
+ *
+ * `pendingMarkerIssues`' fixtures need a column the schema **does not have**,
+ * and the obvious candidate was the cover column itself — which is absent
+ * today and present the moment T2-306 lands. Using it would have made two
+ * freshly written controls assert the feature's absence, which is the exact
+ * defect the re-review had just asked me to remove from three other places.
+ * Caught by simulating the full activation rather than by reading the diff;
+ * a synthetic name in the `TEST-` namespace is absent in every state and
+ * therefore says the same thing before and after.
+ */
+const NEVER_SHIPPED_COLUMN = "test_t2_306a_absent_column";
 
 /* =========================================================================
  * Declaration-tier rules
@@ -338,10 +355,18 @@ function coverMembershipIssues(sql: string): string[] {
  *      `is distinct from`. What matters is that the *old* designation is
  *      read at all; a body that never mentions it cannot be conditioning on
  *      whether the designation changed, whatever else it does.
- *    - the trigger is declared `update of <source column>`, so a patch that
- *      touches only the cover never fires it. Different mechanism, same
- *      guarantee, and a legitimate design a rule demanding `old.` alone would
- *      have failed for its spelling.
+ *    - the trigger is declared `update of <source column>` **and the cover
+ *      column is not also in that scope list**, so a patch that touches only
+ *      the cover never fires it. Different mechanism, same guarantee, and a
+ *      legitimate design a rule demanding `old.` alone would have failed for
+ *      its spelling.
+ *
+ *      Both halves, because the first version asked only whether the source
+ *      column was named and `update of photo_paths, cover_photo_path`
+ *      satisfied it while still firing on a cover-only patch — the original
+ *      defect with a scope clause bolted on. A rule that accepts the thing it
+ *      exists to reject is worse than no rule, and this one did, until the
+ *      re-review shipped that migration and Tier B failed it.
  *
  *    Necessary, not sufficient: a body could name `old.` and ignore it. Tier
  *    B is what proves the semantics — "a path the vehicle does not have is
@@ -383,9 +408,27 @@ function coverClearingIssues(sql: string): string[] {
       );
     }
     const consultsOld = body.includes(`old.${COVER_PHOTO_COLUMN}`);
-    const scopedToSource = new RegExp(
-      `\\bupdate of [a-z0-9_, ]*\\b${COVER_PHOTO_SOURCE_COLUMN}\\b`
-    ).test(trigger);
+    // The scope list is **parsed**, not pattern-matched (T2-306a re-review,
+    // F1 residual). The first version asked only whether `photo_paths`
+    // appeared after `update of`, and `update of photo_paths,
+    // cover_photo_path` satisfied that while still firing on a cover-only
+    // patch — the original defect exactly, blessed by Tier A and caught by
+    // Tier B with the same three failures. The property is not "the source
+    // column is in the scope" but "the source column is in the scope **and
+    // the cover column is not**", so both halves are asked.
+    //
+    // Parsed rather than sliced at the first ` on `, because a trigger
+    // *named* for the column it manages — `vehicles_cover_photo_path_clear`
+    // — would put `cover_photo_path` in that slice and be failed for its
+    // name. Reading the actual comma-separated list has no such trap.
+    const scope = /\bupdate of ([a-z0-9_, ]+?)\s+on\b/
+      .exec(trigger)?.[1]
+      .split(",")
+      .map((column) => column.trim());
+    const scopedToSource =
+      scope !== undefined &&
+      scope.includes(COVER_PHOTO_SOURCE_COLUMN) &&
+      !scope.includes(COVER_PHOTO_COLUMN);
     if (!consultsOld && !scopedToSource) {
       issues.push(
         `public.${TABLE}: trigger ${name} clears ${COVER_PHOTO_COLUMN} ` +
@@ -400,6 +443,59 @@ function coverClearingIssues(sql: string): string[] {
         issues.push(
           `public.${TABLE}: trigger ${name} assigns ${COVER_PHOTO_COLUMN} ` +
             `the value \`${rhs}\` — GAR-01′ forbids promoting another photo`
+        );
+      }
+    }
+  }
+  return issues;
+}
+
+/**
+ * Findings: a contract column whose `pending` marker disagrees with the schema.
+ *
+ * ## Why this is a rule and not a hand-written assertion (re-review, F2)
+ *
+ * `contract.ts`'s own docstring makes promotion a two-part move: the
+ * implementer deletes the `pending:` line *and* the `.fails` markers that
+ * quote it. A grader that flatly asserted `pending === "T2-306"` made those
+ * two halves contradict each other — deleting the line correctly flips three
+ * `PENDING` markers and breaks the assertion, while keeping it green leaves
+ * three markers unexpectedly passing. **There was no fully-green end state**,
+ * which is the same "no sanctioned route to green" defect F2 fixed twice
+ * elsewhere, hiding in a control that looked like a naming check.
+ *
+ * Written as a rule over the whole contract rather than as a branch in one
+ * test, because the disagreement it catches is not special to this column.
+ * `profiles.handle` (T2-402) and every column of `shares` (T2-404) carry the
+ * same marker and inherit the same check the day they ship — and the failure
+ * this catches, a `pending` marker left behind on a column that now exists, is
+ * exactly the kind of stale bookkeeping nobody goes looking for.
+ *
+ * `tables` is a parameter so the rule can be graded against contract state
+ * with a known answer, in both directions, rather than only against whatever
+ * `USER_TABLES` happens to say today.
+ */
+function pendingMarkerIssues(
+  sql: string,
+  tables: readonly TableContract[] = USER_TABLES
+): string[] {
+  const issues: string[] = [];
+  for (const table of tables) {
+    for (const column of table.columns) {
+      const pending = table.pending ?? column.pending;
+      const present =
+        columnDefinitionFor(sql, table.name, column.name) !== null;
+      if (pending !== undefined && present) {
+        issues.push(
+          `${table.name}.${column.name} is marked pending ${pending}, but the ` +
+            `schema already has it — delete the \`pending\` line (and the ` +
+            `\`.fails\` markers that quote it)`
+        );
+      }
+      if (pending === undefined && !present) {
+        issues.push(
+          `${table.name}.${column.name} carries no pending marker, but the ` +
+            `schema does not have it — either it regressed or it needs one`
         );
       }
     }
@@ -1304,6 +1400,31 @@ describe("the membership rule fires, and stays quiet when it should", () => {
   });
 });
 
+/** `update of photo_paths, cover_photo_path` — scoped, but not to a departure. */
+const SCOPED_TO_BOTH_COLUMNS = normalizeSql(`
+  create table public.vehicles (
+    id uuid primary key,
+    photo_paths text[] not null default '{}',
+    cover_photo_path text,
+    constraint vehicles_cover_ck
+      check (cover_photo_path is null or cover_photo_path = any(photo_paths))
+  );
+
+  create function public.clear_cover()
+  returns trigger language plpgsql as $$
+  begin
+    if not (new.cover_photo_path = any(new.photo_paths)) then
+      new.cover_photo_path := null;
+    end if;
+    return new;
+  end;
+  $$;
+
+  create trigger vehicles_clear_cover
+    before update of photo_paths, cover_photo_path on public.vehicles
+    for each row execute function public.clear_cover();
+`);
+
 describe("the clearing rule fires, and stays quiet when it should", () => {
   it("POSITIVE CONTROL: reports nothing against a correct schema", () => {
     expect(coverClearingIssues(CORRECT)).toEqual([]);
@@ -1443,6 +1564,38 @@ describe("the clearing rule fires, and stays quiet when it should", () => {
     expect(coverClearingIssues(columnScoped)).toEqual([]);
   });
 
+  it("MUTATION: reports a trigger scoped to BOTH columns", () => {
+    // **The residual the re-review found (F1 again, one level down).**
+    // `update of photo_paths, cover_photo_path` *looks* scoped and satisfies
+    // "the source column is named", but it still fires on a cover-only patch
+    // — so a freshly written bogus designation is nulled before the
+    // constraint sees it, which is the original defect wearing a scope
+    // clause. Reviewer shipped this exact migration and Tier B failed it with
+    // the same three refusal graders that caught the first version.
+    //
+    // The property is "source in scope AND cover NOT in scope". Half of it
+    // was a rule that passed the thing it existed to reject.
+    expect(coverClearingIssues(SCOPED_TO_BOTH_COLUMNS)).toEqual([
+      expect.stringContaining("without consulting old.cover_photo_path"),
+    ]);
+  });
+
+  it("does not fail a trigger merely NAMED for the column it manages", () => {
+    // The false-positive direction of the same clause. Slicing the statement
+    // at the first ` on ` — the obvious implementation — puts the trigger's
+    // own name in the searched text, so `vehicles_cover_photo_path_clear`
+    // would be rejected for its name while being perfectly correct. Parsing
+    // the comma-separated list has no such trap, and this control is what
+    // keeps it that way.
+    const named = SCOPED_TO_BOTH_COLUMNS.replace(
+      "create trigger vehicles_clear_cover before update of photo_paths, cover_photo_path",
+      "create trigger vehicles_cover_photo_path_clear before update of photo_paths"
+    );
+
+    expect(named).toContain("vehicles_cover_photo_path_clear");
+    expect(coverClearingIssues(named)).toEqual([]);
+  });
+
   it("does not accept `update of` some OTHER column as scoping", () => {
     // The over-acceptance direction. `update of display_name` fires on a write
     // that has nothing to do with photos and scopes nothing that matters, so
@@ -1571,12 +1724,94 @@ describe("the contract and the rules name the same columns", () => {
       (column) => column.name === COVER_PHOTO_COLUMN
     );
 
+    // **No `pending` assertion here** (re-review, F2 residual). This test is
+    // about *identity* — that the contract and the rules name the same column
+    // for the same requirement — and identity does not change at activation.
+    // Whether the `pending` marker is still on the entry is a different claim
+    // with a different answer before and after T2-306, and it is graded by
+    // `pendingMarkerIssues` below, which stays true in both states.
     expect(
       cover,
       `${TABLE}.${COVER_PHOTO_COLUMN} is not in the contract`
     ).toBeDefined();
-    expect(cover?.pending).toBe("T2-306");
     expect(cover?.requirement).toContain("GAR-01′");
+  });
+
+  it("every pending marker in the contract agrees with the schema", () => {
+    // Green today (three pending columns, none of them in the schema) and
+    // green after T2-306 deletes its `pending` line (column present, marker
+    // gone). The one state it refuses is the inconsistent middle, which is
+    // precisely the state the old flat assertion forced an implementer into.
+    expect(pendingMarkerIssues(migrationSql())).toEqual([]);
+  });
+
+  it("MUTATION: reports a pending marker left on a column that shipped", () => {
+    // The stale-bookkeeping direction, and the one T2-306 will hit if it
+    // ships the column without touching `contract.ts`.
+    const sql = migrationSql();
+    const stale: TableContract[] = [
+      {
+        name: TABLE,
+        requirement: "GAR-01′",
+        ownershipPath: ["owner_id"],
+        columns: [
+          {
+            name: COVER_PHOTO_SOURCE_COLUMN,
+            requirement: "GAR-01′",
+            pending: "T2-306",
+          },
+        ],
+      },
+    ];
+
+    expect(pendingMarkerIssues(sql, stale)).toEqual([
+      expect.stringContaining("is marked pending T2-306, but the schema"),
+    ]);
+  });
+
+  it("MUTATION: reports an unmarked column the schema does not have", () => {
+    // The other direction: a contract entry that claims to be shipped and is
+    // not. Without this half the rule would be satisfied by marking
+    // everything pending forever.
+    const sql = migrationSql();
+    const missing: TableContract[] = [
+      {
+        name: TABLE,
+        requirement: "GAR-01′",
+        ownershipPath: ["owner_id"],
+        columns: [{ name: NEVER_SHIPPED_COLUMN, requirement: "GAR-01′" }],
+      },
+    ];
+
+    expect(pendingMarkerIssues(sql, missing)).toEqual([
+      expect.stringContaining("carries no pending marker"),
+    ]);
+  });
+
+  it("POSITIVE CONTROL: reports nothing for either consistent state", () => {
+    // Both ends, so neither mutation above is passing because the rule shouts
+    // at everything.
+    const sql = migrationSql();
+    const consistent: TableContract[] = [
+      {
+        name: TABLE,
+        requirement: "GAR-01′",
+        ownershipPath: ["owner_id"],
+        columns: [
+          // shipped, unmarked
+          { name: COVER_PHOTO_SOURCE_COLUMN, requirement: "GAR-01′" },
+          // unshipped, marked — a synthetic name, so this stays true after
+          // T2-306 ships the real column (see NEVER_SHIPPED_COLUMN)
+          {
+            name: NEVER_SHIPPED_COLUMN,
+            requirement: "GAR-01′",
+            pending: "T2-306",
+          },
+        ],
+      },
+    ];
+
+    expect(pendingMarkerIssues(sql, consistent)).toEqual([]);
   });
 
   it("declares the cover column nullable and with no default in the contract", () => {
