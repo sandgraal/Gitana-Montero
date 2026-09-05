@@ -212,7 +212,7 @@ export const RECORD_MEDIA_TABLE: TableContract = {
  * and the properties that make it safe are graded in `handles.test.ts`; the
  * constants they read are at the foot of this file. Its `pending: "T2-402"`
  * marker was deleted by T2-402 in the commit that added
- * `20260903120000_public_handles.sql`, which is the whole of the promotion
+ * `20260903120100_public_handles.sql`, which is the whole of the promotion
  * `ColumnContract.pending` describes.
  *
  * **`shares` is declared here (pending T2-404), not exempted.** The

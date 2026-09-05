@@ -1192,7 +1192,7 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   `visibleReceipts`, `isEligibleForCommunityEvidence`, over an `owner | world |
   grant` union, so T2-404 adds a principal and not a code path); SHR-02's handle
   as a *namespace* (`src/lib/garage/handles.ts` plus
-  `20260903120000_public_handles.sql`: folded on write by a trigger, unique on
+  `20260903120100_public_handles.sql`: folded on write by a trigger, unique on
   `lower(handle)`, reserved words in a check constraint, and `retired_handles`
   so a renamed owner's old URL cannot be inherited by a stranger); the
   per-vehicle and per-record/per-field toggles on `/en/garage/` + `/es/taller/`.

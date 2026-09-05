@@ -120,7 +120,8 @@ alter table public.profiles
         'garage', 'taller',
         'problems', 'problemas',
         'parts', 'repuestos',
-        'mods', 'modificaciones'
+        'mods', 'modificaciones',
+        'procedures', 'procedimientos'
       ])
     )
   );

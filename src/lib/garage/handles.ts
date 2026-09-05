@@ -19,7 +19,7 @@
  * 2. **Case must fold.** `Gitana` and `gitana` are the same string in the same
  *    position of the same URL to every reader on earth, and two accounts that
  *    differ only in case is an impersonation kit. {@link normalizeHandle} is
- *    the fold, and `20260903120000_public_handles.sql` applies the identical
+ *    the fold, and `20260903120100_public_handles.sql` applies the identical
  *    fold in a `before insert or update` trigger so a row written by a script,
  *    an import job or a `curl` somebody found on a forum is folded too.
  * 3. **A released handle must not immediately become somebody else's.** SHR-02
@@ -200,6 +200,8 @@ const SITE_ROUTE_HANDLES = [
   "repuestos",
   "mods",
   "modificaciones",
+  "procedures",
+  "procedimientos",
 ] as const;
 
 /**

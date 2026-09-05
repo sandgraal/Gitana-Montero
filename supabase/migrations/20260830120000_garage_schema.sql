@@ -51,7 +51,7 @@ alter default privileges in schema public revoke all on functions from public;
 -- marks, it does not drop, until the window closes.
 
 -- `handle` (SHR-02) is declared here and given its rules in
--- `20260903120000_public_handles.sql`, which also adds it by `alter table` for
+-- `20260903120100_public_handles.sql`, which also adds it by `alter table` for
 -- databases that already ran this file. Both paths end identically; the reason
 -- the column is named in *this* statement as well is that a column added only
 -- by an `alter` is invisible to `createTableBody` in `tests/garage/sql.ts`, and
