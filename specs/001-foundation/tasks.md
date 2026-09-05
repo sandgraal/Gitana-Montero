@@ -239,6 +239,28 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
   - **Review round 2 (2026-09-02), PR #94 thread r3920323780 — comment accuracy.** Both mods templates described a route path from `src/i18n/routes.ts` as "locale-independent" three lines above `entryRoutePath(…, locale)`, which returns that locale's own translated segment and slug. The code was right and the comment was wrong. Corrected to the two-part truth — **already this locale's own, and still unprefixed** (no `/en`/`/es`, no deploy base, because `BaseLayout` needs every locale's path side by side for the hreflang pairs, so `localeHref` prefixes last, per link). `collectionRoutePath` in `src/i18n/routes.ts` carried the same phrase and is where a reader following the trail lands next, so it is corrected too, and now records that `splitLocalePath`'s "locale-independent route" in `src/i18n/routing.ts` is a *different and correct* use of the phrase ("what is left after the prefix is stripped") so nobody "fixes" that one.
   - **Follow-ups this task does not own.** (0) The two T501 parts templates (`[partsSegment].astro`, `[partsSegment]/[partSlug].astro`) carry the same "locale-independent" wording round 2 corrected here. Deliberately left alone: editing another task's merged files in passing is the drive-by this repo audits, and it is a comment, so nothing renders wrongly. Worth one follow-up commit by whoever next touches those templates. (a) `mods` is not in `SiteHeader`'s nav — neither is `parts`; adding either is site-chrome work. (b) `affects[].ref` may only target `mods`/`parts`; pointing a consequence at a `problems` or `procedures` entry is a schema change for the task that needs it. (c) A mod with no `affects` rows is indistinguishable from an unexamined one at the schema level — that is `npm run gaps`' (T703, GAP-01) shape, not a rule this schema can express.
 - [ ] **T602 [CONTENT]** Mods wave 1: lifts, 33s and regear math, armor, storage, dual battery, lockers — honest tradeoffs, bilingual. Depends: T601. *(MOD-01, MOD-02)*
+  <br>**Schema gap found by T602's fact-check (2026-09-05), owner-approved to fix:**
+  `modsShared` has no typed numeric field for specs (torque, weight, load rating,
+  dimensions), so wave-1 authors put every figure inside `sources[].title`
+  prose. Two real costs: `check:citations` only walks typed fields, so it
+  passes on these entries **because** the numbers are hidden from it — the
+  "every numeric spec carries a source" guarantee is vacuous for them; and a
+  Spanish reader's only view of a figure like "100 kg roof load" is an English
+  sentence inside a citation, defeating the bilingual number-locality rule in
+  spirit even though no field is technically duplicated. See T603/T604 below.
+- [ ] **T603 [TEST]** Graders for typed mods figures: `modsShared` gains a
+  referenced-by-ID numeric spec field (torque, weight, load rating, dimension),
+  mirroring T502a/T502's specs-by-id pattern (PRC-03) — a figure lives once in
+  shared reference data, resolves by ID, and renders per-locale instead of
+  living only inside a citation's `title` string. Grade: every entry with a
+  numeric claim in `sources[].title` prose has an alternative typed path
+  available; `check:citations` actually walks the new field; both locales
+  render the identical resolved figure from the one stored value. Judgment
+  call for the implementer: share `src/lib/procedures/specs.ts`'s module or
+  fork a `mods`-specific one — record which and why. Depends: T601, T502
+  merged (reuse candidate). *(MOD-01, MOD-02, PRC-03 precedent)*
+- [ ] **T604 [PLATFORM]** Implements the T603 seam. Depends: T603 merged.
+  *(MOD-01, MOD-02, PRC-03 precedent)*
 
 ## Phase 7 — Community, search, gaps
 - [x] **T700 [PLATFORM]** Community schema (owner-approved addition, 2026-08-28): extend the `community` collection per COM-01/COM-02 — community type (forum, subreddit, FB group, Discord, YouTube, vendor, shop), region/language/gen/activity tags, links. Attempt within the T104 base contract first; if community entries genuinely need the fitment/confidence requirement relaxed, that is the negotiated stop-and-ask recorded on T205 — report BLOCKED for the owner decision, never a drive-by change. Depends: T106. *(COM-01, COM-02)*
