@@ -417,10 +417,22 @@ function coverClearingIssues(sql: string): string[] {
     // column is in the scope" but "the source column is in the scope **and
     // the cover column is not**", so both halves are asked.
     //
-    // Parsed rather than sliced at the first ` on `, because a trigger
-    // *named* for the column it manages — `vehicles_cover_photo_path_clear`
-    // — would put `cover_photo_path` in that slice and be failed for its
-    // name. Reading the actual comma-separated list has no such trap.
+    // Parsed into a column list rather than pattern-matched against the text
+    // before the first ` on `. The two agree on every input either was tried
+    // against — including a trigger *named* for the column it manages,
+    // `vehicles_cover_photo_path_clear`, which an earlier version of this
+    // comment wrongly claimed the slice would reject. It does not: `_` is a
+    // word character, so `\bcover_photo_path\b` finds no boundary inside that
+    // name (T2-306a final review; the claim was tested and disproved, and the
+    // correction is recorded here rather than quietly dropped).
+    //
+    // The reason to parse is therefore not a bug in slicing, it is *what the
+    // rule reads*. The slice searches a region that also holds the trigger
+    // name, the timing keyword and the event list, so a match there is a match
+    // on the wrong text even when the answer comes out right. A rule that
+    // gets the right answer from the wrong region stays right only by luck,
+    // and the luck runs out on the first identifier nobody predicted. The
+    // column list is the thing the requirement is actually about.
     const scope = /\bupdate of ([a-z0-9_, ]+?)\s+on\b/
       .exec(trigger)?.[1]
       .split(",")
@@ -1581,12 +1593,19 @@ describe("the clearing rule fires, and stays quiet when it should", () => {
   });
 
   it("does not fail a trigger merely NAMED for the column it manages", () => {
-    // The false-positive direction of the same clause. Slicing the statement
-    // at the first ` on ` — the obvious implementation — puts the trigger's
-    // own name in the searched text, so `vehicles_cover_photo_path_clear`
-    // would be rejected for its name while being perfectly correct. Parsing
-    // the comma-separated list has no such trap, and this control is what
-    // keeps it that way.
+    // The false-positive direction of the same clause: a correctly scoped
+    // trigger must not be rejected for what it is *called*.
+    //
+    // **What this control does and does not prove**, since an earlier version
+    // of this comment overstated it. It pins a real property — the rule
+    // judges the scope list, not the identifier — and it would catch a future
+    // rewrite that started matching the column name anywhere in the
+    // statement. It does **not** discriminate between the current parsing
+    // implementation and the slice-at-` on ` one it replaced: both pass this,
+    // because `_` is a word character and `\bcover_photo_path\b` never
+    // matches inside `vehicles_cover_photo_path_clear`. A control that claims
+    // to separate two implementations should be shown doing it; this one
+    // cannot, so it no longer claims to (T2-306a final review).
     const named = SCOPED_TO_BOTH_COLUMNS.replace(
       "create trigger vehicles_clear_cover before update of photo_paths, cover_photo_path",
       "create trigger vehicles_cover_photo_path_clear before update of photo_paths"
