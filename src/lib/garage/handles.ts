@@ -129,17 +129,26 @@ const GARAGE_ROUTE_SEGMENTS = {
  * and a reader who finds it missing has to work out for themselves whether that
  * is an oversight.
  *
- * ## `gitana` is deliberately **not** here, and `contract.ts` disagrees
+ * ## `gitana`, and the contradiction that resolved against me
  *
- * `RESERVED_HANDLES` in `tests/garage/contract.ts` lists it among the
- * impersonation words, and the same file's `handles.test.ts` asserts
- * `handleIssues("gitana")` returns **no** issues as one of its four positive
- * controls. Both cannot hold, and the positive control is the one that is
- * right: Gitana Blanca is a *user's* truck (MIG-04 — "user page #1"), not the
- * site's own identity, so reserving her name would be the platform taking a
- * handle away from the first owner it was built for. The divergence is reported
- * on T2-402 rather than patched into the grader's list, because that list is an
- * independent statement and not mine to edit.
+ * T2-402 shipped this list **without** `gitana`, on the reading that Gitana
+ * Blanca is a *user's* truck (MIG-04 — "user page #1") rather than the site's
+ * own identity, and reported the disagreement with `contract.ts` instead of
+ * silently patching a grader's list. T2-401 then settled it the other way
+ * (merged 97f743a), and the argument is better than mine was: MIG-04 makes her
+ * "user page #1 … used to drive the design of every garage view" and AGENTS.md
+ * calls her "the template every other garage is shaped by", so on
+ * monterogarage.com a stranger holding `/en/garage/gitana/` reads as the site
+ * speaking — exactly like the `montero` and `monterogarage` beside her here.
+ * `contract.ts`'s own recorded asymmetry is what decides it: un-reserving later
+ * is safe, reserving later is not, because by then somebody holds it.
+ *
+ * Reserving the word does not take the name from the owner. This module is the
+ * *self-service claim* validator; MIG-04's seeding is a migration, which is a
+ * different mechanism — and the spec never says the owner's handle is the
+ * literal string `gitana`. The name it gives is the display name **Gitana
+ * Blanca**, whose handle form `gitana-blanca` is unreserved and is a positive
+ * control in `handles.test.ts`.
  */
 const IMPERSONATION_HANDLES = [
   "admin",
@@ -153,8 +162,12 @@ const IMPERSONATION_HANDLES = [
   "moderator",
   "security",
   "billing",
+  // The flagship words: the site itself, and the truck the whole platform is
+  // designed around. A garage URL is the one place a stranger cannot tell the
+  // difference between the three.
   "montero",
   "monterogarage",
+  "gitana",
   "www",
   "mail",
   "static",

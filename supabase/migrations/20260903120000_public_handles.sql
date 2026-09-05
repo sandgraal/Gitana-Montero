@@ -86,10 +86,17 @@ comment on column public.profiles.retired_handles is
 -- is listed so a reader does not have to work out whether its absence was an
 -- oversight.
 --
--- `gitana` is deliberately absent, and `tests/garage/contract.ts` disagrees —
--- see the note on `IMPERSONATION_HANDLES` in `src/lib/garage/handles.ts`.
--- Gitana Blanca is a user's truck (MIG-04), not the site's identity, and
--- `handles.test.ts`'s own positive control requires the handle to be claimable.
+-- `gitana` sits with `montero` and `monterogarage` as a flagship word: on
+-- monterogarage.com a stranger holding `/en/garage/gitana/` reads as the site
+-- speaking (MIG-04, AGENTS.md). T2-402 first shipped it claimable and T2-401
+-- settled it the other way in 97f743a — see the note on
+-- `IMPERSONATION_HANDLES` in `src/lib/garage/handles.ts`. `gitana-blanca`
+-- stays claimable, which is the form MIG-04's display name actually implies.
+--
+-- Tier B writes every lower-case word in the grader's `RESERVED_FIXTURES`
+-- against this constraint, so a word reserved in `handles.ts` and forgotten
+-- here is a red `tier-b` job rather than a silent divergence between the
+-- affordance and the guarantee.
 
 alter table public.profiles
   drop constraint if exists profiles_handle_ck;
@@ -104,7 +111,7 @@ alter table public.profiles
       and handle <> all (array[
         'admin', 'administrator', 'api', 'root', 'support', 'help',
         'official', 'staff', 'moderator', 'security', 'billing',
-        'montero', 'monterogarage', 'www', 'mail',
+        'montero', 'monterogarage', 'gitana', 'www', 'mail',
         'static', 'assets', '_astro',
         'en', 'es',
         'glossary', 'glosario',

@@ -412,17 +412,18 @@ describe("handleIssues names every reason, not the first one", () => {
     );
   });
 
-  it.each<[string]>(
-    CLAIMABLE_FIXTURES.map((handle): [string] => [handle])
-  )("POSITIVE CONTROL: accepts %s", (input) => {
-    // Every rejection above is only meaningful because these pass. A
-    // validator that refused everything would satisfy the whole table.
-    //
-    // `gitana` was here until 2026-09-05 and is not any more: it is reserved
-    // (see the file header and `RESERVED_FIXTURES`). `blanca` took its row so
-    // the "plain alphabetic word" shape is still controlled for.
-    expect(handleIssues(input)).toEqual([]);
-  });
+  it.each<[string]>(CLAIMABLE_FIXTURES.map((handle): [string] => [handle]))(
+    "POSITIVE CONTROL: accepts %s",
+    (input) => {
+      // Every rejection above is only meaningful because these pass. A
+      // validator that refused everything would satisfy the whole table.
+      //
+      // `gitana` was here until 2026-09-05 and is not any more: it is reserved
+      // (see the file header and `RESERVED_FIXTURES`). `blanca` took its row so
+      // the "plain alphabetic word" shape is still controlled for.
+      expect(handleIssues(input)).toEqual([]);
+    }
+  );
 
   it("screens the reserved list AFTER folding, not before", () => {
     // `Admin` is `admin`. A reservation check that ran on the raw input would
