@@ -201,7 +201,7 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
   - **Independent-audit F5 fix (2026-09-02, branch `fix/001-t501-f5-supersession-unknown-state`), not round-1's same-numbered "Owed" finding.** A later, independent T501 audit (graders merged at `8ac5fe6`, distinct from the round-1 review at line above) named a sharper defect than round-1's F1: `supersessionView` folded all three of `supersessionChain`'s "cannot answer" cases (unknown id, dangling pointer, cycle) into the same fixed empty object a genuinely history-less part gets, and both templates' `.every(…)` over that object's empty `rows` reads as vacuously `true` — a chain the page failed to resolve rendered as the *most* confident state, "order this one", not a neutral one (`.claude/GRADER-PRINCIPLES.md`, "unknown is not zero"). **Fixed:** `supersessionView` now returns `SupersessionView | null`, `null` exactly on `supersessionChain`'s three cases; both parts pages compute a three-state `"current" | "superseded" | "unknown"` and render a new dashed third badge (`partsSupersessionUnknownBadge`, one key in both locales) rather than ever defaulting to the current-badge branch. Defense-in-depth only — `validate-parts` already refuses all three corpora at build time — which is why the two grader files (`tests/lib/parts/supersession-unknown-state.test.ts`, `tests/pages/parts-unknown-chain.render.test.ts`) render through mocked `astro:content` / the Astro container API rather than a real build. 14 `it.fails` markers activated (6 lib, 8 page), all green. **GRADER-EDIT DISCLOSURE (T207/T208/T501 precedent):** the pre-existing `tests/lib/parts/parts-graph.test.ts` asserted `supersessionView(...).show === false` for the same unresolvable corpus — exactly the old, now-corrected behavior — so its one `it` was updated to assert `toBeNull()` instead (title changed to match), and five other positive-control `it`s in that file plus two in the F5 grader gained a `null`-narrowing guard (`if (view === null) throw …`) so `astro check` accepts the new `SupersessionView | null` contract. No other assertion, fixture or expectation in either grader file changed.
 - [x] **T502a [TEST]** Graders for the procedures schema contract: prerequisites/tools/parts-consumed/torque+fluid-spec-by-ID/step prose/time estimate/difficulty/safety-notes shape (PRC-01); `safetyCritical` flag required + PRB-03 notice rendering when a procedure touches a safety-critical system (PRC-02); torque/fluid values must resolve to shared reference data by ID — an inlined per-locale value is a build error, same numeric-prose guard pattern as T207/T501 (PRC-03). Expected-failure markers. Depends: T203. *(PRC-01, PRC-02, PRC-03)*
   <br>**Added while backfilling this task (2026-09-02): T502/T502a did not exist as task lines in this file** — T503, T504 and T703 all cited "Depends: T502" and T501's own notes referenced "T502 owns per-value attribution" / "T502 adopts the same [sourceKind] keys", but no task defining the procedures schema was ever written. Reconstructed from spec.md §7 (PRC-01..03) and T501's shipped precedent (the closest analogous schema task) at the owner's direction. Read T501's full task entry (this file) for the pattern this repo uses for numeric-prose guards, slug-registry rows, and shared-component reuse — do not re-derive it from scratch.
-- [ ] **T502 [PLATFORM]** Procedures schema + page template in `src/schemas/` — the T502a seam: prerequisites, tools (flagging special/SST tools), parts consumed (references `parts` entry ids), torque/fluid specs sourced from T207's shared reference data by ID (never inlined per-locale — same check:citations rule as T207/T501), step-by-step bilingual prose, time estimate, difficulty 1–5, safety notes. `safetyCritical: true` procedures render via T401's `SafetyNotice.astro` + `ConfidenceCaveat.astro` (reuse, never re-mint — same class-for-class-identical discipline T501 followed once both had merged) and must carry T204's provisional-match indicator when a listing is filtered on a partial fitment match. Adopt T501's shared `sourceKind.*` label keys unprefixed; never re-mint them (T501 review, "Owed 2" note — T502 was the task named there). Slug registry row per entry (`ENTRY_SLUGS.procedures`), EN + Costa Rican ES slugs; segments and canonical-vs-alias term choice per the glossary (`check:glossary` conformance applies to prose same as every other collection). Activates T502a graders. Depends: T502a merged. *(PRC-01, PRC-02, PRC-03)*
+- [x] **T502 [PLATFORM]** Procedures schema + page template in `src/schemas/` — the T502a seam: prerequisites, tools (flagging special/SST tools), parts consumed (references `parts` entry ids), torque/fluid specs sourced from T207's shared reference data by ID (never inlined per-locale — same check:citations rule as T207/T501), step-by-step bilingual prose, time estimate, difficulty 1–5, safety notes. `safetyCritical: true` procedures render via T401's `SafetyNotice.astro` + `ConfidenceCaveat.astro` (reuse, never re-mint — same class-for-class-identical discipline T501 followed once both had merged) and must carry T204's provisional-match indicator when a listing is filtered on a partial fitment match. Adopt T501's shared `sourceKind.*` label keys unprefixed; never re-mint them (T501 review, "Owed 2" note — T502 was the task named there). Slug registry row per entry (`ENTRY_SLUGS.procedures`), EN + Costa Rican ES slugs; segments and canonical-vs-alias term choice per the glossary (`check:glossary` conformance applies to prose same as every other collection). Activates T502a graders. Depends: T502a merged. *(PRC-01, PRC-02, PRC-03)*
   <br>**T203 exception, extended here:** T502 DELETES
   `tests/schemas/procedures-seam-contract.test.ts` whole by design, same as
   T203 deleted `tests/lib/fitment/seam-contract.test.ts` — the canary's
@@ -213,6 +213,159 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
   supports the entry-in-props shape (its own claim of supporting both was a
   bug, fixed on the T502a branch), so this is no longer T502's choice to
   make; it is already decided by the graders it must satisfy.
+  <br>**Shipped (2026-09-05).** All 99 T502a markers activated by deleting the
+  `.fails` and nothing else (37 shape, 23 spec-by-id, 18 safety, 9 citations,
+  12 render), and `tests/schemas/procedures-seam-contract.test.ts` deleted per
+  the exception above. Decisions worth reading before T504:
+  1. **The ES segment is `procedimientos`** (`src/i18n/routes.ts`, with the
+     derivation). No glossary entry is headed "procedure" and `procedimiento`
+     appears in no entry's `aliases`, so GLO-02 is not engaged in either
+     direction; the deciding argument is that the merged ES corpus already
+     reaches for the word unprompted (FSM section index, a torque entry, a
+     brakes problem entry all use it). `ENTRY_SLUGS.procedures` is opened empty
+     on T501's precedent — T504 fills it, ES slugs in a Costa Rican reader's
+     own words.
+  2. **Vocabularies and corpus rules live in `src/lib/procedures/index.ts`,
+     re-exported by `src/schemas/procedures.ts`.** The seam declared them in the
+     schema module and the graders import them from there, which still holds —
+     but the module also has to sit on an `astro:build:start` hook's chain,
+     which Node's own ESM resolver walks, and the schema graph's imports are
+     extensionless. Same split, same reason, as `src/lib/parts/part-numbers.ts`.
+  3. **PRC-03's fourth guard is a detector, not a spelling list**
+     (`src/lib/procedures/figures.ts`): a digit bound to a torque or volume unit
+     in step or safety-note prose, with units assembled from *families* rather
+     than enumerated. The engine-code carve-out ("the 3.5 L 6G74") is scoped to
+     the **volume** family alone — nobody names an engine after a torque figure
+     — which closes the hole a sentence-scoped carve-out would leave for
+     "torque the crank bolt to 185 N·m on the 6G74". `mm` is a stated gap: a
+     socket size and a valve clearance are written identically, and the
+     clearance case is closed the other way instead (`dimension` is citable, so
+     an author has a correct move). The rule is applied to steps and safety
+     notes only — a tool's name legitimately carries its range ("torque wrench,
+     20–200 N·m"), which is identity, not a figure the job sets.
+  4. **`PROCEDURE_SPEC_KINDS` is four kinds, `dimension` included**, per the
+     seam's own reasoning: valve clearance, belt deflection, endplay, runout and
+     alignment are figures a *procedure* sets and are all `dimension` rows.
+  5. **New build gate:** `src/integrations/validate-procedures.ts`, wired in
+     `astro.config.mjs` beside the fitment, parts and mods hooks. It resolves
+     every `specs[]` id to a `reference` row *that carries a figure*, every
+     `partsConsumed[].part` to a parts entry, every `prerequisites[].procedure`
+     to a procedure, refuses prerequisite loops, and checks I18N-05 slug
+     coverage both ways — each failure naming every file involved.
+  6. **Reused, never re-minted:** `difficultySchema`/`FIX_TIME_UNITS`
+     (problems), `quantitySchema` (reference), `ENTRY_REFERENCE_PATTERN` +
+     `partNumberSchema` (parts — an SST number *is* a catalogue token),
+     `fixTimeLabel` (problems), `isSafetyCritical`/`requiresSafetyFlagFromSubject`
+     (lib/safety), `SafetyNotice.astro` + `ConfidenceCaveat.astro`, and T401's
+     unprefixed `sourceKind.*` keys via `sourceKindLabel()` — the "Owed 2" note
+     on T501 discharged. `RESERVED_HANDLES` in `tests/garage/contract.ts` gained
+     both segments, on the same cross-check that caught `mods`.
+  7. **Judgment call open for review:** `proceduresDifficultyTemplate` is a
+     third copy of "Difficulty {value}/{max}", following T601's precedent for
+     declining to reuse T401's `problemDifficultyTemplate`. The *scale* is
+     shared (`difficultySchema` is imported); only the sentence is per
+     collection. If the owner would rather collapse the three, that is a
+     UI-strings decision, not a schema one.
+  <br>**Independent-review round 1 (2026-09-05), four defects fixed on the same
+  branch.** The reviewer verified the seam split, the build-gate wiring, the
+  spec rendering, the cycle detection and the grader-edit disclosure as exactly
+  as claimed, and found four real defects by building probe entries and
+  shipping them:
+  - **F1 (medium-high) — a hazard could ship in one language.**
+    `checkSafetyNotes` fires only on safety-critical entries and
+    `checkProseCoverage` never covered `safetyNotes`, so an *ordinary*
+    procedure could carry `prose.en.safetyNotes` with no `es` counterpart:
+    the reviewer's probe rendered "Hot oil will burn you" on the EN page and
+    nothing on the ES page, with `astro check` clean. Fixed by
+    `checkOptionalSafetyNotesAreSymmetric`, ported from
+    `checkOptionalNotesAreSymmetric` in `src/schemas/parts.ts` — the same
+    defect class as T501's own audit F1, one collection later and on a field
+    where it costs more. It reports against the *missing* locale and excludes
+    the safety-critical case so it never double-reports.
+  - **F2 (medium) — PRC-03's prose detector did not scan `summary`.** A
+    summary renders on the detail page *and* on every index card; the
+    reviewer's probe shipped "39 N·m" twice, once per locale, past every gate.
+    The detector's scope is now `title`, `summary`, `steps`, `prerequisites`
+    and `safetyNotes` — every free-sentence field this collection owns except
+    `tools`, which stays out because a tool's range ("torque wrench,
+    20–200 N·m") is its identity, not a figure the job sets.
+  - **F3 (medium) — the two new index pages were missing from
+    `tests/e2e/hidden-guard.spec.ts`' `UNCONDITIONAL_PAGES`.** Coverage gap,
+    not a live bug; both paths added on T601's precedent, and they pass
+    vacuously until T504 fills the collection, exactly as the parts rows did.
+  - **F5 (low) — the torque family missed the spelling FSM tables print.** A
+    Mitsubishi table reads `88 N·m (9.0 kg-m, 65 ft-lb)`, and the pattern
+    required the `f` in `kgf`. Widened per the T502a grader's own instruction
+    ("add it here and widen the pattern, do not narrow the rule") to `kg-m` /
+    `kgm` / `kg·m`, inch-pounds in both orders, and the spelled-out units
+    (`newton metres`, `kilográmetros`, `foot-pounds`, `libras-pie`).
+  All four fixes are pinned by new regression tests —
+  `src/schemas/procedures.test.ts` (F1, F2) and
+  `src/lib/procedures/figures.test.ts` (F5, N2) — and mutation-verified.
+  **State the mutant set with the count, because the number is meaningless
+  without it:** reverting all four code fixes at once (drop
+  `checkOptionalSafetyNotesAreSymmetric` from the rule list; empty
+  `FIGURE_SCANNED_PROSE` and cut `prerequisites` from
+  `FIGURE_SCANNED_RECORDS`; `kgf?` → `kgf`; `in${JOIN}` → `in${TIGHT_JOIN}`)
+  turns **12 tests red across the full 110-file suite and nothing else**. An
+  earlier round of this record said "10", which was a two-file run taken before
+  the N2 and F6/F7 tests existed; the reviewer measured 21 under a wider mutant
+  set. All three numbers are consistent — they differ in what was reverted and
+  what was run, which is exactly why the set is now written down beside the
+  count.
+  <br>**Review findings also closed, though the reviewer marked them optional:**
+  **F6**, `UNIT_SYMBOLS` had no completeness grader, so a unit added to
+  `src/schemas/reference.ts` would have silently rendered its raw id — now
+  derived from `TORQUE_UNITS ∪ VOLUME_UNITS ∪ DIMENSION_UNITS` at test time
+  rather than re-listed. **F7**, the `dimension` render path (the one that
+  closes the `mm` gap, so a valve clearance has a legal home outside a
+  sentence) is now graded in both locales' number formatting, along with a
+  signed alignment figure.
+  <br>**Owed, and deliberately not done here — F4: the procedures *index* page
+  has no render-test coverage,** unlike `tests/pages/parts-index.render.test.ts`
+  and `mods-index.render.test.ts`. Nothing is broken today (the list branch does
+  not render until T504 fills `ENTRY_SLUGS.procedures`), but the reviewer is
+  right that this is the surface past defects in this repo have hidden in
+  (T501 F1, T601 F1/F2) — the bare-route `href` bug in particular is
+  re-implementable from scratch on every new listing page and no CI check sees
+  it while the collection is empty. **The honest sequencing is that this grader
+  belongs to a `[TEST]` author, not to T502's implementer**, and it is most
+  useful landing with or just before T504, when it would have real entries to
+  render. Added to the T901-ledgered `[TEST]` back-fill scope alongside
+  T207/T208/T401/T501.
+  <br>**F8/F9 informational, no action:** the third difficulty-template string
+  (see judgment call 7 above) and the absence of extra listing prominence for
+  safety-critical cards — both owner/precedent questions rather than defects.
+  <br>**Independent-review round 2 (2026-09-05) — two LOW findings. N2 fixed,
+  N1 recorded as an authoring note. READ N1 BEFORE WRITING T504's PROSE.**
+  - **N1 (low, no code change) — the engine-code carve-out is *positional*, and
+    the F2 widening made that more reachable.** The detector excuses a volume
+    figure only when a Mitsubishi engine code **follows** it (`3.5 L 6G74`),
+    because that is the position in which the code is naming the figure. Write
+    the displacement with the code *before* it — "Cambio de aceite del 3.5 L",
+    "6G74 3.5 L oil change" — and the sentence is rejected as an inlined
+    capacity. This is pre-existing detector behaviour and not introduced by the
+    F2 fix, but F2 brought `title` and `summary` into scope, which is precisely
+    where a displacement gets used as a name, so an author is now much more
+    likely to meet it.
+    **Authoring rule for T504: write engine-code-adjacent displacement as
+    `3.5 L 6G74` — figure first, code second.** That is also how the FSM, the
+    catalogue and the owner's own description of Gitana Blanca write it, so the
+    rule costs nothing.
+    **If T504's author hits it anyway, fixing it properly is the better move
+    than working around it:** make the adjacency check bidirectional (a
+    lookbehind for the code as well as the lookahead), keeping it strictly
+    *token-adjacent* in both directions. The property that must survive is the
+    one three T502a reject rows pin: the code excuses the figure it is attached
+    to, never every figure in its sentence — "The 6G74 takes 4.5 L of oil" must
+    stay rejected, because there the code is attached to nothing.
+  - **N2 (low) — FIXED.** `TIGHT_JOIN` was applied symmetrically to both
+    `lb…in` and `in…lb`, so "Torque to 45 in lbs" was a live bypass while the
+    tight join was only ever needed to keep "Put the 5 lbs in the parts tray"
+    from firing. The spacing is now one-directional: `lb…in` still requires
+    punctuation, `in…lb` takes the ordinary spaced `JOIN`. Both the newly-caught
+    spelling and the false positive it must not reopen are pinned in
+    `src/lib/procedures/figures.test.ts`.
 - [ ] **T503 [CONTENT]** Parts wave 1: every part referenced by T303/T403/T404 garage+problem entries. Depends: T501, gaps report. *(PRT-01, PRT-02)*
 - [ ] **T504a [TEST]** Render graders for the procedures index page
   (`procedures-index.render.test.ts`) — cards render, hrefs resolve, filters
@@ -249,6 +402,28 @@ or explicitly named) are checked. `/conduct next` dispatches the whole frontier.
   - **Review round 2 (2026-09-02), PR #94 thread r3920323780 — comment accuracy.** Both mods templates described a route path from `src/i18n/routes.ts` as "locale-independent" three lines above `entryRoutePath(…, locale)`, which returns that locale's own translated segment and slug. The code was right and the comment was wrong. Corrected to the two-part truth — **already this locale's own, and still unprefixed** (no `/en`/`/es`, no deploy base, because `BaseLayout` needs every locale's path side by side for the hreflang pairs, so `localeHref` prefixes last, per link). `collectionRoutePath` in `src/i18n/routes.ts` carried the same phrase and is where a reader following the trail lands next, so it is corrected too, and now records that `splitLocalePath`'s "locale-independent route" in `src/i18n/routing.ts` is a *different and correct* use of the phrase ("what is left after the prefix is stripped") so nobody "fixes" that one.
   - **Follow-ups this task does not own.** (0) The two T501 parts templates (`[partsSegment].astro`, `[partsSegment]/[partSlug].astro`) carry the same "locale-independent" wording round 2 corrected here. Deliberately left alone: editing another task's merged files in passing is the drive-by this repo audits, and it is a comment, so nothing renders wrongly. Worth one follow-up commit by whoever next touches those templates. (a) `mods` is not in `SiteHeader`'s nav — neither is `parts`; adding either is site-chrome work. (b) `affects[].ref` may only target `mods`/`parts`; pointing a consequence at a `problems` or `procedures` entry is a schema change for the task that needs it. (c) A mod with no `affects` rows is indistinguishable from an unexamined one at the schema level — that is `npm run gaps`' (T703, GAP-01) shape, not a rule this schema can express.
 - [ ] **T602 [CONTENT]** Mods wave 1: lifts, 33s and regear math, armor, storage, dual battery, lockers — honest tradeoffs, bilingual. Depends: T601. *(MOD-01, MOD-02)*
+  <br>**Schema gap found by T602's fact-check (2026-09-05), owner-approved to fix:**
+  `modsShared` has no typed numeric field for specs (torque, weight, load rating,
+  dimensions), so wave-1 authors put every figure inside `sources[].title`
+  prose. Two real costs: `check:citations` only walks typed fields, so it
+  passes on these entries **because** the numbers are hidden from it — the
+  "every numeric spec carries a source" guarantee is vacuous for them; and a
+  Spanish reader's only view of a figure like "100 kg roof load" is an English
+  sentence inside a citation, defeating the bilingual number-locality rule in
+  spirit even though no field is technically duplicated. See T603/T604 below.
+- [ ] **T603 [TEST]** Graders for typed mods figures: `modsShared` gains a
+  referenced-by-ID numeric spec field (torque, weight, load rating, dimension),
+  mirroring T502a/T502's specs-by-id pattern (PRC-03) — a figure lives once in
+  shared reference data, resolves by ID, and renders per-locale instead of
+  living only inside a citation's `title` string. Grade: every entry with a
+  numeric claim in `sources[].title` prose has an alternative typed path
+  available; `check:citations` actually walks the new field; both locales
+  render the identical resolved figure from the one stored value. Judgment
+  call for the implementer: share `src/lib/procedures/specs.ts`'s module or
+  fork a `mods`-specific one — record which and why. Depends: T601, T502
+  merged (reuse candidate). *(MOD-01, MOD-02, PRC-03 precedent)*
+- [ ] **T604 [PLATFORM]** Implements the T603 seam. Depends: T603 merged.
+  *(MOD-01, MOD-02, PRC-03 precedent)*
 
 ## Phase 7 — Community, search, gaps
 - [x] **T700 [PLATFORM]** Community schema (owner-approved addition, 2026-08-28): extend the `community` collection per COM-01/COM-02 — community type (forum, subreddit, FB group, Discord, YouTube, vendor, shop), region/language/gen/activity tags, links. Attempt within the T104 base contract first; if community entries genuinely need the fitment/confidence requirement relaxed, that is the negotiated stop-and-ask recorded on T205 — report BLOCKED for the owner decision, never a drive-by change. Depends: T106. *(COM-01, COM-02)*

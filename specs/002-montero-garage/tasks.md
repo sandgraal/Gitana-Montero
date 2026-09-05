@@ -564,7 +564,7 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   contract; distinct from and independent of GAR-05′'s receipt fields
   (vendor/date/amount stay receipt-only, never required on an attachment).
   Depends: T2-302. *(GAR-06′)*
-- [ ] **T2-305 [PLATFORM]** Record media attachments (owner-approved
+- [x] **T2-305 [PLATFORM]** Record media attachments (owner-approved
   addition, 2026-09-02): new private bucket (photo/video/audio) + attachment
   rows scoped to a record, path `<owner uuid>/<vehicle id>/<record id>/<file>`
   per the T2-301a photos precedent; upload UI on the record edit page,
@@ -572,8 +572,118 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   `vehicles.photo_paths` noted above while touching this surface, if not
   already fixed elsewhere first. Activates T2-305a graders. Depends: T2-305a
   merged. *(GAR-06′)*
+  <br>**All 41 `it.fails` markers in `tests/garage/record-media.test.ts`
+  activated by deleting exactly the `.fails`** — 33 declaration, 8 live (20
+  live cases once `it.fails.each` expands). Mutation-checked rather than
+  assumed: with the migration moved aside, 32 of the 33 declaration graders go
+  red and only the promotion one stays green, which is correct — promotion is a
+  contract edit, not a migration one.
+  <br>**Promotion, the three edits `RECORD_MEDIA_TABLE`'s docstring names**,
+  plus one it could not have predicted: the entry had to *move* to above
+  `USER_TABLES` in `contract.ts`, because `const` has no hoisting and
+  `USER_TABLE_NAMES` reads the array a hundred lines before the old
+  declaration site. `PENDING_USER_TABLES` is emptied but still exported —
+  `rules.ts` reads it so `isCorrelated` has columns for a pending table's
+  policy. `harness-contract.test.ts` needed **two** lists updated, not one:
+  the shipped/pending split is a second hard equality in the same block.
+  <br>**The record-delete belt narrows on `vehicle_id` AND `id`, not on the
+  owner.** A records row has no `owner_id` to read, and matching the owner
+  segment alone would empty that owner's whole garage on the deletion of one
+  note. `for each row` on purpose, so it also fires for records cascaded away
+  by a vehicle delete — which is the one live grader that would catch a
+  statement-level trigger.
+  <br>**Named for the third time and still not fixed: `receipts` has no belt.**
+  T2-302 recorded it, T2-305a repeated it, and this task does not close it
+  either — the cause is the receipt *path* shape (`<owner>/<file>`), which
+  carries nothing identifying a record or a vehicle, so the fix is a migration
+  of object names already in storage. That is a data migration this task did
+  not authorise. It stays open for whoever owns receipts hardening.
+  <br>**The lost-update race is fixed at the SQL layer** —
+  `append_vehicle_photo` / `remove_vehicle_photo`, `security invoker` so
+  `vehicles`' own policy still decides whose row it is, `array_append` /
+  `array_remove` inside one `update` under the row lock Postgres already
+  takes. Not a client-side queue: a queue is a promise one tab makes that a
+  second tab has never heard of. The append is idempotent, because a retry
+  after a lost response must not list the same object twice. New graders in
+  `src/lib/supabase/garage-writes.test.ts` (12) run against a recording fake
+  client; mutation-checked by restoring the client-computed array, which turns
+  6 of them red including the named concurrency one. Before this branch the
+  whole request layer of `garage.ts` had no graders at all, so a revert would
+  have been silent.
+  <br>**The media section is deliberately field-less.** GAR-06′ says an
+  attachment is "independent of a receipt's vendor/date/amount fields", so the
+  form is one file input and a button — the WhatsApp voice note that motivated
+  the requirement cannot be filed at all if the form asks for a vendor first.
+  `media_kind` is read from the declared MIME type rather than chosen by the
+  reader, and each row renders as exactly one of `<img>`/`<video>`/`<audio>`
+  with the other two removed.
+  <br>**Two numbers differ from receipts and both are about video.** The bucket
+  limit is 100 MB (receipts 20, photos 10) because a two-minute phone video of
+  a noise is the motivating case; the signed-URL TTL is 30 minutes rather than
+  10 because a browser streaming a large file makes range requests for as long
+  as playback lasts, and a 10-minute signature expires *mid-playback* on a slow
+  connection with an error that looks like a broken file.
+  <br>**Not done, deliberately: no media chip on the timeline.** Receipts have
+  one; adding a second would mean a second per-timeline request and a second
+  "unknown is not zero" surface (PR #68), and the task scopes the UI to the
+  record edit page. `mediaCountsByRecord` exists and returns the same
+  three-state `ReadonlyMap | null` for whoever adds it.
+  <br>**Tier B was not run: Docker is not running on this machine**
+  (`supabase start` → `failed to connect to the docker API`). The 20 live
+  graders are activated and unexercised locally; CI's informational `tier-b`
+  job is the first thing that will run them. Every Tier-A grader, the whole
+  unit suite and `npm run verify` are green.
+  <br>**Review (no blocking findings; five Low/Informational, two fixed).**
+  <br>*F1 — a docstring claimed a guarantee the code did not implement.*
+  `record-media.ts` said `mediaPathBelongsTo` refuses to ask the storage API to
+  "sign or remove" a foreign path. It guards `removeRecordMedia`,
+  `deleteRecord` and `vehicleMediaPaths`; it does **not** guard
+  `signRecordMediaUrls`. Not a live exposure — the bucket policy pins
+  `(storage.foldername(name))[1]` to `auth.uid()`, so signing another owner's
+  object is refused at the point it is asked for — and `signReceiptUrls` /
+  `signPhotoUrls` have the identical unguarded shape. Fixed as documentation:
+  the module docstring now names the three guarded call sites, names signing as
+  deliberately unguarded, and says why (a refused signature is a player that
+  does not render; a delete on an invented name is irreversible). Adding a
+  fourth, differently-shaped sign path to prove what the database already
+  proves would have left the other two looking careless by comparison.
+  <br>*F2 — `in` and a bare bracket lookup walk the prototype chain.* Fixed in
+  all three sibling modules (`record-media.ts`, and the pre-existing copies in
+  `photos.ts` and `receipt.ts`) via one `Object.hasOwn` accessor each, so the
+  next lookup added cannot get it wrong. **The sharper half was not in
+  `mediaIssue`:** `mediaObjectPath` / `photoObjectPath` / `receiptObjectPath`
+  guard with `=== undefined`, and `MIME_MAP["constructor"]` returns `Object`
+  rather than `undefined` — so the guard did not fire at all and the builder
+  returned a name whose "extension" was a function's source text. Six new
+  graders (two per module), all six red against the old idiom.
+  **`toLowerCase()` runs before the lookup**, so `toString`/`valueOf`/
+  `hasOwnProperty` lower-case into members of nothing and make vacuous graders
+  — verified by running them, and the reachable set is exactly `constructor`
+  and `__proto__`. Pinned by a control asserting that fact.
+  <br>*F3 — the hand-rolled supabase-js fake in `garage-writes.test.ts` has
+  three modelling gaps*, now named in that file's own header rather than left
+  for the next person to discover: `.eq()`/`.in()`/`.order()` ignore their
+  arguments, `.single()` and a bare `select()` both resolve to one object where
+  production returns an array without `.single()`, and `outcome("insert", …)`
+  is used for every verb so only insert failures can be injected. Each would
+  let a *future* grader pass while production did something else.
+  <br>*F4 — the `photo_paths` race graders are self-authored.* There is no
+  `[TEST]` task for GAR-01′'s race fix and no independent grader pass; the 12
+  graders in `garage-writes.test.ts` were written by the same instance that
+  wrote the fix. They mutation-test correctly (6 red against the restored
+  client-computed array), but that is a weaker guarantee than the
+  test-writer/implementer split this project normally gets, and this line does
+  not claim otherwise. Whether it belongs on the AGENTS.md debt ledger is the
+  conductor's call.
+  <br>*F5 — nothing on the required merge path executes the migration SQL.*
+  `npm run verify` is Tier A only, which parses migration text; the SQL is run
+  only by CI's **non-required** `tier-b` job. Review did a static
+  `libpg_query` parse (grammar valid; the alias-in-`RETURNING` this task
+  flagged as its own biggest risk is in fact required and correct), but a parse
+  is not an execution. **`tier-b`'s actual output must be read once CI runs,
+  not assumed green.**
 
-- [ ] **T2-306a [TEST]** Graders for the cover-photo designation (GAR-01′):
+- [x] **T2-306a [TEST]** Graders for the cover-photo designation (GAR-01′):
   a nullable `vehicles.cover_photo_path` column (or equivalent) naming one entry already
   present in `vehicles.photo_paths` as the cover; the value SHALL be validated as
   membership in that same array (a cover path naming a photo the vehicle
@@ -584,6 +694,137 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   between two tabs is the concrete case to grade for; setting a cover SHALL
   be independent of upload order (the Nth photo added, not just the most
   recent or the first, can become the cover). Depends: T2-301. *(GAR-01′)*
+  <br>**33 `it.fails` marker lines across two files**, activated by deleting
+  exactly the `.fails` on each. `tests/garage/cover-photo.test.ts` — 21 (7
+  declaration, 14 live under `describe.skipIf`); `src/lib/garage/cover.test.ts`
+  — 12, all pure. Because four of them are `it.fails.each` tables the markers
+  produce **43 expected-failure cases**: 21 that run anywhere (7 + 14) and 22
+  live. Three more cases come free from the contract entry, in
+  `schema-shape.test.ts`'s pending sweeps.
+  <br>**Your whole activation is four moves, and none of them edits a
+  grader** (T2-306a review, F2 + residual): ship the migration; implement the
+  two `cover.ts` seam functions; delete the one `pending:` line in
+  `contract.ts`; delete the `.fails` markers in `cover-photo.test.ts` and
+  `cover.test.ts`. **Do not touch `schema-shape.test.ts`** — its
+  `it.fails.each` sweeps are shared with `profiles.handle` (T2-402) and
+  `shares` (T2-404), and deleting the `pending:` line re-partitions your
+  column out of them automatically. Every control that used to assert the
+  feature's *absence* is now either branch-aware or written against a
+  synthetic never-shipping column, so all of them stay true on both sides of
+  activation. **Measured, not asserted:** the whole end state was simulated —
+  migration, seam, `pending:` line, markers — and the suite came back
+  **3322 passed, 415 expected fail, 0 failures.** If you find yourself editing
+  an unmarked grader to get green, that is a defect in these graders; say so
+  rather than editing, because T901's separation audit reads exactly that
+  signal.
+  <br>**Contract decisions, all argued in `tests/garage/contract.ts`:**
+  `vehicles.cover_photo_path text` — **nullable, and with no default**. A
+  *path*, not `cover_photo_index int`, because an index into a client-written
+  array names a different photo after any removal and a stale index is
+  indistinguishable from a fresh one; a path is checkable against
+  `photo_paths` and an index is not. Not `vehicle_photos.is_cover` either —
+  no photos table exists, `src/lib/garage/photos.ts` argues why, and creating
+  one is a schema decision this task had no mandate for. No default because
+  `default photo_paths[1]` is the silent promotion GAR-01′ forbids, spelled
+  as DDL and applied to every vehicle ever created.
+  <br>**Two enforcements, and both routes are accepted.** Membership: a
+  `check` constraint relating the two columns **or** a trigger that `raise`s —
+  demanding one would fail a schema that chose the other for no reason a
+  requirement can name. Clearing: a **`before update`** trigger on
+  `public.vehicles` that assigns `cover_photo_path` and assigns it only
+  `null`. `before` is graded because here the mechanism *is* the behaviour —
+  an `after` trigger cannot change the row, so the membership constraint has
+  already refused the removal GAR-01′ says must succeed. The trigger's
+  function is found by **following `execute function`**, never by name
+  (T2-301a's F1).
+  <br>**Scope the clearing trigger to a DEPARTURE, or it will silently swallow
+  the defect this task exists to catch** (T2-306a review, F1 — found by
+  shipping the graders' own fixture as a real migration and watching a live
+  stack accept it). A `before` trigger runs *before* the check constraint, so
+  one that clears whenever the cover is not a member never lets a **freshly
+  written** bogus designation reach the constraint: it nulls it and the write
+  returns `ok`. The owner clicks "set as cover", gets no error, and gets no
+  cover. Add
+  `and new.cover_photo_path is not distinct from old.cover_photo_path` to the
+  clearing condition (`is not distinct from`, not `=` — both sides are
+  nullable and `null = null` is null), **or** declare the trigger
+  `before update of photo_paths` so a cover-only patch never fires it — and if
+  you take that route, **`photo_paths` must be the only column in the scope
+  list**. `update of photo_paths, cover_photo_path` looks scoped, satisfies
+  the naive reading, and still fires on a cover-only patch: the same defect
+  with a scope clause bolted on, which the re-review caught by shipping that
+  exact migration and watching Tier B fail it the same three ways. Either
+  route satisfies the Tier A rule; all of it is controlled in
+  `cover-photo.test.ts`. The rule is necessary, not sufficient — Tier B's
+  "a path the vehicle does not have is refused" is what actually proves it.
+  <br>**A seam you must fill: `src/lib/garage/cover.ts`.** Two exported
+  symbols, both throwing `not implemented: T2-306` today —
+  `resolveCoverPath(vehicle)` (the shared render helper T2-306's own line asks
+  for, so T2-402 needs no second implementation; returns `null` for *no
+  photos*, *no designation*, and *a designation the vehicle does not have*,
+  and never falls back to `photo_paths[0]`) and `coverPhotoWrite(path)` (the
+  patch body, graded to carry **exactly one key**). `CoverPhotoSource` is
+  declared structurally so a `VehicleRow` that gains the column is assignable
+  with no adapter.
+  <br>**Why the write shape is graded at all:** T2-304's lost-update race on
+  `vehicles.photo_paths` (open as T2-305) is one careless payload away from
+  coming back — a "set as cover" that transmitted the array it read a moment
+  ago would be the same bug on a surface where only one photo goes missing.
+  Three live `it.fails.each` tables run the two-tab interleaving three ways
+  (A→B, B→A, `Promise.all`), and one of them exists specifically to fail if
+  designating a cover loses a photo another tab added.
+  <br>**Harness change this needed: `columnDefinitionFor` in
+  `tests/garage/sql.ts`.** `createTableBody` reads one statement, so it could
+  only see columns a table was *born* with — and `public.vehicles` already
+  exists, so this column can only arrive by `alter table`, and an applied
+  migration is history (T2-301 tried editing one and reverted). Left alone,
+  `schema-shape.test.ts`'s pending sweeps would have stayed red after the
+  column shipped with no legitimate route to green. The new helper replays
+  `create table` + `add`/`drop column` + `set`/`drop not null` + `set`/`drop
+  default` in order; `isNotNullFor` and `isOptionalColumn` now read it too.
+  **`profiles.handle` (T2-402) gets the same fix for free.**
+  <br>**Verified, not assumed.** A scratch migration implementing the column,
+  the check constraint and the departure-scoped trigger was applied to the
+  migrations directory, the two `cover.ts` seam functions were temporarily
+  implemented, and the whole suite re-run: **24 failures, every one of them an
+  `it.fails` marker line that now passes, and zero unmarked controls moved.**
+  Nothing else in the suite fired either — no anon-privilege,
+  definer-`search_path` or ungraded-table sweep. Both scratch changes were
+  reverted.
+  <br>*Correcting the record (review F3):* the commit that first pushed this
+  branch claimed the same experiment "moved nothing else in the suite". That
+  was measured before the F2 fix and was an overclaim — **one** unmarked
+  control did also go red, the flat absence assertion that F2 has since made
+  branch-aware. The 10-marker half of that claim was right; "nothing else" was
+  not. The number above (zero unmarked) is the post-fix measurement.
+  <br>Eleven rule-level mutations were run one at a time — membership
+  always-clean; the `before` clause; `isNullAssignment` always-true; the
+  `set … =` assignment spelling; the `alter table` branch of
+  `checkExpressions`; the `drop column` branch of `columnDefinitionFor`; the
+  two halves of the departure-scoping clause (`consultsOld`,
+  `scopedToSource`); the "cover not in the scope list" half of that clause;
+  and both directions of `pendingMarkerIssues` — and each turned the suite red
+  on exactly the controls that name it.
+  <br>**One finding the activation simulation caught that review would not
+  have.** Two of the controls written to *fix* the re-review's F2 residual
+  used `cover_photo_path` itself as the "column the schema does not have" —
+  reintroducing, inside the fix, the very defect being fixed. It surfaced only
+  because the end state was simulated rather than reasoned about; both now use
+  a synthetic `NEVER_SHIPPED_COLUMN` that is absent in every state. Worth
+  repeating for any future `[TEST]` task: simulate the activation, do not
+  argue it from the diff.
+  <br>**Tier B:** could not be run in the authoring worktree (no Docker on
+  that machine), so the 22 live markers were written blind there. The
+  independent review ran them against a real stack — **822 passed, 243
+  expected-fail, 0 failures** — and it is also how both F1 findings were
+  caught, since three of these graders (`a path the vehicle does not have is
+  refused`, `another vehicle's photo is refused`, `a vehicle with no photos
+  cannot be given a cover`) fail loudly against an unscoped *or* a
+  both-columns-scoped trigger. Tier A could not see either; Tier B saw both.
+  That is the argument for promoting the `tier-b` job from informational,
+  recorded here rather than acted on. No storage object is uploaded by any of them: the
+  designation is a claim about two columns, and borrowing the bucket would
+  make every cover grader depend on the storage API being up.
 - [ ] **T2-306 [PLATFORM]** Cover-photo UI (owner-approved addition,
   2026-09-02): a "Set as cover" control per photo on the vehicle edit view,
   a "Remove cover" affordance, and rendering the designated cover — never
@@ -905,6 +1146,36 @@ Read 002 §10 and `specs/003-shop-tools/spec.md` before starting any of these.
   machine); the changed Tier B lines sit inside `it.fails` markers that cannot
   execute until T2-404 activates them, and the Tier A/pure paths are covered by
   the battery.
+  <br>**Grader correction 2026-09-05 — `gitana` was graded both ways at once.**
+  The T2-402 code review found `handles.test.ts` asserting
+  `handleIssues("gitana") === []` (claimable by anyone) while `contract.ts`
+  already listed `gitana` under its impersonation heading. Both cannot hold,
+  and as things stood the *positive control* was the operative one: `gitana`
+  was claimable. The reservation survives — MIG-04 makes Gitana Blanca user
+  page #1 and the template every other garage is shaped by, so on
+  monterogarage.com `/en/garage/gitana/` is the same impersonation surface as
+  `montero`, which sits beside it in that list; and `contract.ts`'s own
+  asymmetry argument (un-reserving later is safe, reserving later is not)
+  decides ties like this. Reserving the word is not denying the owner the
+  name: `handleIssues` gates *self-service claims*, MIG-04's seeding is a
+  migration, and the display name's handle form `gitana-blanca` stays
+  unreserved. **Grader-only change** — `contract.ts` was already correct and
+  was not touched.
+  <br>*Fix:* `blanca` replaces `gitana` in the claimable table (same "plain
+  alphabetic word" shape, so no control was lost); `gitana` and `montero` join
+  the reserved-rejection table and the Tier B database probes; the fixture
+  lists are hoisted to `CLAIMABLE_FIXTURES` / `RESERVED_FIXTURES` and
+  cross-checked against `RESERVED_HANDLES` in both directions, because the
+  contradiction was only possible while the two lists were inline literals in
+  blocks that never met. **5 mutants, all killed** — including one that
+  restores the original defect verbatim. Documented limit: de-deriving the
+  rejection table from `RESERVED_FIXTURES` silently shrinks it rather than
+  going red; the derivation is what buys the guarantee.
+  <br>*Owed by T2-402:* `gitana` (and `montero`) must reach the hand-written
+  impersonation list in `handles.ts` **and** the SQL check constraint. Two
+  open questions for the owner are in that branch's report: whether a
+  reserved-word check constraint needs a seed/admin path for MIG-04's own
+  profile, and whether `gitana-blanca` should be reserved too.
 - [ ] **T2-402 [PLATFORM]** Showcase + work-log public pages: stable handle
   URLs, per-vehicle toggles, per-record/per-field visibility, HANDOFF-DESIGN.md
   chrome, hreflang. Activates T2-401. Depends: T2-401 merged, T2-303. *(SHR-02..04)*
