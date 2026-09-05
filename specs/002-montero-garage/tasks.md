@@ -683,7 +683,7 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   is not an execution. **`tier-b`'s actual output must be read once CI runs,
   not assumed green.**
 
-- [ ] **T2-306a [TEST]** Graders for the cover-photo designation (GAR-01′):
+- [x] **T2-306a [TEST]** Graders for the cover-photo designation (GAR-01′):
   a nullable `vehicles.cover_photo_path` column (or equivalent) naming one entry already
   present in `vehicles.photo_paths` as the cover; the value SHALL be validated as
   membership in that same array (a cover path naming a photo the vehicle
@@ -694,6 +694,137 @@ Vercel is an owner action inside T2-102 (the task prepares the exact records).
   between two tabs is the concrete case to grade for; setting a cover SHALL
   be independent of upload order (the Nth photo added, not just the most
   recent or the first, can become the cover). Depends: T2-301. *(GAR-01′)*
+  <br>**33 `it.fails` marker lines across two files**, activated by deleting
+  exactly the `.fails` on each. `tests/garage/cover-photo.test.ts` — 21 (7
+  declaration, 14 live under `describe.skipIf`); `src/lib/garage/cover.test.ts`
+  — 12, all pure. Because four of them are `it.fails.each` tables the markers
+  produce **43 expected-failure cases**: 21 that run anywhere (7 + 14) and 22
+  live. Three more cases come free from the contract entry, in
+  `schema-shape.test.ts`'s pending sweeps.
+  <br>**Your whole activation is four moves, and none of them edits a
+  grader** (T2-306a review, F2 + residual): ship the migration; implement the
+  two `cover.ts` seam functions; delete the one `pending:` line in
+  `contract.ts`; delete the `.fails` markers in `cover-photo.test.ts` and
+  `cover.test.ts`. **Do not touch `schema-shape.test.ts`** — its
+  `it.fails.each` sweeps are shared with `profiles.handle` (T2-402) and
+  `shares` (T2-404), and deleting the `pending:` line re-partitions your
+  column out of them automatically. Every control that used to assert the
+  feature's *absence* is now either branch-aware or written against a
+  synthetic never-shipping column, so all of them stay true on both sides of
+  activation. **Measured, not asserted:** the whole end state was simulated —
+  migration, seam, `pending:` line, markers — and the suite came back
+  **3322 passed, 415 expected fail, 0 failures.** If you find yourself editing
+  an unmarked grader to get green, that is a defect in these graders; say so
+  rather than editing, because T901's separation audit reads exactly that
+  signal.
+  <br>**Contract decisions, all argued in `tests/garage/contract.ts`:**
+  `vehicles.cover_photo_path text` — **nullable, and with no default**. A
+  *path*, not `cover_photo_index int`, because an index into a client-written
+  array names a different photo after any removal and a stale index is
+  indistinguishable from a fresh one; a path is checkable against
+  `photo_paths` and an index is not. Not `vehicle_photos.is_cover` either —
+  no photos table exists, `src/lib/garage/photos.ts` argues why, and creating
+  one is a schema decision this task had no mandate for. No default because
+  `default photo_paths[1]` is the silent promotion GAR-01′ forbids, spelled
+  as DDL and applied to every vehicle ever created.
+  <br>**Two enforcements, and both routes are accepted.** Membership: a
+  `check` constraint relating the two columns **or** a trigger that `raise`s —
+  demanding one would fail a schema that chose the other for no reason a
+  requirement can name. Clearing: a **`before update`** trigger on
+  `public.vehicles` that assigns `cover_photo_path` and assigns it only
+  `null`. `before` is graded because here the mechanism *is* the behaviour —
+  an `after` trigger cannot change the row, so the membership constraint has
+  already refused the removal GAR-01′ says must succeed. The trigger's
+  function is found by **following `execute function`**, never by name
+  (T2-301a's F1).
+  <br>**Scope the clearing trigger to a DEPARTURE, or it will silently swallow
+  the defect this task exists to catch** (T2-306a review, F1 — found by
+  shipping the graders' own fixture as a real migration and watching a live
+  stack accept it). A `before` trigger runs *before* the check constraint, so
+  one that clears whenever the cover is not a member never lets a **freshly
+  written** bogus designation reach the constraint: it nulls it and the write
+  returns `ok`. The owner clicks "set as cover", gets no error, and gets no
+  cover. Add
+  `and new.cover_photo_path is not distinct from old.cover_photo_path` to the
+  clearing condition (`is not distinct from`, not `=` — both sides are
+  nullable and `null = null` is null), **or** declare the trigger
+  `before update of photo_paths` so a cover-only patch never fires it — and if
+  you take that route, **`photo_paths` must be the only column in the scope
+  list**. `update of photo_paths, cover_photo_path` looks scoped, satisfies
+  the naive reading, and still fires on a cover-only patch: the same defect
+  with a scope clause bolted on, which the re-review caught by shipping that
+  exact migration and watching Tier B fail it the same three ways. Either
+  route satisfies the Tier A rule; all of it is controlled in
+  `cover-photo.test.ts`. The rule is necessary, not sufficient — Tier B's
+  "a path the vehicle does not have is refused" is what actually proves it.
+  <br>**A seam you must fill: `src/lib/garage/cover.ts`.** Two exported
+  symbols, both throwing `not implemented: T2-306` today —
+  `resolveCoverPath(vehicle)` (the shared render helper T2-306's own line asks
+  for, so T2-402 needs no second implementation; returns `null` for *no
+  photos*, *no designation*, and *a designation the vehicle does not have*,
+  and never falls back to `photo_paths[0]`) and `coverPhotoWrite(path)` (the
+  patch body, graded to carry **exactly one key**). `CoverPhotoSource` is
+  declared structurally so a `VehicleRow` that gains the column is assignable
+  with no adapter.
+  <br>**Why the write shape is graded at all:** T2-304's lost-update race on
+  `vehicles.photo_paths` (open as T2-305) is one careless payload away from
+  coming back — a "set as cover" that transmitted the array it read a moment
+  ago would be the same bug on a surface where only one photo goes missing.
+  Three live `it.fails.each` tables run the two-tab interleaving three ways
+  (A→B, B→A, `Promise.all`), and one of them exists specifically to fail if
+  designating a cover loses a photo another tab added.
+  <br>**Harness change this needed: `columnDefinitionFor` in
+  `tests/garage/sql.ts`.** `createTableBody` reads one statement, so it could
+  only see columns a table was *born* with — and `public.vehicles` already
+  exists, so this column can only arrive by `alter table`, and an applied
+  migration is history (T2-301 tried editing one and reverted). Left alone,
+  `schema-shape.test.ts`'s pending sweeps would have stayed red after the
+  column shipped with no legitimate route to green. The new helper replays
+  `create table` + `add`/`drop column` + `set`/`drop not null` + `set`/`drop
+  default` in order; `isNotNullFor` and `isOptionalColumn` now read it too.
+  **`profiles.handle` (T2-402) gets the same fix for free.**
+  <br>**Verified, not assumed.** A scratch migration implementing the column,
+  the check constraint and the departure-scoped trigger was applied to the
+  migrations directory, the two `cover.ts` seam functions were temporarily
+  implemented, and the whole suite re-run: **24 failures, every one of them an
+  `it.fails` marker line that now passes, and zero unmarked controls moved.**
+  Nothing else in the suite fired either — no anon-privilege,
+  definer-`search_path` or ungraded-table sweep. Both scratch changes were
+  reverted.
+  <br>*Correcting the record (review F3):* the commit that first pushed this
+  branch claimed the same experiment "moved nothing else in the suite". That
+  was measured before the F2 fix and was an overclaim — **one** unmarked
+  control did also go red, the flat absence assertion that F2 has since made
+  branch-aware. The 10-marker half of that claim was right; "nothing else" was
+  not. The number above (zero unmarked) is the post-fix measurement.
+  <br>Eleven rule-level mutations were run one at a time — membership
+  always-clean; the `before` clause; `isNullAssignment` always-true; the
+  `set … =` assignment spelling; the `alter table` branch of
+  `checkExpressions`; the `drop column` branch of `columnDefinitionFor`; the
+  two halves of the departure-scoping clause (`consultsOld`,
+  `scopedToSource`); the "cover not in the scope list" half of that clause;
+  and both directions of `pendingMarkerIssues` — and each turned the suite red
+  on exactly the controls that name it.
+  <br>**One finding the activation simulation caught that review would not
+  have.** Two of the controls written to *fix* the re-review's F2 residual
+  used `cover_photo_path` itself as the "column the schema does not have" —
+  reintroducing, inside the fix, the very defect being fixed. It surfaced only
+  because the end state was simulated rather than reasoned about; both now use
+  a synthetic `NEVER_SHIPPED_COLUMN` that is absent in every state. Worth
+  repeating for any future `[TEST]` task: simulate the activation, do not
+  argue it from the diff.
+  <br>**Tier B:** could not be run in the authoring worktree (no Docker on
+  that machine), so the 22 live markers were written blind there. The
+  independent review ran them against a real stack — **822 passed, 243
+  expected-fail, 0 failures** — and it is also how both F1 findings were
+  caught, since three of these graders (`a path the vehicle does not have is
+  refused`, `another vehicle's photo is refused`, `a vehicle with no photos
+  cannot be given a cover`) fail loudly against an unscoped *or* a
+  both-columns-scoped trigger. Tier A could not see either; Tier B saw both.
+  That is the argument for promoting the `tier-b` job from informational,
+  recorded here rather than acted on. No storage object is uploaded by any of them: the
+  designation is a claim about two columns, and borrowing the bucket would
+  make every cover grader depend on the storage API being up.
 - [ ] **T2-306 [PLATFORM]** Cover-photo UI (owner-approved addition,
   2026-09-02): a "Set as cover" control per photo on the vehicle edit view,
   a "Remove cover" affordance, and rendering the designated cover — never
