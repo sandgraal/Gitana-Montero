@@ -46,6 +46,31 @@
  *    That is the intended ergonomics (a reserved word is a decision), but it is
  *    worth stating plainly rather than implying the list computes itself.
  *
+ *    **`gitana` is one of those reserved words, and this file used to say the
+ *    opposite.** Until 2026-09-05 the POSITIVE CONTROL table below asserted
+ *    `handleIssues("gitana") === []` — claimable by any account — while
+ *    `contract.ts` had already listed `gitana` under its impersonation
+ *    heading. Both cannot hold. The reservation is the half that survives:
+ *    MIG-04 makes Gitana Blanca "user page #1 … used to drive the design of
+ *    every garage view", and AGENTS.md calls her "the template every other
+ *    garage is shaped by" — so on monterogarage.com `/en/garage/gitana/` in a
+ *    stranger's hands reads as the site speaking, exactly like the `montero`
+ *    and `monterogarage` sitting beside it in that list. `contract.ts`'s own
+ *    recorded asymmetry decides it: un-reserving later is safe, reserving
+ *    later is not, because somebody already holds it by then.
+ *
+ *    Reserving the word does not deny the owner the name. `handleIssues` is
+ *    the *self-service claim* validator; MIG-04's seeding is a migration.
+ *    Those are different mechanisms — and the spec never says the owner's
+ *    handle is the literal string `gitana`. The name it actually gives is the
+ *    display name **Gitana Blanca**, whose handle form `gitana-blanca` is
+ *    unreserved and stays a positive control below.
+ *
+ *    The contradiction was possible because the two lists were only ever read
+ *    by human eyes. They are cross-checked now, in the unmarked block below:
+ *    no claimable fixture may be reserved, and every fixture this file rejects
+ *    *as* reserved must actually be in `RESERVED_HANDLES`.
+ *
  *    **`src/pages/` is deliberately not scanned**, and that is not an
  *    oversight: every route under `src/pages/[locale]/` is a *dynamic* segment
  *    (`[garageSegment].astro`, `[partsSegment].astro`), so the directory
@@ -136,6 +161,72 @@ function siteRouteSegments(): string[] {
 }
 
 /* =========================================================================
+ * Handle fixtures, hoisted so the reserved-set block can cross-check them.
+ *
+ * These were inline `it.each` tables until 2026-09-05, which is precisely how
+ * `gitana` came to be asserted claimable in one table while `contract.ts`
+ * reserved it in another: nothing compared the two. Named constants let the
+ * unmarked block below assert they cannot disagree again.
+ * ====================================================================== */
+
+/**
+ * Handles a stranger may claim. Every rejection in this file is only
+ * meaningful because these are accepted — a validator that refused everything
+ * would satisfy the whole rejection table.
+ *
+ * Four distinct shapes, on purpose:
+ * - `blanca` — a plain lowercase alphabetic word, no separator, no digit.
+ *   This is the row `gitana` used to fill; it is *not* a site word, *not* the
+ *   distinctive half of the flagship truck's name, and not in
+ *   `RESERVED_HANDLES` (asserted below, so reserving it later turns this file
+ *   red rather than silently recreating the contradiction).
+ * - `gitana-blanca` — the hyphen. Unreserved: the impersonation risk is the
+ *   bare site word, and MIG-04's seed needs a claimable form of the display
+ *   name. Availability is the unique index's job, not `handleIssues`'.
+ * - `montero2002` — digits, and a reserved word as a strict prefix.
+ * - `g1` — exactly `HANDLE_LENGTH.min`.
+ */
+const CLAIMABLE_FIXTURES = [
+  "blanca",
+  "gitana-blanca",
+  "montero2002",
+  "g1",
+] as const;
+
+/**
+ * Handles that must be rejected with the `reserved` issue specifically.
+ *
+ * `Admin` is here in mixed case deliberately — the reservation check runs
+ * after folding, and a check that ran on the raw input would be defeated by
+ * the shift key.
+ */
+const RESERVED_FIXTURES = [
+  "admin",
+  "Admin",
+  "api",
+  "es",
+  "taller",
+  // The flagship words. `montero` and `monterogarage` are the site itself;
+  // `gitana` is the truck the whole platform is designed around (MIG-04), and
+  // a garage URL is the one place a stranger cannot tell the difference.
+  "montero",
+  "gitana",
+] as const;
+
+/**
+ * The subset Tier B writes to a real database.
+ *
+ * Already folded, so the probe tests the *reservation* rule rather than the
+ * case-folding rule — which has its own grader, and would otherwise be the
+ * thing answering. Derived from `RESERVED_FIXTURES` rather than re-typed so
+ * the SQL check constraint and the pure validator cannot drift apart: adding a
+ * word in one place adds it in both.
+ */
+const RESERVED_DB_PROBES = RESERVED_FIXTURES.filter(
+  (handle) => handle === handle.toLowerCase()
+);
+
+/* =========================================================================
  * The reserved set. **Unmarked** — a claim about two files that exist.
  * ====================================================================== */
 
@@ -194,6 +285,67 @@ describe("the reserved set covers the site's own namespace", () => {
   it("the reserved list has no duplicates", () => {
     expect(new Set(RESERVED_HANDLES).size).toBe(RESERVED_HANDLES.length);
   });
+
+  it("reserves the flagship words a stranger could speak as the site", () => {
+    // `montero` and `monterogarage` are the site's own name. `gitana` is the
+    // truck MIG-04 makes user page #1 and AGENTS.md calls the template every
+    // other garage is shaped by — on this domain the three read alike in a
+    // URL, so they are reserved alike.
+    expect([...RESERVED_HANDLES]).toContain("montero");
+    expect([...RESERVED_HANDLES]).toContain("monterogarage");
+    expect([...RESERVED_HANDLES]).toContain("gitana");
+  });
+
+  /* -----------------------------------------------------------------------
+   * The two consistency guards. These exist because the defect they catch
+   * actually shipped: `gitana` sat in `RESERVED_HANDLES` and in this file's
+   * claimable table at the same time from T2-401 until 2026-09-05, and no
+   * grader could see it because the fixtures were inline literals in two
+   * blocks that never met. They are unmarked — they compare two test-file
+   * constants and are answerable today, before T2-402 exists.
+   * -------------------------------------------------------------------- */
+
+  it("NO claimable fixture is reserved — the two lists cannot disagree", () => {
+    const reserved = new Set<string>(RESERVED_HANDLES);
+    const contradictory = CLAIMABLE_FIXTURES.filter((handle) =>
+      reserved.has(handle.toLowerCase())
+    );
+
+    expect(contradictory).toEqual([]);
+  });
+
+  it("EVERY fixture rejected as reserved is actually in the list", () => {
+    // The mirror. Without it, deleting a word from `RESERVED_HANDLES` leaves
+    // the rejection table below asserting a rule nothing implements — and the
+    // implementer, reading only `contract.ts`, would build the weaker thing
+    // and never learn the grader disagreed.
+    const reserved = new Set<string>(RESERVED_HANDLES);
+    const unbacked = RESERVED_FIXTURES.filter(
+      (handle) => !reserved.has(handle.toLowerCase())
+    );
+
+    expect(unbacked).toEqual([]);
+  });
+
+  it("the two fixture sets are disjoint and neither is empty", () => {
+    // Vacuity control for the two guards above: both are `filter(...)` over a
+    // list, and both are trivially satisfied by an empty list.
+    expect(CLAIMABLE_FIXTURES.length).toBeGreaterThanOrEqual(4);
+    expect(RESERVED_FIXTURES.length).toBeGreaterThanOrEqual(5);
+    // `RESERVED_DB_PROBES` is a `filter`, and `it.each([])` over an empty
+    // table is a Tier B block that reports nothing and looks like a pass.
+    expect(RESERVED_DB_PROBES.length).toBeGreaterThanOrEqual(5);
+    expect(RESERVED_DB_PROBES).toContain("gitana");
+
+    const claimable = new Set<string>(
+      CLAIMABLE_FIXTURES.map((handle) => handle.toLowerCase())
+    );
+    const overlap = RESERVED_FIXTURES.filter((handle) =>
+      claimable.has(handle.toLowerCase())
+    );
+
+    expect(overlap).toEqual([]);
+  });
 });
 
 /* =========================================================================
@@ -249,11 +401,12 @@ describe("handleIssues names every reason, not the first one", () => {
     ["gitana_blanca", "bad-characters"],
     ["-gitana", "bad-characters"],
     ["gitana-", "bad-characters"],
-    ["admin", "reserved"],
-    ["Admin", "reserved"],
-    ["api", "reserved"],
-    ["es", "reserved"],
-    ["taller", "reserved"],
+    // Derived from `RESERVED_FIXTURES` rather than re-typed, so this table and
+    // the guards above can never name different words.
+    ...RESERVED_FIXTURES.map((handle): [string, string] => [
+      handle,
+      "reserved",
+    ]),
   ])("rejects %s as %s", (input, issue) => {
     expect(handleIssues(input)).toContain(issue);
   });
@@ -268,14 +421,15 @@ describe("handleIssues names every reason, not the first one", () => {
     );
   });
 
-  it.fails.each<[string]>([
-    ["gitana"],
-    ["gitana-blanca"],
-    ["montero2002"],
-    ["g1"],
-  ])("POSITIVE CONTROL: accepts %s", (input) => {
+  it.fails.each<[string]>(
+    CLAIMABLE_FIXTURES.map((handle): [string] => [handle])
+  )("POSITIVE CONTROL: accepts %s", (input) => {
     // Every rejection above is only meaningful because these pass. A
     // validator that refused everything would satisfy the whole table.
+    //
+    // `gitana` was here until 2026-09-05 and is not any more: it is reserved
+    // (see the file header and `RESERVED_FIXTURES`). `blanca` took its row so
+    // the "plain alphabetic word" shape is still controlled for.
     expect(handleIssues(input)).toEqual([]);
   });
 
@@ -405,7 +559,7 @@ describe.skipIf(!live.available)(
       }
     );
 
-    it.fails.each(["admin", "api", "es", "taller"])(
+    it.fails.each(RESERVED_DB_PROBES)(
       "the database refuses the reserved handle %s",
       async (handle) => {
         // Reserved in the schema, not only in the form. SHR-01's posture is
